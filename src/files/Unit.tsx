@@ -1,6 +1,6 @@
-enum unitType {Battlearmor, Mek, Infantry, Vehicle};
+import { unitType } from '../constants/enums';
 
-abstract class Unit {
+export abstract class Unit {
 
     public mul_id: number;              //id within the MTF database, used for matching units to MTF files
     public id: number;                  //id within the campaign database
@@ -10,12 +10,19 @@ abstract class Unit {
     public rules_level: number;          //Rules level of the unit
     public tech_base: String;            //Tech base of the unit
     public mtfFile: String;              //Full MTF file content
-    public chassis: String;            
+    public mtfFileLines: String[];       //MTF file split into lines for easy searching
+    public chassis: String;
+    public ut: unitType;                 //unit type (Battlearmor, Mek, Infantry, Vehicle)
+    public owner: number;                //id of player that owns the unit
+    public force: number;                //id of force the unit belongs to
 
-    constructor(public ut: unitType,                   //unit type (Battlearmor, Mek, Infantry, Vehicle)  
-                public owner: number,                  //id of player that owns the unit
-                public force: number                   //id of force the unit belongs to
+    constructor(ut: unitType,                   //unit type (Battlearmor, Mek, Infantry, Vehicle)
+                owner: number,                  //id of player that owns the unit
+                force: number                   //id of force the unit belongs to
                 ) {
+        this.ut = ut;
+        this.owner = owner;
+        this.force = force;
         this.mul_id = 0;
         this.id = 0;
         this.year = 0;
@@ -24,6 +31,7 @@ abstract class Unit {
         this.rules_level = 0;
         this.tech_base = "";
         this.mtfFile = "";
+        this.mtfFileLines = [];
         this.chassis = "";
     }
 
@@ -70,11 +78,34 @@ abstract class Unit {
             }
             
             this.mtfFile = await response.text();
+            this.mtfFileLines = this.mtfFile.split('\n');
             return this.mtfFile;
         } catch (error) {
             console.error(`Error loading MTF file for ${this.chassis}:`, error);
             throw error;
         }
+    }
+    
+    searchMTF(searchKey: String): String {
+        if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
+            console.warn("MTF file not loaded");
+            return "";
+        }
+
+        for (const line of this.mtfFileLines) {
+            // Case-insensitive search for the key
+            if (line.toLowerCase().includes(searchKey.toLowerCase())) {
+                // Extract the value after the colon
+                const colonIndex = line.indexOf(':');
+                if (colonIndex !== -1) {
+                    const value = line.substring(colonIndex + 1).trim();
+                    return value;
+                }
+            }
+        }
+
+        console.warn(`Key "${searchKey}" not found in MTF file`);
+        return "";
     }
 
     // id
