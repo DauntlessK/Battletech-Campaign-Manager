@@ -3,9 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import { unitType } from './constants/enums'
+import { Mek } from './files/mek';
 
 function App() {
   const [count, setCount] = useState(0)
+  const testMek = new Mek(unitType.Mek, 1, 1, "Atlas", "AS7-D");
+  console.log(testMek);
 
   return (
     <>
@@ -117,6 +121,7 @@ function App() {
       <section id="spacer"></section>
     </>
   )
+
 }
 
 export default App

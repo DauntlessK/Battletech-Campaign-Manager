@@ -1,3 +1,4 @@
+import { parse } from 'uuid';
 import { unitType } from '../constants/enums';
 
 export abstract class Unit {
@@ -5,51 +6,60 @@ export abstract class Unit {
     public mul_id: number;              //id within the MTF database, used for matching units to MTF files
     public id: number;                  //id within the campaign database
     public year: number;                 //Year the unit was introduced
-    public role: String;
-    public source: String;               //Sourcebook the unit is from     
+    public role: string;
+    public source: string;               //Sourcebook the unit is from     
     public rules_level: number;          //Rules level of the unit
-    public tech_base: String;            //Tech base of the unit
-    public mtfFile: String;              //Full MTF file content
-    public mtfFileLines: String[];       //MTF file split into lines for easy searching
-    public chassis: String;
+    public tech_base: string;            //Tech base of the unit
+    public mtfFile: string;              //Full MTF file content
+    public mtfFileLines: string[];       //MTF file split into lines for easy searching
+    public chassis: string;
+    public model: string;
     public ut: unitType;                 //unit type (Battlearmor, Mek, Infantry, Vehicle)
     public owner: number;                //id of player that owns the unit
     public force: number;                //id of force the unit belongs to
+    protected initializationPromise: Promise<void>;  //Promise that resolves when unit initialization is complete
 
     constructor(ut: unitType,                   //unit type (Battlearmor, Mek, Infantry, Vehicle)
                 owner: number,                  //id of player that owns the unit
-                force: number                   //id of force the unit belongs to
+                force: number,                  //id of force the unit belongs to
+                chassis: string = "",                //chassis of the unit
+                model: string = ""                   //model of the unit
                 ) {
         this.ut = ut;
         this.owner = owner;
         this.force = force;
-        this.mul_id = 0;
-        this.id = 0;
-        this.year = 0;
+        this.chassis = chassis;
+        this.model = model;
+        this.mul_id = -1; 
+        this.id = -1;                   //TODO: Generate unique ID for the unit
+        this.year = -1;
         this.role = "";
         this.source = "";
-        this.rules_level = 0;
+        this.rules_level = -1
         this.tech_base = "";
         this.mtfFile = "";
         this.mtfFileLines = [];
-        this.chassis = "";
+
+        // Store the initialization promise so subclasses can wait for it
+        this.initializationPromise = this.configureUnit();
     }
 
-    getSourceLoc(): String {
-        const matches = this.source.match(/\d{4}/g);
-        
-        // If we found a 4-digit number, use it as the subfolder name
-        if (matches && matches.length > 0) {
-            return matches[0];
+    async configureUnit(): Promise<void> {
+        await this.getMTF();
+
+        this.setMulId(parseInt(this.searchMTF("mul id"))); 
+        this.setId(parseInt(this.searchMTF("id")));
+        this.setYear(parseInt(this.searchMTF("era")));
+        if (this.year === -1) {
+            this.setYear(parseInt(this.searchMTF("year")));
         }
-        
-        // Otherwise, return the source name itself as the subfolder
-        console.log(`No year found in source: ${this.source}. Using source name as subfolder.`);
-
-        return this.source;
+        this.setRole(this.searchMTF("role"));
+        this.setSource(this.searchMTF("source"));
+        this.setRulesLevel(parseInt(this.searchMTF("rules level")));
+        this.setTechBase(this.searchMTF("tech base"));
     }
 
-    private getUnitTypeFolder(): String {
+    private getUnitTypeFolder(): string {
         switch (this.ut) {
             case unitType.Battlearmor:
                 return "battlearmor";
@@ -64,13 +74,23 @@ export abstract class Unit {
         }
     }
 
-    async getMTF(): Promise<String> {
+    async getMTF(): Promise<string> {
         try {
             const unitTypeFolder = this.getUnitTypeFolder();
-            const sourceFolder = this.getSourceLoc();
             
-            // Construct the path: Units/[unitType]/[source]/[filename].blk
-            const filePath = `/Units/${unitTypeFolder}/${sourceFolder}/${this.chassis}.blk`;
+            // Construct the expected filename: <chassis> <model>.mtf
+            // Note: We'll search for any .mtf file matching the chassis pattern
+            const expectedFileName = `${this.chassis} ${this.model}.mtf`;
+            
+            // Recursively search through subfolders
+            const filePath = await this.findFileInSubfolders(
+                `/units/${unitTypeFolder}`,
+                expectedFileName
+            );
+            
+            if (!filePath) {
+                throw new Error(`Failed to find MTF file matching: ${expectedFileName}`);
+            }
             
             const response = await fetch(filePath);
             if (!response.ok) {
@@ -85,8 +105,73 @@ export abstract class Unit {
             throw error;
         }
     }
+
+    private async findFileInSubfolders(folderPath: string, fileName: string): Promise<string | null> {
+        // Define known subfolders for each unit type based on actual workspace structure
+        const subfoldersByUnitType: { [key: string]: string[] } = {
+            battlearmor: [
+                "3058Uu", "3075", "3085u", "3145", "3150", "Golden Century", 
+                "Jihad FR", "OTP", "ProtoTypes", "Rec Guides ilClan", "Shrapnel", 
+                "ToS", "TRO VA", "XTRs"
+            ],
+            meks: [
+                "3039u", "3050U", "3055U", "3058Uu", "3060u", "3067", "3067 Unabridged", 
+                "3075", "3085u", "3145", "3150", "Arano Restoration", "Battlecorps", 
+                "Dark Age", "Dominions Divided (April)", "Dossiers", "ER 2750", 
+                "Era Digests", "Force Manuals", "Force Packs", "Golden Century", "Gothic", 
+                "HBMPS", "Historicals", "Iron Wind Metals", "ISP", "ISP2", "ISP3", 
+                "Jihad Final Reckoning", "Jihad Secrets", "LAMS", "Operation Klondike", 
+                "ProtoTypes", "QuadVees", "Rec Guides ilClan", "RS Jihad", 
+                "RS Succession Wars", "RS Unique", "Shattered Fortress", "Shrapnel", 
+                "Spotlight On", "Starterbook Sword and Dragon", "Starterpack Sword and Dragon", 
+                "ToS", "Total Chaos", "TRO Irregulars", "TRO SW", "TRO Vehicle Annex", 
+                "Tukayyid", "Turning Points", "Urbanfest", "Videogame (Apocryphal)", 
+                "Wolf and Blake", "WoR Supplemental", "WWEs", "XTRs"
+            ],
+            vehicles: [
+                "2750 IS Land", "3025 IS Land", "3039u", "3050U", "3058Uu", "3060u", 
+                "3067", "3067 Unabridged", "3075", "3075 Support tanks", "3085u", 
+                "3145", "3150", "AToW Companion", "DarkAge", "Era Digests", "FM DC", 
+                "Golden Century", "HB HD", "HB HK", "HB HL", "HB HM", "Hist LOT II", 
+                "Hist Reunification War", "House Arano", "Operation Klondike", "ProtoTypes", 
+                "Rec Guides ilClan", "Shrapnel", "Somerset Strikers", "TOS", 
+                "TRO Irregulars", "TRO Vehicle Annex", "Turning Points", "Urbanfest", "XTRs"
+            ],
+            infantry: [
+                "3085", "Beast Mounted", "Clan", "CS WOB", "DCMS", "Field Gunners", 
+                "FWLM", "HBHD", "HBHM", "HBHS", "LCAF", "MHAF", "Mobs", 
+                "Taurian Infantry", "TP Vega 3039", "TW"
+            ]
+        };
+
+        try {
+            // Get the unit type folder name to look up subfolders
+            const unitTypeFolder = this.getUnitTypeFolder();
+            const subfolders = subfoldersByUnitType[unitTypeFolder] || [];
+            
+            // URL-encode the filename to handle spaces and special characters
+            const encodedFileName = encodeURIComponent(fileName);
+
+            // Search through known subfolders systematically
+            // Files are always in subfolders (era/source folders), not in the root
+            for (const subfolder of subfolders) {
+                const encodedSubfolder = encodeURIComponent(subfolder);
+                const subfolderPath = `${folderPath}/${encodedSubfolder}/${encodedFileName}`;
+                const response = await fetch(subfolderPath);
+                if (response.ok) {
+                    return subfolderPath;
+                }
+            }
+
+            console.warn(`File not found in any subfolder: ${fileName}`);
+            return null;
+        } catch (error) {
+            console.error(`Error searching for file: ${fileName}`, error);
+            return null;
+        }
+    }
     
-    searchMTF(searchKey: String): String {
+    searchMTF(searchKey: string): string {
         if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
             console.warn("MTF file not loaded");
             return "";
@@ -145,20 +230,20 @@ export abstract class Unit {
     }
 
     // role
-    getRole(): String {
+    getRole(): string {
         return this.role;
     }
 
-    setRole(role: String): void {
+    setRole(role: string): void {
         this.role = role;
     }
 
     // source
-    getSource(): String {
+    getSource(): string {
         return this.source;
     }
 
-    setSource(source: String): void {
+    setSource(source: string): void {
         this.source = source;
     }
 
@@ -172,11 +257,11 @@ export abstract class Unit {
     }
 
     // tech_base
-    getTechBase(): String {
+    getTechBase(): string {
         return this.tech_base;
     }
 
-    setTechBase(tech_base: String): void {
+    setTechBase(tech_base: string): void {
         this.tech_base = tech_base;
     }
 
@@ -196,11 +281,11 @@ export abstract class Unit {
         this.force = force;
     }
 
-    getChassis(): String {
+    getChassis(): string {
         return this.chassis;
     }
 
-    setChassis(chassis: String): void {
+    setChassis(chassis: string): void {
         this.chassis = chassis;
     }
 }
