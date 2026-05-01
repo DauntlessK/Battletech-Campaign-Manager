@@ -1,0 +1,94 @@
+Software Requirement specification: Battletech Campaign Manager
+
+==================
+==   OVERVIEW   ==
+==================
+
+1. INTRODUCTION
+
+1.1 Purpose
+
+The purpose of this web app is to help players manage / run their battletech classic campaign. The platform, built upon React, will allow players to build forces with battletech units,
+create campaigns, assign a force to a campaign and manage that campaign.
+
+It is designed not only to assist in the normal chaos campaign management - which has other competitiors - it is primarily designed to bridge a gap between running a simplified
+campaign like the chaos system, and running a campaign on MekHQ. This middleground is designed to give a bit more interesting depth to a campaign while still being easy to maintain.
+
+1.2 Scope
+
+The Campaign Manager will:
+
+• Registered users can add friends, create & customize forces of various units and pilots, and create / manage / and partipate in campaigns
+• Facilitate the running of a campaign by managing the player's resources and unit's status persistance
+• Allow a few various types of campaigns to suit player's desired depth / complexity
+• Within a campaign, allow a player to log a battle and thus record damage to units and track outcomes as they relate to the campaign
+
+Techstack:
+
+• React front end + tailwind
+• Backend Flask? REST endpoints + server rendering?
+• MySQL db
+
+1.3
+
+Definitions and Abbreviations
+
+1.4
+
+References
+
+React Documentation:
+MySQL Documentation:
+Tailwind CSS Documentation:
+
+2. OVERALL DESCRIPTION
+
+2.1 Product DESCRIPTION
+
+The system will have only one type of user, who can interact with other users in a few different ways, including keeping a list of friends and see what campaigns and battles they are a part of.
+
+2.2 Product features
+
+1. An FAQ and "simple guide" is going to be key to ease players in.
+
+
+
+
+
+The web app is designed to facilitate several different methods of running a classic battletech campaign. Registered users can add friends, create forces consisting of
+various units and pilots, and create campaigns. The main purpose of the program is to do the heavy lifting for various level campaigns, from simpler ones to more
+advanced ones, taking care of unit management (keeping track of unit's damage, repairs, etc), XP and resource expenditure and more. All campaigns share some common features:
+
+• Force management between battles (repair, rearmament, purchasing new/replacement units, XP expenditure)
+• Battle logs (a history of all battles fought in the campaign, with results in each, keeping track of wins, losses, participants, kills, and more)
+• Resource Tracking (warchest / cBills, etc)
+
+This means that the system must have comprehensive unit list, a clear UI to add units to build forces and edit and customize them. Creating and custimizing the unit to make it fielded
+like the user's very own unit, from name, unit insignia and TO&E, it should be easy to create the unit and build (add units, etc). 
+
+It should be simple to create new campaigns and assign units, invite friends and manage the settings within. It should be clear how each campaign is run during creation. Below is a 
+brief summary of the difference between campaigns.
+
+- CHAOS CAMPAIGN (2-10p) - The simplest option, an implementation of the chaos campaign system. Extremely simplified for quick and easy management and minimal admin and upkeep, the
+campaign uses a generic warchest currency to handle all rearm and resupply costs, unit purchases and sales, upgrades and more. The admin configures the campaign (setting things like
+BV / size, warchest size, era, fog of war, etc) and players battle at their own pace. After a battle, both players enter the results and the system will "marry" and verify the data as 
+one battle entry (ensuring accuracy between the two records) that can be referenced at any time. Between battles players can spend warchest to repair, etc.
+
+- ADVANCED CAMPAIGN (2-10p) - An advanced campaign is esentially a halfway point between a chaos campaign and the full campaign experience within cam-ops that is in MekHQ. It is designed to
+be grittier and more detailed than a chaos campaign but still be appraochable and managable within a faster timeline. Players manage cBills, individual pilot XP, part availabilty (Though
+simplified compared to cam-ops) and time (as a resource for repairs- also simplified). The key concept is that units like mechs and such will bear true scars and players will truly 
+feel like each battle is a part of a larger conflict. Pilots may enter injured already, mechs may be missing armor or whole limbs / weapons, and more as unit attrition is front and center,
+making for engaging long-term struggle. Victory can be achieved (as set at campaign creation) by either forcing a surrender, 
+
+- CONQUEST CAMPAIGN (2p) - This strict 2p campaign takes the advanced campaign rules and adds a map and turn layer to it. Players fight over a planet with a full hex-map, which starts
+with multiple objectives all hidden across the map. The campaign takes place over a number of turns (either a preset limit, or unlimited) that consist of multiple days. Each turn, players
+will prioritize a repair and select a target hex to scout / control etc. Forces may be able to scout more hexes, or devote more time to repair, etc. 
+
+---- SUB TYPES ----
+
+- CLASH (2p) - Simple campaign type of just pummeling each other until one force cannot carry on and/or surrenders. Possibly force surrender when warchest / cBills run out.
+
+- DFA / Branching (2p) - A branching sort of campaign with a scenario and two outcomes that lead to the next scenario, depending on if the attack or defender wins.
+
+- OPEN WAR VARIANT (2p+) - One or more objectives are listed and fought over. There is an overall "leaderboard" that tracks control of the planet being fought over with victories
+granting more control by percentage over the planet.

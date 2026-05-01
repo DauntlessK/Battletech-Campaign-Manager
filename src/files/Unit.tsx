@@ -56,7 +56,7 @@ export abstract class Unit {
         this.setRole(this.searchMTF("role"));
         this.setSource(this.searchMTF("source"));
         this.setRulesLevel(parseInt(this.searchMTF("rules level")));
-        this.setTechBase(this.searchMTF("tech base"));
+        this.setTechBase(this.searchMTF("techbase"));
     }
 
     private getUnitTypeFolder(): string {
