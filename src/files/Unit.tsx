@@ -193,6 +193,25 @@ export abstract class Unit {
         return "";
     }
 
+    /**
+     * Method uses searchMTF to find and count the number of instances in a file
+     * @returns the count of instances found
+     */
+    countInstancesInMTF(searchKey: string): number {
+        if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
+            console.warn("MTF file not loaded");
+            return 0;
+        }
+
+        let count = 0;
+        for (const line of this.mtfFileLines) {
+            if (line.toLowerCase().includes(searchKey.toLowerCase())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // id
     getId(): number {
         return this.id;

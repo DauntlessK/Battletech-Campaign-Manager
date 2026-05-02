@@ -15,6 +15,8 @@ export class Mek extends Unit{
     public heatSinksType : string;     //Standard, Double, etc.
     public heatSinks: number;
     public engine: string;
+    public gyro: string;
+    public armorType: string;           //Standard, Ferro-Fibrous, etc. - affects BV calculation but not actual armor values
     public structure: string;           // Mek structure is a string like "Standard", "Endo Steel", etc. - the actual structure points are determined by the mass and the BATTLEMECH_INTERNAL_STRUCTURE constant
     public myomer: string;              // Mek myomer is a string like "Standard", "Endo Steel", etc.
     public walkMP: number;
@@ -28,6 +30,7 @@ export class Mek extends Unit{
     public primaryfactory: string[];
     public hasCASE: boolean;
     public hasECM: boolean;
+    public bv: number;
 
     constructor(ut: unitType,
                 owner: number,
@@ -45,6 +48,8 @@ export class Mek extends Unit{
         this.heatSinksType = "Single"; // Default to Single Heat Sinks
         this.heatSinks = 0;
         this.engine = "";
+        this.gyro = "Standard"; // Default to Standard Gyro
+        this.armorType = "Standard"; // Default to Standard Armor
         this.structure = "";
         this.myomer = "";
         this.walkMP = 0;
@@ -58,11 +63,13 @@ export class Mek extends Unit{
         this.primaryfactory = [];
         this.hasCASE = false;
         this.hasECM = false;
+        this.bv = 0;
 
         // Call configureMek after parent initialization completes
         this.initializationPromise.then(() => this.configureMek());
     }
 
+    // #region MTF Parsing and Mek Configuration
     /**
      * Gets all relevant variables for the Mek from the MTF file and returns them in an object
      * @returns record of all relevant Mek variables extracted from the MTF file, with default values if not found
@@ -162,6 +169,11 @@ export class Mek extends Unit{
         return values;
     }
 
+    /**
+     * 
+     * @param lowerLine 
+     * @returns 
+     */
     private isLocationHeader(lowerLine: string): boolean {
         const locationHeaders = [
             "head:",
@@ -176,6 +188,12 @@ export class Mek extends Unit{
         return locationHeaders.includes(lowerLine);
     }
 
+    /**
+     * Assigns a value to a key in the values object
+     * @param values 
+     * @param key 
+     * @param value 
+     */
     private assignValue(values: Record<string, any>, key: string, value: string): void {
         switch (key) {
             case "config":
@@ -183,6 +201,9 @@ export class Mek extends Unit{
                 break;
             case "mass":
                 values.mass = parseInt(value);
+                break;
+            case "tech base":
+                values.tech_base = value;
                 break;
             case "heat sinks type":
                 values.heatSinksType = value;
@@ -193,8 +214,14 @@ export class Mek extends Unit{
             case "engine":
                 values.engine = value;
                 break;
+            case "gyro":
+                values.gyro = value;
+                break;
             case "structure":
                 values.structure = value;
+                break;
+            case "armor":
+                values.armorType = value;
                 break;
             case "myomer":
                 values.myomer = value;
@@ -265,18 +292,21 @@ export class Mek extends Unit{
                 armor: { current: parseInt(this.searchMTF("HD armor")), max: parseInt(this.searchMTF("HD armor")) },
                 structure: { current: 3, max: 3 },      // Mek heads have a fixed structure of 3
                 slots: this.setSlots(locationFullName.head),
+                hasCase: this.locationHasCASE(this.locations.head.slots)
             },
             centerTorso: {
                 armor: { current: parseInt(this.searchMTF("CT armor")), max: parseInt(this.searchMTF("CT armor")) },
                 rearArmor: { current: parseInt(this.searchMTF("RTC armor")), max: parseInt(this.searchMTF("RTC armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].ct, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].ct },
                 slots: this.setSlots(locationFullName.centerTorso),
+                hasCase: this.locationHasCASE(this.locations.centerTorso.slots)
             },
             leftTorso: {
                 armor: { current: parseInt(this.searchMTF("LT armor")), max: parseInt(this.searchMTF("LT armor")) },
                 rearArmor: { current: parseInt(this.searchMTF("RTL armor")), max: parseInt(this.searchMTF("RTL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso },
                 slots: this.setSlots(locationFullName.leftTorso),
+                hasCase: this.locationHasCASE(this.locations.leftTorso.slots)
             },
             rightTorso: {
                 armor: { current: parseInt(this.searchMTF("RT armor")), max: parseInt(this.searchMTF("RT armor")) },
@@ -288,28 +318,39 @@ export class Mek extends Unit{
                 armor: { current: parseInt(this.searchMTF("LA armor")), max: parseInt(this.searchMTF("LA armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm },
                 slots: this.setSlots(locationFullName.leftArm),
+                hasCase: this.locationHasCASE(this.locations.leftArm.slots)
             },
             rightArm: {
                 armor: { current: parseInt(this.searchMTF("RA armor")), max: parseInt(this.searchMTF("RA armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm },
                 slots: this.setSlots(locationFullName.rightArm),
+                hasCase: this.locationHasCASE(this.locations.rightArm.slots)
             },
             leftLeg: {
                 armor: { current: parseInt(this.searchMTF("LL armor")), max: parseInt(this.searchMTF("LL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg },
                 slots: this.setSlots(locationFullName.leftLeg),
+                hasCase: this.locationHasCASE(this.locations.leftLeg.slots)
             },
             rightLeg: {
                 armor: { current: parseInt(this.searchMTF("RL armor")), max: parseInt(this.searchMTF("RL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg },
                 slots: this.setSlots(locationFullName.rightLeg),
+                hasCase: this.locationHasCASE(this.locations.rightLeg.slots)
             }
         }
 
         // Link weapons to actual weapon objects from the database
         this.linkWeapons();
+
+        // After all variables are set, calculate BV
+        this.bv = this.setTotalBV();
     }
 
+    // #endregion MTF Parsing and Mek Configuration
+
+    //  #region Weapon / slots Import
+    
     /**
      * Links weapon objects from the WEAPONS database based on weapon names and locations found in MTF
      * Searches the slots in each location to find the weapon ID (like CLLRM10) and retrieves full weapon data
@@ -532,6 +573,10 @@ export class Mek extends Unit{
         return !exclusions.some(exclusion => lowerSlot.includes(exclusion));
     }
 
+    // #endregion Weapon / slots Import
+
+    //  #region getters and setters ---------------------------------------------------------------------------
+
     getSlots(location: string): string[] {
         return this.locations[location].slots;
     }
@@ -573,6 +618,124 @@ export class Mek extends Unit{
         }
 
         return slots;
+    }
+
+    /**
+     * Determines if this location has CASE by checking if any of the slots contain "CASE"
+     * @param location 
+     * @returns true if a slot from the array has CASE
+     */
+    locationHasCASE(location: string[]): boolean {
+        if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
+            console.warn("MTF file not loaded");
+            return false;
+        }
+        for (const slot of location) {
+            if (slot.toLowerCase().includes("case")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    locationHasExplosiveAmmo(location: string[]): boolean {
+        if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
+            console.warn("MTF file not loaded");
+            return false;
+        }
+        for (const slot of location) {
+            if (slot.toLowerCase().includes("ammo")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the ammo slot count for a specific location
+     * @param location array of slots for a location
+     * @param isCountingExplosive true if only counting explosive ammo slots - Does not count MG, flamer
+     * @returns int
+     */
+    getAmmoSlotCountInLocation(location: string, isCountingExplosive: boolean): number {
+        let ammoSlotCount = 0;
+        for (const slot of location) {
+            if (slot.toLowerCase().includes("ammo")) {
+                if (!isCountingExplosive) {
+                    ammoSlotCount++;
+                    continue;
+                }
+                else if (!slot.toLowerCase().includes("mg") || !slot.toLowerCase().includes("flamer")) {
+                    ammoSlotCount++;
+                }
+            }
+        }
+        return ammoSlotCount;
+    }
+
+    /**
+     * Gets the meks' total ammo slot count through all locations by counting the number of slots that contain "ammo"
+     * @param isCountingExplosive true if only counting explosive ammo slots - Does not count MG, flamer
+     * @returns int
+     */
+    getTotalAmmoSlotCount(isCountingExplosive: boolean): number {
+        let ammoSlotCount = 0;
+        for (const locationKey in this.locations) {
+            const location = this.locations[locationKey];
+            for (const slot of location.slots) {
+
+                if (slot.toLowerCase().includes("ammo")) {
+                    if (!isCountingExplosive) {
+                        ammoSlotCount++;
+                        continue;
+                    }
+                    else if (!slot.toLowerCase().includes("mg") || !slot.toLowerCase().includes("flamer")) {
+                        ammoSlotCount++;
+                    }
+                }
+            }
+        }
+        return ammoSlotCount;
+    }
+
+    /**
+     * Gets the total count of unprotected Gauss weapons in a specific location
+     * @param location 
+     * @returns int
+     */
+    getTotalUnprotectedGaussCountInLocation(location: string[]): number {
+        let gaussCount = 0;
+        for (const slot of location) {
+            if (slot.toLowerCase().includes("gauss")) {
+                    gaussCount++;
+                }
+                if (slot.toLowerCase().includes("case")) {
+                    return 0;
+                }
+        }
+        return gaussCount;
+    }
+
+    getTotalGaussCountInLocation(location: string[]): number {
+        let gaussCount = 0;
+        for (const slot of location) {
+            if (slot.toLowerCase().includes("gauss")) {
+                gaussCount++;
+            }
+        }
+        return gaussCount;
+    }
+
+    /**
+     * Gets total number of slots (and thus tons) of ammo on the entire mek
+     * @param ammoType 
+     */
+    getAmmoCount(ammoType : string): number {
+        let tonsOfAmmo = 0;
+        for (const location in this.locations) {
+            //TODO: loop through locations and find slots that match the specific ammo type.
+        }
+        return tonsOfAmmo;
     }
 
     /**
@@ -619,6 +782,17 @@ export class Mek extends Unit{
     }
 
     /**
+     * Total heat sink capability of a mek, based on the number of heat sinks and their type (single or double)
+     * @returns int of heat sink total capability
+     */
+    getTotalHeatSink(): number {
+        if (this.heatSinksType.toLowerCase() === "double") {
+            return this.heatSinks * 2;
+        }
+        return this.heatSinks;
+    }
+
+    /**
      * Gets the total armor of the Mek by summing armor of all locations
      * @returns int of armor total
      */
@@ -648,61 +822,215 @@ export class Mek extends Unit{
         return totalInternal;
     }
 
+    getBV(): number {
+        return this.bv;
+    }
+
+    private setTotalBV(): number {
+        const offensiveBV = this.getOffensiveBV();
+        const defensiveBV = this.getDefensiveBV();
+        return offensiveBV + defensiveBV;
+    }
+
+    // #endregion getters and setters ---------------------------------------------------------------------------
+
     //  #region BV Calculation
+
+    /**
+     * 
+     * @returns long of defensive BV value
+     */
     private getDefensiveBV(): number {
         let defensiveBV = 0;
+
+        // get armor type modifier
+        let armorTypeModifier = 1.0;
+        if (this.armorType.toLowerCase().includes("commercial")) {
+            armorTypeModifier = 0.5;
+        }
+
+        //Get internal structure modifier
+        let structureModifier = 1.0;
+        if (this.structure.toLowerCase().includes("industrial")) {
+            structureModifier = .5;
+        }
+
+        let engineModifier = 1.0;
+        if (this.engine.toLowerCase().includes("light")) {
+            engineModifier = 0.75;
+        }
+        else if (this.engine.toLowerCase().includes("xl") && this.tech_base === "Inner Sphere") { 
+            // inner sphere XL
+            engineModifier = 0.5;
+        }
+        else if (this.engine.toLowerCase().includes("xl") && this.tech_base === "Clan") {
+            engineModifier = 0.75;
+        }
+
+        let gyroModifier = 0.5;
+        if (this.gyro.toLowerCase().includes("heavy duty")) {
+            gyroModifier = 1.0;
+        }
+
         let totalArmor = this.getArmorTotal();
         let totalInternal = this.getInternalTotal();
 
-        let baseDefense = totalArmor * 2.5 + totalInternal * 1.5;
+        let baseDefense = (totalArmor * 2.5) + (totalInternal * 1.5 * structureModifier * engineModifier) + (this.mass * gyroModifier);
 
-        if (this.hasCASE) baseDefense += 20;
-        if (this.hasECM) baseDefense += 50;
+        //DEFENSIVE Battle rating for equipment  -- TODO: Possibly? No anti-personnel pod or armor checks
+        let defensiveEquipmentBV = 0;
+        if (this.searchMTF("GuardianECM") !== "") {
+            defensiveEquipmentBV += 61;
+        }
+        if (this.searchMTF("Anti-Missile System") !== "") {
+            defensiveEquipmentBV += 32;
+            //If AMS is present, add BV for each ton of ammo found:
+            defensiveEquipmentBV += 11 * this.countInstancesInMTF("ams ammo");
+        }
+        if (this.searchMTF("Beagle") !== "") {
+            defensiveEquipmentBV += 10;
+        }
 
-        const movementMultiplier = this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0);
+        //TODO: MG ammo, Flamer ammo, coolant pods / coolant ammo are not explosive in terms of BV subtractive penalty
+        //Subtractive figures for non-case explosive ammo
+        let explosiveAmmoSubtraction = 0;
+        // Handle IS first
+        if (this.tech_base === "Inner Sphere") {
+            //XL engines w/ ammo (in any location)
+            if (this.engine.toLowerCase().includes("xl")) {
+                explosiveAmmoSubtraction += 15 * this.getTotalAmmoSlotCount(true);
+            }
+            //Standard or light engines
+            if (this.engine.toLowerCase().includes("light") || this.engine.toLowerCase().includes("standard")) {
+                for (const locationKey in this.locations) {
+                    const location = this.locations[locationKey];
+                    const hasCASE = location.hasCase;
+                    if (hasCASE || ((location == this.locations.leftArm && this.locations.leftTorso.hasCase) || (location == this.locations.rightArm && this.locations.rightTorso.hasCase))) {
+                        continue; // skip locations protected by CASE or arms protected by torso CASE
+                    }
+                    else {
+                        explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                        explosiveAmmoSubtraction += this.getTotalUnprotectedGaussCountInLocation(location.slots);
+                    }
+                }
+            }
+            //XL engines
+            if (this.engine.toLowerCase().includes("xl")) {
+                for (const locationKey in this.locations) {
+                    const location = this.locations[locationKey];
+                    explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                    explosiveAmmoSubtraction += this.getTotalUnprotectedGaussCountInLocation(location.slots);
+                }
+            }
+        }
+        else { // Clan and other tech base
+            for (const locationKey in this.locations) {
+                const location = this.locations[locationKey];
+                const hasCASE = location.hasCase;
+                if (location == this.locations.centerTorso || location == this.locations.leftLeg || location == this.locations.rightLeg || location == this.locations.head) {
+                    explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                }
+                explosiveAmmoSubtraction += this.getTotalGaussCountInLocation(location.slots);
+            }
+        }
 
-        return defensiveBV * movementMultiplier;
+        defensiveBV = (baseDefense - explosiveAmmoSubtraction) * this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0);
+
+        return defensiveBV;
     }
 
+    /**
+     * gets the multiplier based on the MAX TMM a unit can achieve - from 1.0 and up
+     * @param walkMP 
+     * @param jumpMP 
+     * @returns value
+     */
     private getMovementMultiplier(walkMP: number, jumpMP: number): number {
-        const effectiveMP = Math.max(walkMP, jumpMP);
+        const effectiveMP = Math.max(walkMP, jumpMP + 1);
 
-        if (effectiveMP <= 2) return 0.8;
-        if (effectiveMP <= 4) return 1.0;
-        if (effectiveMP <= 6) return 1.2;
-        if (effectiveMP <= 8) return 1.4;
+        if (effectiveMP <= 2) return 1.0;       // Max TMM is  0
+        if (effectiveMP <= 4) return 1.1;       // Max TMM is +1
+        if (effectiveMP <= 6) return 1.2;       // Max TMM is +2
+        if (effectiveMP <= 9) return 1.3;       // Max TMM is +3
+        if (effectiveMP <= 17) return 1.4;      // Max TMM is +4
+        if (effectiveMP <= 24) return 1.5;      // Max TMM is +5
         return 1.6;
     }
 
-/*     private getOffensiveBV(): number {
-        const weaponBV = mek.weapons.reduce((sum, weapon) => {
-            return sum + calculateWeaponBV(weapon);
-        }, 0);
+    private getOffensiveBV(): number {
 
-        const totalWeaponHeat = mek.weapons.reduce((sum, weapon) => sum + weapon.heat, 0);
-        const heatCapacity = mek.heatSinks;
+        type WeaponBVEntry = {
+            name: string;
+            bv: number;
+            heat: number;
+        };
 
-        const heatEfficiencyMultiplier =
-            totalWeaponHeat <= heatCapacity
-            ? 1
-            : Math.max(0.65, heatCapacity / totalWeaponHeat);
+        const weaponEntries: WeaponBVEntry[] = [];
+        let ammoBV = 0;
 
-        return weaponBV * heatEfficiencyMultiplier;
+        for (const weaponKey in this.weapons) {
+            const weaponEntry = this.weapons[weaponKey];
+
+            //add ammoBV of weapon
+            ammoBV += weaponEntry.ammo.ammoBV * this.get;
+
+            // Adjust these field names to match your structure
+            const weapon = weaponEntry.definition ?? weaponEntry;
+
+            const quantity = weaponEntry.quantity ?? weaponEntry.count ?? 1;
+
+            for (let i = 0; i < quantity; i++) {
+                weaponEntries.push({
+                    name: weapon.name,
+                    bv: weapon.bv,
+                    heat: weapon.heat ?? 0,
+                });
+            }
+        }
+
+    // BV2 applies heat adjustment starting with the most valuable weapons.
+    weaponEntries.sort((a, b) => b.bv - a.bv);
+
+    const heatSinkCapacity = this.getTotalHeatSink();
+
+    // For walking/running 'Mechs, movement heat is usually 0.
+    // For jumping 'Mechs, use jump heat.
+    const movementHeat = Math.max(2, this.jumpMP);
+
+    const heatEfficiency = 6 + heatSinkCapacity - movementHeat;
+
+    let runningHeat = 0;
+    let baseWeaponBV = 0;
+    let heatLimitReached = false;
+
+    for (const weapon of weaponEntries) {
+        if (!heatLimitReached) {
+            runningHeat += weapon.heat;
+            baseWeaponBV += weapon.bv;
+
+            // Important: the weapon that reaches/exceeds heat efficiency
+            // still counts at full BV.
+            if (runningHeat >= heatEfficiency) {
+                heatLimitReached = true;
+            }
+        } else {
+            baseWeaponBV += weapon.bv * 0.5;
+        }
     }
 
-    private calculateWeaponBV(weapon: Weapon): number {
-        const rangeFactor = this.getRangeFactor(weapon);
-        const ammoFactor = weapon.ammoLimited ? 0.9 : 1;
+    // Ammo BV, offensive equipment, targeting computer, Artemis, etc.
+    const offensiveEquipmentBV = this.getOffensiveEquipmentBV?.() ?? 0;
 
-        return weapon.damage * rangeFactor * ammoFactor * 10;
-    }
+    const baseOffensiveBV =
+        baseWeaponBV +
+        ammoBV +
+        offensiveEquipmentBV;
 
-    private getRangeFactor(weapon: Weapon): number {
-        if (weapon.longRange >= 18) return 1.4;
-        if (weapon.longRange >= 12) return 1.2;
-        if (weapon.longRange >= 6) return 1.0;
-        return 0.8;
-    } */
+    // Speed factor is part of actual Offensive BV.
+    const speedFactor = this.getSpeedFactor?.() ?? 1;
+
+    return Math.round(baseOffensiveBV * speedFactor);
+}
 
     //  #endregion BV Calculation
 }

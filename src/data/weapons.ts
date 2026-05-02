@@ -47,6 +47,8 @@ export type WeaponDefinition = {
     flags?: string[];
 };
 
+//TODO: Ammo cost per ton, tech rating, availability need verification / fixes
+
 export const WEAPONS: Record<string, WeaponDefinition> = {
     smallLaser: {
         id: "smallLaser",
