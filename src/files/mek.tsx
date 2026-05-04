@@ -30,7 +30,6 @@ export class Mek extends Unit{
     public primaryfactory: string[];
     public hasCASE: boolean;
     public hasECM: boolean;
-    public bv: number;
 
     constructor(ut: unitType,
                 owner: number,
@@ -63,7 +62,6 @@ export class Mek extends Unit{
         this.primaryfactory = [];
         this.hasCASE = false;
         this.hasECM = false;
-        this.bv = 0;
 
         // Call configureMek after parent initialization completes
         this.initializationPromise.then(() => this.configureMek());
@@ -278,11 +276,11 @@ export class Mek extends Unit{
         this.primaryfactory = mekVars.primaryfactory;
         this.weapons = mekVars.weapons;
 
-        if (this.searchMTF("CASE") !== "") {
+        if (this.searchMTF("CASE", false) !== "") {
             this.hasCASE = true;
         }
 
-        if (this.searchMTF("ECM") !== "") {
+        if (this.searchMTF("ECM", false) !== "") {
             this.hasECM = true;
         }
 
@@ -292,59 +290,70 @@ export class Mek extends Unit{
                 armor: { current: parseInt(this.searchMTF("HD armor")), max: parseInt(this.searchMTF("HD armor")) },
                 structure: { current: 3, max: 3 },      // Mek heads have a fixed structure of 3
                 slots: this.setSlots(locationFullName.head),
-                hasCase: this.locationHasCASE(this.locations.head.slots)
+                hasCase: false
             },
             centerTorso: {
                 armor: { current: parseInt(this.searchMTF("CT armor")), max: parseInt(this.searchMTF("CT armor")) },
                 rearArmor: { current: parseInt(this.searchMTF("RTC armor")), max: parseInt(this.searchMTF("RTC armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].ct, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].ct },
                 slots: this.setSlots(locationFullName.centerTorso),
-                hasCase: this.locationHasCASE(this.locations.centerTorso.slots)
+                hasCase: false
             },
             leftTorso: {
                 armor: { current: parseInt(this.searchMTF("LT armor")), max: parseInt(this.searchMTF("LT armor")) },
                 rearArmor: { current: parseInt(this.searchMTF("RTL armor")), max: parseInt(this.searchMTF("RTL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso },
                 slots: this.setSlots(locationFullName.leftTorso),
-                hasCase: this.locationHasCASE(this.locations.leftTorso.slots)
+                hasCase: false
             },
             rightTorso: {
                 armor: { current: parseInt(this.searchMTF("RT armor")), max: parseInt(this.searchMTF("RT armor")) },
                 rearArmor: { current: parseInt(this.searchMTF("RTR armor")), max: parseInt(this.searchMTF("RTR armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].sideTorso },
                 slots: this.setSlots(locationFullName.rightTorso),
+                hasCase: false
             },
             leftArm: {
                 armor: { current: parseInt(this.searchMTF("LA armor")), max: parseInt(this.searchMTF("LA armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm },
                 slots: this.setSlots(locationFullName.leftArm),
-                hasCase: this.locationHasCASE(this.locations.leftArm.slots)
+                hasCase: false
             },
             rightArm: {
                 armor: { current: parseInt(this.searchMTF("RA armor")), max: parseInt(this.searchMTF("RA armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].arm },
                 slots: this.setSlots(locationFullName.rightArm),
-                hasCase: this.locationHasCASE(this.locations.rightArm.slots)
+                hasCase: false
             },
             leftLeg: {
                 armor: { current: parseInt(this.searchMTF("LL armor")), max: parseInt(this.searchMTF("LL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg },
                 slots: this.setSlots(locationFullName.leftLeg),
-                hasCase: this.locationHasCASE(this.locations.leftLeg.slots)
+                hasCase: false
             },
             rightLeg: {
                 armor: { current: parseInt(this.searchMTF("RL armor")), max: parseInt(this.searchMTF("RL armor")) },
                 structure: { current: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg, max: BATTLEMECH_INTERNAL_STRUCTURE[this.mass].leg },
                 slots: this.setSlots(locationFullName.rightLeg),
-                hasCase: this.locationHasCASE(this.locations.rightLeg.slots)
+                hasCase: false
             }
         }
 
         // Link weapons to actual weapon objects from the database
         this.linkWeapons();
 
+        //Mark all locations on whether they have case or not
+        for (const locationKey in this.locations) {
+            const location = this.locations[locationKey];
+            const slots: string[] = location.slots;
+
+            location.hasCase = slots.some(slot =>
+                slot.toLowerCase().includes("case")
+            );
+}
+
         // After all variables are set, calculate BV
-        this.bv = this.setTotalBV();
+        this.setTotalBV();
     }
 
     // #endregion MTF Parsing and Mek Configuration
@@ -622,7 +631,7 @@ export class Mek extends Unit{
 
     /**
      * Determines if this location has CASE by checking if any of the slots contain "CASE"
-     * @param location 
+     * @param location array 
      * @returns true if a slot from the array has CASE
      */
     locationHasCASE(location: string[]): boolean {
@@ -803,6 +812,9 @@ export class Mek extends Unit{
             if (location.armor) {
                 totalArmor += location.armor.max;
             }
+            if (location.rearArmor) {
+                totalArmor += location.rearArmor.max;
+            }
         }
         return totalArmor;
     }
@@ -826,10 +838,12 @@ export class Mek extends Unit{
         return this.bv;
     }
 
-    private setTotalBV(): number {
+
+    private setTotalBV() {
         const offensiveBV = this.getOffensiveBV();
         const defensiveBV = this.getDefensiveBV();
-        return offensiveBV + defensiveBV;
+        console.log("Setting BV: Offensive BV: " + offensiveBV + " || Defensive BV: " + defensiveBV);
+        this.bv = Math.floor(offensiveBV + defensiveBV);
     }
 
     // #endregion getters and setters ---------------------------------------------------------------------------
@@ -876,22 +890,22 @@ export class Mek extends Unit{
         let totalInternal = this.getInternalTotal();
 
         let baseDefense = (totalArmor * 2.5) + (totalInternal * 1.5 * structureModifier * engineModifier) + (this.mass * gyroModifier);
+        console.log("Defensive BV calc- baseDefense= " + baseDefense);
 
         //DEFENSIVE Battle rating for equipment  -- TODO: Possibly? No anti-personnel pod or armor checks
         let defensiveEquipmentBV = 0;
-        if (this.searchMTF("GuardianECM") !== "") {
+        if (this.searchMTF("GuardianECM", false) !== "") {
             defensiveEquipmentBV += 61;
         }
-        if (this.searchMTF("Anti-Missile System") !== "") {
+        if (this.searchMTF("Anti-Missile System", false) !== "") {
             defensiveEquipmentBV += 32;
             //If AMS is present, add BV for each ton of ammo found:
             defensiveEquipmentBV += 11 * this.countInstancesInMTF("ams ammo");
         }
-        if (this.searchMTF("Beagle") !== "") {
+        if (this.searchMTF("Beagle", false) !== "") {
             defensiveEquipmentBV += 10;
         }
 
-        //TODO: MG ammo, Flamer ammo, coolant pods / coolant ammo are not explosive in terms of BV subtractive penalty
         //Subtractive figures for non-case explosive ammo
         let explosiveAmmoSubtraction = 0;
         // Handle IS first
@@ -934,6 +948,7 @@ export class Mek extends Unit{
             }
         }
 
+        console.log("Defensive BV calc - speed multiplier: " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0));
         defensiveBV = (baseDefense - explosiveAmmoSubtraction) * this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0);
 
         return defensiveBV;
@@ -946,19 +961,19 @@ export class Mek extends Unit{
      * @returns value
      */
     private getMovementMultiplier(walkMP: number, jumpMP: number): number {
-        const effectiveMP = Math.max(walkMP, jumpMP + 1);
+        const runMP = Math.ceil(walkMP * 1.5);
+        const effectiveMP = Math.max(runMP, jumpMP);
 
-        if (effectiveMP <= 2) return 1.0;       // Max TMM is  0
-        if (effectiveMP <= 4) return 1.1;       // Max TMM is +1
-        if (effectiveMP <= 6) return 1.2;       // Max TMM is +2
-        if (effectiveMP <= 9) return 1.3;       // Max TMM is +3
-        if (effectiveMP <= 17) return 1.4;      // Max TMM is +4
-        if (effectiveMP <= 24) return 1.5;      // Max TMM is +5
+        if (effectiveMP <= 2) return 1.0;
+        if (effectiveMP <= 4) return 1.1;
+        if (effectiveMP <= 6) return 1.2;
+        if (effectiveMP <= 9) return 1.3;
+        if (effectiveMP <= 17) return 1.4;
+        if (effectiveMP <= 24) return 1.5;
         return 1.6;
     }
 
     private getOffensiveBV(): number {
-
         type WeaponBVEntry = {
             name: string;
             bv: number;
@@ -966,70 +981,117 @@ export class Mek extends Unit{
         };
 
         const weaponEntries: WeaponBVEntry[] = [];
-        let ammoBV = 0;
 
         for (const weaponKey in this.weapons) {
             const weaponEntry = this.weapons[weaponKey];
+            const weapon = weaponEntry.data;
 
-            //add ammoBV of weapon
-            ammoBV += weaponEntry.ammo.ammoBV * this.get;
+            if (!weapon) {
+                console.warn(`Missing weapon data for`, weaponEntry);
+                continue;
+            }
 
-            // Adjust these field names to match your structure
-            const weapon = weaponEntry.definition ?? weaponEntry;
+            weaponEntries.push({
+                name: weapon.name,
+                bv: weapon.bv ?? 0,
+                heat: weapon.heat ?? 0,
+            });
+        }
 
-            const quantity = weaponEntry.quantity ?? weaponEntry.count ?? 1;
+        // Highest BV weapons get counted first for heat efficiency.
+        weaponEntries.sort((a, b) => b.bv - a.bv);
 
-            for (let i = 0; i < quantity; i++) {
-                weaponEntries.push({
-                    name: weapon.name,
-                    bv: weapon.bv,
-                    heat: weapon.heat ?? 0,
-                });
+        const heatSinkCapacity = this.getTotalHeatSink();
+
+        // Only subtract jumping heat if the 'Mech can actually jump.
+        // Your Math.max(2, this.jumpMP) was subtracting 2 heat even from non-jumpers.
+        const movementHeat = this.jumpMP > 0 ? Math.max(3, this.jumpMP) : 0;
+
+        const heatEfficiency = Math.max(0, 6 + heatSinkCapacity - movementHeat);
+
+        let runningHeat = 0;
+        let baseWeaponBV = 0;
+        let heatLimitReached = false;
+
+        for (const weapon of weaponEntries) {
+            if (!heatLimitReached) {
+                runningHeat += weapon.heat;
+                baseWeaponBV += weapon.bv;
+
+                // The weapon that reaches/exceeds heat efficiency still counts full.
+                if (runningHeat >= heatEfficiency) {
+                    heatLimitReached = true;
+                }
+            } else {
+                baseWeaponBV += weapon.bv * 0.5;
             }
         }
 
-    // BV2 applies heat adjustment starting with the most valuable weapons.
-    weaponEntries.sort((a, b) => b.bv - a.bv);
+        const ammoBV = this.getAmmoBV();
+        const offensiveEquipmentBV = 0; // targeting computer, Artemis, C3, etc. later
+        const speedFactor = this.getOffensiveSpeedFactor();
 
-    const heatSinkCapacity = this.getTotalHeatSink();
+        console.log("Offensive BV Calc - Ammo bv: " + ammoBV + " || Offensive Equip BV: " + offensiveEquipmentBV + " || speedFactor: " + speedFactor);
+        console.log("Offensive BV Calc - Base Weapon BV: " + baseWeaponBV);
 
-    // For walking/running 'Mechs, movement heat is usually 0.
-    // For jumping 'Mechs, use jump heat.
-    const movementHeat = Math.max(2, this.jumpMP);
+        return Math.round((baseWeaponBV + ammoBV + offensiveEquipmentBV) * speedFactor);
+    }
 
-    const heatEfficiency = 6 + heatSinkCapacity - movementHeat;
+    private getOffensiveSpeedFactor(): number {
+    const runningMP = Math.ceil(this.walkMP * 1.5);
+    return 1 + runningMP / 10;
+}
 
-    let runningHeat = 0;
-    let baseWeaponBV = 0;
-    let heatLimitReached = false;
+private getAmmoBV(): number {
+    let ammoBV = 0;
 
-    for (const weapon of weaponEntries) {
-        if (!heatLimitReached) {
-            runningHeat += weapon.heat;
-            baseWeaponBV += weapon.bv;
+    for (const locationKey in this.locations) {
+        const location = this.locations[locationKey];
 
-            // Important: the weapon that reaches/exceeds heat efficiency
-            // still counts at full BV.
-            if (runningHeat >= heatEfficiency) {
-                heatLimitReached = true;
+        for (const slot of location.slots ?? []) {
+            const lower = slot.toLowerCase();
+
+            if (!lower.includes("ammo")) continue;
+            console.log("Ammo BV To add found: " + lower);
+            const matchingWeapon = this.findAmmoWeaponForSlot(lower);
+            console.log(matchingWeapon)
+            console.log(matchingWeapon.ammo)
+            console.log(matchingWeapon.ammo.ammoBV);
+            if (matchingWeapon?.ammo?.ammoBV) {
+                ammoBV += matchingWeapon.ammo.ammoBV;
+            } else {
+                console.warn(`Could not match ammo slot to weapon ammo BV: ${slot}`);
             }
-        } else {
-            baseWeaponBV += weapon.bv * 0.5;
         }
     }
 
-    // Ammo BV, offensive equipment, targeting computer, Artemis, etc.
-    const offensiveEquipmentBV = this.getOffensiveEquipmentBV?.() ?? 0;
+    return ammoBV;
+}
 
-    const baseOffensiveBV =
-        baseWeaponBV +
-        ammoBV +
-        offensiveEquipmentBV;
+private findAmmoWeaponForSlot(lowerSlot: string): any | null {
+    for (const weaponKey in WEAPONS) {
+        const weapon = WEAPONS[weaponKey];
 
-    // Speed factor is part of actual Offensive BV.
-    const speedFactor = this.getSpeedFactor?.() ?? 1;
+        if (!weapon.ammo) continue;
 
-    return Math.round(baseOffensiveBV * speedFactor);
+        const ammoType = weapon.ammo.ammoType.toLowerCase();
+        const weaponName = weapon.name.toLowerCase();
+        const family = weapon.family?.toLowerCase();
+        const altNames = weapon.altNames ?? [];
+
+        if (
+            lowerSlot.includes(ammoType) ||
+            lowerSlot.includes(weaponName) ||
+            (family && lowerSlot.includes(family)) ||
+            altNames.some((altName: string) =>
+                lowerSlot.includes(altName.toLowerCase())
+            )
+        ) {
+            return weapon;
+        }
+    }
+
+    return null;
 }
 
     //  #endregion BV Calculation

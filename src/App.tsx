@@ -8,7 +8,7 @@ import { Mek } from './files/mek';
 
 function App() {
   const [count, setCount] = useState(0)
-  const testMek = new Mek(unitType.Mek, 1, 1, "Atlas", "AS7-D");
+  const testMek = new Mek(unitType.Mek, 1, 1, "Locust", "LCT-1V");
   console.log(testMek);
 
   return (

@@ -17,6 +17,7 @@ export abstract class Unit {
     public ut: unitType;                 //unit type (Battlearmor, Mek, Infantry, Vehicle)
     public owner: number;                //id of player that owns the unit
     public force: number;                //id of force the unit belongs to
+    public bv: number;
     protected initializationPromise: Promise<void>;  //Promise that resolves when unit initialization is complete
 
     constructor(ut: unitType,                   //unit type (Battlearmor, Mek, Infantry, Vehicle)
@@ -39,6 +40,7 @@ export abstract class Unit {
         this.tech_base = "";
         this.mtfFile = "";
         this.mtfFileLines = [];
+        this.bv = 0;
 
         // Store the initialization promise so subclasses can wait for it
         this.initializationPromise = this.configureUnit();
@@ -171,7 +173,7 @@ export abstract class Unit {
         }
     }
     
-    searchMTF(searchKey: string): string {
+    searchMTF(searchKey: string, warn: boolean = true): string {
         if (!this.mtfFileLines || this.mtfFileLines.length === 0) {
             console.warn("MTF file not loaded");
             return "";
@@ -189,7 +191,7 @@ export abstract class Unit {
             }
         }
 
-        console.warn(`Key "${searchKey}" not found in MTF file`);
+        if (warn) { console.warn(`Key "${searchKey}" not found in MTF file`); }
         return "";
     }
 

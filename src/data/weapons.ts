@@ -3,7 +3,7 @@ export type WeaponCategory = "Energy" | "Ballistic" | "Missile";
 export type WeaponDefinition = {
     id: string;
     name: string;
-    altNames?: string[];
+    altNames: string[];
     category: WeaponCategory;
     techBase: "Inner Sphere" | "Clan" | "Mixed";
     rulesLevel?: "Introductory" | "Standard" | "Advanced" | "Experimental";
