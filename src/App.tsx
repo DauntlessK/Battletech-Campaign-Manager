@@ -8,8 +8,23 @@ import { Mek } from './files/mek';
 
 function App() {
   const [count, setCount] = useState(0)
-  const testMek = new Mek(unitType.Mek, 1, 1, "Locust", "LCT-1V");
-  console.log(testMek);
+   const testMek1 = new Mek(unitType.Mek, 1, 1, "Locust", "LCT-1V");
+   const testMek2 = new Mek(unitType.Mek, 1, 1, "Highlander", "HGN-733");
+    const testMek3 = new Mek(unitType.Mek, 1, 1, "Hunchback", "HBK-4P");
+    const testMek4 = new Mek(unitType.Mek, 1, 1, "Shadow hawk", "SHD-2H");
+    const testMek5 = new Mek(unitType.Mek, 1, 1, "Atlas", "AS7-D");
+    const testMek6 = new Mek(unitType.Mek, 1, 1, "Archer", "ARC-2K");
+    const testMek7 = new Mek(unitType.Mek, 1, 1, "Catapult", "CPLT-C4");
+      const testMek8 = new Mek(unitType.Mek, 1, 1, "Archer", "ARC-2K");
+       const testMek9 = new Mek(unitType.Mek, 1, 1, "Phoenix Hawk", "PXH-1");
+
+
+  // console.log(testMek1);
+   console.log(testMek2);
+  // console.log(testMek3);
+  // console.log(testMek4);
+  //console.log(testMek9);
+
 
   return (
     <>

@@ -47,7 +47,7 @@ export type WeaponDefinition = {
     flags?: string[];
 };
 
-//TODO: Ammo cost per ton, tech rating, availability need verification / fixes
+//TODO: Ttech rating, availability need verification / fixes
 
 export const WEAPONS: Record<string, WeaponDefinition> = {
     smallLaser: {
@@ -237,7 +237,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
         ammo: { ammoType: "ac10", ammoPerTon: 10, ammoCostPerTon: 6000, ammoBV: 15 },
         range: { short: 5, medium: 10, long: 15 },
         cost: 200000,
-        bv: 124,
+        bv: 123,
         techRating: "C",
         availability: { starLeague: "C", successionWars: "C", clanInvasion: "C", darkAge: "C" },
         flags: ["directFire", "requiresAmmo"],

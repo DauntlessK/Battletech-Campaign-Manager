@@ -47,18 +47,25 @@ export abstract class Unit {
     }
 
     async configureUnit(): Promise<void> {
-        await this.getMTF();
+        try {
+            await this.getMTF();
 
-        this.setMulId(parseInt(this.searchMTF("mul id"))); 
-        this.setId(parseInt(this.searchMTF("id")));
-        this.setYear(parseInt(this.searchMTF("era")));
-        if (this.year === -1) {
-            this.setYear(parseInt(this.searchMTF("year")));
+            this.setMulId(parseInt(this.searchMTF("mul id")));
+            this.setId(parseInt(this.searchMTF("id")));
+            this.setYear(parseInt(this.searchMTF("era")));
+
+            if (this.year === -1 || Number.isNaN(this.year)) {
+                this.setYear(parseInt(this.searchMTF("year")));
+            }
+
+            this.setRole(this.searchMTF("role"));
+            this.setSource(this.searchMTF("source"));
+            this.setRulesLevel(parseInt(this.searchMTF("rules level")));
+            this.setTechBase(this.searchMTF("techbase"));
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
-        this.setRole(this.searchMTF("role"));
-        this.setSource(this.searchMTF("source"));
-        this.setRulesLevel(parseInt(this.searchMTF("rules level")));
-        this.setTechBase(this.searchMTF("techbase"));
     }
 
     private getUnitTypeFolder(): string {
@@ -77,35 +84,21 @@ export abstract class Unit {
     }
 
     async getMTF(): Promise<string> {
-        try {
-            const unitTypeFolder = this.getUnitTypeFolder();
-            
-            // Construct the expected filename: <chassis> <model>.mtf
-            // Note: We'll search for any .mtf file matching the chassis pattern
-            const expectedFileName = `${this.chassis} ${this.model}.mtf`;
-            
-            // Recursively search through subfolders
-            const filePath = await this.findFileInSubfolders(
-                `/units/${unitTypeFolder}`,
-                expectedFileName
-            );
-            
-            if (!filePath) {
-                throw new Error(`Failed to find MTF file matching: ${expectedFileName}`);
-            }
-            
-            const response = await fetch(filePath);
-            if (!response.ok) {
-                throw new Error(`Failed to load MTF file: ${filePath} (${response.status})`);
-            }
-            
-            this.mtfFile = await response.text();
-            this.mtfFileLines = this.mtfFile.split('\n');
-            return this.mtfFile;
-        } catch (error) {
-            console.error(`Error loading MTF file for ${this.chassis}:`, error);
-            throw error;
+        const unitTypeFolder = this.getUnitTypeFolder();
+        const fileName = `${this.chassis} ${this.model}.mtf`;
+        const encodedFileName = encodeURIComponent(fileName);
+        const filePath = `/units/${unitTypeFolder}/${encodedFileName}`;
+
+        const response = await fetch(filePath);
+
+        this.mtfFile = await response.text();
+        if (!response.ok || !this.isValidMTF(this.mtfFile)) {
+            throw new Error(`MTF not found or invalid: ${filePath}`);
         }
+
+        this.mtfFileLines = this.mtfFile.split("\n");
+
+        return this.mtfFile;
     }
 
     private async findFileInSubfolders(folderPath: string, fileName: string): Promise<string | null> {
@@ -171,6 +164,15 @@ export abstract class Unit {
             console.error(`Error searching for file: ${fileName}`, error);
             return null;
         }
+    }
+
+    private isValidMTF(text: string): boolean {
+        const lower = text.toLowerCase();
+
+        return (
+            lower.includes("megamek") &&
+            lower.includes("data")
+        );
     }
     
     searchMTF(searchKey: string, warn: boolean = true): string {

@@ -390,7 +390,7 @@ export class Mek extends Unit{
             }
 
             const slots = this.locations[normalizedLocation].slots;
-            const slotKey = normalizedLocation;
+            const slotKey = normalizedLocation + ":" + this.normalizeWeaponText(weaponName);
             if (!slotUsageMap[slotKey]) {
                 slotUsageMap[slotKey] = 0;
             }
@@ -406,6 +406,17 @@ export class Mek extends Unit{
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
                 if (!slot || slot === "-Empty-") continue;
+
+                //console.log("TRY SLOT", {
+                //    weaponName,
+                //    locationName,
+                //    normalizedLocation,
+                //    slotKey,
+                //    slotUsage: slotUsageMap[slotKey],
+                //    instanceCount,
+                //    slot,
+                //    matches: slot.toLowerCase().includes(weaponName.toLowerCase())
+                //});
                 
                 // Check if the slot entry matches or contains the weapon name
                 if (slot.toLowerCase().includes(weaponName.toLowerCase())) {
@@ -442,6 +453,7 @@ export class Mek extends Unit{
                     }
                     instanceCount++;
                 }
+                //console.log(`${this.model} raw weapon entries`, this.weapons);
             }
 
             // If not found by name match, search for any weapon in the location
@@ -485,6 +497,12 @@ export class Mek extends Unit{
         }
 
         this.weapons = linkedWeapons;
+    }
+
+    private normalizeWeaponText(text: string): string {
+        return text
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
     }
 
     /**
@@ -666,19 +684,28 @@ export class Mek extends Unit{
      * @param isCountingExplosive true if only counting explosive ammo slots - Does not count MG, flamer
      * @returns int
      */
-    getAmmoSlotCountInLocation(location: string, isCountingExplosive: boolean): number {
+    getAmmoSlotCountInLocation(slots: string[], isCountingExplosive: boolean): number {
         let ammoSlotCount = 0;
-        for (const slot of location) {
-            if (slot.toLowerCase().includes("ammo")) {
-                if (!isCountingExplosive) {
-                    ammoSlotCount++;
-                    continue;
-                }
-                else if (!slot.toLowerCase().includes("mg") || !slot.toLowerCase().includes("flamer")) {
-                    ammoSlotCount++;
-                }
+
+        for (const slot of slots) {
+            const lower = slot.toLowerCase();
+
+            if (!lower.includes("ammo")) continue;
+
+            if (!isCountingExplosive) {
+                ammoSlotCount++;
+                continue;
+            }
+
+            const isNonExplosiveAmmo =
+                lower.includes("flamer") ||
+                lower.includes("coolant");
+
+            if (!isNonExplosiveAmmo) {
+                ammoSlotCount++;
             }
         }
+
         return ammoSlotCount;
     }
 
@@ -839,11 +866,14 @@ export class Mek extends Unit{
     }
 
 
+    /**
+     * Sets total BV by figuring out offensive and defensive BV automatically.
+     */
     private setTotalBV() {
         const offensiveBV = this.getOffensiveBV();
         const defensiveBV = this.getDefensiveBV();
-        console.log("Setting BV: Offensive BV: " + offensiveBV + " || Defensive BV: " + defensiveBV);
-        this.bv = Math.floor(offensiveBV + defensiveBV);
+        this.bv = Math.round(offensiveBV + defensiveBV);
+        console.log(this.model + " Setting BV: Offensive BV: " + offensiveBV + " || Defensive BV: " + defensiveBV + " = " + this.bv);
     }
 
     // #endregion getters and setters ---------------------------------------------------------------------------
@@ -890,7 +920,7 @@ export class Mek extends Unit{
         let totalInternal = this.getInternalTotal();
 
         let baseDefense = (totalArmor * 2.5) + (totalInternal * 1.5 * structureModifier * engineModifier) + (this.mass * gyroModifier);
-        console.log("Defensive BV calc- baseDefense= " + baseDefense);
+        //console.log(this.model + " Defensive BV calc- baseDefense= " + baseDefense);
 
         //DEFENSIVE Battle rating for equipment  -- TODO: Possibly? No anti-personnel pod or armor checks
         let defensiveEquipmentBV = 0;
@@ -912,10 +942,14 @@ export class Mek extends Unit{
         if (this.tech_base === "Inner Sphere") {
             //XL engines w/ ammo (in any location)
             if (this.engine.toLowerCase().includes("xl")) {
-                explosiveAmmoSubtraction += 15 * this.getTotalAmmoSlotCount(true);
+                for (const locationKey in this.locations) {
+                    const location = this.locations[locationKey];
+                    explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                    explosiveAmmoSubtraction += this.getTotalUnprotectedGaussCountInLocation(location.slots);
+                }
             }
-            //Standard or light engines
-            if (this.engine.toLowerCase().includes("light") || this.engine.toLowerCase().includes("standard")) {
+            //Standard or light engines (this.engine.toLowerCase().includes("light") || this.engine.toLowerCase().includes("standard"))
+            else {
                 for (const locationKey in this.locations) {
                     const location = this.locations[locationKey];
                     const hasCASE = location.hasCase;
@@ -923,19 +957,21 @@ export class Mek extends Unit{
                         continue; // skip locations protected by CASE or arms protected by torso CASE
                     }
                     else {
-                        explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                        const toSubtract = 15 * this.getAmmoSlotCountInLocation(location.slots, true);
+                        //console.log(`${this.model} penalty: ${locationKey} | ${toSubtract} | hasCase=${location.hasCase}`);
+                        explosiveAmmoSubtraction += toSubtract;
                         explosiveAmmoSubtraction += this.getTotalUnprotectedGaussCountInLocation(location.slots);
                     }
                 }
             }
-            //XL engines
+/*             //XL engines
             if (this.engine.toLowerCase().includes("xl")) {
                 for (const locationKey in this.locations) {
                     const location = this.locations[locationKey];
                     explosiveAmmoSubtraction += 15 * this.getAmmoSlotCountInLocation(location.slots, true);
                     explosiveAmmoSubtraction += this.getTotalUnprotectedGaussCountInLocation(location.slots);
                 }
-            }
+            } */
         }
         else { // Clan and other tech base
             for (const locationKey in this.locations) {
@@ -948,7 +984,8 @@ export class Mek extends Unit{
             }
         }
 
-        console.log("Defensive BV calc - speed multiplier: " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0));
+        console.log(this.model +  " Defensive BV calc - speed multiplier: " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0));
+        console.log("Full defensive bv calc: " + baseDefense + " - " + explosiveAmmoSubtraction + " x " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0))
         defensiveBV = (baseDefense - explosiveAmmoSubtraction) * this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0);
 
         return defensiveBV;
@@ -971,128 +1008,280 @@ export class Mek extends Unit{
         if (effectiveMP <= 17) return 1.4;
         if (effectiveMP <= 24) return 1.5;
         return 1.6;
-    }
+        }
 
-    private getOffensiveBV(): number {
+        private getOffensiveBV(): number {
         type WeaponBVEntry = {
             name: string;
-            bv: number;
+            modifiedBV: number;
             heat: number;
+            isRear: boolean;
         };
 
-        const weaponEntries: WeaponBVEntry[] = [];
+        const heatWeapons: WeaponBVEntry[] = [];
+        let zeroHeatWeaponBV = 0;
 
+        //console.log(`\n=== ${this.model} OFFENSIVE BV START ===`);
+
+        // 1. Build weapon list
         for (const weaponKey in this.weapons) {
             const weaponEntry = this.weapons[weaponKey];
             const weapon = weaponEntry.data;
 
-            if (!weapon) {
-                console.warn(`Missing weapon data for`, weaponEntry);
-                continue;
-            }
+            if (!weapon) continue;
 
-            weaponEntries.push({
-                name: weapon.name,
-                bv: weapon.bv ?? 0,
-                heat: weapon.heat ?? 0,
-            });
-        }
+            const isRear = weaponEntry.isRearFacing ?? false;
+            const modifiedBV = isRear ? weapon.bv / 2 : weapon.bv;
+            const heat = weapon.heat ?? 0;
 
-        // Highest BV weapons get counted first for heat efficiency.
-        weaponEntries.sort((a, b) => b.bv - a.bv);
+            //console.log(`${this.model} weapon: ${weapon.name} | rear=${isRear} | baseBV=${weapon.bv} | modifiedBV=${modifiedBV} | heat=${heat}`);
 
-        const heatSinkCapacity = this.getTotalHeatSink();
-
-        // Only subtract jumping heat if the 'Mech can actually jump.
-        // Your Math.max(2, this.jumpMP) was subtracting 2 heat even from non-jumpers.
-        const movementHeat = this.jumpMP > 0 ? Math.max(3, this.jumpMP) : 0;
-
-        const heatEfficiency = Math.max(0, 6 + heatSinkCapacity - movementHeat);
-
-        let runningHeat = 0;
-        let baseWeaponBV = 0;
-        let heatLimitReached = false;
-
-        for (const weapon of weaponEntries) {
-            if (!heatLimitReached) {
-                runningHeat += weapon.heat;
-                baseWeaponBV += weapon.bv;
-
-                // The weapon that reaches/exceeds heat efficiency still counts full.
-                if (runningHeat >= heatEfficiency) {
-                    heatLimitReached = true;
-                }
+            if (heat === 0) {
+                zeroHeatWeaponBV += modifiedBV;
             } else {
-                baseWeaponBV += weapon.bv * 0.5;
+                heatWeapons.push({
+                    name: weapon.name,
+                    modifiedBV,
+                    heat,
+                    isRear,
+                });
             }
         }
+
+        //console.log(`${this.model} zeroHeatWeaponBV=${zeroHeatWeaponBV}`);
 
         const ammoBV = this.getAmmoBV();
-        const offensiveEquipmentBV = 0; // targeting computer, Artemis, C3, etc. later
+        const offensiveEquipmentBV = 0;
+
+        const heatSinkCapacity = this.getTotalHeatSink();
+        const movementHeat = this.jumpMP > 0
+            ? Math.max(3, this.jumpMP)
+            : 2;
+
+        const heatEfficiency = 6 + heatSinkCapacity - movementHeat;
+
+        const totalWeaponHeat = heatWeapons.reduce(
+            (sum, w) => sum + w.heat,
+            0
+        );
+
+        //console.log(`${this.model} heatSinkCapacity=${heatSinkCapacity}`);
+        //console.log(`${this.model} movementHeat=${movementHeat}`);
+        //console.log(`${this.model} heatEfficiency=${heatEfficiency}`);
+        //console.log(`${this.model} totalWeaponHeat=${totalWeaponHeat}`);
+
+        // 2. Heat ordering
+        let heatAdjustedWeaponBV = zeroHeatWeaponBV;
+
+        if (totalWeaponHeat <= heatEfficiency) {
+            //console.log(`${this.model} NO HEAT REDUCTION`);
+
+            for (const w of heatWeapons) {
+                heatAdjustedWeaponBV += w.modifiedBV;
+            }
+        } else {
+            //console.log(`${this.model} APPLYING HEAT REDUCTION`);
+
+            heatWeapons.sort((a, b) => {
+                if (b.modifiedBV !== a.modifiedBV) {
+                    return b.modifiedBV - a.modifiedBV;
+                }
+                return a.heat - b.heat;
+            });
+
+            //console.log(`${this.model} sorted heat weapons:`);
+            for (const w of heatWeapons) {
+                //console.log(`  ${w.name} | BV=${w.modifiedBV} | heat=${w.heat} | rear=${w.isRear}`);
+            }
+
+            let runningHeat = 0;
+            let heatLimitReached = false;
+
+            for (const w of heatWeapons) {
+                if (!heatLimitReached) {
+                    runningHeat += w.heat;
+                    heatAdjustedWeaponBV += w.modifiedBV;
+
+                    //console.log( `${this.model} FULL: ${w.name} | runningHeat=${runningHeat}`);
+
+                    if (runningHeat >= heatEfficiency) {
+                        heatLimitReached = true;
+                        //console.log(`${this.model} HEAT LIMIT REACHED`);
+                    }
+                } else {
+                    heatAdjustedWeaponBV += w.modifiedBV / 2;
+
+                    //console.log(`${this.model} HALF: ${w.name} | BV=${w.modifiedBV / 2}`);
+                }
+            }
+        }
+
+        //console.log(`${this.model} heatAdjustedWeaponBV=${heatAdjustedWeaponBV}`);
+        //console.log(`${this.model} ammoBV=${ammoBV}`);
+
+        const weaponBattleRating =
+            heatAdjustedWeaponBV +
+            ammoBV +
+            offensiveEquipmentBV +
+            this.mass;
+
+        //console.log(`${this.model} tonnage=${this.mass}`);
+        //console.log(`${this.model} WBR=${weaponBattleRating}`);
+
         const speedFactor = this.getOffensiveSpeedFactor();
 
-        console.log("Offensive BV Calc - Ammo bv: " + ammoBV + " || Offensive Equip BV: " + offensiveEquipmentBV + " || speedFactor: " + speedFactor);
-        console.log("Offensive BV Calc - Base Weapon BV: " + baseWeaponBV);
+        //console.log(`${this.model} speedFactor=${speedFactor}`);
 
-        return Math.round((baseWeaponBV + ammoBV + offensiveEquipmentBV) * speedFactor);
+        const offensiveBV = weaponBattleRating * speedFactor;
+
+        //console.log(`${this.model} offensiveBV=${offensiveBV}`);
+        //console.log(`=== ${this.model} OFFENSIVE BV END ===\n`);
+
+        return offensiveBV;
     }
 
     private getOffensiveSpeedFactor(): number {
-    const runningMP = Math.ceil(this.walkMP * 1.5);
-    return 1 + runningMP / 10;
-}
+        const runMP = Math.ceil(this.walkMP * 1.5);
+        const jumpMP = this.jumpMP ?? 0;
 
-private getAmmoBV(): number {
-    let ammoBV = 0;
+        const mobility = runMP + Math.ceil(jumpMP / 2);
 
-    for (const locationKey in this.locations) {
-        const location = this.locations[locationKey];
+        // BV2 Speed Factor Table
+        const speedTable: Record<number, number> = {
+            0: 0.44,
+            1: 0.54,
+            2: 0.65,
+            3: 0.77,
+            4: 0.88,
+            5: 1.00,
+            6: 1.12,
+            7: 1.24,
+            8: 1.37,
+            9: 1.50,
+            10: 1.63,
+            11: 1.76,
+            12: 1.89,
+            13: 2.02,
+            14: 2.16,
+            15: 2.30,
+            16: 2.44,
+            17: 2.58,
+            18: 2.72,
+            19: 2.86,
+            20: 3.00,
+            21: 3.15,
+            22: 3.29,
+            23: 3.44,
+            24: 3.59,
+            25: 3.74
+        };
 
-        for (const slot of location.slots ?? []) {
-            const lower = slot.toLowerCase();
+        // Clamp to table range
+        const clampedMobility = Math.min(
+            Math.max(mobility, 0),
+            15
+        );
 
-            if (!lower.includes("ammo")) continue;
-            console.log("Ammo BV To add found: " + lower);
-            const matchingWeapon = this.findAmmoWeaponForSlot(lower);
-            console.log(matchingWeapon)
-            console.log(matchingWeapon.ammo)
-            console.log(matchingWeapon.ammo.ammoBV);
-            if (matchingWeapon?.ammo?.ammoBV) {
-                ammoBV += matchingWeapon.ammo.ammoBV;
-            } else {
-                console.warn(`Could not match ammo slot to weapon ammo BV: ${slot}`);
+        const speedFactor = speedTable[clampedMobility];
+
+        console.log(`${this.model} mobility=${mobility} → speedFactor=${speedFactor}`);
+
+        return speedFactor;
+    }
+
+    /**
+     * gets total BV of all ammo on the mek, which is used for offensive calculations
+     * @returns ammoBV int of all BV for ammo
+     */
+    private getAmmoBV(): number {
+        let ammoBV = 0;
+
+        for (const locationKey in this.locations) {
+            const location = this.locations[locationKey];
+
+            for (const slot of location.slots ?? []) {
+                const lower = slot.toLowerCase();
+
+                if (!lower.includes("ammo")) continue;
+                const matchingWeapon = this.findAmmoWeaponForSlot(lower);
+                if (matchingWeapon?.ammo?.ammoBV) {
+                    ammoBV += matchingWeapon.ammo.ammoBV;
+                    //console.log(`${this.model} - Ammo bv for ammo of ${matchingWeapon.name} = ${matchingWeapon.ammo.ammoBV}`);
+                } else {
+                    console.warn(`Could not match ammo slot to weapon ammo BV: ${slot}`);
+                }
             }
         }
+        return ammoBV;
     }
 
-    return ammoBV;
-}
+    /**
+     * Goes through weapon list to match an ammo type with its weapon
+     * @param lowerSlot 
+     * @returns weapon object, or null for not found
+     */
+    private findAmmoWeaponForSlot(lowerSlot: string): any {
+        // 1. Exact ammo labels first
+        const exactMatches: Record<string, any> = {
+            "ac/20": WEAPONS.ac20,
+            "ac/10": WEAPONS.ac10,
+            "ac/5": WEAPONS.ac5,
+            "ac/2": WEAPONS.ac2,
 
-private findAmmoWeaponForSlot(lowerSlot: string): any | null {
-    for (const weaponKey in WEAPONS) {
-        const weapon = WEAPONS[weaponKey];
+            "lrm 20": WEAPONS.lrm20,
+            "lrm-20": WEAPONS.lrm20,
+            "lrm 15": WEAPONS.lrm15,
+            "lrm-15": WEAPONS.lrm15,
+            "lrm 10": WEAPONS.lrm10,
+            "lrm-10": WEAPONS.lrm10,
+            "lrm 5": WEAPONS.lrm5,
+            "lrm-5": WEAPONS.lrm5,
 
-        if (!weapon.ammo) continue;
+            "srm 6": WEAPONS.srm6,
+            "srm-6": WEAPONS.srm6,
+            "srm 4": WEAPONS.srm4,
+            "srm-4": WEAPONS.srm4,
+            "srm 2": WEAPONS.srm2,
+            "srm-2": WEAPONS.srm2,
 
-        const ammoType = weapon.ammo.ammoType.toLowerCase();
-        const weaponName = weapon.name.toLowerCase();
-        const family = weapon.family?.toLowerCase();
-        const altNames = weapon.altNames ?? [];
+            "mg": WEAPONS.machineGun,
+            "machine gun": WEAPONS.machineGun,
+        };
 
-        if (
-            lowerSlot.includes(ammoType) ||
-            lowerSlot.includes(weaponName) ||
-            (family && lowerSlot.includes(family)) ||
-            altNames.some((altName: string) =>
-                lowerSlot.includes(altName.toLowerCase())
-            )
-        ) {
-            return weapon;
+        for (const key in exactMatches) {
+            if (lowerSlot.includes(key)) {
+                return exactMatches[key];
+            }
         }
-    }
 
-    return null;
-}
+        // 2. Generic ammo fallback: match against mounted weapons only
+        const mountedAmmoWeapons = Object.values(this.weapons)
+            .map((entry: any) => entry.data)
+            .filter((weapon: any) => weapon?.ammo);
+
+        const candidates = mountedAmmoWeapons.filter((weapon: any) => {
+            const ammoType = weapon.ammo.ammoType.toLowerCase();
+            const family = weapon.family?.toLowerCase();
+
+            return (
+                lowerSlot.includes(ammoType) ||
+                (family && lowerSlot.includes(family))
+            );
+        });
+
+        const uniqueCandidates = Array.from(
+            new Map(candidates.map((weapon: any) => [weapon.id, weapon])).values()
+        );
+
+        if (uniqueCandidates.length !== 1) {
+            throw new Error(
+                `${this.model}: ambiguous ammo slot "${lowerSlot}". ` +
+                `Matches: ${uniqueCandidates.map((w: any) => w.name).join(", ") || "none"}`
+            );
+        }
+
+        return uniqueCandidates[0];
+    }
 
     //  #endregion BV Calculation
 }
