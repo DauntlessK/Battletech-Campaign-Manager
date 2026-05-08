@@ -32,8 +32,8 @@ export class Mek extends Unit{
     public hasECM: boolean;
 
     constructor(ut: unitType,
-                owner: number,
-                force: number,
+                owner: number | null,
+                force: number | null,
                 chassis: string,
                 model: string
                 ) {           
@@ -63,8 +63,13 @@ export class Mek extends Unit{
         this.hasCASE = false;
         this.hasECM = false;
 
-        // Call configureMek after parent initialization completes
-        this.initializationPromise.then(() => this.configureMek());
+        // Chain Mek-specific setup onto the parent Unit initialization
+        this.initializationPromise = this.initializationPromise.then(() => this.configureMek());
+    }
+
+    public async ready(): Promise<this> {
+        await this.initializationPromise;
+        return this;
     }
 
     // #region MTF Parsing and Mek Configuration
@@ -873,7 +878,7 @@ export class Mek extends Unit{
         const offensiveBV = this.getOffensiveBV();
         const defensiveBV = this.getDefensiveBV();
         this.bv = Math.round(offensiveBV + defensiveBV);
-        console.log(this.model + " Setting BV: Offensive BV: " + offensiveBV + " || Defensive BV: " + defensiveBV + " = " + this.bv);
+        //console.log(this.model + " Setting BV: Offensive BV: " + offensiveBV + " || Defensive BV: " + defensiveBV + " = " + this.bv);
     }
 
     // #endregion getters and setters ---------------------------------------------------------------------------
@@ -984,8 +989,8 @@ export class Mek extends Unit{
             }
         }
 
-        console.log(this.model +  " Defensive BV calc - speed multiplier: " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0));
-        console.log("Full defensive bv calc: " + baseDefense + " - " + explosiveAmmoSubtraction + " x " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0))
+        //console.log(this.model +  " Defensive BV calc - speed multiplier: " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0));
+        //console.log("Full defensive bv calc: " + baseDefense + " - " + explosiveAmmoSubtraction + " x " + this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0))
         defensiveBV = (baseDefense - explosiveAmmoSubtraction) * this.getMovementMultiplier(this.walkMP, this.jumpMP ?? 0);
 
         return defensiveBV;
@@ -1184,7 +1189,7 @@ export class Mek extends Unit{
 
         const speedFactor = speedTable[clampedMobility];
 
-        console.log(`${this.model} mobility=${mobility} → speedFactor=${speedFactor}`);
+        //console.log(`${this.model} mobility=${mobility} → speedFactor=${speedFactor}`);
 
         return speedFactor;
     }

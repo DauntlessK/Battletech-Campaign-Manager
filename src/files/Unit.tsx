@@ -15,14 +15,14 @@ export abstract class Unit {
     public chassis: string;
     public model: string;
     public ut: unitType;                 //unit type (Battlearmor, Mek, Infantry, Vehicle)
-    public owner: number;                //id of player that owns the unit
-    public force: number;                //id of force the unit belongs to
+    public owner: number | null;                //id of player that owns the unit
+    public force: number | null;                //id of force the unit belongs to
     public bv: number;
     protected initializationPromise: Promise<void>;  //Promise that resolves when unit initialization is complete
 
     constructor(ut: unitType,                   //unit type (Battlearmor, Mek, Infantry, Vehicle)
-                owner: number,                  //id of player that owns the unit
-                force: number,                  //id of force the unit belongs to
+                owner: number | null,                  //id of player that owns the unit
+                force: number | null,                  //id of force the unit belongs to
                 chassis: string = "",                //chassis of the unit
                 model: string = ""                   //model of the unit
                 ) {
@@ -92,6 +92,7 @@ export abstract class Unit {
         const response = await fetch(filePath);
 
         this.mtfFile = await response.text();
+
         if (!response.ok || !this.isValidMTF(this.mtfFile)) {
             throw new Error(`MTF not found or invalid: ${filePath}`);
         }
@@ -288,17 +289,17 @@ export abstract class Unit {
         this.tech_base = tech_base;
     }
 
-    getOwner(): number {
-        return this.owner;
-    }
+    // getOwner(): number {
+    //     return this.owner;
+    // }
 
     setOwner(owner: number): void {
         this.owner = owner;
     }
 
-    getForce(): number {
-        return this.force;
-    }
+    // getForce(): number {
+    //     return this.force || null;
+    // }
 
     setForce(force: number): void {
         this.force = force;
