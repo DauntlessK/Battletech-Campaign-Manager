@@ -71,9 +71,54 @@ export function mekToUnitDto(mek: AnyMek, sourceFile?: string): Unit {
 
     sourceFile,
 
+    clanName: readString(mek, ["clanName", "clan_name", "getClanName"]) || undefined,
+    mulId: readString(mek, ["mulId", "mulID", "mul_id", "getMulId", "getMULId"]) || undefined,
+    sourceBook: readString(mek, ["sourceBook", "source", "sourceFile", "getSourceBook", "getSource"]) || undefined,
+
+    overview: readString(mek, ["overview", "getOverview"]) || undefined,
+    capabilities: readString(mek, ["capabilities", "getCapabilities"]) || undefined,
+    deployment: readString(mek, ["deployment", "getDeployment"]) || undefined,
+    history: readString(mek, ["history", "getHistory"]) || undefined,
+
+    quirks: readStringArray(mek, ["quirks", "designQuirks", "getQuirks", "getDesignQuirks"]),
+
+    manufacturer: readString(mek, ["manufacturer", "manufacturers", "getManufacturer"]) || undefined,
+    factory: readString(mek, ["factory", "factories", "getFactory"]) || undefined,
+    myomer: readString(mek, ["myomer", "myomerType", "getMyomer"]) || undefined,
+    armorType: readString(mek, ["armorType", "armor_type", "getArmorType"]) || undefined,
+    structureType: readString(mek, ["structureType", "structure_type", "internalStructureType", "getStructureType"]) || undefined,
+    heatSinkType: readString(mek, ["heatSinkType", "heat_sink_type", "sinkType", "getHeatSinkType"]) || "Single",
+
     weapons: mapWeapons(mek),
     locations: mapLocations(mek),
   };
+}
+
+function readStringArray(source: any, keys: string[]): string[] {
+  for (const key of keys) {
+    const value = readValue(source, key);
+
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).filter(Boolean);
+    }
+
+    if (value instanceof Set) {
+      return Array.from(value).map((item) => String(item)).filter(Boolean);
+    }
+
+    if (value instanceof Map) {
+      return Array.from(value.values()).map((item) => String(item)).filter(Boolean);
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      return value
+        .split(/[;,]/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+
+  return [];
 }
 
 function totalArmor(mek: AnyMek): number {

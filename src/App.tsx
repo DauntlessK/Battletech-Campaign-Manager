@@ -23,6 +23,7 @@ import {
   Weight,
   Zap,
   MapPin,
+  SlidersHorizontal,
 } from "lucide-react";
 
 type PageKey =
@@ -36,7 +37,7 @@ type PageKey =
   | "myCampaigns"
   | "myAccount";
 
-type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace";
+type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace" | string;
 type UnitPanelMode = "slots" | "weapons" | "details";
 type SortMode = "name" | "tonnage" | "bv" | "cost";
 
@@ -72,30 +73,47 @@ type Unit = {
   name: string;
   model: string;
   chassis: string;
+  unitType?: string;
   type: UnitType;
-  techBase: "Inner Sphere" | "Clan" | "Mixed";
+  techBase: "Inner Sphere" | "Clan" | "Mixed" | "Unknown" | string;
   era: string;
   year: number;
   tonnage: number;
-  weightClass: "Light" | "Medium" | "Heavy" | "Assault";
+  weightClass: "Light" | "Medium" | "Heavy" | "Assault" | string;
   costCBills: number;
-  rulesLevel: "Introductory" | "Standard" | "Advanced" | "Experimental";
+  rulesLevel: "Introductory" | "Standard" | "Advanced" | "Experimental" | "Unknown" | string;
   walk: number;
   run: number;
   jump: number;
   heatSinks: number;
-  armor: number;
-  structure: number;
-  offensiveBV: number;
-  defensiveBV: number;
+  heatSinkType?: string;
+  armor?: number;
+  structure?: number;
+  offensiveBV?: number;
+  defensiveBV?: number;
   totalBV: number;
+  bv?: number;
   role: string;
   engine: string;
   gyro: string;
-  cockpit: string;
+  cockpit?: string;
   sourceFile?: string;
-  weapons: UnitWeapon[];
-  locations: UnitLocation[];
+  fileName?: string;
+  relativePath?: string;
+  mulId?: string | number;
+  sourceBook?: string;
+  overview?: string;
+  capabilities?: string;
+  deployment?: string;
+  history?: string;
+  quirks?: string[];
+  manufacturer?: string;
+  factory?: string;
+  myomer?: string;
+  armorType?: string;
+  structureType?: string;
+  weapons?: UnitWeapon[];
+  locations?: UnitLocation[];
 };
 
 const navItems: Array<{ key: PageKey; label: string; icon: React.ReactNode }> = [
@@ -113,6 +131,18 @@ const aboutChildren: Array<{ key: PageKey; label: string }> = [
   { key: "campaignTypes", label: "Campaign Types" },
 ];
 
+const ERA_OPTIONS = [
+  "All",
+  "Star League",
+  "Succession Wars",
+  "Clan Invasion",
+  "Civil War",
+  "Jihad",
+  "Republic",
+  "Dark Age",
+  "IlClan",
+];
+
 export default function App() {
   const [activePage, setActivePage] = useState<PageKey>("units");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -122,6 +152,7 @@ export default function App() {
   const [unitsLoading, setUnitsLoading] = useState(true);
   const [unitsError, setUnitsError] = useState<string | null>(null);
   const [selectedUnitLoading, setSelectedUnitLoading] = useState(false);
+  const [selectedUnitError, setSelectedUnitError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUnits = async () => {
@@ -132,11 +163,12 @@ export default function App() {
         const response = await fetch("/api/units");
 
         if (!response.ok) {
-          throw new Error(`Failed to load units: ${response.status}`);
+          const errorBody = await response.json().catch(() => null);
+          throw new Error(errorBody?.message ?? errorBody?.error ?? `Failed to load units: ${response.status}`);
         }
 
         const data = (await response.json()) as Unit[];
-        setUnits(data);
+        setUnits(data.map(normalizeCatalogUnit));
       } catch (error) {
         setUnitsError(error instanceof Error ? error.message : "Failed to load units");
       } finally {
@@ -150,24 +182,29 @@ export default function App() {
   useEffect(() => {
     if (!selectedUnitId) {
       setSelectedUnit(null);
+      setSelectedUnitError(null);
       return;
     }
 
     const loadSelectedUnit = async () => {
       try {
         setSelectedUnitLoading(true);
+        setSelectedUnitError(null);
 
         const response = await fetch(`/api/units/${selectedUnitId}`);
 
         if (!response.ok) {
-          throw new Error(`Failed to load unit: ${response.status}`);
+          const errorBody = await response.json().catch(() => null);
+          throw new Error(errorBody?.message ?? errorBody?.error ?? `Failed to load unit: ${response.status}`);
         }
 
         const data = (await response.json()) as Unit;
-        setSelectedUnit(data);
+        setSelectedUnit(normalizeCatalogUnit(data));
       } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load selected unit";
         console.error(error);
         setSelectedUnit(null);
+        setSelectedUnitError(message);
       } finally {
         setSelectedUnitLoading(false);
       }
@@ -213,6 +250,12 @@ export default function App() {
                   </div>
                 )}
 
+                {selectedUnitError && (
+                  <div className="mb-4 rounded-3xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">
+                    {selectedUnitError}
+                  </div>
+                )}
+
                 <UnitsPage
                   units={units}
                   selectedUnit={selectedUnit}
@@ -231,6 +274,33 @@ export default function App() {
       {mobileMenuOpen && <MobileMenu activePage={activePage} onNavigate={navigate} onClose={() => setMobileMenuOpen(false)} />}
     </div>
   );
+}
+
+function normalizeCatalogUnit(unit: Unit): Unit {
+  return {
+    ...unit,
+    name: unit.name || unit.chassis,
+    type: unit.type || unit.unitType || "BattleMech",
+    totalBV: Number(unit.totalBV ?? unit.bv ?? 0),
+    costCBills: Number(unit.costCBills ?? 0),
+    tonnage: Number(unit.tonnage ?? 0),
+    year: Number(unit.year ?? 0),
+    walk: Number(unit.walk ?? 0),
+    run: Number(unit.run ?? 0),
+    jump: Number(unit.jump ?? 0),
+    heatSinks: Number(unit.heatSinks ?? 0),
+    heatSinkType: unit.heatSinkType || "Single",
+    role: unit.role || "Unknown",
+    engine: unit.engine || "Unknown",
+    gyro: unit.gyro || "Standard",
+    cockpit: unit.cockpit || "Standard",
+    era: normalizeEra(unit.era, Number(unit.year ?? 0)),
+    techBase: unit.techBase || "Unknown",
+    rulesLevel: normalizeRulesLevel(unit.rulesLevel),
+    weightClass: unit.weightClass || weightClassFromTonnage(Number(unit.tonnage ?? 0)),
+    weapons: unit.weapons ?? [],
+    locations: unit.locations ?? [],
+  };
 }
 
 function Header({
@@ -332,26 +402,29 @@ function UnitsPage({
   onClearSelectedUnit: () => void;
 }) {
   const [query, setQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState<UnitType | "All">("All");
-  const [weightFilter, setWeightFilter] = useState<Unit["weightClass"] | "All">("All");
+  const [typeFilter, setTypeFilter] = useState<string>("All");
+  const [weightFilter, setWeightFilter] = useState<string>("All");
   const [eraFilter, setEraFilter] = useState("All");
-  const [rulesFilter, setRulesFilter] = useState<Unit["rulesLevel"] | "All">("All");
+  const [rulesFilter, setRulesFilter] = useState<string>("All");
   const [roleFilter, setRoleFilter] = useState("All");
-  const [techBaseFilter, setTechBaseFilter] = useState<Unit["techBase"] | "All">("All");
+  const [techBaseFilter, setTechBaseFilter] = useState<string>("All");
   const [minTonnage, setMinTonnage] = useState(0);
   const [maxTonnage, setMaxTonnage] = useState(100);
   const [minBV, setMinBV] = useState(0);
-  const [maxBV, setMaxBV] = useState(3000);
+  const [maxBV, setMaxBV] = useState(10000);
   const [minCost, setMinCost] = useState(0);
-  const [maxCost, setMaxCost] = useState(20000000);
+  const [maxCost, setMaxCost] = useState(100000000);
   const [sortBy, setSortBy] = useState<SortMode>("name");
   const [panelMode, setPanelMode] = useState<UnitPanelMode>("slots");
   const [topMode, setTopMode] = useState<"filters" | "browse">("filters");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filterOptions = useMemo(
     () => ({
-      eras: ["All", ...Array.from(new Set(units.map((unit) => unit.era)))],
-      roles: ["All", ...Array.from(new Set(units.map((unit) => unit.role)))],
+      roles: ["All", ...Array.from(new Set(units.map((unit) => unit.role).filter(Boolean)))],
+      unitTypes: ["All", ...Array.from(new Set(units.map((unit) => String(unit.type || unit.unitType || "BattleMech")).filter(Boolean)))],
+      rules: ["All", ...Array.from(new Set(units.map((unit) => unit.rulesLevel).filter(Boolean)))],
+      techBases: ["All", ...Array.from(new Set(units.map((unit) => unit.techBase).filter(Boolean)))],
     }),
     [units]
   );
@@ -359,30 +432,51 @@ function UnitsPage({
   const filteredUnits = useMemo(() => {
     return units
       .filter((unit) => {
-        const matchesQuery = `${unit.name} ${unit.model} ${unit.chassis} ${unit.role} ${unit.sourceFile ?? ""}`.toLowerCase().includes(query.toLowerCase());
+        const unitEra = unit.era || eraFromYear(unit.year);
+        const totalBV = Number(unit.totalBV ?? unit.bv ?? 0);
+        const cost = Number(unit.costCBills ?? 0);
+        const text = `${unit.name} ${unit.model} ${unit.chassis} ${unit.role} ${unit.sourceFile ?? ""} ${unit.fileName ?? ""} ${unit.relativePath ?? ""}`.toLowerCase();
+        const matchesQuery = text.includes(query.toLowerCase());
+
         return (
           matchesQuery &&
-          (typeFilter === "All" || unit.type === typeFilter) &&
+          (typeFilter === "All" || String(unit.type || unit.unitType) === typeFilter) &&
           (weightFilter === "All" || unit.weightClass === weightFilter) &&
-          (eraFilter === "All" || unit.era === eraFilter) &&
+          (eraFilter === "All" || normalizeEra(unitEra, unit.year) === eraFilter) &&
           (rulesFilter === "All" || unit.rulesLevel === rulesFilter) &&
           (roleFilter === "All" || unit.role === roleFilter) &&
           (techBaseFilter === "All" || unit.techBase === techBaseFilter) &&
           unit.tonnage >= minTonnage &&
           unit.tonnage <= maxTonnage &&
-          unit.totalBV >= minBV &&
-          unit.totalBV <= maxBV &&
-          unit.costCBills >= minCost &&
-          unit.costCBills <= maxCost
+          totalBV >= minBV &&
+          totalBV <= maxBV &&
+          cost >= minCost &&
+          cost <= maxCost
         );
       })
       .sort((a, b) => {
-        if (sortBy === "tonnage") return b.tonnage - a.tonnage;
-        if (sortBy === "bv") return b.totalBV - a.totalBV;
-        if (sortBy === "cost") return b.costCBills - a.costCBills;
+        if (sortBy === "tonnage") return Number(b.tonnage) - Number(a.tonnage);
+        if (sortBy === "bv") return Number(b.totalBV ?? b.bv ?? 0) - Number(a.totalBV ?? a.bv ?? 0);
+        if (sortBy === "cost") return Number(b.costCBills ?? 0) - Number(a.costCBills ?? 0);
         return `${a.name} ${a.model}`.localeCompare(`${b.name} ${b.model}`);
       });
   }, [query, sortBy, typeFilter, weightFilter, eraFilter, rulesFilter, roleFilter, techBaseFilter, minTonnage, maxTonnage, minBV, maxBV, minCost, maxCost, units]);
+
+  const clearFilters = () => {
+    setQuery("");
+    setTypeFilter("All");
+    setWeightFilter("All");
+    setEraFilter("All");
+    setRulesFilter("All");
+    setRoleFilter("All");
+    setTechBaseFilter("All");
+    setMinTonnage(0);
+    setMaxTonnage(100);
+    setMinBV(0);
+    setMaxBV(10000);
+    setMinCost(0);
+    setMaxCost(100000000);
+  };
 
   const selectUnit = (id: string) => {
     onSelectUnit(id);
@@ -400,7 +494,7 @@ function UnitsPage({
         <PageTitle
           eyebrow="Unit database"
           title="Units"
-          description="A MechLab-style testing surface for parsed RTF files, Mek object creation, location slots, armor, structure, weapons, and BV output."
+          description="API-backed unit catalog loaded from generated MegaMek CSV indexes. Select a unit to parse the full MTF and load the MechLab view."
           actions={<button className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300">Add to Force</button>}
         />
 
@@ -408,11 +502,20 @@ function UnitsPage({
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Find / filter a chassis</div>
-              <p className="text-xs text-zinc-500">{filteredUnits.length} matching unit{filteredUnits.length === 1 ? "" : "s"}</p>
+              <p className="text-xs text-zinc-500">{filteredUnits.length.toLocaleString("en-US")} matching unit{filteredUnits.length === 1 ? "" : "s"}</p>
             </div>
-            <div className="grid w-full grid-cols-2 rounded-2xl border border-zinc-800 bg-zinc-950 p-1 sm:w-auto sm:min-w-[220px]">
-              <button onClick={() => setTopMode("filters")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "filters" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Filters</button>
-              <button onClick={() => setTopMode("browse")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "browse" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Browse</button>
+            <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="shrink-0 rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:border-lime-400 hover:text-lime-300 sm:px-4 sm:text-sm"
+              >
+                Clear Filters
+              </button>
+              <div className="grid min-w-[190px] grid-cols-2 rounded-2xl border border-zinc-800 bg-zinc-950 p-1 sm:min-w-[220px]">
+                <button onClick={() => setTopMode("filters")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "filters" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Filters</button>
+                <button onClick={() => setTopMode("browse")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "browse" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Browse</button>
+              </div>
             </div>
           </div>
 
@@ -447,6 +550,8 @@ function UnitsPage({
               setMinCost={setMinCost}
               maxCost={maxCost}
               setMaxCost={setMaxCost}
+              mobileFiltersOpen={mobileFiltersOpen}
+              setMobileFiltersOpen={setMobileFiltersOpen}
             />
           ) : (
             <BrowseUnitList units={filteredUnits} onSelectUnit={selectUnit} compact sortBy={sortBy} setSortBy={setSortBy} />
@@ -502,24 +607,26 @@ function UnitToolbar({
   setMinCost,
   maxCost,
   setMaxCost,
+  mobileFiltersOpen,
+  setMobileFiltersOpen,
 }: {
   units: Unit[];
   query: string;
   setQuery: (query: string) => void;
   onSelectByModel: (value: string) => void;
-  typeFilter: UnitType | "All";
-  setTypeFilter: (type: UnitType | "All") => void;
-  weightFilter: Unit["weightClass"] | "All";
-  setWeightFilter: (weight: Unit["weightClass"] | "All") => void;
+  typeFilter: string;
+  setTypeFilter: (type: string) => void;
+  weightFilter: string;
+  setWeightFilter: (weight: string) => void;
   eraFilter: string;
   setEraFilter: (era: string) => void;
-  rulesFilter: Unit["rulesLevel"] | "All";
-  setRulesFilter: (rules: Unit["rulesLevel"] | "All") => void;
+  rulesFilter: string;
+  setRulesFilter: (rules: string) => void;
   roleFilter: string;
   setRoleFilter: (role: string) => void;
-  techBaseFilter: Unit["techBase"] | "All";
-  setTechBaseFilter: (techBase: Unit["techBase"] | "All") => void;
-  filterOptions: { eras: string[]; roles: string[] };
+  techBaseFilter: string;
+  setTechBaseFilter: (techBase: string) => void;
+  filterOptions: { roles: string[]; unitTypes: string[]; rules: string[]; techBases: string[] };
   minTonnage: number;
   setMinTonnage: (value: number) => void;
   maxTonnage: number;
@@ -532,6 +639,8 @@ function UnitToolbar({
   setMinCost: (value: number) => void;
   maxCost: number;
   setMaxCost: (value: number) => void;
+  mobileFiltersOpen: boolean;
+  setMobileFiltersOpen: (open: boolean) => void;
 }) {
   return (
     <div>
@@ -555,23 +664,34 @@ function UnitToolbar({
             className="h-11 w-full rounded-2xl border border-zinc-700 bg-zinc-950 pl-10 pr-3 text-sm text-zinc-100 outline-none ring-lime-400/30 placeholder:text-zinc-600 focus:border-lime-400 focus:ring-4"
           />
           <datalist id="unit-models">
-            {units.map((unit) => (
+            {units.slice(0, 500).map((unit) => (
               <option key={unit.id} value={`${unit.model} - ${unit.name}`} />
             ))}
           </datalist>
         </label>
       </div>
 
-      <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-        <CompactSelect label="Unit" value={typeFilter} onChange={(value) => setTypeFilter(value as UnitType | "All")} options={["All", "BattleMech", "Vehicle", "Infantry", "Aerospace"]} />
-        <CompactSelect label="Class" value={weightFilter} onChange={(value) => setWeightFilter(value as Unit["weightClass"] | "All")} options={["All", "Light", "Medium", "Heavy", "Assault"]} />
-        <CompactSelect label="Era" value={eraFilter} onChange={setEraFilter} options={filterOptions.eras} />
-        <CompactSelect label="Rules" value={rulesFilter} onChange={(value) => setRulesFilter(value as Unit["rulesLevel"] | "All")} options={["All", "Introductory", "Standard", "Advanced", "Experimental"]} />
-        <CompactSelect label="Tech" value={techBaseFilter} onChange={(value) => setTechBaseFilter(value as Unit["techBase"] | "All")} options={["All", "Inner Sphere", "Clan", "Mixed"]} />
+      <div className="mt-3 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-lime-400 hover:text-lime-300"
+        >
+          <SlidersHorizontal size={16} />
+          {mobileFiltersOpen ? "Hide Advanced Filters" : "Show Advanced Filters"}
+        </button>
+      </div>
+
+      <div className={`${mobileFiltersOpen ? "grid" : "hidden"} mt-3 gap-3 md:grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6`}>
+        <CompactSelect label="Unit" value={typeFilter} onChange={setTypeFilter} options={filterOptions.unitTypes} />
+        <CompactSelect label="Class" value={weightFilter} onChange={setWeightFilter} options={["All", "Light", "Medium", "Heavy", "Assault"]} />
+        <CompactSelect label="Era" value={eraFilter} onChange={setEraFilter} options={ERA_OPTIONS} />
+        <CompactSelect label="Rules" value={rulesFilter} onChange={setRulesFilter} options={["All", "Introductory", "Standard", "Advanced", "Experimental", "Unofficial"]} />
+        <CompactSelect label="Tech" value={techBaseFilter} onChange={setTechBaseFilter} options={filterOptions.techBases} />
         <CompactSelect label="Role" value={roleFilter} onChange={setRoleFilter} options={filterOptions.roles} />
       </div>
 
-      <div className="mt-3 grid gap-3 md:grid-cols-3">
+      <div className={`${mobileFiltersOpen ? "grid" : "hidden"} mt-3 gap-3 md:grid md:grid-cols-3`}>
         <RangePair label="Tonnage Range" min={minTonnage} max={maxTonnage} setMin={setMinTonnage} setMax={setMaxTonnage} step={5} />
         <RangePair label="BV Range" min={minBV} max={maxBV} setMin={setMinBV} setMax={setMaxBV} step={50} />
         <RangePair label="C-Bill Range" min={minCost} max={maxCost} setMin={setMinCost} setMax={setMaxCost} step={100000} />
@@ -603,7 +723,7 @@ function BrowseUnitList({
           </div>
         ) : (
           <div className="text-xs text-zinc-500">
-            {units.length} result{units.length === 1 ? "" : "s"}
+            {units.length.toLocaleString("en-US")} result{units.length === 1 ? "" : "s"}
           </div>
         )}
 
@@ -636,7 +756,7 @@ function BrowseUnitList({
                 <td className="px-4 py-3 text-zinc-300">{unit.model}</td>
                 <td className="hidden px-4 py-3 text-zinc-400 xl:table-cell">{unit.techBase}</td>
                 <td className="hidden px-4 py-3 text-zinc-400 2xl:table-cell">{unit.rulesLevel}</td>
-                <td className="px-4 py-3 text-right font-bold text-lime-300">{unit.totalBV.toLocaleString("en-US")}</td>
+                <td className="px-4 py-3 text-right font-bold text-lime-300">{Number(unit.totalBV ?? unit.bv ?? 0).toLocaleString("en-US")}</td>
                 <td className="px-4 py-3 text-right text-zinc-300">{unit.tonnage}t</td>
               </tr>
             ))}
@@ -684,7 +804,7 @@ function MechSummary({ unit, panelMode, setPanelMode }: { unit: Unit; panelMode:
           <p className="truncate text-zinc-400">{unit.name}</p>
         </div>
         <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 px-4 py-3 text-center">
-          <div className="text-2xl font-black text-lime-200">{unit.totalBV.toLocaleString("en-US")}</div>
+          <div className="text-2xl font-black text-lime-200">{Number(unit.totalBV ?? unit.bv ?? 0).toLocaleString("en-US")}</div>
           <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300/70">BV</div>
         </div>
       </div>
@@ -693,10 +813,10 @@ function MechSummary({ unit, panelMode, setPanelMode }: { unit: Unit; panelMode:
         <DetailStat label="Tons" value={unit.tonnage} icon={<Weight size={15} />} />
         <DetailStat label="Movement" value={`${unit.walk}/${unit.run}/${unit.jump}`} icon={<Gauge size={15} />} />
         <DetailStat label="Role" value={unit.role} icon={<Crosshair size={15} />} />
-        <DetailStat label="Heat" value={`${unit.heatSinks} single`} icon={<Flame size={15} />} />
+        <DetailStat label="Heat" value={`${unit.heatSinks} (${unit.heatSinkType || "Single"})`} icon={<Flame size={15} />} />
         <DetailStat label="Engine" value={unit.engine} icon={<Zap size={15} />} />
         <DetailStat label="Rules" value={unit.rulesLevel} icon={<BookOpen size={15} />} />
-        <DetailStat label="Year" value={unit.year} icon={<Flag size={15} />} />
+        <DetailStat label="Year" value={unit.year || "—"} icon={<Flag size={15} />} />
         <DetailStat label="Tech Base" value={unit.techBase} icon={<Cpu size={15} />} />
       </div>
 
@@ -711,6 +831,8 @@ function MechSummary({ unit, panelMode, setPanelMode }: { unit: Unit; panelMode:
 }
 
 function WeaponSummary({ unit }: { unit: Unit }) {
+  const weapons = unit.weapons ?? [];
+
   return (
     <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -718,11 +840,12 @@ function WeaponSummary({ unit }: { unit: Unit }) {
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">Primary weapons</div>
           <h3 className="text-lg font-black text-zinc-50">Loadout Summary</h3>
         </div>
-        <div className="rounded-2xl bg-zinc-950 px-3 py-2 text-sm font-black text-lime-300">{unit.weapons.length}</div>
+        <div className="rounded-2xl bg-zinc-950 px-3 py-2 text-sm font-black text-lime-300">{weapons.length}</div>
       </div>
 
       <div className="space-y-2">
-        {unit.weapons.map((weapon) => (
+        {weapons.length === 0 && <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/50 p-4 text-sm text-zinc-500">No weapon data loaded.</div>}
+        {weapons.map((weapon) => (
           <div key={weapon.id} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3">
             <div className="flex items-center justify-between gap-3">
               <div className="font-bold text-zinc-100">{weapon.name}</div>
@@ -756,7 +879,7 @@ function MechLabPanel({ unit, panelMode, setPanelMode, onClose }: { unit: Unit; 
             <button onClick={() => setPanelMode("details")} className={`min-w-0 whitespace-nowrap rounded-xl px-2 py-2 text-xs font-bold transition sm:px-4 sm:text-sm ${panelMode === "details" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Details</button>
           </div>
           {onClose && (
-            <button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-2xl border border-zinc-700 bg-zinc-950 text-zinc-400 transition hover:border-lime-400 hover:text-lime-300" aria-label="Close selected BattleMech" title="Close selected BattleMech">
+            <button onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-zinc-700 bg-zinc-950 text-zinc-400 transition hover:border-lime-400 hover:text-lime-300" aria-label="Close selected BattleMech" title="Close selected BattleMech">
               <X size={18} />
             </button>
           )}
@@ -776,32 +899,80 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Complete record</div>
           <h3 className="mt-1 text-2xl font-black text-zinc-50">{unit.model} Full Information</h3>
         </div>
-        <Badge>{unit.sourceFile ?? "No source"}</Badge>
+        <Badge>{unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <InfoSection title="Manufacturers" items={["Manufacturer", "Primary Factory", "Known Production Lines", "Availability Notes"]} />
-        <InfoSection title="History" items={["Development History", "Service History", "Notable Deployments", "Variants / Lineage Notes"]} />
-        <InfoSection title="Factories" items={["Factory World", "Faction Ownership", "Production Status", "Campaign Availability"]} />
-        <InfoSection title="Capabilities" items={["Battlefield Role", "Strengths", "Limitations", "Doctrine Notes"]} />
-        <InfoSection title="Quirks" items={["Positive Quirks", "Negative Quirks", "Campaign Rule Notes", "Maintenance Notes"]} />
-        <InfoSection title="Construction" items={["Engine", "Gyro", "Cockpit", "Myomer", "Internal Structure", "Armor Type"]} />
-        <InfoSection title="Heat System" items={["Heat Sink Count", "Heat Sink Type", "Engine Sinks", "External Sinks", "Heat Efficiency Notes"]} />
-        <InfoSection title="Rules / Source" items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Validation Warnings"]} />
+        <TextInfoSection title="Overview" value={unit.overview} />
+        <TextInfoSection title="Capabilities" value={unit.capabilities} />
+        <TextInfoSection title="Deployment" value={unit.deployment} />
+        <TextInfoSection title="History" value={unit.history} />
+
+        <InfoSection
+          title="Manufacturing"
+          items={["Manufacturer", "Primary Factory", "Known Production Lines", "Availability Notes"]}
+          values={[unit.manufacturer ?? "—", unit.factory ?? "—", "—", "—"]}
+        />
+
+        <QuirksInfoSection quirks={unit.quirks ?? []} />
+
+        <InfoSection
+          title="Construction"
+          items={["Engine", "Gyro", "Cockpit", "Myomer", "Internal Structure", "Armor Type"]}
+          values={[unit.engine, unit.gyro, unit.cockpit ?? "Standard", unit.myomer ?? "—", unit.structureType ?? "—", unit.armorType ?? "—"]}
+        />
+
+        <InfoSection
+          title="Rules / Source"
+          items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Source Book", "MUL ID"]}
+          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || eraFromYear(unit.year), unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.mulId ? String(unit.mulId) : "—"]}
+        />
       </div>
     </section>
   );
 }
 
-function InfoSection({ title, items }: { title: string; items: string[] }) {
+function TextInfoSection({ title, value }: { title: string; value?: string }) {
+  return (
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4">
+      <h4 className="text-sm font-black uppercase tracking-[0.16em] text-lime-300">{title}</h4>
+      <p className="mt-3 min-h-28 whitespace-pre-wrap rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-6 text-zinc-400">
+        {value?.trim() || "—"}
+      </p>
+    </div>
+  );
+}
+
+function QuirksInfoSection({ quirks }: { quirks: string[] }) {
+  return (
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4">
+      <h4 className="text-sm font-black uppercase tracking-[0.16em] text-lime-300">Quirks</h4>
+      <div className="mt-3 min-h-28 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
+        {quirks.length > 0 ? (
+          <ul className="space-y-2 text-sm text-zinc-400">
+            {quirks.map((quirk, index) => (
+              <li key={`${quirk}-${index}`} className="rounded-xl border border-zinc-800 bg-zinc-900/70 px-3 py-2">
+                {quirk}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="text-sm text-zinc-500">—</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InfoSection({ title, items, values = [] }: { title: string; items: string[]; values?: React.ReactNode[] }) {
   return (
     <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4">
       <h4 className="text-sm font-black uppercase tracking-[0.16em] text-lime-300">{title}</h4>
       <div className="mt-3 space-y-2">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <div key={item} className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3">
             <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">{item}</div>
-            <div className="mt-1 min-h-5 text-sm text-zinc-400">—</div>
+            <div className="mt-1 min-h-5 truncate text-sm text-zinc-400">{values[index] || "—"}</div>
           </div>
         ))}
       </div>
@@ -810,32 +981,49 @@ function InfoSection({ title, items }: { title: string; items: string[] }) {
 }
 
 function LocationGrid({ unit }: { unit: Unit }) {
-  const byId = Object.fromEntries(unit.locations.map((location) => [location.id, location])) as Record<string, UnitLocation>;
+  const locations = unit.locations ?? [];
+  const byId = Object.fromEntries(locations.map((location) => [location.id, location])) as Record<string, UnitLocation>;
   const stackedLocations = [byId.head, byId.ct, byId.lt, byId.rt, byId.la, byId.ra, byId.ll, byId.rl].filter(Boolean) as UnitLocation[];
+
+  if (stackedLocations.length === 0) {
+    return <EmptyPanel message="No location/slot data loaded for this unit." />;
+  }
 
   return (
     <>
       <div className="grid min-w-0 gap-3 lg:grid-cols-2 xl:hidden">
         {stackedLocations.map((location) => (
-          <LocationCard key={location.id} location={location} mode="details" />
+          <LocationCard key={location.id} location={location} mode="slots" />
         ))}
       </div>
 
-      <div className="hidden min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 xl:grid xl:items-start">
-        <div className="space-y-3 pt-20 2xl:pt-10"><LocationCard location={byId.la} mode="details" compact /></div>
-        <div className="space-y-3"><LocationCard location={byId.lt} mode="details" compact /><LocationCard location={byId.ll} mode="details" compact /></div>
-        <div className="space-y-3"><LocationCard location={byId.head} mode="details" compact /><LocationCard location={byId.ct} mode="details" compact tall /></div>
-        <div className="space-y-3"><LocationCard location={byId.rt} mode="details" compact /><LocationCard location={byId.rl} mode="details" compact /></div>
-        <div className="space-y-3 pt-20 2xl:pt-10"><LocationCard location={byId.ra} mode="details" compact /></div>
+      <div className="hidden min-w-0 w-full max-w-full xl:block">
+        <div className="mx-auto mb-3 max-w-[260px]">
+          {byId.head && <LocationCard location={byId.head} mode="slots" compact head />}
+        </div>
+
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 items-start">
+          <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="slots" compact />}</div>
+          <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="slots" compact />}{byId.ll && <LocationCard location={byId.ll} mode="slots" compact />}</div>
+          <div className="space-y-3 pt-6">{byId.ct && <LocationCard location={byId.ct} mode="slots" compact tall />}</div>
+          <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="slots" compact />}{byId.rl && <LocationCard location={byId.rl} mode="slots" compact />}</div>
+          <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="slots" compact />}</div>
+        </div>
       </div>
     </>
   );
 }
 
 function WeaponPlacementGrid({ unit }: { unit: Unit }) {
-  const byId = Object.fromEntries(unit.locations.map((location) => [location.id, location])) as Record<string, UnitLocation>;
+  const locations = unit.locations ?? [];
+  const weapons = unit.weapons ?? [];
+  const byId = Object.fromEntries(locations.map((location) => [location.id, location])) as Record<string, UnitLocation>;
   const stackedLocations = [byId.head, byId.ct, byId.lt, byId.rt, byId.la, byId.ra, byId.ll, byId.rl].filter(Boolean) as UnitLocation[];
-  const weaponsFor = (location: UnitLocation) => unit.weapons.filter((weapon) => weapon.location === location.name);
+  const weaponsFor = (location: UnitLocation) => weapons.filter((weapon) => weapon.location === location.name);
+
+  if (stackedLocations.length === 0) {
+    return <EmptyPanel message="No location/weapon placement data loaded for this unit." />;
+  }
 
   return (
     <>
@@ -845,27 +1033,61 @@ function WeaponPlacementGrid({ unit }: { unit: Unit }) {
         ))}
       </div>
 
-      <div className="hidden min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 xl:grid xl:items-start">
-        <div className="space-y-3 pt-20 2xl:pt-10"><LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact /></div>
-        <div className="space-y-3"><LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact /><LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact /></div>
-        <div className="space-y-3"><LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact /><LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall /></div>
-        <div className="space-y-3"><LocationCard location={byId.rt} mode="weapons" weapons={weaponsFor(byId.rt)} compact /><LocationCard location={byId.rl} mode="weapons" weapons={weaponsFor(byId.rl)} compact /></div>
-        <div className="space-y-3 pt-20 2xl:pt-10"><LocationCard location={byId.ra} mode="weapons" weapons={weaponsFor(byId.ra)} compact /></div>
+      <div className="hidden min-w-0 w-full max-w-full xl:block">
+        <div className="mx-auto mb-3 max-w-[260px]">
+          {byId.head && <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />}
+        </div>
+
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 items-start">
+          <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact />}</div>
+          <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact />}{byId.ll && <LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact />}</div>
+          <div className="space-y-3 pt-6">{byId.ct && <LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall />}</div>
+          <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="weapons" weapons={weaponsFor(byId.rt)} compact />}{byId.rl && <LocationCard location={byId.rl} mode="weapons" weapons={weaponsFor(byId.rl)} compact />}</div>
+          <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="weapons" weapons={weaponsFor(byId.ra)} compact />}</div>
+        </div>
       </div>
     </>
   );
 }
 
-function LocationCard({ location, mode, weapons = [], compact = false, tall = false }: { location: UnitLocation; mode: UnitPanelMode; weapons?: UnitWeapon[]; compact?: boolean; tall?: boolean }) {
-  const occupiedSlots = location.slots.filter((slot) => slot.type !== "empty").length;
-  const armorPct = Math.min(100, Math.round((location.armor / Math.max(location.armor, location.structure)) * 100));
+function LocationCard({
+  location,
+  mode,
+  weapons = [],
+  compact = false,
+  tall = false,
+  head = false,
+}: {
+  location: UnitLocation;
+  mode: UnitPanelMode;
+  weapons?: UnitWeapon[];
+  compact?: boolean;
+  tall?: boolean;
+  head?: boolean;
+}) {
+  const visibleSlots = head ? location.slots.slice(0, 6) : location.slots;
+  const occupiedSlots = visibleSlots.filter((slot) => slot.type !== "empty").length;
+  const armorPct = Math.min(100, Math.round((location.armor / Math.max(location.armor, location.structure || 1)) * 100));
+
+  const cardClassName = [
+    "min-w-0 rounded-3xl border border-zinc-800 bg-zinc-950/70",
+    compact ? "p-3" : "p-4",
+    tall ? "xl:min-h-[520px]" : "",
+    head ? "xl:min-h-0" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <article className={`min-w-0 rounded-3xl border border-zinc-800 bg-zinc-950/70 ${compact ? "p-3" : "p-4"} ${tall ? "xl:min-h-[520px]" : ""}`}>
+    <article className={cardClassName}>
       <div className="mb-3 text-center">
-        <div className="mx-auto mb-1 grid h-7 w-7 place-items-center rounded-xl bg-lime-400/10 text-lime-300"><MapPin size={15} /></div>
+        <div className="mx-auto mb-1 grid h-7 w-7 place-items-center rounded-xl bg-lime-400/10 text-lime-300">
+          <MapPin size={15} />
+        </div>
         <h3 className="text-base font-black text-zinc-50">{location.name}</h3>
-        <p className="text-[11px] text-zinc-500">{occupiedSlots}/{location.slots.length} slots occupied</p>
+        <p className="text-[11px] text-zinc-500">
+          {occupiedSlots}/{visibleSlots.length} slots occupied
+        </p>
       </div>
 
       <div className={`mb-4 grid gap-2 ${location.rearArmor !== undefined ? "grid-cols-3" : "grid-cols-2"}`}>
@@ -874,15 +1096,25 @@ function LocationCard({ location, mode, weapons = [], compact = false, tall = fa
         <ArmorPip label="ST" value={location.structure} />
       </div>
 
-      <div className="mb-4 h-2 overflow-hidden rounded-full bg-zinc-800"><div className="h-full rounded-full bg-lime-400" style={{ width: `${armorPct}%` }} /></div>
+      <div className="mb-4 h-2 overflow-hidden rounded-full bg-zinc-800">
+        <div className="h-full rounded-full bg-lime-400" style={{ width: `${armorPct}%` }} />
+      </div>
 
-      {mode === "details" ? (
+      {mode === "slots" ? (
         <div className="grid grid-cols-1 gap-1.5">
-          {location.slots.map((slot) => <CriticalSlotRow key={slot.slot} slot={slot} />)}
+          {visibleSlots.map((slot) => (
+            <CriticalSlotRow key={`${location.id}-${slot.slot}`} slot={slot} />
+          ))}
         </div>
       ) : (
         <div className="space-y-2">
-          {weapons.length > 0 ? weapons.map((weapon) => <WeaponPlacementRow key={weapon.id} weapon={weapon} />) : <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/50 p-4 text-center text-sm text-zinc-500">No weapons in this location.</div>}
+          {weapons.length > 0 ? (
+            weapons.map((weapon) => <WeaponPlacementRow key={weapon.id} weapon={weapon} />)
+          ) : (
+            <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/50 p-4 text-center text-sm text-zinc-500">
+              No weapons in this location.
+            </div>
+          )}
         </div>
       )}
     </article>
@@ -911,6 +1143,10 @@ function WeaponPlacementRow({ weapon }: { weapon: UnitWeapon }) {
       </div>
     </div>
   );
+}
+
+function EmptyPanel({ message }: { message: string }) {
+  return <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-950/50 p-8 text-center text-zinc-500">{message}</div>;
 }
 
 function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
@@ -1046,4 +1282,54 @@ function slotClass(type: CriticalSlot["type"]) {
     default:
       return "border-zinc-800 bg-zinc-950/50 text-zinc-600";
   }
+}
+
+function weightClassFromTonnage(tonnage: number) {
+  if (!Number.isFinite(tonnage) || tonnage <= 0) return "";
+  if (tonnage <= 35) return "Light";
+  if (tonnage <= 55) return "Medium";
+  if (tonnage <= 75) return "Heavy";
+  return "Assault";
+}
+
+function normalizeRulesLevel(value: string | number | undefined) {
+  const raw = String(value ?? "").trim();
+  const lower = raw.toLowerCase();
+
+  if (!raw) return "Unknown";
+  if (["1", "intro", "introductory"].includes(lower)) return "Introductory";
+  if (["2", "standard"].includes(lower)) return "Standard";
+  if (["3", "advanced"].includes(lower)) return "Advanced";
+  if (["4", "experimental"].includes(lower)) return "Experimental";
+  if (["5", "unofficial"].includes(lower)) return "Unofficial";
+
+  return raw;
+}
+
+function normalizeEra(value: string | undefined, year: number) {
+  const raw = String(value ?? "").trim();
+  const lower = raw.toLowerCase();
+
+  if (lower === "star league") return "Star League";
+  if (lower === "succession wars") return "Succession Wars";
+  if (lower === "clan invasion") return "Clan Invasion";
+  if (lower === "civil war") return "Civil War";
+  if (lower === "jihad") return "Jihad";
+  if (lower === "republic") return "Republic";
+  if (lower === "dark age") return "Dark Age";
+  if (lower === "ilclan" || lower === "ilclan era" || lower === "dark age / ilclan") return "IlClan";
+
+  return eraFromYear(year);
+}
+
+function eraFromYear(year: number) {
+  if (!Number.isFinite(year) || year <= 0) return "";
+  if (year <= 2780) return "Star League";
+  if (year <= 3049) return "Succession Wars";
+  if (year <= 3061) return "Clan Invasion";
+  if (year <= 3067) return "Civil War";
+  if (year <= 3080) return "Jihad";
+  if (year <= 3130) return "Republic";
+  if (year <= 3150) return "Dark Age";
+  return "IlClan";
 }

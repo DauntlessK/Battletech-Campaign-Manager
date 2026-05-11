@@ -17,6 +17,7 @@ type CatalogRow = {
   name: string;
   fileName: string;
   relativePath: string;
+
   tonnage: string;
   weightClass: string;
   bv: string;
@@ -26,15 +27,6 @@ type CatalogRow = {
   year: string;
   era: string;
   role: string;
-  walk: string;
-  run: string;
-  jump: string;
-  heatSinks: string;
-  heatSinkType: string;
-  engine: string;
-  gyro: string;
-  armorType: string;
-  structureType: string;
 };
 
 const UNITS_ROOT = path.resolve(process.cwd(), "src", "data", "units");
@@ -66,15 +58,6 @@ const CSV_COLUMNS: Array<keyof CatalogRow> = [
   "year",
   "era",
   "role",
-  "walk",
-  "run",
-  "jump",
-  "heatSinks",
-  "heatSinkType",
-  "engine",
-  "gyro",
-  "armorType",
-  "structureType",
 ];
 
 async function main() {
@@ -100,18 +83,18 @@ async function indexUnitType(unitType: UnitTypeKey) {
 
   for (const filePath of files) {
     const fileName = path.basename(filePath);
+    const content = await fs.readFile(filePath, "utf-8");
+
+    const metadata = parseMtfMetadata(content);
     const parsedName = parseChassisModelFromFileName(fileName);
 
-    if (!parsedName) {
+    const chassis = metadata.chassis || parsedName?.chassis || "";
+    const model = metadata.model || parsedName?.model || "";
+
+    if (!chassis || !model) {
+      console.warn("[indexUnits] Skipping file with missing chassis/model:", filePath);
       continue;
     }
-
-    const content = await fs.readFile(filePath, "utf-8");
-    const metadata = parseMtfMetadata(content);
-
-    const chassis = metadata.chassis || parsedName.chassis;
-    const model = metadata.model || parsedName.model;
-    const tonnage = metadata.tonnage;
 
     rows.push({
       id: createCatalogId(unitType, path.relative(UNITS_ROOT, filePath)),
@@ -122,8 +105,8 @@ async function indexUnitType(unitType: UnitTypeKey) {
       fileName,
       relativePath: path.relative(UNITS_ROOT, filePath).replace(/\\/g, "/"),
 
-      tonnage,
-      weightClass: getWeightClass(tonnage),
+      tonnage: metadata.tonnage,
+      weightClass: getWeightClass(metadata.tonnage),
       bv: metadata.bv,
       costCBills: metadata.costCBills,
       techBase: metadata.techBase,
@@ -131,15 +114,6 @@ async function indexUnitType(unitType: UnitTypeKey) {
       year: metadata.year,
       era: metadata.era,
       role: metadata.role,
-      walk: metadata.walk,
-      run: metadata.run,
-      jump: metadata.jump,
-      heatSinks: metadata.heatSinks,
-      heatSinkType: metadata.heatSinkType,
-      engine: metadata.engine,
-      gyro: metadata.gyro,
-      armorType: metadata.armorType,
-      structureType: metadata.structureType,
     });
   }
 
@@ -189,9 +163,17 @@ async function findFilesByExtension(root: string, extension: string): Promise<st
   return results;
 }
 
-function parseChassisModelFromFileName(fileName: string) {
+function parseChassisModelFromFileName(fileName: string): {
+  chassis: string;
+  model: string;
+} | null {
   const baseName = fileName.replace(/\.mtf$/i, "").trim();
-  const parts = baseName.split(/\s+/);
+
+  // Handles Clan-style names like:
+  // Daishi (Dire Wolf) Prime.mtf
+  // by treating the parenthetical name as an alternate name rather than part of model parsing.
+  const withoutParentheses = baseName.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  const parts = withoutParentheses.split(/\s+/);
 
   if (parts.length < 2) {
     return null;
@@ -208,36 +190,42 @@ function parseMtfMetadata(content: string) {
 
   const getValue = (...keys: string[]) => {
     for (const key of keys) {
-      const found = lines.find((line) =>
-        line.trim().toLowerCase().startsWith(`${key.toLowerCase()}:`)
-      );
+      const normalizedTarget = normalizeMtfKey(key);
 
-      if (found) {
-        return found.slice(found.indexOf(":") + 1).trim();
+      for (const line of lines) {
+        const parsed = parseKeyValueLine(line);
+
+        if (!parsed) continue;
+
+        if (normalizeMtfKey(parsed.key) === normalizedTarget) {
+          return parsed.value;
+        }
       }
     }
 
     return "";
   };
 
-  const chassis = getValue("chassis", "Chassis");
-  const model = getValue("model", "Model");
+  const chassis = getValue("chassis");
+  const model = getValue("model");
   const tonnage = getValue("mass", "tonnage", "weight");
-  const year = getValue("year", "introYear");
-  const techBase = getValue("techbase", "tech_base", "tech base");
-  const rulesLevel = getValue("rules level", "rules_level", "rules");
-  const walk = getValue("walkmp", "walk mp", "walkingmp", "walking mp");
-  const jump = getValue("jumpmp", "jump mp", "jumpingmp", "jumping mp");
-  const heatSinks = getValue("heatsinks", "heat sinks");
-  const heatSinkType = getValue("sinktype", "heat sink type", "heatsinktype");
-  const engine = getValue("engine");
-  const gyro = getValue("gyro");
-  const armorType = getValue("armor type", "armortype");
-  const structureType = getValue("structure type", "structuretype");
+
+  // Many MegaMek MTF files use "era" as the introduction year.
+  const year =
+    getValue("year", "introYear", "intro year", "introduced", "introduction year") ||
+    numericYearOnly(getValue("era"));
+
+  const techBase = normalizeTechBase(
+    getValue("techbase", "tech base", "tech_base")
+  );
+
+  const rulesLevel = normalizeRulesLevelForCatalog(
+    getValue("rules level", "rules_level", "rules", "ruleslevel")
+  );
+
   const bv = getValue("bv", "battle value", "battlevalue");
   const costCBills = getValue("cost", "cost cbills", "cbills");
   const role = getValue("role");
-  const era = year ? yearToEra(year) : "";
 
   return {
     chassis,
@@ -246,20 +234,70 @@ function parseMtfMetadata(content: string) {
     year,
     techBase,
     rulesLevel,
-    walk,
-    run: walk ? String(Math.ceil(Number(walk) * 1.5)) : "",
-    jump,
-    heatSinks,
-    heatSinkType,
-    engine,
-    gyro,
-    armorType,
-    structureType,
     bv,
     costCBills,
     role,
-    era,
+    era: year ? yearToEraBucket(year) : "",
   };
+}
+
+function parseKeyValueLine(line: string): { key: string; value: string } | null {
+  const trimmed = line.trim();
+
+  if (!trimmed || trimmed.startsWith("#")) {
+    return null;
+  }
+
+  // Handles:
+  // key: value
+  // key=value
+  const separatorMatch = trimmed.match(/^([^:=]+)\s*[:=]\s*(.*)$/);
+
+  if (!separatorMatch) {
+    return null;
+  }
+
+  return {
+    key: separatorMatch[1].trim(),
+    value: separatorMatch[2].trim(),
+  };
+}
+
+function normalizeMtfKey(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function numericYearOnly(value: string) {
+  const match = String(value || "").match(/\b(2[0-9]{3}|3[0-9]{3})\b/);
+  return match ? match[1] : "";
+}
+
+function normalizeTechBase(value: string) {
+  const raw = String(value || "").trim();
+  const lower = raw.toLowerCase();
+
+  if (!raw) return "";
+
+  if (lower.includes("clan")) return "Clan";
+  if (lower.includes("mixed")) return "Mixed";
+  if (lower.includes("inner") || lower.includes("is")) return "Inner Sphere";
+
+  return raw;
+}
+
+function normalizeRulesLevelForCatalog(value: string) {
+  const raw = String(value || "").trim();
+  const lower = raw.toLowerCase();
+
+  if (!raw) return "";
+
+  if (["1", "intro", "introductory"].includes(lower)) return "Introductory";
+  if (["2", "standard"].includes(lower)) return "Standard";
+  if (["3", "advanced"].includes(lower)) return "Advanced";
+  if (["4", "experimental"].includes(lower)) return "Experimental";
+  if (["5", "unofficial"].includes(lower)) return "Unofficial";
+
+  return raw;
 }
 
 function getWeightClass(tonnage: string) {
@@ -273,17 +311,20 @@ function getWeightClass(tonnage: string) {
   return "Assault";
 }
 
-function yearToEra(yearValue: string) {
+function yearToEraBucket(yearValue: string) {
   const year = Number(yearValue);
 
   if (!Number.isFinite(year) || year <= 0) return "";
-  if (year < 2781) return "Star League";
-  if (year < 3049) return "Succession Wars";
-  if (year < 3062) return "Clan Invasion";
-  if (year < 3068) return "Civil War";
-  if (year < 3081) return "Jihad";
-  if (year < 3131) return "Republic";
-  return "Dark Age / ilClan";
+
+  if (year <= 2780) return "Star League";
+  if (year <= 3049) return "Succession Wars";
+  if (year <= 3061) return "Clan Invasion";
+  if (year <= 3067) return "Civil War";
+  if (year <= 3080) return "Jihad";
+  if (year <= 3130) return "Republic";
+  if (year <= 3150) return "Dark Age";
+
+  return "IlClan";
 }
 
 function createCatalogId(unitType: UnitTypeKey, relativePath: string) {

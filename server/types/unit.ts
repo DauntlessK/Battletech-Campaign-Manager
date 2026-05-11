@@ -44,6 +44,7 @@ export type Unit = {
   run: number;
   jump: number;
   heatSinks: number;
+  heatSinkType?: string;
   armor: number;
   structure: number;
   offensiveBV: number;
@@ -54,6 +55,24 @@ export type Unit = {
   gyro: string;
   cockpit: string;
   sourceFile?: string;
+
+  clanName?: string;
+  mulId?: string | number;
+  sourceBook?: string;
+
+  overview?: string;
+  capabilities?: string;
+  deployment?: string;
+  history?: string;
+
+  quirks?: string[];
+
+  manufacturer?: string;
+  factory?: string;
+  myomer?: string;
+  armorType?: string;
+  structureType?: string;
+
   weapons: UnitWeapon[];
   locations: UnitLocation[];
 };

@@ -10,6 +10,7 @@ export class Mek extends Unit{
     public config: string;             //Biped or Quad, etc.
     public mass: number;
     public chassis: string;
+    public clanName?: string;
     public locations: Record<string, any>;
     public quirks: string[];
     public heatSinksType : string;     //Standard, Double, etc.
@@ -204,6 +205,9 @@ export class Mek extends Unit{
                 break;
             case "mass":
                 values.mass = parseInt(value);
+                break;
+            case "clanname":
+                values.clanName = value;
                 break;
             case "tech base":
                 values.tech_base = value;
