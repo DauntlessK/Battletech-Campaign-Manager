@@ -53,59 +53,252 @@ The system will have only one type of user, who can interact with other users in
 
 3. FUNCTIONAL REQUIREMENTS
 
-3.1 Site 
+============================================================
+3.1 Site, Help, and Public Information
+============================================================
 
-FR-: FAQ
+FR-001: The system shall display a landing page that provides an overview of the application, its purpose, and its major features.
 
-FR-: Comprehensive guide to creating and running a campaign
+FR-002: The system shall provide an FAQ page that answers common questions about campaigns, forces, battles, user accounts, and leaderboards.
 
-FR-: Overview on landing page
+FR-003: The system shall provide a comprehensive campaign guide explaining how to create, configure, run, and conclude a campaign.
 
-FR-: View Leaderboards - most frequent players, stats on meks destroyed, best factions, famous units
+FR-004: The system shall provide guidance for creating and managing forces, including explanations of force constraints such as era, Battle Value, faction, and unit type.
 
-3.2 User Accounts
+FR-005: The system shall provide guidance for logging battles, confirming battle results, repairing units, spending resources, and tracking campaign progress.
 
-FR1: Create and manage user account
+FR-006: The system shall allow users and visitors to view public leaderboards.
 
-FR2: System can send emails to users
+FR-007: The system shall display leaderboard statistics, including most frequent players, most successful players, units destroyed, best-performing factions, famous units, and other campaign performance metrics.
 
-FR3: Add freinds via a unique code for each user
+FR-008: The system shall allow leaderboards to be sorted and/or filtered by supported categories such as player, faction, campaign, force, unit, or time period.
 
-FR4: Receive notifications similar to FB notifications on campaign and battle updates
 
-3.3 Force management
+============================================================
+3.2 User Accounts and Social Features
+============================================================
 
-FR: View list of forces the player has created
+FR-009: The system shall allow a visitor to create a user account.
 
-FR5: Create unique forces - most likely with constraints (era, BV-max, etc)
+FR-010: The system shall allow a registered user to log in.
 
-FR6: Add units to force following contstraints assigned
+FR-011: The system shall allow a logged-in user to log out.
 
-FR7: Customize force and units to some extent (logo for force, unit background, name, pilot names, faction, etc)
+FR-012: The system shall allow a logged-in user to view and manage their account information.
 
-3.4 Campaign management
+FR-013: The system shall allow a logged-in user to update editable profile information, such as display name, profile image, preferred faction, or other supported profile settings.
 
-FR: View list of campaigns the player is / has participated in
+FR-014: The system shall assign each user a unique friend code.
 
-FR8: Create unique campaigns as the Campaign Owner, selecting campaign type and settings, and force to participate with
+FR-015: The system shall allow users to send friend requests using another user's unique friend code.
 
-FR9: Invite friend(s) to particpate in campaign
+FR-016: The system shall allow users to accept, reject, or remove friend connections.
 
-FR10: Join a campaign user was invited to and assign a force to a campaign, creating a unique instance of that force
+FR-017: The system shall allow users to view a list of their friends.
 
-FR11: View campaign progress and overall "score" (campaign home / dashboard)
+FR-018: The system shall send email notifications to users for supported events.
 
-FR: View past battles in the current campaign
+FR-019: The system shall allow users to receive in-app notifications for campaign invitations, battle updates, battle confirmations, campaign status changes, and other relevant events.
 
-FR12: View force/units in detail from any players in the campaign, including a list of kills and other status
+FR-020: The system shall display notifications in a format similar to social media notifications, including the notification type, message, timestamp, and read/unread status.
 
-FR13: Manage campaign by spending resources, repairing units etc
+FR-021: The system shall allow users to mark notifications as read.
 
-FR14: Log a new battle against a campaign
+FR-022: The system shall restrict account, force, campaign, and battle management actions to authenticated users.
 
-FR: Confirm a battle
 
-FR15: Finalize campaign / conclude
+============================================================
+3.3 Force Management
+============================================================
+
+FR-023: The system shall allow a logged-in user to view a list of forces they have created.
+
+FR-024: The system shall allow a logged-in user to create a new force.
+
+FR-025: The system shall allow users to assign basic force information, including force name, faction, logo, background description, BV, era, etc.
+
+FR-026: The system shall allow users to configure force-building constraints, such as era, maximum Battle Value, faction restrictions, unit type restrictions, technology level, or other supported limits.
+
+FR-027: The system shall allow users to add units to a force.
+
+FR-028: The system shall validate that units added to a force follow the assigned force constraints.
+
+FR-029: The system shall prevent users from adding units that violate the force's constraints unless the campaign or force settings explicitly allow exceptions.
+
+FR-030: The system shall allow users to remove units from a force.
+
+FR-031: The system shall allow users to view the details of each unit in a force.
+
+FR-032: The system shall allow users to customize supported unit details, such as unit nickname, pilot name, pilot notes, status notes, and visual identifiers.
+
+FR-033: The system shall allow users to edit supported force information after creation.
+
+FR-034: The system shall allow users to delete or archive a force if it is not currently locked by an active campaign.
+
+FR-035: The system shall preserve a campaign-specific copy of a force when that force is assigned to a campaign.
+
+FR-036: The system shall track campaign-specific unit status separately from the user's original force, including damage, kills, repairs, pilot changes, and other campaign-related changes.
+
+
+============================================================
+3.4 Campaign Management
+============================================================
+
+FR-037: The system shall allow a logged-in user to view a list of campaigns they own or participate in.
+
+FR-038: The system shall allow a logged-in user to create a new campaign as the Campaign Owner.
+
+FR-039: The system shall allow the Campaign Owner to select a campaign type.
+
+FR-040: The system shall allow the Campaign Owner to configure campaign settings, such as era, faction restrictions, force limits, Battle Value limits, resource rules, repair rules, scoring rules, and victory conditions.
+
+FR-041: The system shall allow the Campaign Owner to select one of their forces to participate in the campaign.
+
+FR-042: The system shall allow the Campaign Owner to invite friends to participate in a campaign.
+
+FR-043: The system shall send invited users a campaign invitation notification.
+
+FR-044: The system shall allow an invited user to accept or decline a campaign invitation.
+
+FR-045: The system shall allow a user who joins a campaign to assign one of their forces to that campaign.
+
+FR-046: The system shall create a unique campaign-specific instance of each assigned force when it joins a campaign.
+
+FR-047: The system shall allow campaign participants to view the campaign home page or dashboard.
+
+FR-048: The system shall display campaign progress on the campaign dashboard.
+
+FR-049: The system shall display an overall campaign score or standing based on the campaign's selected scoring rules.
+
+FR-050: The system shall allow campaign participants to view current campaign resources, status, standings, and major campaign events.
+
+FR-051: The system shall allow campaign participants to view a history of past battles in the current campaign.
+
+FR-052: The system shall allow campaign participants to view details of past battles, including participating forces, units destroyed, damage results, victory result, and confirmed status.
+
+FR-053: The system shall allow campaign participants to view the forces and units of other players in the campaign.
+
+FR-054: The system shall display detailed unit information for campaign forces, including unit status, damage, kills, pilot information, repair status, and other campaign-specific statistics.
+
+FR-055: The system shall allow the Campaign Owner or authorized users to manage campaign resources.
+
+FR-056: The system shall allow users to spend campaign resources according to the rules of the campaign.
+
+FR-057: The system shall allow users to repair damaged units according to the campaign's repair rules.
+
+FR-058: The system shall allow users to update unit status, including active, damaged, destroyed, captured, repaired, or unavailable.
+
+FR-059: The system shall allow an authorized user to log a new battle for a campaign.
+
+FR-060: The system shall allow the battle logger to enter battle details, including date, participating forces, participating units, scenario type, result, kills, losses, damage, and notes.
+
+FR-061: The system shall allow battle results to be submitted for confirmation.
+
+FR-062: The system shall notify relevant campaign participants when a battle requires confirmation.
+
+FR-063: The system shall allow authorized campaign participants to confirm or dispute a submitted battle result.
+
+FR-064: The system shall update campaign progress, force status, unit status, kills, losses, resources, and scores after a battle is confirmed.
+
+FR-065: The system shall allow the Campaign Owner to finalize or conclude a campaign.
+
+FR-066: The system shall prevent finalized campaigns from being modified except where explicitly allowed, such as viewing history, exporting results, or adding notes.
+
+FR-067: The system shall preserve finalized campaign results for later viewing.
+
+FR-068: The system shall allow users to view completed campaigns they previously participated in.
+
+
+============================================================
+3.5 Battle Management
+============================================================
+
+FR-069: The system shall allow authorized users to create a battle record within an active campaign.
+
+FR-070: The system shall allow users to select which campaign forces participated in a battle.
+
+FR-071: The system shall allow users to select which units participated in a battle.
+
+FR-072: The system shall allow users to record battle outcomes, including winner, loser, draw, objective results, or custom result types supported by the campaign.
+
+FR-073: The system shall allow users to record unit kills.
+
+FR-074: The system shall allow users to record unit damage.
+
+FR-075: The system shall allow users to record destroyed, disabled, captured, or salvaged units.
+
+FR-076: The system shall allow users to add notes or a battle report summary to a battle record.
+
+FR-077: The system shall allow battle records to remain pending until confirmed.
+
+FR-078: The system shall allow confirmed battle records to affect campaign standings and force status.
+
+FR-079: The system shall allow disputed battle records to be reviewed by the Campaign Owner or authorized users.
+
+
+============================================================
+3.6 Notifications and Communication
+============================================================
+
+FR-080: The system shall notify users when they are invited to a campaign.
+
+FR-081: The system shall notify users when a campaign invitation is accepted or declined.
+
+FR-082: The system shall notify campaign participants when a battle is logged.
+
+FR-083: The system shall notify campaign participants when a battle result requires confirmation.
+
+FR-084: The system shall notify campaign participants when a battle result is confirmed or disputed.
+
+FR-085: The system shall notify users when campaign status changes, such as campaign start, pause, completion, or cancellation.
+
+FR-086: The system shall allow users to view all notifications relevant to their account.
+
+FR-087: The system shall visually distinguish unread notifications from read notifications.
+
+FR-088: The system shall allow users to clear, archive, or dismiss notifications where supported.
+
+
+============================================================
+3.7 Search, Filtering, and Viewing Data
+============================================================
+
+FR-089: The system shall allow users to search or filter their forces.
+
+FR-090: The system shall allow users to search or filter available units when building a force.
+
+FR-091: The system shall allow users to filter units by supported attributes such as era, faction, Battle Value, tonnage, type, technology base, and role.
+
+FR-092: The system shall allow users to search or filter campaigns they own or participate in.
+
+FR-093: The system shall allow users to search or filter battle history within a campaign.
+
+FR-094: The system shall allow users to sort lists such as forces, campaigns, battles, units, and leaderboards by supported fields.
+
+
+============================================================
+3.8 Data Persistence and Access Control
+============================================================
+
+FR-095: The system shall store user account data.
+
+FR-096: The system shall store force data.
+
+FR-097: The system shall store campaign data.
+
+FR-098: The system shall store battle records.
+
+FR-099: The system shall store campaign-specific unit status separately from base unit data.
+
+FR-100: The system shall store notification data.
+
+FR-101: The system shall ensure that users can only modify forces, campaigns, battles, and account data they are authorized to modify.
+
+FR-102: The system shall ensure that campaign participants can view campaign data according to their campaign role and permissions.
+
+FR-103: The system shall prevent non-participants from viewing private campaign details unless the campaign is marked public.
+
+FR-104: The system shall allow public data, such as public leaderboards or public campaign summaries, to be viewed without requiring unauthorized access to private campaign details.
 
 
 
