@@ -1,0 +1,123 @@
+============================================================
+SYSTEM USE CASES
+Project: Daunt's Battletech Campaign Manager
+Document: SRS Use Case List
+Version: 1.0
+Date: 5/11/2026
+============================================================
+
+TABLE OF CONTENTS
+
+UC-001  Register New User
+UC-002  Log In
+UC-003  Log Out
+UC-004  Create Vehicle Listing
+UC-005  Search for Vehicles
+UC-006  Book Vehicle
+UC-007  Approve or Deny Booking
+UC-008  Mark Booking as Paid
+UC-009  Send Booking Message
+UC-010  View Notifications
+UC-011  Update Vehicle Listing
+UC-012  Deactivate Vehicle Listing
+UC-013  Reactivate Vehicle Listing
+UC-014  View My Bookings
+UC-015  Manage Owner Bookings
+
+============================================================
+USE CASE DETAILS
+============================================================
+
+------------------------------------------------------------
+UC-001: Book Vehicle
+------------------------------------------------------------
+
+Actor:
+    Renter
+
+Goal:
+    Reserve an available vehicle for selected dates.
+
+Description:
+    The renter selects a vehicle, chooses rental dates, and submits a booking
+    request. The system checks availability and creates a pending booking.
+
+Preconditions:
+    - Renter is logged in.
+    - Vehicle is active and available for booking.
+
+Trigger:
+    Renter clicks "Book this Car."
+
+Main Flow:
+    1. Renter selects a vehicle.
+    2. Renter enters start and end dates.
+    3. System checks for overlapping bookings.
+    4. System calculates total cost.
+    5. Renter submits booking request.
+    6. System creates booking with Pending status.
+    7. System notifies the vehicle owner.
+
+Alternative Flows:
+    A1. Selected dates overlap with an existing booking.
+        - System rejects the booking and asks renter to choose different dates.
+
+    A2. Renter cancels before submitting.
+        - System returns renter to vehicle details page.
+
+Postconditions:
+    Success:
+        - Booking request exists.
+        - Owner receives notification.
+
+    Failure:
+        - No booking is created.
+
+Related Requirements:
+    - FR-010: The system shall allow renters to book vehicles.
+    - FR-011: The system shall prevent overlapping bookings.
+    - FR-012: The system shall notify owners of new booking requests.
+
+Priority:
+    High
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------
+REQUIREMENTS TRACEABILITY MATRIX
+------------------------------------------------------------
+
+Requirement ID   Requirement Summary                 Related Use Case(s)
+--------------   ----------------------------------  -------------------
+FR-001           Register new user                   UC-001
+FR-002           Log in user                         UC-002
+FR-003           Log out user                        UC-003
+FR-004           Create vehicle listing              UC-004
+FR-005           Upload vehicle image                UC-004
+FR-006           Search vehicles                     UC-005
+FR-007           Filter vehicles by type/location    UC-005
+FR-008           Book vehicle                        UC-006
+FR-009           Prevent overlapping bookings        UC-006
+FR-010           Notify owner of booking request     UC-006, UC-007
+FR-011           Approve or deny booking             UC-007
+FR-012           Mark booking as paid                UC-008
+FR-013           Send booking message                UC-009
+FR-014           View notifications                  UC-010
