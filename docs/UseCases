@@ -29,59 +29,98 @@ USE CASE DETAILS
 ============================================================
 
 ------------------------------------------------------------
-UC-001: Book Vehicle
+UC-001: Register New User
 ------------------------------------------------------------
 
 Actor:
-    Renter
+    Player
 
 Goal:
-    Reserve an available vehicle for selected dates.
+    Create an account
 
 Description:
-    The renter selects a vehicle, chooses rental dates, and submits a booking
-    request. The system checks availability and creates a pending booking.
+    The prospective player can get started by registering below login information.
 
 Preconditions:
-    - Renter is logged in.
-    - Vehicle is active and available for booking.
+    - User is not logged in.
 
 Trigger:
-    Renter clicks "Book this Car."
+    User clicks register in the login modal, instead of providing login credentials.
 
 Main Flow:
-    1. Renter selects a vehicle.
-    2. Renter enters start and end dates.
-    3. System checks for overlapping bookings.
-    4. System calculates total cost.
-    5. Renter submits booking request.
-    6. System creates booking with Pending status.
-    7. System notifies the vehicle owner.
+    1. User clicks login / regsiter button at top right
+    2. User clicks registration
+    3. User provides a username, email, password
+    4. ?? Email is sent to user to confirm email with code
+    5. ?? User enters code to confirm account
 
 Alternative Flows:
-    A1. Selected dates overlap with an existing booking.
-        - System rejects the booking and asks renter to choose different dates.
-
-    A2. Renter cancels before submitting.
-        - System returns renter to vehicle details page.
+    n/a
 
 Postconditions:
     Success:
-        - Booking request exists.
-        - Owner receives notification.
+        - User account created.
+        - User receives email with account details.
 
     Failure:
-        - No booking is created.
+        - No account is created.
 
 Related Requirements:
-    - FR-010: The system shall allow renters to book vehicles.
-    - FR-011: The system shall prevent overlapping bookings.
-    - FR-012: The system shall notify owners of new booking requests.
+    - FR-01: The system shall allow prospective players to register.
+    - FR-02: The system shall send email notifications.
 
 Priority:
     High
 
+------------------------------------------------------------
+UC-002: User Adds a Friend
+------------------------------------------------------------
 
+Actor:
+    Player
+
+Goal:
+    Add friend 
+
+Description:
+    In order to join other player's campaigns, or have other players join your campaigns, the players need to be friends. To add a friend,
+    the player needs to have the other user's unique friend ID, which when provided, will prompt the prospective friend to accept or deny.
+
+Preconditions:
+    - User is logged in.
+    - User has their prospective friend's unique friend ID
+
+Trigger:
+    User is on the friends page and clicks on add friend button.
+
+Main Flow:
+    1. User clicks the add friend button
+    2. User enters the unique friend ID
+    3. User clicks submit
+    4. A notification is sent to the prospective friend
+    5. The prospective friend can choose to accept or deny
+    6. A notification of acceptance is sent to the first user
+
+Alternative Flows:
+    3a. Friend was not found due to incorrect or missing unique ID, reprompts for unique ID, doesn't advance from current screen / modal
+
+Postconditions:
+    Success:
+        - Users are now friends.
+        - Users can view each other's profiles.
+        - Users can invite each other to their campaigns
+
+    Failure:
+        - No friend found: does not advance from screen- ability to re-enter / resubmit ID.
+        - Denied request: Notification is sent to requester, no change in statuses
+
+Related Requirements:
+    - FR-03: The system shall allow users to add other users as friends via their unique ID
+    - FR-01: The system shall allow prospective players to register.
+    - FR-02: The system shall send email notifications.
+
+Priority:
+    High
 
 
 

@@ -143,6 +143,8 @@ const ERA_OPTIONS = [
   "IlClan",
 ];
 
+const RULE_OPTIONS = ["All", "Introductory", "Standard", "Advanced", "Experimental", "Unofficial"];
+
 export default function App() {
   const [activePage, setActivePage] = useState<PageKey>("units");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -300,6 +302,7 @@ function normalizeCatalogUnit(unit: Unit): Unit {
     weightClass: unit.weightClass || weightClassFromTonnage(Number(unit.tonnage ?? 0)),
     weapons: unit.weapons ?? [],
     locations: unit.locations ?? [],
+    quirks: unit.quirks ?? [],
   };
 }
 
@@ -423,7 +426,6 @@ function UnitsPage({
     () => ({
       roles: ["All", ...Array.from(new Set(units.map((unit) => unit.role).filter(Boolean)))],
       unitTypes: ["All", ...Array.from(new Set(units.map((unit) => String(unit.type || unit.unitType || "BattleMech")).filter(Boolean)))],
-      rules: ["All", ...Array.from(new Set(units.map((unit) => unit.rulesLevel).filter(Boolean)))],
       techBases: ["All", ...Array.from(new Set(units.map((unit) => unit.techBase).filter(Boolean)))],
     }),
     [units]
@@ -432,7 +434,7 @@ function UnitsPage({
   const filteredUnits = useMemo(() => {
     return units
       .filter((unit) => {
-        const unitEra = unit.era || eraFromYear(unit.year);
+        const unitEra = normalizeEra(unit.era, unit.year);
         const totalBV = Number(unit.totalBV ?? unit.bv ?? 0);
         const cost = Number(unit.costCBills ?? 0);
         const text = `${unit.name} ${unit.model} ${unit.chassis} ${unit.role} ${unit.sourceFile ?? ""} ${unit.fileName ?? ""} ${unit.relativePath ?? ""}`.toLowerCase();
@@ -442,7 +444,7 @@ function UnitsPage({
           matchesQuery &&
           (typeFilter === "All" || String(unit.type || unit.unitType) === typeFilter) &&
           (weightFilter === "All" || unit.weightClass === weightFilter) &&
-          (eraFilter === "All" || normalizeEra(unitEra, unit.year) === eraFilter) &&
+          (eraFilter === "All" || unitEra === eraFilter) &&
           (rulesFilter === "All" || unit.rulesLevel === rulesFilter) &&
           (roleFilter === "All" || unit.role === roleFilter) &&
           (techBaseFilter === "All" || unit.techBase === techBaseFilter) &&
@@ -626,7 +628,7 @@ function UnitToolbar({
   setRoleFilter: (role: string) => void;
   techBaseFilter: string;
   setTechBaseFilter: (techBase: string) => void;
-  filterOptions: { roles: string[]; unitTypes: string[]; rules: string[]; techBases: string[] };
+  filterOptions: { roles: string[]; unitTypes: string[]; techBases: string[] };
   minTonnage: number;
   setMinTonnage: (value: number) => void;
   maxTonnage: number;
@@ -686,7 +688,7 @@ function UnitToolbar({
         <CompactSelect label="Unit" value={typeFilter} onChange={setTypeFilter} options={filterOptions.unitTypes} />
         <CompactSelect label="Class" value={weightFilter} onChange={setWeightFilter} options={["All", "Light", "Medium", "Heavy", "Assault"]} />
         <CompactSelect label="Era" value={eraFilter} onChange={setEraFilter} options={ERA_OPTIONS} />
-        <CompactSelect label="Rules" value={rulesFilter} onChange={setRulesFilter} options={["All", "Introductory", "Standard", "Advanced", "Experimental", "Unofficial"]} />
+        <CompactSelect label="Rules" value={rulesFilter} onChange={setRulesFilter} options={RULE_OPTIONS} />
         <CompactSelect label="Tech" value={techBaseFilter} onChange={setTechBaseFilter} options={filterOptions.techBases} />
         <CompactSelect label="Role" value={roleFilter} onChange={setRoleFilter} options={filterOptions.roles} />
       </div>
@@ -998,14 +1000,14 @@ function LocationGrid({ unit }: { unit: Unit }) {
       </div>
 
       <div className="hidden min-w-0 w-full max-w-full xl:block">
-        <div className="mx-auto mb-3 max-w-[260px]">
+        <div className="relative z-10 mx-auto -mb-10 max-w-[260px]">
           {byId.head && <LocationCard location={byId.head} mode="slots" compact head />}
         </div>
 
-        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 items-start">
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3 pt-16">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="slots" compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="slots" compact />}{byId.ll && <LocationCard location={byId.ll} mode="slots" compact />}</div>
-          <div className="space-y-3 pt-6">{byId.ct && <LocationCard location={byId.ct} mode="slots" compact tall />}</div>
+          <div className="space-y-3 pt-10">{byId.ct && <LocationCard location={byId.ct} mode="slots" compact tall />}</div>
           <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="slots" compact />}{byId.rl && <LocationCard location={byId.rl} mode="slots" compact />}</div>
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="slots" compact />}</div>
         </div>
@@ -1034,14 +1036,14 @@ function WeaponPlacementGrid({ unit }: { unit: Unit }) {
       </div>
 
       <div className="hidden min-w-0 w-full max-w-full xl:block">
-        <div className="mx-auto mb-3 max-w-[260px]">
+        <div className="relative z-10 mx-auto -mb-10 max-w-[260px]">
           {byId.head && <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />}
         </div>
 
-        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] gap-3 items-start">
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3 pt-16">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact />}{byId.ll && <LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact />}</div>
-          <div className="space-y-3 pt-6">{byId.ct && <LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall />}</div>
+          <div className="space-y-3 pt-10">{byId.ct && <LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall />}</div>
           <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="weapons" weapons={weaponsFor(byId.rt)} compact />}{byId.rl && <LocationCard location={byId.rl} mode="weapons" weapons={weaponsFor(byId.rl)} compact />}</div>
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="weapons" weapons={weaponsFor(byId.ra)} compact />}</div>
         </div>
