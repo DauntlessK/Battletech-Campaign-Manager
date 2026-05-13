@@ -560,7 +560,7 @@ User selects Create Force.
 1. User opens the force creation page.
 2. System displays the force creation form.
 3. User enters force name, faction, logo, background, BV, era, and other supported details.
-4. User configures force-building constraints.
+4. User configures force-building constraints or select a campaign the user is in to use as constraints.
 5. User submits the form.
 6. System validates the force information.
 7. System creates the force.
@@ -856,6 +856,7 @@ Success:
 * Campaign exists.
 * User is Campaign Owner.
 * Campaign-specific force instance exists.
+* Campaign enters a "Beginning" state and stays until all players are invited and forces are finalized.
 
 Failure:
 
@@ -871,6 +872,7 @@ Failure:
 * FR-046: Create campaign-specific force instance.
 * FR-098: Store campaign data.
 * FR-100: Store campaign-specific unit status separately.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High
@@ -920,6 +922,10 @@ A2. Campaign is not accepting invitations.
 
 1. System prevents invitation.
 2. System explains the campaign status.
+
+A3. User does not have a force that matches the restrictions of the campaign
+1. System allow player to join.
+2. Notifies user that a force must be created, then can be assigned
 
 **Postconditions:**
 Success:
@@ -1011,6 +1017,7 @@ Failure:
 * FR-082: Notify users when invitation is accepted or declined.
 * FR-098: Store campaign data.
 * FR-100: Store campaign-specific unit status separately.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High
@@ -1140,6 +1147,7 @@ Failure:
 * FR-036: Track campaign-specific unit status separately.
 * FR-100: Store campaign-specific unit status separately.
 * FR-103: View campaign data according to permissions.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High

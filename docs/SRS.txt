@@ -133,7 +133,7 @@ FR-032: The system shall allow users to customize supported unit details, such a
 
 FR-033: The system shall allow users to edit supported force information after creation.
 
-FR-034: The system shall allow users to delete or archive a force if it is not currently locked by an active campaign.
+FR-034: The system shall allow users to delete or archive a force - note that forces can be deleted even if used in a campaign because when they're assigned to a campaign, they're copied as a new, unique force.
 
 FR-035: The system shall preserve a campaign-specific copy of a force when that force is assigned to a campaign. This is only shown through the campaign.
 
@@ -162,7 +162,7 @@ FR-044: The system shall allow an invited user to accept or decline a campaign i
 
 FR-045: The system shall allow a user who joins a campaign to assign one of their forces to that campaign.
 
-FR-046: The system shall create a unique campaign-specific instance of each assigned force when it joins a campaign.
+FR-046: The system shall create a unique campaign-specific instance of each assigned force when it joins a campaign, essentially using the forces that each player has as a "template." This campaign-specific force breaks its ties with the original force and is unique and only found within the campaign at this point.
 
 FR-047: The system shall allow campaign participants to view the campaign home page or dashboard.
 
@@ -292,6 +292,8 @@ FR-099: The system shall store battle records.
 
 FR-100: The system shall store campaign-specific unit status separately from base unit data.
 
+FR-109: Store campaign-specific forces separately from the original forces they were copied from.
+
 FR-101: The system shall store notification data.
 
 FR-102: The system shall ensure that users can only modify forces, campaigns, battles, and account data they are authorized to modify.
@@ -311,6 +313,8 @@ FR-106: The system shall maintain a leaderboard of various global statistics, li
 FR-107: The system shall maintain a dashboard that shows off intersting counts like total # of games played, # of destroyed meks, and most popular units
 
 FR-108: The system shall only show leaderboard statistics of games from confirmed and completed campaigns, a low-effort way to filter out bogus-submitted campaigns
+
+FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 
 
