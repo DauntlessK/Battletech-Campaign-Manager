@@ -33,6 +33,20 @@ Techstack:
 
 Definitions and Abbreviations
 
+Battletech: A tabletop game from 1984 played on hex-based maps with many different types of units, most usually with mechs
+
+Classic: Only supported game-type by the app, uses BV to balance, game played on hexes, as opposed to Alpha-Strike which is played without hexes (rulers, etc) and PV to balance
+
+Mechs / Meks: an armored combat vehicle of roughly humanoid shape, standing 8 to 14 meters tall and typically massing from 20 to 100 tons.
+
+BV: Battlevalue - used to balance units
+
+Player: A partipant in a battle or campaign
+
+Campaign: A colletion of battles fought with the same, finite units with assets and consequences carrying over from one to the next
+
+Force: A set of units and pilots to be used in a campaign, built around restrictions like BV limit and era
+
 1.4
 
 References
@@ -317,11 +331,141 @@ FR-108: The system shall only show leaderboard statistics of games from confirme
 FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 
+4.0 CAMPAIGNS
+
+Players partipate in one of 3 different campaign types with varying granularity / complexity. Each campaign has one of several settings that can be adjusted upon creation. They include:
+
+Campaign Settings:
+-Campaign type
+-Campaign sub-type???
+-Campaign Scoring
+-Campaign era
+-Rules Level
+-Campaign Force BV limit
+-[conquest only] Lances/Stars
+-Victory Condition(s)
+
+Some of these settings may be inherently decided by the campaign type selected.
+
+4.1 Campaign Types
+
+- CHAOS CAMPAIGN (2-10p) - The simplest option, an implementation of the chaos campaign system. Extremely simplified for quick and easy management and minimal admin and upkeep, the
+campaign uses a generic warchest currency to handle all rearm and resupply costs, unit purchases and sales, upgrades and more. The admin configures the campaign (setting things like
+BV / size, warchest size, era, fog of war, etc) and players battle at their own pace. After a battle, both players enter the results and the system will "marry" and verify the data as 
+one battle entry (ensuring accuracy between the two records) that can be referenced at any time. Between battles players can spend warchest to repair, etc.
+
+- ADVANCED CAMPAIGN (2-10p) - An advanced campaign is esentially a halfway point between a chaos campaign and the full campaign experience within cam-ops that is in MekHQ. It is designed to
+be grittier and more detailed than a chaos campaign but still be appraochable and managable within a faster timeline. Players manage cBills, individual pilot XP, part availabilty and time 
+(as a resource for repairs) The key concept is that units like mechs and such will bear true scars and players will truly feel like each battle is a part of a larger conflict. 
+Pilots may enter injured already, mechs may be missing armor or whole limbs / weapons, and more as unit attrition is front and center, making for engaging long-term struggle.
+
+- CONQUEST CAMPAIGN (2p) - This strict 2p campaign takes the advanced campaign rules and adds a map and turn layer to it. Players fight over a planet with a full hex-map, which starts
+with multiple objectives all hidden across the map. The campaign takes place over a number of turns (either a preset limit, or unlimited) that consist of multiple days. Each turn, players
+will prioritize a repair and select a target hex to scout / control etc. Forces may be able to scout more hexes, or devote more time to repair, etc. 
+
+4.2 Campaign Scoring
+
+-While the campaign type determines the depth of management that goes into the player's force- in terms of resources, repairs, and orders, the scoring determines how the campaign is run and
+how players are ranked / doing in their campaign and ultimately who wins and loses the campaign. 
+
+Victory Conditions / scoring
+
+- [Chaos, Advanced, Conquest 2P] Total # of battles
+- [All Types] Surrender / Automatic Capitulation based on BV or resources (warchest, c-bills)
+- [Chaos, Advanced Campaigns] Domination - Over 75% control of objective world / area
+- [Conquest Campaigns] Control of key objectives across the world
+- [Conquest Campaigns] Finding and eliminating the enemy force's base / dropship
+- [Advanced Campaigns, Conquest Campaigns] Time / turns elapsed
+
+4.3 Campaign era
+
+This will restrict the era of forces the players can choose. These follow the normal eras of the Battltech Universe:
+
+Star League
+Early Succession wars
+Late Succession wars
+Clan Invasion
+...
+
+4.4 Rules Level
+
+This will restrict the rules level for forces the players can choose.
+
+1- Introductory
+2- Standard
+3- advanced
+4- Expirmental
+5- Unofficial
+
+4.5 Force BV limit
+
+This restricts the max allowable BV total for a force.
+
+4.6 Lances/Stars
+
+Only applicable to conquest campaign. Because each player must assign orders to each lance/star individually, forces should be organized into lances/stars. While within a campaign,
+a player can reorganize / switch out mechs etc, the campaign should start off with players having the same amount of lances/stars. Typically this would starting at company-strength,
+with 3 lances of 4 mechs each.
+
+4.7 Turns / Time
+
+A turn for advanced / Conquest campaigns can be configured to some degree. A turn represents a set amount of time, usually 1 to 5 days.
+
+For advanced campaigns, a turn is conducted in between battles. Following a battle, a player can use his turn to repair, rearm, and spend resources for other things like upgrades, etc. The
+campaign's configured turn length in days will dictate just how much work can be done to repair, rearm and reinforce.
+
+For conquest cmapaigns, a turn is a length of time in which each player will assign orders and those orders are carried out. Each lance/star is given an order like patrol, defend, attack,
+repair and it performs that action over that turn. (See section 4.9 for more details)
+
+There are no turns or concept of time in chaos campaigns- battles are fought and then units are repaired as resources are spent between battles.
+
+SCORING
+
+As it relates to chaos and advanced campaigns, the campaign owner sets a number of objectives (1-20 objectives total) that are fought over during the campaign. The campaign owner is also
+responsible for setting / fine tuning (or using default values) for battles. At its most basic, every battle can be worth a specific percentage of control over an objective. In 2p+ campaigns
+this would also mean a loss in control for the loser as well as a gain for the winner. Depending on the type of battle (and maybe results / # of losses / margin?) the amount won and the
+amount lost may differ.
+
+Certain objectives, with control over a threshold (75%?) may grant additional bonuses. Such as: An additional tech (for repairs), a cash income (one time or after each battle), 
+a radar or comms facility, etc
+
+4.8 Chaos Campaign details
+
+A chaos campaign uses warchest points / support points as resources for each player's force. Players use these to repair, promote, buy new units and more. There are no turns or concept
+of time. Players battle and the effects are shown afterward once the battle has been logged. Then players repair units, etc in between battles. Depending on the desired victory condition(s),
+the campaign will end (and a victor declared) after 
+
+4.9 Advanced Campaigns
+
+Players must juggle managing c-Bills and time/turns as the battle enemies and keep their forces from falling apart or running out of funds.
 
 
-USE CASES
 
-1) A player wants to create a new campaign
+
+
+
+
+Campaign Sub-types
+
+- CLASH (2p) - Simple campaign type of just pummeling each other until one force cannot carry on and/or surrenders. Possibly force surrender when warchest / cBills run out.
+
+- OPEN WAR VARIANT (2p+) - One or more objectives are listed and fought over. There is an overall "leaderboard" that tracks control of the planet being fought over with victories
+granting more control by percentage over the planet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
