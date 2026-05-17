@@ -49,6 +49,16 @@ Combat team: A group of units within a force, usually organized into a lance (4 
 
 Company: The assumed force size for campaigns, though not required. 3 lances of 4 meks each. So 3 total combat teams and 12 total meks.
 
+Warchest / WP: Abstract points used only in chaos campaigns to represent c-bills, reputation, luck, etc that the player uses as currency to buy and upgrade units, repair, etc.
+
+Faction Quality Rating: Represents the faction's default unit quality - which influences the ease of repairs (and other things not really relevant to this campaign manager)
+
+Tech Rating: A-F rating that represents a unit's or equipment's (components, weapons, etc) complexity and thus repair difficulty. A being primitive, D being succession-wars level, and on. This should be reversed - cam-ops describes A-F as A being primitive. Should reverse this so that F is primitive.
+
+Availability Rating: A-F rating that represents a unit's or equipment's (components, weapons, etc) ease of requisition. At A, it is very common and easy to find, at F, it is near-impossible. X represents unavailable in that time period. All items are given 3 availabilities such as C/D/B representing Star League era, Succession Wars and Clan Invasion availability.
+
+
+
 1.4
 
 References
@@ -404,6 +414,8 @@ Only applicable to conquest campaign. Because each player must assign orders to 
 
 These combat teams are assigned orders as a whole, and for the duration of a turn, that combat team performs that order.
 
+TODO: still braingstorming but: Combat force size (BV limit) should be uniform. Since each combat force is given orders individually and operates as a separate force, any 1 combat team from one player could meet any combat team from the enemy player's force. If one combat team had a BV of 7,000 and it met another combat team in the campaign that was configured as 5,000, it's not exactly a fair fight.
+
 4.7 Turns / Time --------------------
 
 A turn for advanced / Conquest campaigns can be configured to some degree. A turn represents a set amount of time, usually 1 to 5 days.
@@ -425,6 +437,7 @@ Objectives represent key locations of strategic value that are worth fighting ov
 • Fort - Defensive bonuses when attacked
 • Repair Facility - Gives a +1 bonus to repair rolls when performed at a facility (not improvised repairs)
 • Space Port - Gives a +1 bonus for delivery time rolls
+• Medical Facility - Gives +1 bonus to on rolls for healing.
 
 4.9 Chaos Campaign details --------------------
 
@@ -448,14 +461,19 @@ The conquest campaign can best be desribed as a strategic board game on top of t
 4.12.1 Conquest Orders ---
 
 Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the 6 surrounding hexes (% chance for each*). Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way) 
-Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. 
-Patrol [hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each*). 
+Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn.
+Patrol [owned hex that borders enemy hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each**). 
 Recon [hex] - For this turn, the combat team probes into enemy territory, looking for targets of opportunity and attempting to deny bonuses from held objectives 
 Defend [hex] - For this turn, the combat team thwarts any attempts at territorial control by the enemy in the hex selected, and 6 surrounding hexes. There's also percetnage chance to deny recon. 
 Field Repair & Rearm [Owned hex] - For this turn, the combat team performs improvised field repairs which helps contribute to control percentage and defense, but is able to perform basic repairs at a penalty. 
 Facility Repairs - For this turn, the combat team performs advanced maintenance and repairs and is not considered at all for combat. Reserve - For this turn, the combat team is kept powered down and out for various reasons (major damage, awaiting parts, healing pilots, etc)
 
 *For percentages beyond the inital hex, the system should first roll 2D6 to find out how many hexes are gained. A 6-8 roll gains 3 hexes, a 5 or 9 gains 2 hexes, a 4 or 10 gains 4 hexes, a 2 gains 1 hex (the main hex), a 3 gains 5 hexes, a 11 gains 6 hexes and a 12 gains all 7 hexes.
+**Results in preventing hex control loss nearby while extending control into enemy / unowned hexes with greater percentage chances.
+
+4.12.2 Hex control ---
+
+TODO: 
 
 4.13 Repair, Rearmament and Requestioning --------------------
 
@@ -505,7 +523,6 @@ C items: (7+) This turn, (5-6) next turn, (3-4) 2 Turns, (2) 3 turns
 D items: (8+) This turn,  (6-7) next turn, (4-5) 2 turns, (2-3) 3 turns
 E items: (10+) this turn, (7-9) next turn, (5-6) 2 turns, (3-4) 3 turns, (2) 4 turns
 F items: (11+) this turn, (9-10) next turn, (7-8) 2 turns, (5-6) 3 turns, (2-4) 4 turns
-TODO: double check rarity levels
 
 Order of operations:
 1) Stock roll - Roll to see if the item in question is in stock. (2d6 against rarity roll)
@@ -520,6 +537,8 @@ Field repair: 4 reqs
 Facility repair: 5 reqs
 ** Repair, scrounge and salvage repair priority gives +2 reqs and +1 to rolls against rarity. (No effect on delivery time)
 
+Note that a bonus or penalty could be applied based on a campaign setting for the world that the campaign is taking place on. For example, a periphery world might make supplies harder to obtain, while a core inner sphere world might make things easier to obtain.
+
 4.14 Unit Purchasing, XP Purchasing, upgrades --------------------
 
 Purchasing new units follows the rolls against rarity table above, so every mek needs a rarity level. If it's not found, another attempt to find that mek can be made next turn. Otherwise it fails and the player can choose to purchase a different mek.
@@ -527,6 +546,24 @@ Purchasing new units follows the rolls against rarity table above, so every mek 
 XP can be spent at any time to improve pilots. I believe cam-ops contains skills and costs for improving mekwarriors.
 
 4.15 Health --------------------
+
+Healing for pilots that are injured depends on their severity. Each turn, a pilot at level 1 or 2 injury has a chance to progress "down" one level.
+
+Any level 3 and beyond injuries (6 representing death) requires that the pilot be unassigned to a combat force on the frontline, or his/her combat force be only performing facility maintenance or reserve orders. A level 3 will automatically move down to 2 on one week of facility maintenance or reserve orders. A level 4 and a level 5 requires a roll of 6+ and 8+, respectively, to move "down" all the way to 2 - again assuming the pilot's combat force is on facility maintenance or reserve orders. If a level 4 fails the roll, it moves down to level 4 automatically.
+
+4.17 Battles -------------------
+
+During chaos and advanced campaigns, battles occur at the end of a turn automatically. The time / turns will not advance otherwise.
+
+For conquest campaigns, a single battle MAY occur between turns. First, there is cadence that is preset in the back end that will be configurable long-term if needed. If a battle just occured, for example, another battle after one turn is less likely but not impossible. After 1 turn, the likelihood of a battle triggering again following the next turn would be 33%, and after 2 turns it might go up to 50%, then 75%, then 90%, then 100% each following turn.
+
+Additionally, there are modifiers that will influence this on top of the base percentages. If one combat force is in the area that another combat force is carrying out orders, the orders each combat force is carrying out will influence the percentage, making it more or less likely a battle occurs. TODO: need to hammer out the details
+
+Finally, attacks on objective are highly likely (75%) to result in a battle that will determine who controls that objective, making it a meaningful way to follow up a recent, previous victory to press an attack. Defending an objective with orders can reduce this likelihood, while the six adjacent hexes also sway the likelihood in one way or another, by 5% for each hex controlled by the attacker (tipping it towards more likely to start a battle) and 10% for each controlled by the defender and 5% that is uncontrolled (tipping it away and making it less likley to start a battle.) If it does not start a battle, it is considered that the combat force probed the defenses and raided, looking for an opening but found none and withdrew.
+
+* Note these percentages (anything hex related in terms of control, etc) will likely need a lot of refinement, and as such should be easily configurable on the back end for system admin only. Liklely needing hard, constant percentages to additional hex gains for specific order types, battle likelihoods, etc.
+
+4.18 EXAMPLE GAMEPLAY
 
 
 
