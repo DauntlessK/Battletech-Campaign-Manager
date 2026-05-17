@@ -379,6 +379,7 @@ Victory Conditions / scoring
 - [Conquest Campaigns] Control of key objectives across the world
 - [Conquest Campaigns] Finding and eliminating the enemy force's base / dropship
 - [Advanced Campaigns, Conquest Campaigns] Time / turns elapsed
+- [Conquest Campaigns] Control 75% of the hexes on the map
 
 As it relates to chaos and advanced campaigns, the campaign owner sets a number of objectives (1-20 objectives total) that are fought over during the campaign. The campaign owner is also responsible for setting / fine tuning (or using default values) for battles. At its most basic, every battle can be worth a specific percentage of control over an objective. In 2p+ campaigns this would also mean a loss in control for the loser as well as a gain for the winner. Depending on the type of battle (and maybe results / # of losses / margin?) the amount won and the amount lost may differ.
 
@@ -460,16 +461,42 @@ The conquest campaign can best be desribed as a strategic board game on top of t
 
 4.12.1 Conquest Orders ---
 
-Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the 6 surrounding hexes (% chance for each*). Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way) 
-Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn.
-Patrol [owned hex that borders enemy hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each**). 
-Recon [hex] - For this turn, the combat team probes into enemy territory, looking for targets of opportunity and attempting to deny bonuses from held objectives 
-Defend [hex] - For this turn, the combat team thwarts any attempts at territorial control by the enemy in the hex selected, and 6 surrounding hexes. There's also percetnage chance to deny recon. 
-Field Repair & Rearm [Owned hex] - For this turn, the combat team performs improvised field repairs which helps contribute to control percentage and defense, but is able to perform basic repairs at a penalty. 
-Facility Repairs - For this turn, the combat team performs advanced maintenance and repairs and is not considered at all for combat. Reserve - For this turn, the combat team is kept powered down and out for various reasons (major damage, awaiting parts, healing pilots, etc)
+• Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the surrounding hexes. Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way) 
+    Use: The main way to grab territory that is not connected to territory you currently control. Cannot be an objective hex or neighboring objective hex. Use this to strike at random spots and open new fronts, though success is much less gaurunteed compared to other orders that gain hexes.
+    Details: Success on a 2D6 roll of 8+. Then roll to see if additional hexes are gained: 10+ gains 2 extra hexes, 8+ 1 extra hex. Gained hexes first prioritize neutral hexes, then enemy hexes. A D6 roll determines which is gained (with 1 being north, 2 being NE, 3 being SE, etc).
+    Interaction with other orders: Enemy recons in nearby hexes (within two hexes) give a -2 to success.
+    Likelihood of triggering battles: 
+• Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn.
+    Use: This is the only way to gain control of any objective hexes. Must have control of at least 1 hex adjacent to the objective - not counting hexes gained by other combat teams that same turn.
+    Details: The odds of success depend on if the objective is contested (the enemy has attack orders on it as well) and if it is currently already controlled.
+        If contested and unowned: a battle is triggered and the winner gains control of the objective.
+        If controlled: A roll of 9+ is required to trigger a battle for control. For each additional hex the attacking player has beyond the 1 required, a -1 modifier is applied to the roll.
+        If uncontrolled and uncontested: a roll of 4+ will give the attacker control. A failure represents the combat force being spooked / having bad intel / local militia or populace rejecting control, etc
+    Interaction with other orders: Enemy defense applies a +1 modifer to the roll and another +1 modifier if the defender controls 3 or more hexes adjacent to the objective.
+    Likleihood of triggering battles: See above.
+• Patrol [owned hex that borders enemy hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each**). 
+    Use: Best way to gain hexes; use it to gain several hexes from already controlled territory. It offers the best chance to gain hexes, especially more than one or two.
+    Details: Must be made from your own controlled hex - ideally you'd want to patrol a hex that borders several nuetral or enemy hexes.
+        For every hex that could be controlled, a 2d6 roll of 6+ results in the territory coming under control of the player patrolling.
+        Each hex that successfully is gained (not previously controlled) has a chance to generate a "bonus hex" if it borders 1 or more capturable hexes. The player captures that hex (randomly determined) with a roll of 9+.
+    Interaction with other orders: If an enemy combat team is also patrolling within a range of 4 hexes, the each patrol suffers a +1 modifier to gains. Additionally, the bonus hex roll gets a +2 modifier.
+    Likelihood of trigger battles: Only if a patrol from the enemy is within 4 hexes on a roll of 8+.
+• Recon [hex with a seize, attack or patrol order already] - For this turn, the combat team probes into enemy territory, looking for targets of opportunity and attempting to deny bonuses from held objectives. By reconning, a combat team can increase the odds of a successful attack objective.
+    Use: To support other combat team's offensive orders by increasing odds of success for patrols, seizing territory and attacking objectives.
+    Details: A recon provides -1 to:
+        Seize Territory (only the intial hex, not additional hexes)
+        Attack Objective (-1 to attack roll)
+        Patrol (Negates enemy patrol penalties (still applies a penalty to opposing patrol penalty) and a -1 to bonus hex rolls)
+    Interaction with other orders: This order for a given combat unit must take place on the same hex as another combat team's order for seize, attack or patrol.
+    Likelihood of triggering battles: n/a
+• Defend [hex] - For this turn, the combat team thwarts any attempts at territorial control by the enemy in the hex selected, and 6 surrounding hexes. Sort of the opposite of recon in that it decreases the odds of success for the enemy.
+    Use: TODO:
+• Field Repair & Rearm [Owned hex] - For this turn, the combat team performs improvised field repairs which helps contribute to control percentage and defense, but is able to perform basic repairs at a penalty. 
+• Facility Repairs - For this turn, the combat team performs advanced maintenance and repairs and is not considered at all for combat. Reserve - For this turn, the combat team is kept powered down and out for various reasons (major damage, awaiting parts, healing pilots, etc)
 
-*For percentages beyond the inital hex, the system should first roll 2D6 to find out how many hexes are gained. A 6-8 roll gains 3 hexes, a 5 or 9 gains 2 hexes, a 4 or 10 gains 4 hexes, a 2 gains 1 hex (the main hex), a 3 gains 5 hexes, a 11 gains 6 hexes and a 12 gains all 7 hexes.
+
 **Results in preventing hex control loss nearby while extending control into enemy / unowned hexes with greater percentage chances.
+***Note about all roll changes and modifiers: Percentages (anything hex related in terms of control, etc) will likely need a lot of refinement, and as such should be easily configurable on the back end for system admin only. Liklely needing hard, constant percentages to additional hex gains for specific order types, battle likelihoods, etc.
 
 4.12.2 Hex control ---
 
