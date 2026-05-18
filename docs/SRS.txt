@@ -354,7 +354,8 @@ Campaign Settings:
 -Campaign era
 -Rules Level
 -Campaign Force BV limit
--[conquest only] Lances/Stars
+-[conquest only] Combat Forces
+-[conquest only] Combat Force size
 -Victory Condition(s)
 
 Some of these settings may be inherently decided by the campaign type selected.
@@ -417,6 +418,14 @@ These combat teams are assigned orders as a whole, and for the duration of a tur
 
 TODO: still braingstorming but: Combat force size (BV limit) should be uniform. Since each combat force is given orders individually and operates as a separate force, any 1 combat team from one player could meet any combat team from the enemy player's force. If one combat team had a BV of 7,000 and it met another combat team in the campaign that was configured as 5,000, it's not exactly a fair fight.
 
+Note that combat teams will have a total/full BV, representing the fully repaired BV, and an actual BV, representing the current BV which takes into account the status of the units within as it has sustained damage, etc.
+
+4.6.1 Auxiliary Forces
+
+May be an optional rule for conquest campaign, but as a means to allow for battling forces the opportunity to square off more "fairly" when actual (or full BV) is at a large discrepancy. Auxiliary forces can be selected from to add light or medium meks to a combat force that is that much less. This would be for discrepancies of over 400 or so. A generic unit can be selected from an approved list to participate but is not considered a part of the player's force for the campaign and is removed from the campaign following the battle. This Auxiliary force represents militia or friendly forces lending a hand to the player's force for that battle.
+
+* this may require further balancing as, since this unit is not really a part of the campaign at large, it gives the player a unit to throw into combat with little to no regard at it's loss. In addition to the normal, required forced withdrawal rules, a c-bill penalty might be worth instituting when an Auxiliary unit is lost- representing the cost of the mek itself, as well as if the pilot was killed, etc.
+
 4.7 Turns / Time --------------------
 
 A turn for advanced / Conquest campaigns can be configured to some degree. A turn represents a set amount of time, usually 1 to 5 days.
@@ -461,18 +470,21 @@ The conquest campaign can best be desribed as a strategic board game on top of t
 
 4.12.1 Conquest Orders ---
 
-• Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the surrounding hexes. Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way) 
+Various complementary orders give bonuses to the attacker (usually in positive modifiers) and some orders give the defender a bonus (usually with a negative modifier)
+Note that bonuses from orders of the same type do not stack. Meaning that you cannot have 2 combat forces with the same order (such as recon) provide the modifier twice. Only one will count.
+
+• Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the surrounding hexes. Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way).
     Use: The main way to grab territory that is not connected to territory you currently control. Cannot be an objective hex or neighboring objective hex. Use this to strike at random spots and open new fronts, though success is much less gaurunteed compared to other orders that gain hexes.
     Details: Success on a 2D6 roll of 8+. Then roll to see if additional hexes are gained: 10+ gains 2 extra hexes, 8+ 1 extra hex. Gained hexes first prioritize neutral hexes, then enemy hexes. A D6 roll determines which is gained (with 1 being north, 2 being NE, 3 being SE, etc).
     Interaction with other orders: Enemy recons in nearby hexes (within two hexes) give a -2 to success.
     Likelihood of triggering battles: 
-• Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn.
+• Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn. If it does not start a battle, it is considered that the combat force probed the defenses and raided, looking for an opening but found none and withdrew.
     Use: This is the only way to gain control of any objective hexes. Must have control of at least 1 hex adjacent to the objective - not counting hexes gained by other combat teams that same turn.
     Details: The odds of success depend on if the objective is contested (the enemy has attack orders on it as well) and if it is currently already controlled.
         If contested and unowned: a battle is triggered and the winner gains control of the objective.
         If controlled: A roll of 9+ is required to trigger a battle for control. For each additional hex the attacking player has beyond the 1 required, a -1 modifier is applied to the roll.
         If uncontrolled and uncontested: a roll of 4+ will give the attacker control. A failure represents the combat force being spooked / having bad intel / local militia or populace rejecting control, etc
-    Interaction with other orders: Enemy defense applies a +1 modifer to the roll and another +1 modifier if the defender controls 3 or more hexes adjacent to the objective.
+    Interaction with other orders: Enemy defense applies a -1 modifer to the roll and another -1 modifier if the defender controls 3 or more hexes adjacent to the objective.
     Likleihood of triggering battles: See above.
 • Patrol [owned hex that borders enemy hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each**). 
     Use: Best way to gain hexes; use it to gain several hexes from already controlled territory. It offers the best chance to gain hexes, especially more than one or two.
@@ -483,16 +495,31 @@ The conquest campaign can best be desribed as a strategic board game on top of t
     Likelihood of trigger battles: Only if a patrol from the enemy is within 4 hexes on a roll of 8+.
 • Recon [hex with a seize, attack or patrol order already] - For this turn, the combat team probes into enemy territory, looking for targets of opportunity and attempting to deny bonuses from held objectives. By reconning, a combat team can increase the odds of a successful attack objective.
     Use: To support other combat team's offensive orders by increasing odds of success for patrols, seizing territory and attacking objectives.
-    Details: A recon provides -1 to:
-        Seize Territory (only the intial hex, not additional hexes)
-        Attack Objective (-1 to attack roll)
-        Patrol (Negates enemy patrol penalties (still applies a penalty to opposing patrol penalty) and a -1 to bonus hex rolls)
+    Details: A recon provides:
+        Seize Territory (+2 modifier for only the intial hex, not additional hexes)
+        Attack Objective (+1 to attack roll)
+        Patrol (Negates enemy patrol penalties (still applies a penalty to opposing patrol penalty) and a +1 to bonus hex rolls)
     Interaction with other orders: This order for a given combat unit must take place on the same hex as another combat team's order for seize, attack or patrol.
     Likelihood of triggering battles: n/a
 • Defend [hex] - For this turn, the combat team thwarts any attempts at territorial control by the enemy in the hex selected, and 6 surrounding hexes. Sort of the opposite of recon in that it decreases the odds of success for the enemy.
-    Use: TODO:
+    Use: To make it more difficult for enemy combat forces to gain control of hexes via seize, attack and patrol orders.
+    Details: Defend provides a -1 modifier to:
+        Seize Territory (all rolls)
+        Attack Objective
+        Patrol (all rolls)
+    Interaction with other orders:
 • Field Repair & Rearm [Owned hex] - For this turn, the combat team performs improvised field repairs which helps contribute to control percentage and defense, but is able to perform basic repairs at a penalty. 
+    Use: A great way to repair minor damage and rearm meks.
+    Details: This more improvised repair and rearm occurs on the field and comes with a small risk that the combat force could be ambushed, and that slight drawback that field repairs are not as comprehensive / quick as a full repair facility.
+    Interaction with other orders: If an enemy seize, patrol or recon occurs within 2,3,2 hexes respectively, there is a chance for a battle.
+    Likelihood of triggering battles: For each combat unit that is within range and performing one of the three above orders, a 2D6 roll is made. At +4, there is no battle. A +1 mod is applied if the enemy force's order is within 1 hex and +2 if the same hex.
 • Facility Repairs - For this turn, the combat team performs advanced maintenance and repairs and is not considered at all for combat. Reserve - For this turn, the combat team is kept powered down and out for various reasons (major damage, awaiting parts, healing pilots, etc)
+    Use: Intended for more comprehensive repairs on units.
+    Details: This is an off-map order, so the combat force is not in any danger of participating in any combat.
+    Interaction with other orders: None
+• Reserve - For this turn, the combat team is held back and does not partipate in any map-related actions - so it does not help hold hexes, gain hexes, etc. However this combat force can be swapped out / in during any battle once for that turn for a roll of 7+.
+    Use: Generally great for units that are extremely damaged and are awaiting parts, or units containing pilots that are severely injured.
+
 
 
 **Results in preventing hex control loss nearby while extending control into enemy / unowned hexes with greater percentage chances.
@@ -578,17 +605,15 @@ Healing for pilots that are injured depends on their severity. Each turn, a pilo
 
 Any level 3 and beyond injuries (6 representing death) requires that the pilot be unassigned to a combat force on the frontline, or his/her combat force be only performing facility maintenance or reserve orders. A level 3 will automatically move down to 2 on one week of facility maintenance or reserve orders. A level 4 and a level 5 requires a roll of 6+ and 8+, respectively, to move "down" all the way to 2 - again assuming the pilot's combat force is on facility maintenance or reserve orders. If a level 4 fails the roll, it moves down to level 4 automatically.
 
+4.16 Map ---------------------
+
+For initial release, only premade maps will be available for conquest mode. Will need to test a few different sizes. After release will look at implementing a random map generator. In addition to various objective hexes, the map will require city/village hexes, forest, hills, mountainous, river, plains and a few other types of hexes.
+
 4.17 Battles -------------------
 
 During chaos and advanced campaigns, battles occur at the end of a turn automatically. The time / turns will not advance otherwise.
 
-For conquest campaigns, a single battle MAY occur between turns. First, there is cadence that is preset in the back end that will be configurable long-term if needed. If a battle just occured, for example, another battle after one turn is less likely but not impossible. After 1 turn, the likelihood of a battle triggering again following the next turn would be 33%, and after 2 turns it might go up to 50%, then 75%, then 90%, then 100% each following turn.
-
-Additionally, there are modifiers that will influence this on top of the base percentages. If one combat force is in the area that another combat force is carrying out orders, the orders each combat force is carrying out will influence the percentage, making it more or less likely a battle occurs. TODO: need to hammer out the details
-
-Finally, attacks on objective are highly likely (75%) to result in a battle that will determine who controls that objective, making it a meaningful way to follow up a recent, previous victory to press an attack. Defending an objective with orders can reduce this likelihood, while the six adjacent hexes also sway the likelihood in one way or another, by 5% for each hex controlled by the attacker (tipping it towards more likely to start a battle) and 10% for each controlled by the defender and 5% that is uncontrolled (tipping it away and making it less likley to start a battle.) If it does not start a battle, it is considered that the combat force probed the defenses and raided, looking for an opening but found none and withdrew.
-
-* Note these percentages (anything hex related in terms of control, etc) will likely need a lot of refinement, and as such should be easily configurable on the back end for system admin only. Liklely needing hard, constant percentages to additional hex gains for specific order types, battle likelihoods, etc.
+For conquest campaigns, battles occur after orders are confirmed, essentially between turns. Since each combat force has some sort of chance at triggering a battle, it is possible that, RAW, there would be multiple battles in a single turn. While it may be necessary, as testing goes on, to adjust this cadence, for initial setup and launch, we'll aim not to limit it. In the future, we may want to adjust it so that there is a maximum number of battles that can take place per turn, or limit the chances beyond a max of 1 per turn, or slow the cadence even further with max 1 battle per turn and reduce the likelihood of battle within X amount of turns following a battle.
 
 4.18 EXAMPLE GAMEPLAY
 
