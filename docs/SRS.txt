@@ -708,6 +708,16 @@ Otherwise payment from the player's c-bills is automatic- each unit (scaled in t
 
 Pilots will have a cost based on their skill level.
 
+4.19 Order of Operations [Once turns are set] ----
+
+TODO: Figure out the order of which all combat force's orders are resolved. Probably defensive ones first, then patrols, then seizes and attacks?
+
+This may not be necessary - we just need to ensure certain rolls (like rolls for patrol vs patrol battle triggers) aren't duplicated.
+
+There is still some order of operations to deal with the possiblity of triggering a battle BEFORE we resolve the order itself (sieze, raid, etc), since this may deny the attacker.
+
+So probably all battle probabilities need to be rolled for before resolving territory changes, objectives, etc
+
 4.19 EXAMPLE GAMEPLAY -------------------------
 
 The below provide some useful interactions for each campaign type, giving a sense of how a player plays through a campaign, what settings, buttons etc may be interacted with.
@@ -752,4 +762,12 @@ He doesn't feel he needs to spend any of his c-bills for any new units, pilots o
 
 The system runs through the various orders, first dealing with repairs (figuring out what gets repaired based on priority, reqs, etc) then resolving offensive orders while taking defensive orders into account. A report of this is given to each player after its complete, as a turn log report. With this report they can review the results of each repair, order and more, even down to individual dice rolls and modifiers to said rolls (and their needed roll).
 
-It just so happens, that unbeknownest to John, Lauren had assigned a defense order near to where John's seize orders took place. Near enough that they are taken into account with their mods. There is a 
+It just so happens, that unbeknownest to John, Lauren had assigned a defense order near to where John's seize orders took place. Near enough that they are taken into account with their mods. There is a -2 modifier applied to John's seize order, but a +2 modifier thanks to his recon. The system rolls 2D6 to see if it triggers a battle first. A roll of a 9 means a battle was triggered.
+
+The players are notified that there is 1 battle pending. They can still view the log of everything else that occured, but since there is a battle pending, the turn isn't really complete (there could be additional territory changes, for example, based on the result of the battle.)
+
+The players assemble their combat forces, print sheets if they don't already have them, and play out the battle. Afterwards, they both record results, in the same way as the advanced campaign.
+
+With reconcilliation between the logs and all battles played out, the system plays out the remainder of the turn, completing the turn log. At the end of the log, any bonuses (like c-bill payout) are carried out, and salaries are deducted.
+
+After that, the turn is complete and players can go through the process again for the next turn.
