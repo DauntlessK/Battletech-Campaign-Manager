@@ -6,4 +6,6 @@ The application is intended to provide a middle ground between very simple campa
 
 A PvP campaign manager with the crunch of true, deep Battletech Campaign Ops, without the need for a GM, Opfor,accountant and finance degree.
 
+See `docs/EmailNotificationGuide.md` for backend email mode configuration, mock email testing, and SMTP setup.
+
 Run a mercenary unit with the granularity we all enjoy, all the while conducting a clash for control of a planet against your friend. You both are responsible for managing your meks, mekwarriors and resources as you duke it out on the tabletop in a campaign that could last days, weeks or months (in-game) to outlast each other in a battle of attrition or seize control of important objectives planet-wide.

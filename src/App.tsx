@@ -24,6 +24,7 @@ import {
   Zap,
   MapPin,
   SlidersHorizontal,
+  Bell,
 } from "lucide-react";
 
 type PageKey =
@@ -116,6 +117,67 @@ type Unit = {
   locations?: UnitLocation[];
 };
 
+type User = {
+  id: string;
+  email: string;
+  displayName: string;
+  friendCode: string;
+  role: string;
+  status: string;
+  authProvider: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type Campaign = {
+  id: string;
+  name: string;
+  description?: string;
+  ownerId: string;
+  status?: string;
+  settings?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type Force = {
+  id: string;
+  name: string;
+  ownerId: string;
+  description?: string;
+  unitIds?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+type PendingInvite = {
+  participant: {
+    id: string;
+    campaignId: string;
+    userId: string;
+    role: string;
+    status: string;
+    invitedById: string;
+    invitedAt: string;
+  };
+  campaign: {
+    id: string;
+    name: string;
+    ownerId: string;
+    status?: string;
+  };
+};
+
+type NotificationItem = {
+  id: string;
+  type: string;
+  payload: Record<string, any>;
+  read: boolean;
+  createdAt: string;
+};
+
+type AuthMode = "login" | "register";
+
 const navItems: Array<{ key: PageKey; label: string; icon: React.ReactNode }> = [
   { key: "landing", label: "Home", icon: <Home size={17} /> },
   { key: "about", label: "About", icon: <Shield size={17} /> },
@@ -155,6 +217,241 @@ export default function App() {
   const [unitsError, setUnitsError] = useState<string | null>(null);
   const [selectedUnitLoading, setSelectedUnitLoading] = useState(false);
   const [selectedUnitError, setSelectedUnitError] = useState<string | null>(null);
+  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authDisplayName, setAuthDisplayName] = useState("");
+
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(false);
+  const [campaignsError, setCampaignsError] = useState<string | null>(null);
+  const [forces, setForces] = useState<Force[]>([]);
+  const [forcesLoading, setForcesLoading] = useState(false);
+  const [forcesError, setForcesError] = useState<string | null>(null);
+  const [invites, setInvites] = useState<PendingInvite[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [accountDataLoading, setAccountDataLoading] = useState(false);
+
+  const AUTH_TOKEN_KEY = "bcm-auth-token";
+
+  const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+  const saveAuthToken = (token: string) => localStorage.setItem(AUTH_TOKEN_KEY, token);
+  const clearAuthToken = () => localStorage.removeItem(AUTH_TOKEN_KEY);
+
+  const authHeaders = () => {
+    const token = getAuthToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthSuccess = (user: User, token: string, successMessage: string) => {
+    saveAuthToken(token);
+    setAuthUser(user);
+    setAuthError(null);
+    setAuthSuccess(successMessage);
+    setAuthEmail("");
+    setAuthPassword("");
+    setAuthDisplayName("");
+  };
+
+  const fetchCurrentUser = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      const response = await fetch("/api/users/me", {
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        clearAuthToken();
+        setAuthUser(null);
+        return;
+      }
+
+      const data = (await response.json()) as User;
+      setAuthUser(data);
+    } catch (error) {
+      console.error("Failed to load current user", error);
+      clearAuthToken();
+      setAuthUser(null);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const submitAuthForm = async (mode: AuthMode) => {
+    setAuthLoading(true);
+    setAuthError(null);
+    setAuthSuccess(null);
+
+    const endpoint = mode === "register" ? "/api/auth/register" : "/api/auth/login";
+    const payload: Record<string, string> = {
+      email: authEmail,
+      password: authPassword,
+    };
+    if (mode === "register") {
+      payload.displayName = authDisplayName;
+    }
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.error || `Unable to ${mode}.`);
+      }
+
+      handleAuthSuccess(result.user, result.token, mode === "register" ? "Account created successfully." : "Signed in successfully.");
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Authentication failed.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setAuthLoading(true);
+    const token = getAuthToken();
+
+    try {
+      if (token) {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: {
+            ...authHeaders(),
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      clearAuthToken();
+      setAuthUser(null);
+      setCampaigns([]);
+      setForces([]);
+      setInvites([]);
+      setNotifications([]);
+      setAuthLoading(false);
+      setAuthSuccess("You have been signed out.");
+    }
+  };
+
+  const fetchCampaigns = async () => {
+    setCampaignsLoading(true);
+    setCampaignsError(null);
+    try {
+      const response = await fetch("/api/campaigns", {
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Unable to load campaigns.");
+      }
+      const data = (await response.json()) as Campaign[];
+      setCampaigns(data);
+    } catch (error) {
+      setCampaignsError(error instanceof Error ? error.message : "Unable to load campaigns.");
+    } finally {
+      setCampaignsLoading(false);
+    }
+  };
+
+  const fetchForces = async () => {
+    setForcesLoading(true);
+    setForcesError(null);
+    try {
+      const response = await fetch("/api/forces", {
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Unable to load forces.");
+      }
+      const data = (await response.json()) as Force[];
+      setForces(data);
+    } catch (error) {
+      setForcesError(error instanceof Error ? error.message : "Unable to load forces.");
+    } finally {
+      setForcesLoading(false);
+    }
+  };
+
+  const fetchAccountExtras = async () => {
+    setAccountDataLoading(true);
+    setAuthError(null);
+    try {
+      const [inviteResponse, notificationResponse] = await Promise.all([
+        fetch("/api/users/me/invites", {
+          headers: {
+            ...authHeaders(),
+            "Content-Type": "application/json",
+          },
+        }),
+        fetch("/api/users/me/notifications", {
+          headers: {
+            ...authHeaders(),
+            "Content-Type": "application/json",
+          },
+        }),
+      ]);
+
+      if (!inviteResponse.ok) {
+        const body = await inviteResponse.json().catch(() => null);
+        throw new Error(body?.error || "Unable to load invites.");
+      }
+      if (!notificationResponse.ok) {
+        const body = await notificationResponse.json().catch(() => null);
+        throw new Error(body?.error || "Unable to load notifications.");
+      }
+
+      const inviteData = (await inviteResponse.json()) as PendingInvite[];
+      const notificationData = (await notificationResponse.json()) as NotificationItem[];
+      setInvites(inviteData);
+      setNotifications(notificationData);
+    } catch (error) {
+      console.error("Failed to load account extras", error);
+    } finally {
+      setAccountDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authUser) {
+      fetchCampaigns();
+      fetchForces();
+      fetchAccountExtras();
+    } else {
+      setCampaigns([]);
+      setForces([]);
+      setInvites([]);
+      setNotifications([]);
+    }
+  }, [authUser]);
 
   useEffect(() => {
     const loadUnits = async () => {
@@ -222,7 +519,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full bg-zinc-950 text-zinc-100">
-      <Header activePage={activePage} onNavigate={navigate} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      <Header
+        activePage={activePage}
+        onNavigate={navigate}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        authUser={authUser}
+        unreadNotifications={notifications.filter((note) => !note.read).length}
+        onLogout={handleLogout}
+      />
 
       <main className="w-full max-w-none px-3 pb-10 pt-4 sm:px-5 2xl:px-8">
         {activePage === "landing" && <LandingPage onNavigate={navigate} />}
@@ -268,12 +573,46 @@ export default function App() {
             )}
           </>
         )}
-        {activePage === "myForces" && <PlaceholderPage title="My Forces" eyebrow="Company roster" />}
-        {activePage === "myCampaigns" && <PlaceholderPage title="My Campaigns" eyebrow="Active campaigns" />}
-        {activePage === "myAccount" && <PlaceholderPage title="My Account" eyebrow="Commander profile" />}
+        {activePage === "myForces" && (
+          <ForcesPage
+            authUser={authUser}
+            forces={forces}
+            loading={forcesLoading}
+            error={forcesError}
+          />
+        )}
+        {activePage === "myCampaigns" && (
+          <CampaignsPage
+            authUser={authUser}
+            campaigns={campaigns}
+            loading={campaignsLoading}
+            error={campaignsError}
+          />
+        )}
+        {activePage === "myAccount" && (
+          <AccountPage
+            user={authUser}
+            mode={authMode}
+            onToggleMode={() => setAuthMode(authMode === "login" ? "register" : "login")}
+            onChangeMode={setAuthMode}
+            email={authEmail}
+            password={authPassword}
+            displayName={authDisplayName}
+            loading={authLoading || accountDataLoading}
+            error={authError}
+            success={authSuccess}
+            invites={invites}
+            notifications={notifications}
+            onEmailChange={setAuthEmail}
+            onPasswordChange={setAuthPassword}
+            onDisplayNameChange={setAuthDisplayName}
+            onSubmit={() => submitAuthForm(authMode)}
+            onLogout={handleLogout}
+          />
+        )}
       </main>
 
-      {mobileMenuOpen && <MobileMenu activePage={activePage} onNavigate={navigate} onClose={() => setMobileMenuOpen(false)} />}
+      {mobileMenuOpen && <MobileMenu activePage={activePage} authUser={authUser} onNavigate={navigate} onClose={() => setMobileMenuOpen(false)} />}
     </div>
   );
 }
@@ -311,12 +650,20 @@ function Header({
   onNavigate,
   mobileMenuOpen,
   setMobileMenuOpen,
+  authUser,
+  unreadNotifications,
+  onLogout,
 }: {
   activePage: PageKey;
   onNavigate: (page: PageKey) => void;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
+  authUser: User | null;
+  unreadNotifications: number;
+  onLogout: () => void;
 }) {
+  const hasUnreadNotifications = unreadNotifications > 0;
+
   return (
     <header className="sticky top-0 z-40 border-b border-lime-400/10 bg-zinc-950/90 backdrop-blur">
       <div className="flex h-16 w-full max-w-none items-center justify-between gap-3 px-3 sm:px-5 2xl:px-8">
@@ -334,10 +681,51 @@ function Header({
         </button>
 
         <nav className="hidden min-w-0 flex-1 items-center justify-end gap-1 xl:flex">
-          {navItems.map((item) => (
-            <NavButton key={item.key} active={activePage === item.key} onClick={() => onNavigate(item.key)} label={item.label} icon={item.icon} />
-          ))}
+          {navItems
+            .filter((item) => item.key !== "myAccount" || authUser)
+            .map((item) => (
+              <NavButton key={item.key} active={activePage === item.key} onClick={() => onNavigate(item.key)} label={item.label} icon={item.icon} />
+            ))}
         </nav>
+
+        <div className="hidden items-center gap-2 xl:flex">
+          {authUser ? (
+            <>
+              <button
+                onClick={() => onNavigate("myAccount")}
+                aria-label={hasUnreadNotifications ? `Open account, ${unreadNotifications} unread notifications` : "Open account, no unread notifications"}
+                title="Open account"
+                className="relative rounded-2xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 hover:border-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-400"
+              >
+                <div className="flex items-center gap-2">
+                  <Bell className={`${hasUnreadNotifications ? "text-red-400" : "text-zinc-500"} h-4 w-4`} />
+                  <span>{hasUnreadNotifications ? `${unreadNotifications} unread` : "No unread"}</span>
+                </div>
+                {hasUnreadNotifications && (
+                  <span className="absolute -top-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-[10px] font-black text-white">
+                    {unreadNotifications}
+                  </span>
+                )}
+              </button>
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300">
+                Signed in as <span className="font-semibold text-lime-300">{authUser.displayName}</span>
+              </div>
+              <button
+                onClick={onLogout}
+                className="rounded-2xl border border-lime-400 bg-lime-400 px-3 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-lime-300"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => onNavigate("myAccount")}
+              className="rounded-2xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-semibold text-zinc-300 transition hover:border-lime-400 hover:text-lime-300"
+            >
+              Sign in
+            </button>
+          )}
+        </div>
 
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -366,7 +754,7 @@ function NavButton({ active, onClick, label, icon }: { active: boolean; onClick:
   );
 }
 
-function MobileMenu({ activePage, onNavigate, onClose }: { activePage: PageKey; onNavigate: (page: PageKey) => void; onClose: () => void }) {
+function MobileMenu({ activePage, authUser, onNavigate, onClose }: { activePage: PageKey; authUser: User | null; onNavigate: (page: PageKey) => void; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-zinc-950/70 backdrop-blur-sm xl:hidden">
       <div className="absolute right-3 top-3 w-[min(92vw,360px)] rounded-3xl border border-zinc-800 bg-zinc-950 p-3 shadow-2xl">
@@ -377,19 +765,330 @@ function MobileMenu({ activePage, onNavigate, onClose }: { activePage: PageKey; 
           </button>
         </div>
         <div className="space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => onNavigate(item.key)}
-              className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${activePage === item.key ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
-            >
-              {item.icon}
-              <span className="font-medium">{item.label}</span>
-            </button>
-          ))}
+          {navItems
+            .filter((item) => item.key !== "myAccount" || authUser)
+            .map((item) => (
+              <button
+                key={item.key}
+                onClick={() => onNavigate(item.key)}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${activePage === item.key ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
+              >
+                {item.icon}
+                <span className="font-medium">{item.label}</span>
+              </button>
+            ))}
         </div>
       </div>
     </div>
+  );
+}
+
+function AccountPage({
+  user,
+  mode,
+  onToggleMode,
+  onChangeMode,
+  email,
+  password,
+  displayName,
+  loading,
+  error,
+  success,
+  onEmailChange,
+  onPasswordChange,
+  onDisplayNameChange,
+  invites,
+  notifications,
+  onSubmit,
+  onLogout,
+}: {
+  user: User | null;
+  mode: AuthMode;
+  onToggleMode: () => void;
+  onChangeMode: (mode: AuthMode) => void;
+  email: string;
+  password: string;
+  displayName: string;
+  loading: boolean;
+  error: string | null;
+  success: string | null;
+  onEmailChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onDisplayNameChange: (value: string) => void;
+  invites: PendingInvite[];
+  notifications: NotificationItem[];
+  onSubmit: () => void;
+  onLogout: () => void;
+}) {
+  const unreadCount = notifications.filter((note) => !note.read).length;
+  const hasUnreadNotifications = unreadCount > 0;
+
+  return (
+    <section className="space-y-6">
+      <PageTitle
+        eyebrow="Account"
+        title="Commander login"
+        description="Create a BattleTech Campaign Manager account or sign in to access campaigns, invites, and notifications."
+        actions={user ? <button onClick={onLogout} className="rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300">Logout</button> : null}
+      />
+
+      {loading && (
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">Checking session...</div>
+      )}
+
+      {user ? (
+        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="space-y-4 xl:col-span-2">
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-5">
+              <div className="text-sm text-zinc-400">Signed in as</div>
+              <div className="text-xl font-bold text-zinc-50">{user.displayName}</div>
+              <div className="text-sm text-zinc-400">{user.email}</div>
+            </div>
+          </div>
+          <div className="grid gap-3 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-4">
+            <div className="text-sm text-zinc-400">Friend code</div>
+            <div className="font-semibold text-zinc-100">{user.friendCode}</div>
+            <div className="text-sm text-zinc-400">Role</div>
+            <div className="font-semibold text-zinc-100 capitalize">{user.role}</div>
+          </div>
+          <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-4">
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Pending invitations</div>
+                  <div className="text-sm text-zinc-400">{invites.length} invite{invites.length === 1 ? "" : "s"}</div>
+                </div>
+              </div>
+              {invites.length === 0 ? (
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-sm text-zinc-400">No pending campaigns at the moment.</div>
+              ) : (
+                <div className="space-y-3">
+                  {invites.map((invite) => (
+                    <div key={invite.participant.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+                      <div className="flex items-center justify-between gap-2 text-sm text-zinc-200">
+                        <div>
+                          <div className="font-semibold text-zinc-100">{invite.campaign.name}</div>
+                          <div className="text-xs text-zinc-500">Invited by {invite.participant.invitedById}</div>
+                        </div>
+                        <span className="rounded-full bg-zinc-800 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-zinc-400">{invite.participant.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Notifications</div>
+                  <div className="text-sm text-zinc-400">{notifications.length} recent notification{notifications.length === 1 ? "" : "s"}</div>
+                </div>
+              </div>
+              {notifications.length === 0 ? (
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-sm text-zinc-400">No notifications yet.</div>
+              ) : (
+                <div className="space-y-3">
+                  {notifications.slice(0, 5).map((note) => (
+                    <div key={note.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <div className="font-semibold text-zinc-100">{note.type}</div>
+                          <div className="text-xs text-zinc-500">{new Date(note.createdAt).toLocaleString()}</div>
+                        </div>
+                        <span className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${note.read ? "bg-zinc-800 text-zinc-400" : "bg-lime-400/10 text-lime-200"}`}>
+                          {note.read ? "Read" : "New"}
+                        </span>
+                      </div>
+                      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap text-sm text-zinc-400">{JSON.stringify(note.payload, null, 2)}</pre>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="grid gap-2 xl:col-span-2">
+            <p className="text-sm text-zinc-400">Use the account page to manage your login and sign out when you're done with a session.</p>
+            <p className="text-sm text-zinc-400">After signing in, return to Campaigns and Forces to use campaign-level features.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+            <p className="text-sm text-zinc-400">You can sign in or create a new account to access campaign invites and notifications.</p>
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-2">
+              <button
+                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${mode === "login" ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:text-zinc-50"}`}
+                onClick={() => onChangeMode("login")}
+              >
+                Sign in
+              </button>
+              <button
+                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${mode === "register" ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:text-zinc-50"}`}
+                onClick={() => onChangeMode("register")}
+              >
+                Register
+              </button>
+            </div>
+          </div>
+
+          {error && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{error}</div>}
+          {success && <div className="rounded-2xl border border-lime-400/30 bg-lime-400/10 p-4 text-sm text-lime-200">{success}</div>}
+
+          <div className="grid gap-4">
+            <div className="grid gap-4 xl:grid-cols-2">
+              {mode === "register" && (
+                <label className="grid gap-2 text-sm">
+                  <span>Commander name</span>
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(event) => onDisplayNameChange(event.target.value)}
+                    className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                    placeholder="Commander display name"
+                  />
+                </label>
+              )}
+
+              <label className="grid gap-2 text-sm">
+                <span>Email address</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => onEmailChange(event.target.value)}
+                  className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                  placeholder="you@example.com"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span>Password</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) => onPasswordChange(event.target.value)}
+                  className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                  placeholder="Choose a secure password"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3">
+              <button
+                type="button"
+                onClick={onSubmit}
+                disabled={loading}
+                className="rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {mode === "register" ? "Create account" : "Sign in"}
+              </button>
+
+              <button type="button" onClick={onToggleMode} className="text-sm font-semibold text-lime-300 underline-offset-4 transition hover:text-lime-100">
+                {mode === "login" ? "Need a new account? Register instead" : "Already have an account? Sign in"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CampaignsPage({
+  authUser,
+  campaigns,
+  loading,
+  error,
+}: {
+  authUser: User | null;
+  campaigns: Campaign[];
+  loading: boolean;
+  error: string | null;
+}) {
+  if (!authUser) {
+    return (
+      <section className="space-y-5">
+        <PageTitle eyebrow="Campaigns" title="Sign in required" description="Please sign in to view your active campaigns and invitations." />
+        <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-zinc-400">Sign in on the Account page to continue.</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-5">
+      <PageTitle eyebrow="Campaigns" title="My Campaigns" description="View the campaigns you are participating in and track current progress." />
+      {loading && <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">Loading campaigns...</div>}
+      {error && <div className="rounded-3xl border border-red-500/40 bg-red-950/30 p-6 text-red-200">{error}</div>}
+      {!loading && !error && (
+        <div className="grid gap-4">
+          {campaigns.length === 0 ? (
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">You have no active campaigns yet.</div>
+          ) : (
+            campaigns.map((campaign) => (
+              <div key={campaign.id} className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign</div>
+                    <div className="mt-2 text-xl font-black text-zinc-50">{campaign.name}</div>
+                    <div className="mt-1 text-sm text-zinc-400">{campaign.description ?? "No description provided."}</div>
+                  </div>
+                  <div className="rounded-3xl border border-lime-400/20 bg-lime-400/10 px-4 py-2 text-sm font-semibold text-lime-200">{campaign.status ?? "Setup"}</div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ForcesPage({
+  authUser,
+  forces,
+  loading,
+  error,
+}: {
+  authUser: User | null;
+  forces: Force[];
+  loading: boolean;
+  error: string | null;
+}) {
+  if (!authUser) {
+    return (
+      <section className="space-y-5">
+        <PageTitle eyebrow="Forces" title="Sign in required" description="Please sign in to manage your forces and assign them to campaigns." />
+        <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-zinc-400">Sign in on the Account page to continue.</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-5">
+      <PageTitle eyebrow="Forces" title="My Forces" description="View the forces you have created and assign them to campaigns once active." />
+      {loading && <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">Loading forces...</div>}
+      {error && <div className="rounded-3xl border border-red-500/40 bg-red-950/30 p-6 text-red-200">{error}</div>}
+      {!loading && !error && (
+        <div className="grid gap-4">
+          {forces.length === 0 ? (
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">No forces have been created yet.</div>
+          ) : (
+            forces.map((force) => (
+              <div key={force.id} className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Force</div>
+                    <div className="mt-2 text-xl font-black text-zinc-50">{force.name}</div>
+                    <div className="mt-1 text-sm text-zinc-400">{force.description ?? "No description provided."}</div>
+                  </div>
+                  <div className="rounded-3xl border border-zinc-700 bg-zinc-950/90 px-4 py-2 text-sm font-semibold text-zinc-200">{force.unitIds?.length ?? 0} units</div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 

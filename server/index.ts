@@ -2,6 +2,10 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import unitsRouter from "./routes/units";
+import authRouter from "./routes/auth";
+import usersRouter from "./routes/users";
+import campaignsRouter from "./routes/campaigns";
+import forcesRouter from "./routes/forces";
 
 dotenv.config();
 
@@ -20,6 +24,10 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/units", unitsRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/campaigns", campaignsRouter);
+app.use("/api/forces", forcesRouter);
 
 app.listen(PORT, () => {
   console.log(`API server running at http://localhost:${PORT}`);
