@@ -1,0 +1,773 @@
+Software Requirement specification: Battletech Campaign Manager
+
+==================
+==   OVERVIEW   ==
+==================
+
+1. INTRODUCTION
+
+1.1 Purpose
+
+The purpose of this web app is to help players manage / run their battletech classic campaign. The platform, built upon React, will allow players to build forces with battletech units,create campaigns, assign a force to a campaign and manage that campaign.
+
+It is designed not only to assist in the normal chaos campaign management - which has other competitiors - it is primarily designed to bridge a gap between running a simplified campaign like the chaos system, and running a campaign on MekHQ. This middleground is designed to give a bit more interesting depth to a campaign while still being easy to maintain.
+
+1.2 Scope
+
+The Campaign Manager will:
+
+• Registered users can add friends, create & customize forces of various units and pilots, and create / manage / and partipate in campaigns
+• Facilitate the running of a campaign by managing the player's resources and unit's status persistance
+• Allow a few various types of campaigns to suit player's desired depth / complexity
+• Within a campaign, allow a player to log a battle and thus record damage to units and track outcomes as they relate to the campaign
+
+Techstack:
+
+• React front end + tailwind
+• Backend Flask? REST endpoints + server rendering?
+• MySQL db
+
+1.3
+
+Definitions and Abbreviations
+
+Battletech: A tabletop game from 1984 played on hex-based maps with many different types of units, most usually with mechs
+
+Classic: Only supported game-type by the app, uses BV to balance, game played on hexes, as opposed to Alpha-Strike which is played without hexes (rulers, etc) and PV to balance
+
+Mechs / Meks: an armored combat vehicle of roughly humanoid shape, standing 8 to 14 meters tall and typically massing from 20 to 100 tons.
+
+BV: Battlevalue - used to balance units
+
+Player: A partipant in a battle or campaign
+
+Campaign: A colletion of battles fought with the same, finite units with assets and consequences carrying over from one to the next
+
+Force: A set of units and pilots to be used in a campaign, built around restrictions like BV limit and era
+
+Combat team: A group of units within a force, usually organized into a lance (4 meks) or star (5 meks).
+
+Company: The assumed force size for campaigns, though not required. 3 lances of 4 meks each. So 3 total combat teams and 12 total meks.
+
+Warchest / WP: Abstract points used only in chaos campaigns to represent c-bills, reputation, luck, etc that the player uses as currency to buy and upgrade units, repair, etc.
+
+Faction Quality Rating: Represents the faction's default unit quality - which influences the ease of repairs (and other things not really relevant to this campaign manager)
+
+Tech Rating: A-F rating that represents a unit's or equipment's (components, weapons, etc) complexity and thus repair difficulty. A being primitive, D being succession-wars level, and on. This should be reversed - cam-ops describes A-F as A being primitive. Should reverse this so that F is primitive.
+
+Availability Rating: A-F rating that represents a unit's or equipment's (components, weapons, etc) ease of requisition. At A, it is very common and easy to find, at F, it is near-impossible. X represents unavailable in that time period. All items are given 3 availabilities such as C/D/B representing Star League era, Succession Wars and Clan Invasion availability.
+
+
+
+1.4
+
+References
+
+React Documentation:
+MySQL Documentation:
+Tailwind CSS Documentation:
+
+2. OVERALL DESCRIPTION
+
+2.1 Product DESCRIPTION
+
+The system will have only one type of user, who can interact with other users in a few different ways, including keeping a list of friends and see what campaigns and battles they are a part of.
+
+2.2 Product features
+
+1. An FAQ and "simple guide" is going to be key to ease players in.
+
+3. FUNCTIONAL REQUIREMENTS
+
+============================================================
+3.1 Site, Help, and Public Information
+============================================================
+
+FR-001: The system shall display a landing page that provides an overview of the application, its purpose, and its major features.
+
+FR-002: The system shall provide an FAQ page that answers common questions about campaigns, forces, battles, user accounts, and leaderboards.
+
+FR-003: The system shall provide a comprehensive campaign guide explaining how to create, configure, run, and conclude a campaign.
+
+FR-004: The system shall provide guidance for creating and managing forces, including explanations of force constraints such as era, Battle Value, faction, and unit type.
+
+FR-005: The system shall provide guidance for logging battles, confirming battle results, repairing units, spending resources, and tracking campaign progress.
+
+FR-006: The system shall allow users and visitors to view public leaderboards.
+
+FR-007: The system shall display leaderboard statistics, including most frequent players, most successful players, units destroyed, best-performing factions, famous units, and other campaign performance metrics.
+
+FR-008: The system shall allow leaderboards to be sorted and/or filtered by supported categories such as player, faction, campaign, force, unit, or time period.
+
+
+============================================================
+3.2 User Accounts and Social Features
+============================================================
+
+FR-009: The system shall allow a visitor to create a user account.
+
+FR-010: The system shall allow a registered user to log in.
+
+FR-011: The system shall allow a logged-in user to log out.
+
+FR-012: The system shall allow a logged-in user to view and manage their account information.
+
+FR-013: The system shall allow a logged-in user to update editable profile information, such as display name, profile image, preferred faction, or other supported profile settings.
+
+FR-014: The system shall assign each user a unique friend code.
+
+FR-015: The system shall allow users to send friend requests using another user's unique friend code.
+
+FR-016: The system shall allow users to accept, reject, or remove friend connections.
+
+FR-017: The system shall allow users to view a list of their friends.
+
+FR-018: The system shall send email notifications to users for supported events.
+
+FR-019: The system shall allow users to receive in-app notifications for campaign invitations, battle updates, battle confirmations, campaign status changes, and other relevant events.
+
+FR-020: The system shall display notifications in a format similar to social media notifications, including the notification type, message, timestamp, and read/unread status.
+
+FR-021: The system shall allow users to mark notifications as read.
+
+FR-022: The system shall restrict account, force, campaign, and battle management actions to authenticated users.
+
+
+============================================================
+3.3 Force Management
+============================================================
+
+FR-023: The system shall allow a logged-in user to view a list of forces they have created.
+
+FR-024: The system shall allow a logged-in user to create a new force.
+
+FR-025: The system shall allow users to assign basic force information, including force name, faction, logo, background description, BV, era, etc.
+
+FR-026: The system shall allow users to configure force-building constraints, such as era, maximum Battle Value, faction restrictions, unit type restrictions, technology level, or other supported limits.
+
+FR-027: The system shall allow users to add units to a force.
+
+FR-028: The system shall validate that units added to a force follow the assigned force constraints.
+
+FR-029: The system shall prevent users from adding units that violate the force's constraints unless the campaign or force settings explicitly allow exceptions.
+
+FR-030: The system shall allow users to remove units from a force.
+
+FR-031: The system shall allow users to view the details of each unit in a force.
+
+FR-032: The system shall allow users to customize supported unit details, such as unit nickname, pilot name, pilot notes, status notes, and visual identifiers.
+
+FR-033: The system shall allow users to edit supported force information after creation.
+
+FR-034: The system shall allow users to delete or archive a force - note that forces can be deleted even if used in a campaign because when they're assigned to a campaign, they're copied as a new, unique force.
+
+FR-035: The system shall preserve a campaign-specific copy of a force when that force is assigned to a campaign. This is only shown through the campaign.
+
+FR-036: The system shall track campaign-specific unit status separately from the user's original force, including damage, kills, repairs, pilot changes, and other campaign-related changes.
+
+
+============================================================
+3.4 Campaign Management
+============================================================
+
+FR-037: The system shall allow a logged-in user to view a list of campaigns they own or participate in.
+
+FR-038: The system shall allow a logged-in user to create a new campaign as the Campaign Owner.
+
+FR-039: The system shall allow the Campaign Owner to select a campaign type.
+
+FR-040: The system shall allow the Campaign Owner to configure campaign settings, such as era, faction restrictions, force limits, Battle Value limits, resource rules, repair rules, scoring rules, and victory conditions.
+
+FR-041: The system shall allow the Campaign Owner to select one of their forces to participate in the campaign, which duplicates it and assigns it to the campaign.
+
+FR-042: The system shall allow the Campaign Owner to invite friends to participate in a campaign.
+
+FR-043: The system shall send invited users a campaign invitation notification.
+
+FR-044: The system shall allow an invited user to accept or decline a campaign invitation.
+
+FR-045: The system shall allow a user who joins a campaign to assign one of their forces to that campaign.
+
+FR-046: The system shall create a unique campaign-specific instance of each assigned force when it joins a campaign, essentially using the forces that each player has as a "template." This campaign-specific force breaks its ties with the original force and is unique and only found within the campaign at this point.
+
+FR-047: The system shall allow campaign participants to view the campaign home page or dashboard.
+
+FR-048: The system shall display campaign progress on the campaign dashboard.
+
+FR-049: The system shall display an overall campaign score or standing based on the campaign's selected scoring rules.
+
+FR-050: The system shall allow campaign participants to view current campaign resources, status, standings, and major campaign events.
+
+FR-051: The system shall allow campaign participants to view a history of past battles in the current campaign.
+
+FR-052: The system shall allow campaign participants to view details of past battles, including participating forces, units destroyed, damage results, victory result, and confirmed status.
+
+FR-053: The system shall allow campaign participants to view the forces and units of other players in the campaign.
+
+FR-054: The system shall display detailed unit information for campaign forces, including unit status, damage, kills, pilot information, repair status, and other campaign-specific statistics.
+
+FR-055: The system shall allow the Campaign Owner or authorized users to manage campaign resources.
+
+FR-056: The system shall allow users to spend campaign resources according to the rules of the campaign.
+
+FR-057: The system shall allow users to repair damaged units according to the campaign's repair rules.
+
+FR-058: The system shall allow users to update unit status, including active, damaged, destroyed, captured, repaired, or unavailable.
+
+FR-059: The system shall allow an authorized user to log a new battle for a campaign.
+
+FR-060: The system shall allow the battle logger to enter battle details, including date, participating forces, participating units, scenario type, result, kills, losses, damage, and notes.
+
+FR-061: The system shall allow battle results to be submitted for confirmation.
+
+FR-062: The system shall notify relevant campaign participants when a battle requires confirmation.
+
+FR-063: The system shall allow authorized campaign participants to confirm or dispute a submitted battle result.
+
+FR-064: The system shall update campaign progress, force status, unit status, kills, losses, resources, and scores after a battle is confirmed.
+
+FR-065: The system shall allow the Campaign Owner to finalize or conclude a campaign.
+
+FR-066: The system shall prevent finalized campaigns from being modified except where explicitly allowed, such as viewing history, exporting results, or adding notes.
+
+FR-067: The system shall preserve finalized campaign results for later viewing.
+
+FR-068: The system shall allow users to view completed campaigns they previously participated in.
+
+
+============================================================
+3.5 Battle Management
+============================================================
+
+FR-069: The system shall allow authorized users to create a battle record within an active campaign.
+
+FR-070: The system shall allow the inital logger to input optional additional battle information like scenario type, map, etc.
+
+FR-071: The system shall allow users to select which players participated in a battle.
+
+FR-072: The system shall allow users to select which units participated in a battle.
+
+FR-073: The system shall allow users to record battle outcomes, including winner, loser, draw, objective results, or custom result types supported by the campaign.
+
+FR-074: The system shall allow users to record unit kills.
+
+FR-075: The system shall allow users to record unit damage.
+
+FR-076: The system shall allow users to record destroyed, disabled, captured, or salvaged units.
+
+FR-077: The system shall allow users to add notes or a battle report summary to a battle record.
+
+FR-078: The system shall allow battle records to remain pending until confirmed.
+
+FR-079: The system shall allow confirmed battle records to affect campaign standings and force status. Pending battles will show how it affects the campaign if confirmed.
+
+FR-080: The system shall allow disputed battle records to be reviewed by the Campaign Owner or authorized users.
+
+
+============================================================
+3.6 Notifications and Communication
+============================================================
+
+FR-081: The system shall notify users when they are invited to a campaign.
+
+FR-082: The system shall notify users when a campaign invitation is accepted or declined.
+
+FR-083: The system shall notify campaign participants when a battle is logged.
+
+FR-084: The system shall notify campaign participants when a battle result requires confirmation.
+
+FR-085: The system shall notify campaign participants when a battle result is confirmed or disputed.
+
+FR-086: The system shall notify users when campaign status changes, such as campaign start, pause, completion, or cancellation.
+
+FR-087: The system shall allow users to view all notifications relevant to their account.
+
+FR-088: The system shall visually distinguish unread notifications from read notifications.
+
+FR-089: The system shall allow users to clear, archive, or dismiss notifications where supported.
+
+
+============================================================
+3.7 Search, Filtering, and Viewing Data
+============================================================
+
+FR-090: The system shall allow users to search or filter their forces.
+
+FR-091: The system shall allow users to search or filter available units when building a force.
+
+FR-092: The system shall allow users to filter units by supported attributes such as era, faction, Battle Value, tonnage, type, technology base, and role.
+
+FR-093: The system shall allow users to search or filter campaigns they own or participate in.
+
+FR-094: The system shall allow users to search or filter battle history within a campaign.
+
+FR-095: The system shall allow users to sort lists such as forces, campaigns, battles, units, and leaderboards by supported fields.
+
+
+============================================================
+3.8 Data Persistence and Access Control
+============================================================
+
+FR-096: The system shall store user account data.
+
+FR-097: The system shall store force data.
+
+FR-098: The system shall store campaign data.
+
+FR-099: The system shall store battle records.
+
+FR-100: The system shall store campaign-specific unit status separately from base unit data.
+
+FR-109: Store campaign-specific forces separately from the original forces they were copied from.
+
+FR-101: The system shall store notification data.
+
+FR-102: The system shall ensure that users can only modify forces, campaigns, battles, and account data they are authorized to modify.
+
+FR-103: The system shall ensure that campaign participants can view campaign data according to their campaign role and permissions.
+
+FR-104: The system shall prevent non-participants from viewing private campaign details unless the campaign is marked public.
+
+FR-105: The system shall allow public data, such as public leaderboards or public campaign summaries, to be viewed without requiring unauthorized access to private campaign details.
+
+============================================================
+3.9 Leaderboards & Statistics
+============================================================
+
+FR-106: The system shall maintain a leaderboard of various global statistics, like best player, best unit, most kills.
+
+FR-107: The system shall maintain a dashboard that shows off intersting counts like total # of games played, # of destroyed meks, and most popular units
+
+FR-108: The system shall only show leaderboard statistics of games from confirmed and completed campaigns, a low-effort way to filter out bogus-submitted campaigns
+
+FR-109: Store campaign-specific forces separately from the original forces they were copied from.
+
+
+4.0 CAMPAIGNS --------------------
+
+Players partipate in one of 3 different campaign types with varying granularity / complexity. Each campaign has one of several settings that can be adjusted upon creation. They include:
+
+Campaign / Force Settings:
+-Campaign type
+-Campaign sub-type???
+-Campaign Scoring
+-Campaign era
+-Rules Level
+-Starting resources (C-bills, warchest)
+-Campaign Force BV limit
+-Force affiliation / faction (optional - mostly fluff but can, if enabled, have a bearing on req and repair)
+-Max Turns ahead (for 3p+ campaigns, dictates how many turns ahead a player is allowed to be - so 1 player can't play 10 games and come close to winning while another has only played 2.)
+-[conquest only] Combat Team
+-[conquest only] Combat Team size
+-[chaos / advanced] Objective Control type (binary or varied - binary only 2P)
+-[chaos / advanced] Salaries enabled / disabled
+-Victory Condition(s)
+
+Some of these settings may be inherently decided by the campaign type selected.
+
+4.1 Campaign Types --------------------
+
+- CHAOS CAMPAIGN (2-10p) - The simplest option, an implementation of the chaos campaign system. Extremely simplified for quick and easy management and minimal admin and upkeep, the campaign uses a generic warchest currency to handle all rearm and resupply costs, unit purchases and sales, upgrades and more. The admin configures the campaign (setting things like BV / size, warchest size, era, fog of war, etc) and players battle at their own pace. After a battle, both players enter the results and the system will "marry" and verify the data as one battle entry (ensuring accuracy between the two records) that can be referenced at any time. Between battles players can spend warchest to repair, etc.
+
+- ADVANCED CAMPAIGN (2-10p) - An advanced campaign is esentially a halfway point between a chaos campaign and the full campaign experience within cam-ops that is in MekHQ. It is designed to be grittier and more detailed than a chaos campaign but still be appraochable and managable within a faster timeline. Players manage cBills, individual pilot XP, part availabilty and time  (as a resource for repairs) The key concept is that units like mechs and such will bear true scars and players will truly feel like each battle is a part of a larger conflict.  Pilots may enter injured already, mechs may be missing armor or whole limbs / weapons, and more as unit attrition is front and center, making for engaging long-term struggle.
+
+- CONQUEST CAMPAIGN (2p) - This strict 2p campaign takes the advanced campaign rules and adds a map and turn layer to it. Players fight over a planet with a full hex-map, which starts with multiple objectives all hidden across the map. The campaign takes place over a number of turns (either a preset limit, or unlimited) that consist of multiple days. Each turn, players will prioritize a repair and select a target hex to scout / control etc. Forces may be able to scout more hexes, or devote more time to repair, etc. 
+
+4.2 Campaign Scoring --------------------
+
+-While the campaign type determines the depth of management that goes into the player's force- in terms of resources, repairs, and orders, the scoring determines how the campaign is run and how players are ranked / doing in their campaign and ultimately who wins and loses the campaign. 
+
+Victory Conditions / scoring
+
+- [Chaos, Advanced, Conquest 2P] Total # of battles
+- [All Types] Surrender / Automatic Capitulation based on BV or resources (warchest, c-bills)
+- [Chaos, Advanced Campaigns] Domination - Over 75% control of objective world / area
+- [Conquest Campaigns] Control of key objectives across the world
+- [Conquest Campaigns] Finding and eliminating the enemy force's base / dropship
+- [Advanced Campaigns, Conquest Campaigns] Time / turns elapsed
+- [Conquest Campaigns] Control 75% of the hexes on the map
+
+As it relates to chaos and advanced campaigns, the campaign owner sets a number of objectives (2-10 objectives total) that are fought over during the campaign. The campaign owner is also responsible for setting / fine tuning (or using default values) for battles. At its most basic, every battle can be worth a specific percentage of control over an objective. In 2p+ campaigns this would also mean a loss in control for the loser as well as a gain for the winner. Depending on the type of battle (and maybe results / # of losses / margin?) the amount won and the amount lost may differ.
+
+Certain objectives, with control over a threshold (75%?) may grant additional bonuses. Such as: An additional tech /team of techs (for repairs), a cash income (one time or after each battle), a radar or comms facility, etc. See objective types for details.
+
+4.2.1 Control Percentages
+
+For chaos and advanced campaigns, control over objectives can either be binary (0 or 100%, no in between) or varied (TODO: need better name for this?). Campaigns with more than 2 players must be varied, but 2p can play either.
+
+In binary control, there would always be a faction either completely controls an objective, or another faction does, or neither. Therefor when battles take place over an objective, usually but not always this would mean the controller of the objective is the defender. Winning a battle as an attacker would represent gaining control of the objective, while winning as the defender would mean retaining control.
+
+In varied, at the start of the campaign, all players start with an equal share of control of every objective. For example, with 4p in a campaign, every objective would show that each player has 25% control of it. When two players battle for an objective, they can gain part of the enemy's control % if they win and risk losing some of their control % (assuming they have some to lose, otherwise there is no risk- no restriction they can't attack) should they lose.
+
+4.2.2 Control Gains / losses
+
+In varied control, the percentage gained or loss would be zero sum- so the attacker gains what the defender loses. These values will likely need tweaking and will likely depend on the total amount of players involved. So having backend values that can be easily adjusted is the way to go. This formula would give a swing value, which determines the total control won/lost.
+
+actualSwing = min(rawSwing, loserCurrentControl, 100 - winnerCurrentControl)
+
+Where rawSwing =   baseSwing
+  * playerCountFactor
+  * objectiveCountFactor
+  * holderConcentrationFactor
+  * stakeContestFactor
+
+baseSwing is a backend value that is configurable. It will start at 10. Under normal circumstances a battle will swing 10 percentage points before modifiers.
+playerCountFactor = Math.pow(4 / playerCount, 0.5)      more player means each player starts with a smaller slice, so swings should be smaller
+objectiveCountFactor = objectiveCountFactor = Math.pow(objectiveCount / 5, 0.5)         More objectives means players need bigger swings
+holderConcentrationFactor =  1 + holderConcentrationWeight * ((playerCount - holdersOnObjective) / (playerCount - 1))           Accounts for how many players currently have control over the objective. If many players hold a stake, swings shoul dbe smaller. If only a few players control, battles matter more.
+holderConcentrationWeight is another backend value that is configurable. Default should start as .65.
+stakeContestFactor handles scenarios where if both players have some control, if only one does, or neither do. 
+    if attackerHasControl && defenderHasControl:
+        stakeContestFactor = 1.10
+
+    else if exactly one player has control:
+        stakeContestFactor = 0.85
+
+    else:
+        stakeContestFactor = 0
+
+
+4.3 Campaign era --------------------
+
+This will restrict the era of forces the players can choose. These follow the normal eras of the Battltech Universe:
+
+Star League
+Early Succession wars
+Late Succession wars
+Clan Invasion
+...
+
+4.4 Rules Level --------------------
+
+This will restrict the rules level for forces the players can choose.
+
+1- Introductory
+2- Standard
+3- advanced
+4- Expirmental
+5- Unofficial
+
+4.5 Force BV limit --------------------
+
+This restricts the max allowable BV total for a force.
+
+4.6 Combat Teams (Lances/Stars) --------------------
+
+Only applicable to conquest campaign. Because each player must assign orders to each lance/star individually, forces should be organized into  combat teams. While within a campaign, a player can reorganize / switch out mechs etc, the campaign should start off with players having the same amount of combat teams. The campaign is ideally suited for company-strength, which is with 3 lances of 4 mechs each.
+
+These combat teams are assigned orders as a whole, and for the duration of a turn, that combat team performs that order.
+
+TODO: still braingstorming but: Combat force size (BV limit) should be uniform. Since each combat force is given orders individually and operates as a separate force, any 1 combat team from one player could meet any combat team from the enemy player's force. If one combat team had a BV of 7,000 and it met another combat team in the campaign that was configured as 5,000, it's not exactly a fair fight.
+
+Note that combat teams will have a total/full BV, representing the fully repaired BV, and an actual BV, representing the current BV which takes into account the status of the units within as it has sustained damage, etc.
+
+4.6.1 Auxiliary Forces
+
+May be an optional rule for conquest campaign, but as a means to allow for battling forces the opportunity to square off more "fairly" when actual (or full BV) is at a large discrepancy. Auxiliary forces can be selected from to add light or medium meks to a combat force that is that much less. This would be for discrepancies of over 400 or so. A generic unit can be selected from an approved list to participate but is not considered a part of the player's force for the campaign and is removed from the campaign following the battle. This Auxiliary force represents militia or friendly forces lending a hand to the player's force for that battle.
+
+* this may require further balancing as, since this unit is not really a part of the campaign at large, it gives the player a unit to throw into combat with little to no regard at it's loss. In addition to the normal, required forced withdrawal rules, a c-bill penalty might be worth instituting when an Auxiliary unit is lost- representing the cost of the mek itself, as well as if the pilot was killed, etc.
+
+4.7 Turns / Time --------------------
+
+A turn for advanced / Conquest campaigns can be configured to some degree. A turn represents a set amount of time, usually 1 to 5 days.
+
+For advanced campaigns, a turn is conducted in between battles. Following a battle, a player can use his turn to repair, rearm, and spend resources for other things like upgrades, etc. The campaign's configured turn length in days will dictate just how much work can be done to repair, rearm and reinforce.
+
+For conquest cmapaigns, a turn is a length of time in which each player will assign orders and those orders are carried out. Each lance/star is given an order like patrol, defend, attack, repair and it performs that action over that turn. (See section 4.9 for more details)
+
+There are no turns or concept of time in chaos campaigns- battles are fought and then units are repaired as resources are spent between battles.
+
+4.8 Objectives -----------------
+
+Objectives represent key locations of strategic value that are worth fighting over. In chaos / advanced campaigns, the player that has the most control over an objective receives its bonus. At the start of each campaign, control over each objective is divided equally among players.
+
+• Factory - Gives a +1 bonus for rolls against requisition
+• Depot - Gives a +1 bonus for stock rolls
+• Comms Array - For conquest, gain +1 to additional hex gain rolls in seize territory and a +1 for the bonus hex roll in patrols. For advanced & choas, this grants a chance at earning an additional 1-5% control of an objective when a battle is won. A 2D6 roll of a 12 results in an additional 5%, a 11 gains 4%, 10 gains 3%, 9 gains 2% and 8 gains 1%.
+• City - Gives 20k c-bills per turn (chaos: gain additional warchest points)
+• Fort (and surrounding lands) - Defensive bonuses when attacked, also a 10k c-bill income
+• Repair Facility - Gives a +1 bonus to repair rolls when performed at a facility (not improvised repairs)
+• Space Port - Gives a +1 bonus for delivery time rolls
+• Medical Facility - Gives +1 bonus to on rolls for healing.
+
+**Note: city and fort incomes will need to be tweaked, and/or possibly may need scaling depending on the initial starting c-bill/warchest fund.
+
+4.9 Chaos Campaign details --------------------
+
+A chaos campaign uses warchest points / support points as resources for each player's force. Players use these to repair, promote, buy new units and more. There are no turns or concept of time. Players battle and the effects are shown afterward once the battle has been logged. Then players repair units, etc in between battles. Depending on the desired victory condition(s), the campaign will end (and a victor declared) after.
+
+Warchest points are converted into support points for the purposes of repair etc. See cam-ops for details.
+
+Unit requisition works exactly the same as other campaigns (see 4.14 for unit req).
+
+
+4.10 Advanced Campaign Details --------------------
+
+Players must juggle managing c-Bills and time/turns as the battle enemies and keep their forces from falling apart or running out of funds. In an advanced campaign, players will take a turn which consists of a battle, then a period of several days (as configured in the campaign) following the battle. In campaigns that consist of more than 2 players, this could mean that some players have played more than others so are technically several turns ahead. This I believe is a better design choice than to disallow games from being played. A campaign setting for max turns ahead (which can be disabled) should help keep things more or less even if necessary. 
+
+4.11 Conquest Campaign Details --------------------
+
+In this 2-player exclusive campaign, players vie for control over a hex map (this can be planet-wide or regional) over a set length of time, with players setting orders for their individual combat teams [lances]. Each turn, players set orders for combat teams, like repair, patrol, etc and once complete, end their turn. Battles may then be automatically created based on these orders. 
+
+The conquest campaign can best be desribed as a strategic board game on top of the normal battletech tactical layer.
+
+4.12.1 Conquest Orders ---
+
+Various complementary orders give bonuses to the attacker (usually in positive modifiers) and some orders give the defender a bonus (usually with a negative modifier)
+Note that bonuses from orders of the same type do not stack. Meaning that you cannot have 2 combat forces with the same order (such as recon) provide the modifier twice. Only one will count.
+
+• Seize Territory [not owned-hex] - For this turn, the combat team gains control of the hex selected, and potentially the surrounding hexes. Any hexes surrounding the target hex that has an objective is ignored (cannot control objectives this way).
+    Use: The main way to grab territory that is not connected to territory you currently control. Cannot be an objective hex or neighboring objective hex. Use this to strike at random spots and open new fronts, though success is much less gaurunteed compared to other orders that gain hexes.
+    Details: If the hex is not controlled by anyone, success on a 2D6 roll of 8+. A -1 is applied if the hex is enemy controlled. If success, then roll to see if additional hexes are gained: 10+ gains 2 extra hexes, 8+ 1 extra hex. Gained hexes first prioritize neutral hexes, then enemy hexes. A D6 roll determines which is gained (with 1 being north, 2 being NE, 3 being SE, etc).
+    Interaction with other orders: Enemy recons in nearby hexes (within two hexes) give a -2 to success. Enemy patrols within 4 hexes make battles more likely to occur.
+    Likelihood of triggering battles: Higher than normal. Triggers a battle by default on 8+. If the battle triggered is lost by the player that is siezing territory (does not necessarily mean the scenario played is him/her as attacker), then no territory is gained.
+• Attack Objective [not owned objective hex] - For this turn, attempts to gain control of an objective. May start a battle, especially if defended. Success increases with each surrounding hex controlled. Requires control of at least 1 hex adjacent to the objective not counting any hexes gained this turn. If it does not start a battle, it is considered that the combat force probed the defenses and raided, looking for an opening but found none and withdrew.
+    Use: This is the only way to gain control of any objective hexes. Must have control of at least 1 hex adjacent to the objective - not counting hexes gained by other combat teams that same turn.
+    Details: The odds of success depend on if the objective is contested (the enemy has attack orders on it as well) and if it is currently already controlled.
+        If contested and unowned: a battle is triggered and the winner gains control of the objective.
+        If controlled: A roll of 9+ is required to trigger a battle for control. For each additional hex the attacking player has beyond the 1 required, a -1 modifier is applied to the roll.
+        If uncontrolled and uncontested: a roll of 4+ will give the attacker control. A failure represents the combat force being spooked / having bad intel / local militia or populace rejecting control, etc
+    Interaction with other orders: Enemy defense applies a -1 modifer to the roll and another -1 modifier if the defender controls 3 or more hexes adjacent to the objective.
+    Likleihood of triggering battles: See above.
+• Patrol [owned hex that borders enemy hex]- For this turn, the combat team extends its control while searching for enemies operating in this hex or POSSIBLY each surrounding hexes (% chance for each**). 
+    Use: Best way to gain hexes; use it to gain several hexes from already controlled territory. It offers the best chance to gain hexes, especially more than one or two.
+    Details: Must be made from your own controlled hex - ideally you'd want to patrol a hex that borders several nuetral or enemy hexes.
+        For every hex that could be controlled, a 2d6 roll of 7+ results in the territory coming under control of the player patrolling.
+        Each hex that successfully is gained (not previously controlled) has a chance to generate a "bonus hex" if it borders 1 or more capturable hexes. The player captures that hex (randomly determined) with a roll of 10+.
+    Interaction with other orders: If an enemy combat team is also patrolling within a range of 4 hexes, then each patrol suffers a +1 modifier to gain hexes. Additionally, the bonus hex roll gets a +2 modifier.
+    Likelihood of trigger battles: If a patrol from the enemy is within 4 hexes on a roll of 8+. A +1 is applied if the patrols are within 2 hexes of one another, and +3 if the patrols are within 1 hex of one another. Patrol also applies a +2 modifier to battle trigger rolls for seize territory if the patrol is within 4 hexes of an enemy sieze order (does not roll itself for the battle).
+• Recon [hex with a seize, attack or patrol order already] - For this turn, the combat team probes into enemy territory, looking for targets of opportunity and attempting to deny bonuses from held objectives. By reconning, a combat team can increase the odds of a successful attack objective.
+    Use: To support other combat team's offensive orders by increasing odds of success for patrols, seizing territory and attacking objectives.
+    Details: A recon provides:
+        Seize Territory (+2 modifier for only the intial hex, not additional hexes)
+        Attack Objective (+1 to attack roll)
+        Patrol (Negates enemy patrol penalties (still applies a penalty to opposing patrol penalty) and a +1 to bonus hex rolls)
+    Interaction with other orders: This order for a given combat unit must take place on the same hex as another combat team's order for seize, attack or patrol.
+    Likelihood of triggering battles: n/a
+• Raid [enemy-controlled objective hex] - For this turn, the combat team performs a sneak raid in an attempt to deny an objective's bonus, or (for only a select few objective types), steal it for that turn.
+    Use: To deny bonuses that are awarded for controlling objectives to the enemy
+    Details: Must be made on a single enemy-controlled objective hex.
+        A roll of 9+ results in a denial of the bonus, while a roll of a 11 or 12 results in stealing whatever bonus the objective has.
+            For factories, depots, comms array and space ports, this gives the raiding player the bonus the following turn.
+            Cities and forts can be raided for a one-time c-bill bonus of half the income they normally produce.
+            For other types, this only denies any bonuses.
+    Interaction with other orders: This attempt fails on a 5+ if the enemy has a defend order within range of the defense order.
+    Liklehood of triggering battles: 9+ if the objective has a combat team with a defense order on it, otherwise 12.
+• Defend [hex] - For this turn, the combat team thwarts any attempts at territorial control by the enemy in the hex selected, and 6 surrounding hexes. Sort of the opposite of recon in that it decreases the odds of success for the enemy.
+    Use: To make it more difficult for enemy combat forces to gain control of hexes via seize, attack and patrol orders.
+    Details: Defend provides a -2 modifier to:
+        Seize Territory (all rolls)
+        Attack Objective
+        Patrol (all rolls)
+    Interaction with other orders: See above on interaction with other enemy offensive orders. Also makes raids less likely to succeed and more likely to trigger a battle.
+    Likelihood of triggering battles:
+• Field Repair & Rearm [Owned hex] - For this turn, the combat team performs improvised field repairs which helps contribute to control percentage and defense, but is able to perform basic repairs at a penalty. On the other hand since the force is still on the field, it provides some defensive bonus to the hex it is in and the 6 surrounding hexes.
+    Use: A great way to repair minor damage and rearm meks.
+    Details: This more improvised repair and rearm occurs on the field and comes with a small risk that the combat force could be ambushed, and that slight drawback that field repairs are not as comprehensive / quick as a full repair facility.
+    Provides a -1 modifier to seize territory (all rolls), attack objective, and patrol (all rolls) in nearby hexes
+    Interaction with other orders: If an enemy seize, patrol or recon occurs within 2,3,2 hexes respectively, there is a chance for a battle.
+    Likelihood of triggering battles: For each combat unit that is within range and performing one of the three above orders, a 2D6 roll is made. At +4, there is no battle. A +1 mod is applied if the enemy force's order is within 1 hex and +2 if the same hex.
+• Facility Repairs - For this turn, the combat team performs advanced maintenance and repairs and is not considered at all for combat. Reserve - For this turn, the combat team is kept powered down and out for various reasons (major damage, awaiting parts, healing pilots, etc)
+    Use: Intended for more comprehensive repairs on units.
+    Details: This is an off-map order, so the combat force is not in any danger of participating in any combat.
+    Interaction with other orders: None
+• Reserve - For this turn, the combat team is held back and does not partipate in any map-related actions - so it does not help hold hexes, gain hexes, etc. However this combat force can be swapped out / in during any battle once for that turn for a roll of 7+.
+    Use: Generally great for units that are extremely damaged and are awaiting parts, or units containing pilots that are severely injured.
+
+
+**Results in preventing hex control loss nearby while extending control into enemy / unowned hexes with greater percentage chances.
+***Note about all roll changes and modifiers: Percentages (anything hex related in terms of control, etc) will likely need a lot of refinement, and as such should be easily configurable on the back end for system admin only. Liklely needing hard, constant percentages to additional hex gains for specific order types, battle likelihoods, etc.
+
+4.13 Repair, Rearmament and Requestioning --------------------
+
+A key element in the advanced and conquest campaigns is that repairs and rearmament is not immediate and sometimes is a balance between getting a unit "good enough" to fight, resulting in units deploying with imperfect stats (missing armor, limbs, weapons broken). These campaigns adhere closely to the cam-ops rules for repair, rearming and requisition of parts.
+
+The system is simplified in terms of overall granular control - as far as repair and requisition goes. As opposed to MekHQ where the player determines every repair attempt (or mass repair), and is responsible for stocking the force, the player instead is responsible for giving broad repair policy and a simplified, automatic stockpile / req system.
+
+4.13.1 Rearming ---
+
+Rearming can only be accomplished by performing one of the two repair & rearm orders. It is assumed that the player's force has enough ammo of every type to conduct the campaign, so  any stockpile of ammo is not necessary. It's only a matter of actually reloading any units that require ammo. It requires 15 min worth of time and is an auto-success to reload one bin, as laid out in cam-ops.
+
+4.13.2 Repair & Salvage---
+
+For a given turn, a player's techs have a set amount of time to perform repairs. Behind the scenes (likely not a campaign setting but could be an advanced setting), players have a set amount of techs and a tech experience level. In MekHQ, this is granular for each tech, but for simplicity here, this will be essentially an "averaged" experience level across the tech force.
+
+In universe, techs and their team (of astechs, laborers, etc) are assigned to a singular unit. So within the context of a campaign, the player won't generally be able to prioritize one unit over another. The main focus is giving general direction on what on each mek is repaired in what order.
+
+Repair Priorities:
+
+-General Repair Priority (The head tech chooses- essentially a flowchart on damage repair starting with rearming all units, then repairing missing limbs (legs first, then arms), then any missing weapons, then broken equipment, then armor, then structure- working through all units in the force. So it does not prioritize an specific unit, only the repair type.)
+-Repair Armor & Structural Priority (Prioritizes getting full armor and structure to all units)
+-Repair limbs & components Priority (Prioritizes more time/resource heavy intensive repair jobs such as limb repair and replacement)
+-Repair weapons Priority (Prioritzes weapon replacement first, and armor second)
+-Repair, scrounge and salvage (General repair that gives bonus to acquiring parts, but less overall time is devoted to repairs as compared to other options)
+
+4.13.2.1 Repair for Chaos Campaigns
+
+Repair for chaos campaigns simply costs a certain amount of warchest points to fully repair the unit. There is no requisition involved, no repair odds, no partially repaired units, no techs, etc. There is no instance where a mek is partially repaired- no repair priorities, etc.
+
+4.13.2.2 Repair for Advanced Campaigns
+
+Players select which repair priority the entire force will use for a given turn. This will apply to all repair orders for that turn. No further input is necessary for repairs, though players can elect to salvage / scrap / sell (as detailed in 4.13.2.4)
+
+Once a the phase between battles is set (the player is happy with repair priorities, salvage, xp expenditure, unit purchase, etc), the player can end his/her turn and the orders are carried out, then he/she is ready for the next battle. At that point they will see the results of the repair orders.
+
+4.13.2.3 Repair for Conquest Campaigns
+
+The player selects for his combat team one of the two repair orders in order to repair and rearm. They are detailed as follows:
+
+Improvised Field Repair & Repair: Can only perform armor repair and rearmament. (Cannot repair components, replace limbs, components, weapons, etc) Follow cam-ops rules for field repair rolls / rules. The plus side of using this over the facility repairs is that the combat team can still contribute and react as a defensive recon force. While not partipcating directly, it can "alert" other forces on other offensive duties and help negate enemy orders near it.
+
+Repair Facility: A unit under orders to repair via repair facility gets additional bonuses for repairing (more likely to succeed in each repair and thus can repair more things - see cam-ops) The unit is considered non-combat during this period and will not take place in any battles, etc.
+
+In addition to what type of repair, the player also needs to select the repair priority (detailed above)
+
+After that, based on those settings, repairs are performed given the turn length (in days) x 8 hours (work time for techs) x # of techs with additional modifiers as described in cam-ops 
+(such as tech quality, complexity, where the repairs are performed etc).
+
+4.13.2.4 Salvage / Sell
+
+Players in any campaign type can choose to salvage / scrap a mek, or sell.
+
+For chaos campaigns, these are esentially the same- so only sell should exist for chaos campaigns. Only a fully repaired unit can be sold.
+
+For advanced and conquest campaigns, players can choose to scrap a unit, which gives only 1/4 of the amount of c-bills of the value of the mek, however, this gives a +2 bonus to stock rolls for the next 4 turns. This is ideal to trying to repair a unit that is too difficult to repair / missing too many important pieces etc.
+
+Otherwise a player can choose to sell a mek. Players receive 1/2 the current value of the unit (so if it's missing components, the value will be even less)
+
+4.13.3 Stocks and Requistion ---
+
+The unit is assumed to have brought enough ammo for the campaign so no stocks for ammunition of any type is required. But for parts (weapons, limbs and components (mek leg, jump jet, etc)), there is first an intial roll to see if the unit happens to have it in stock. This will vary depending on the unit and the part.
+
+Every part will have a rarity which represents the ease at which it can be made or found. This is between A and F. If not known, it is default C. This is also how likely the unit is to stock a given item.
+
+2D6 rolls against rarity:
+A items requires a 4+, B items requires 5+ C requires 7+, D requires 9+, E requires 10+, and F requires 11+
+Should be able to configure and tweak these as needed.
+
+2D6 rolls for delivery time depends on rarity:
+A items: (6+) This turn (available for immediate repairs), (4-5) Next turn, (2-3) 2 Turns
+B items: (7+) This turn, (4-5) next turn, (2-3) 2 Turns
+C items: (7+) This turn, (5-6) next turn, (3-4) 2 Turns, (2) 3 turns
+D items: (8+) This turn,  (6-7) next turn, (4-5) 2 turns, (2-3) 3 turns
+E items: (10+) this turn, (7-9) next turn, (5-6) 2 turns, (3-4) 3 turns, (2) 4 turns
+F items: (11+) this turn, (9-10) next turn, (7-8) 2 turns, (5-6) 3 turns, (2-4) 4 turns
+
+Order of operations:
+1) Stock roll - Roll to see if the item in question is in stock. (2d6 against rarity roll)
+2) Requisition roll - If not in stock, another roll for req. (2d6 against rarity roll)
+3) Delivery time roll - If req is successful, system rolls for delivery time. 
+4) If req is unsuccessful, will attempt to req items next turn.
+
+Each turn, a combat team will make X amount of req attempts total. So at most, X items can be requisitioned per turn for that combat team. This depends on the orders of that unit:
+Any attack / sieze type orders: 1 req
+Defend: 2 req
+Field repair: 4 reqs
+Facility repair: 5 reqs
+** Repair, scrounge and salvage repair priority gives +2 reqs and +1 to rolls against rarity. (No effect on delivery time)
+
+Note that a bonus or penalty could be applied based on a campaign setting for the world that the campaign is taking place on. For example, a periphery world might make supplies harder to obtain, while a core inner sphere world might make things easier to obtain.
+
+4.14 Unit Purchasing, XP Purchasing, upgrades --------------------
+
+Purchasing new units follows the rolls against rarity table above, so every mek needs a rarity level. If it's not found, another attempt to find that mek can be made next turn. Otherwise it fails and the player can choose to purchase a different mek.
+
+XP can be spent at any time to improve pilots. I believe cam-ops contains skills and costs for improving mekwarriors.
+
+4.15 Health --------------------
+
+Healing for pilots that are injured depends on their severity. Each turn, a pilot at level 1 or 2 injury has a chance to progress "down" one level.
+
+Any level 3 and beyond injuries (6 representing death) requires that the pilot be unassigned to a combat force on the frontline, or his/her combat force be only performing facility maintenance or reserve orders. A level 3 will automatically move down to 2 on one week of facility maintenance or reserve orders. A level 4 and a level 5 requires a roll of 6+ and 8+, respectively, to move "down" all the way to 2 - again assuming the pilot's combat force is on facility maintenance or reserve orders. If a level 4 fails the roll, it moves down to level 4 automatically.
+
+4.16 Map ---------------------
+
+For initial release, only premade maps will be available for conquest mode. Will need to test a few different sizes. After release will look at implementing a random map generator. In addition to various objective hexes, the map will require city/village hexes, forest, hills, mountainous, river, plains and a few other types of hexes. Some hexes may be uncontrollable, such as sea or mountains. The player should be able to see, denoted by an opaque color over the hex itself, who controls a hex. The player should also be able to select a hex, which will outline the hex - especially useful to see more about the hex (makeup of control from all players in an objective for example) and to assign orders there.
+
+Additionally for post-launch, a map-maker would be a great tool.
+
+The map should bear resemblance to normal hex-maps from Battletech maps, especially in how hexes have a 4 digit number for reference.
+
+4.16.1 Star Map ---
+
+Post launch goal only: a star map that contains all inner sphere and periphery systems to explore, give campaigns an actual planet to fight on, and allow anyone to see where campaigns are being fought and where some might have been resolved. Possibly even give the Inner Sphere a sort of grand campaign as all players fight for control across planets.
+
+4.17 Battles -------------------
+
+During chaos and advanced campaigns, battles occur at the end of a turn automatically. The time / turns will not advance otherwise.
+
+For conquest campaigns, battles occur after orders are confirmed, essentially between turns. Since each combat force has some sort of chance at triggering a battle, it is possible that, RAW, there would be multiple battles in a single turn. While it may be necessary, as testing goes on, to adjust this cadence, for initial setup and launch, we'll aim not to limit it. In the future, we may want to adjust it so that there is a maximum number of battles that can take place per turn, or limit the chances beyond a max of 1 per turn, or slow the cadence even further with max 1 battle per turn and reduce the likelihood of battle within X amount of turns following a battle.
+
+4.18 Salaries ------------------
+
+Only available for advanced and conquest campaigns, this optional setting is a lightweight, automatically managed system for paying c-bills for the company personnel based roughly on size. Can be used as an indirect time limitation device, but not really ideally suited for it. Each turn some amount of c-bills must be paid for each unit within the company (which takes into account the unit's tech team, general maintenance, storage, ammunition, etc) and pilots (handled separately from the unit itself).
+
+This can act as a balancer to prevent bloat in terms of acquiring too many units or too many pilots.
+
+Otherwise payment from the player's c-bills is automatic- each unit (scaled in terms of BV) will have a c-bill monthly, which as mentioned will encompass everything and everyone that works on that unit. This monthly cost will then be calculated to fit into whatever the turn length is.
+
+Pilots will have a cost based on their skill level.
+
+4.19 Order of Operations [Once turns are set] ----
+
+TODO: Figure out the order of which all combat force's orders are resolved. Probably defensive ones first, then patrols, then seizes and attacks?
+
+This may not be necessary - we just need to ensure certain rolls (like rolls for patrol vs patrol battle triggers) aren't duplicated.
+
+There is still some order of operations to deal with the possiblity of triggering a battle BEFORE we resolve the order itself (sieze, raid, etc), since this may deny the attacker.
+
+So probably all battle probabilities need to be rolled for before resolving territory changes, objectives, etc
+
+4.19 EXAMPLE GAMEPLAY -------------------------
+
+The below provide some useful interactions for each campaign type, giving a sense of how a player plays through a campaign, what settings, buttons etc may be interacted with.
+
+4.19.1 Chaos Example turn for 1 player  -----
+
+The game is two turns in and Bob is on the third turn. Bob's forces have participated in two battles and is meeting to play out a third game today. Bob and his opponent Sophia select their units first from their forces, agreeing to a BV. Then they figure out which track / battle / scenario to carry out and decide on which campaign objective to fight over. If there is any sort of disagreement, or strictly take turns choosing objectives to be fought over. Sophia selected the last objective's battle so Bob selects a city. All this occurs outside of the app (Aside from perhaps consulting the pilot, unit lists, and objective lists).
+
+Sophia and Bob hold their battle and after a few hours, Bob is victorious. Now in the app, Bob will log a battle (#3) and record the objective that was fought over, the winner, kills, and damage and losses to his units and pilots. For a chaos campaign, damage is only recorded in broad categories: Light (armor and some structure damage, no missing limbs and max 1 component/equipment destroyed), Moderate (same as light, but also possibly missing an arm or up to 3 components/equipment destroyed, and Heavy (Everything else)). Destroyed units are logged as well. The log will note who controls the battlefield for salvage potential.
+
+Sophia will also log the battle (#3) and record the objective, winner, kills, damage, losses, etc.
+
+The system afterward will reconcile these two logs into one finalized battle log. Any discrepancies (between who won, # of kills, objective fought over, etc) should be flagged and the system should notify the users to edit their logs to correct.
+
+After the battle is logged and reconcilled, turn 3 is complete. In between turns players may get Warchest points and other bonuses, then players can start turn 4 by repairing, buying new units, etc with Warchest points.
+
+4.19.2 Advanced Example turn for 1 player in a 4p campaign  -----
+
+Jake and Kelly meet on Friday to play a game in their campaign which they are fighting for control of Irian III, alongside two other friends. It started a few weeks ago- Jake hasn't had a chance to battle yet, but Kelly has battled another player once. After they meetup, they pull out the app and discuss the objectives- pulling up the overall campaign dashboard which gives an overview of overall planetary control and your force's overview. They check the campaign control screen which goes in depth with each objective and the control of each to figure out what to battle over.
+
+They decide to have a battle over a city objective. It's Jake's first turn, and Kelly's second turn (she has fought another player over a different objective once already). No one has yet fought over the city objective in the campaign, so everyone still has 25% control. The two players agree on a BV for their forces and use their force list to construct a suitable lance. Both players are using fresh units, but would normally ensure that if they are using units with existing damage carried over from previous battles (and not fully repaired), they would mark the damage on their sheets for the battle. Then they roll dice to determine the exact scenario they'll play and who is attacker and defender in that scenario. All of this occurs off the app (minus any consulting objectives / force lists, etc)
+
+The players then have their battle. It results in Kelly winning. Kelly logs the results, which require a bit more detail mainly in the actual damage of her meks: marking armor, destroyed equipment etc in addition to the pilot's status and kills. All the battle-level details like winner, objective fought over etc are still relevant as well.
+
+Jake logs the battle from his side, and again the system then reconciles the logs into one finalized battle log. Any discrepancies can be flagged for correction.
+
+Each player, now into the next turn, will spend some time managing their force by choosing a repair priority, making choices on if any units should be bought, salvaged or sold, if any pilots need to be hired, whether to spend any XP, etc. Once they are happy with all their changes, adjustments and all, they hit end (or complete?) turn and the system performs repairs and any other things needed, after which point the players will be ready to particpate in their next battle.
+
+4.19.3 Conquest Example -----
+
+So far, John and Lauren have played 4 turns, encompassing 12 days and have fought one battle thus far. Both players meet up and open their app to review the campaign, checking the dashboard which shows the map of the world they're fighting over, which contains about 10-15 hexes controlled by each player at various spots of the map. They consult the overview on the side of the map that shows control details, percentage of the map controlled, objectives and more. A secondary section allows them to look through the objectives specifically to see their status.
+
+They can view each other's forces, then go through each of their combat teams (lances) in order and assign orders. John's first lance took place in a battle only last turn and is need of some repairs, though nothing major. He selects his first lance and selects, as its order for the turn "Improvised field repair and rearm" - allowing him to get some repair work in and reload his munitions. The order requires a friendly hex to be selected, so he selects a hex near a city objective he is holding.
+
+Next, his second lance is fresh and he'll use it in hopes of opening a beachhead, grabbing some territory far away from his currently held territory and close to Lauren's only objective, a factory. He selects "Seize Territory" and again after being prompted for a hex, selects the appropriate one.
+
+His third and final lance he decides will support his second lance, using the "Recon" order to help increase his odds of success. The system prompts for the player to select an appropriate hex (one where a seize order is taking place).
+
+Since he's doing repairs, he sets his repair priorities appropriately, changing it from the default "general priority" to "Repair armor + structure priority". 
+
+He doesn't feel he needs to spend any of his c-bills for any new units, pilots or anything else and since all his units now have been assigned orders for the turn, he marks his turn complete. Once Lauren has done the same, the system processes the turn altogether, working through orders, determining repair results, territory changes and figuring out if any battle(s) are created.
+
+The system runs through the various orders, first dealing with repairs (figuring out what gets repaired based on priority, reqs, etc) then resolving offensive orders while taking defensive orders into account. A report of this is given to each player after its complete, as a turn log report. With this report they can review the results of each repair, order and more, even down to individual dice rolls and modifiers to said rolls (and their needed roll).
+
+It just so happens, that unbeknownest to John, Lauren had assigned a defense order near to where John's seize orders took place. Near enough that they are taken into account with their mods. There is a -2 modifier applied to John's seize order, but a +2 modifier thanks to his recon. The system rolls 2D6 to see if it triggers a battle first. A roll of a 9 means a battle was triggered.
+
+The players are notified that there is 1 battle pending. They can still view the log of everything else that occured, but since there is a battle pending, the turn isn't really complete (there could be additional territory changes, for example, based on the result of the battle.)
+
+The players assemble their combat forces, print sheets if they don't already have them, and play out the battle. Afterwards, they both record results, in the same way as the advanced campaign.
+
+With reconcilliation between the logs and all battles played out, the system plays out the remainder of the turn, completing the turn log. At the end of the log, any bonuses (like c-bill payout) are carried out, and salaries are deducted.
+
+After that, the turn is complete and players can go through the process again for the next turn.

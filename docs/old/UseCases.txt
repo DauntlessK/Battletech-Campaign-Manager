@@ -1,14 +1,12 @@
-# SRS Use Cases: BattleTech Campaign Manager
+# SRS Use Cases
 
-**Document Version:** 0.2
-**Project:** BattleTech Campaign Manager
-**Related Documents:** Clean SRS v0.2, Campaign Gameplay Manual v0.1
+Project: BattleTech Campaign Manager
+Document: Use Case List
+Version: 1.0
 
 ---
 
-# Use Case Index
-
-## Public Site and Account Use Cases
+## Use Case Index
 
 UC-001: View Public Site Information
 UC-002: View Leaderboards and Statistics
@@ -18,16 +16,10 @@ UC-005: Log Out
 UC-006: Manage User Account
 UC-007: Add and Manage Friends
 UC-008: View and Manage Notifications
-
-## Force Management Use Cases
-
 UC-009: Create Force
 UC-010: Add Units to Force
 UC-011: Customize Force or Unit
 UC-012: Manage Existing Force
-
-## Campaign Setup and Management Use Cases
-
 UC-013: Create Campaign
 UC-014: Invite Friends to Campaign
 UC-015: Join Campaign
@@ -39,21 +31,6 @@ UC-020: Confirm or Dispute Battle Result
 UC-021: View Battle History
 UC-022: Finalize Campaign
 UC-023: Search, Filter, and Sort Data
-
-## Campaign Rules and Gameplay Use Cases
-
-UC-024: Configure Campaign Rules
-UC-025: Configure Campaign Objectives
-UC-026: View and Manage Objective Control
-UC-027: Resolve Objective Control After Battle
-UC-028: Run Chaos Campaign Cycle
-UC-029: Run Advanced Campaign Turn
-UC-030: Set Up Conquest Campaign Map
-UC-031: Assign Conquest Combat Team Orders
-UC-032: Resolve Conquest Turn
-UC-033: Manage Repair, Rearmament, and Requisition
-UC-034: Manage Auxiliary Forces
-UC-035: Manage Admin Rule Constants
 
 ---
 
@@ -103,7 +80,11 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-001 through FR-005
+* FR-001: Display landing page overview.
+* FR-002: Provide FAQ page.
+* FR-003: Provide comprehensive campaign guide.
+* FR-004: Provide force management guidance.
+* FR-005: Provide battle and campaign progress guidance.
 
 **Priority:**
 Medium
@@ -122,10 +103,11 @@ System
 Allow actors to view public rankings and global campaign statistics.
 
 **Brief Description:**
-A visitor or user opens the leaderboard or statistics dashboard to view public performance rankings and system-wide statistics based on eligible campaign data.
+A visitor or user opens the leaderboard or statistics dashboard to view public performance rankings and system-wide statistics based on confirmed and completed campaigns.
 
 **Preconditions:**
 
+* Leaderboard data exists.
 * Public leaderboard page is available.
 
 **Trigger:**
@@ -141,10 +123,10 @@ Actor selects the Leaderboards or Statistics option.
 6. System updates the displayed results.
 
 **Alternative Flows:**
-A1. No eligible leaderboard data exists.
+A1. No confirmed or completed campaign data exists.
 
 1. System displays an empty leaderboard message.
-2. System explains that leaderboards are based on eligible confirmed/completed campaign data.
+2. System may display explanatory text that only confirmed and completed campaigns are counted.
 
 A2. Actor applies filters that return no results.
 
@@ -162,8 +144,13 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-006 through FR-008
-* FR-174 through FR-178
+* FR-006: Allow users and visitors to view public leaderboards.
+* FR-007: Display leaderboard statistics.
+* FR-008: Allow leaderboards to be sorted and/or filtered.
+* FR-105: Allow public data to be viewed without exposing private details.
+* FR-106: Maintain leaderboard of global statistics.
+* FR-107: Maintain statistics dashboard.
+* FR-108: Only show leaderboard statistics from confirmed and completed campaigns.
 
 **Priority:**
 Medium
@@ -235,9 +222,10 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-009
-* FR-014
-* FR-159
+* FR-009: Allow visitor to create user account.
+* FR-014: Assign each user a unique friend code.
+* FR-022: Restrict management actions to authenticated users.
+* FR-096: Store user account data.
 
 **Priority:**
 High
@@ -294,9 +282,9 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-010
-* FR-022
-* FR-170 through FR-173
+* FR-010: Allow registered user to log in.
+* FR-022: Restrict management actions to authenticated users.
+* FR-102: Ensure users can only modify authorized data.
 
 **Priority:**
 High
@@ -341,7 +329,7 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-011
+* FR-011: Allow logged-in user to log out.
 
 **Priority:**
 Medium
@@ -401,10 +389,10 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-012
-* FR-013
-* FR-159
-* FR-170
+* FR-012: Allow logged-in user to view and manage account information.
+* FR-013: Allow logged-in user to update editable profile information.
+* FR-096: Store user account data.
+* FR-102: Ensure users can only modify authorized data.
 
 **Priority:**
 Medium
@@ -472,9 +460,11 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-014 through FR-017
-* FR-019
-* FR-160
+* FR-014: Assign each user a unique friend code.
+* FR-015: Allow users to send friend requests.
+* FR-016: Allow users to accept, reject, or remove friends.
+* FR-017: Allow users to view friends list.
+* FR-019: Allow users to receive in-app notifications.
 
 **Priority:**
 High
@@ -490,10 +480,10 @@ Logged-in User
 System
 
 **Goal:**
-Allow users to see and manage notifications related to campaigns, battles, friends, objectives, Conquest turns, and account events.
+Allow users to see and manage notifications related to campaigns, battles, friends, and account events.
 
 **Brief Description:**
-A logged-in user opens the notifications page to view campaign invitations, battle updates, confirmation requests, campaign status updates, objective changes, Conquest order alerts, and other relevant notifications.
+A logged-in user opens the notifications page to view campaign invitations, battle updates, confirmation requests, campaign status updates, and other relevant alerts.
 
 **Preconditions:**
 
@@ -532,9 +522,12 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-018 through FR-021
-* FR-142 through FR-152
-* FR-166
+* FR-018: Send email notifications for supported events.
+* FR-019: Receive in-app notifications.
+* FR-020: Display notification type, message, timestamp, and read/unread status.
+* FR-021: Mark notifications as read.
+* FR-081 through FR-089: Notification and communication requirements.
+* FR-101: Store notification data.
 
 **Priority:**
 High
@@ -553,7 +546,7 @@ System
 Allow a user to create a new BattleTech force.
 
 **Brief Description:**
-A user creates a force by entering basic force information and defining optional force-building constraints such as era, BV limit, faction restrictions, unit type restrictions, technology level, and rules level.
+A user creates a force by entering basic force information and defining optional force-building constraints such as era, BV limit, faction restrictions, unit type restrictions, and technology level.
 
 **Preconditions:**
 
@@ -567,7 +560,7 @@ User selects Create Force.
 1. User opens the force creation page.
 2. System displays the force creation form.
 3. User enters force name, faction, logo, background, BV, era, and other supported details.
-4. User configures force-building constraints or selects a campaign to use as a source of constraints.
+4. User configures force-building constraints or select a campaign the user is in to use as constraints.
 5. User submits the form.
 6. System validates the force information.
 7. System creates the force.
@@ -596,9 +589,12 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-023 through FR-026
-* FR-161
-* FR-170
+* FR-023: View list of created forces.
+* FR-024: Create new force.
+* FR-025: Assign basic force information.
+* FR-026: Configure force-building constraints.
+* FR-097: Store force data.
+* FR-102: Ensure authorized modification.
 
 **Priority:**
 High
@@ -646,9 +642,10 @@ A1. Selected unit violates force constraints.
 2. System explains which constraint was violated.
 3. User may select another unit or adjust constraints if authorized.
 
-A2. User attempts to edit a campaign-specific force from outside the campaign.
+A2. Force is locked by an active campaign.
 
-1. System directs the user to the campaign force view or denies the action.
+1. System prevents modification.
+2. System explains that the force cannot be edited while locked.
 
 **Postconditions:**
 Success:
@@ -661,9 +658,13 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-027 through FR-031
-* FR-153 through FR-155
-* FR-161
+* FR-027: Add units to a force.
+* FR-028: Validate units against constraints.
+* FR-029: Prevent invalid units unless exceptions are allowed.
+* FR-031: View unit details.
+* FR-090: Search or filter forces.
+* FR-091: Search or filter available units.
+* FR-092: Filter units by attributes.
 
 **Priority:**
 High
@@ -704,7 +705,7 @@ User selects Edit, Customize, or Manage Details.
 7. System displays the updated information.
 
 **Alternative Flows:**
-A1. User attempts to edit a campaign-specific copy.
+A1. User attempts to edit a locked campaign copy.
 
 1. System limits editing to supported campaign-specific fields.
 2. User may edit only allowed fields.
@@ -724,12 +725,11 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-025
-* FR-032
-* FR-033
-* FR-036
-* FR-164 through FR-165
-* FR-170
+* FR-025: Assign basic force information.
+* FR-032: Customize supported unit details.
+* FR-033: Edit supported force information after creation.
+* FR-036: Track campaign-specific unit status separately.
+* FR-102: Ensure authorized modification.
 
 **Priority:**
 Medium
@@ -745,10 +745,10 @@ Logged-in User
 System
 
 **Goal:**
-Allow a user to view, update, remove units from, delete, or archive an existing original force.
+Allow a user to view, update, remove units from, delete, or archive an existing force.
 
 **Brief Description:**
-A user opens their force list, selects a force, views details, removes units, edits information, or deletes/archives the original force. Campaign-specific force copies remain preserved even if the original force is deleted.
+A user opens their force list, selects a force, views details, removes units, edits information, or deletes/archives the force if it is not locked by an active campaign.
 
 **Preconditions:**
 
@@ -775,10 +775,10 @@ A1. User removes a unit from the force.
 1. User selects a unit to remove.
 2. System removes the unit and updates force totals.
 
-A2. User deletes or archives a force used as a campaign template.
+A2. User attempts to delete or archive a locked force.
 
-1. System deletes or archives the original force.
-2. System preserves any existing campaign-specific force copies.
+1. System prevents deletion or archiving.
+2. System explains that the force is locked by an active campaign.
 
 **Postconditions:**
 Success:
@@ -791,11 +791,13 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-023
-* FR-030 through FR-034
-* FR-153
-* FR-161
-* FR-165
+* FR-023: View list of forces.
+* FR-030: Remove units from a force.
+* FR-031: View unit details.
+* FR-033: Edit supported force information.
+* FR-034: Delete or archive force if not locked.
+* FR-090: Search or filter forces.
+* FR-097: Store force data.
 
 **Priority:**
 High
@@ -828,20 +830,19 @@ User selects Create Campaign.
 
 1. User opens campaign creation.
 2. System displays campaign creation form.
-3. User enters campaign name.
-4. User selects campaign type.
-5. User configures required campaign settings.
-6. User selects one of their forces to participate.
-7. System validates campaign settings and force eligibility.
-8. System creates the campaign in Setup or Beginning state.
-9. System creates a campaign-specific copy of the selected force.
-10. System stores campaign data and campaign-specific force data.
-11. System displays the campaign dashboard or setup page.
+3. User enters campaign name and selects campaign type.
+4. User configures campaign settings, including era, faction restrictions, BV limits, resource rules, repair rules, scoring rules, and victory conditions.
+5. User selects one of their forces to participate.
+6. System validates campaign settings and force eligibility.
+7. System creates the campaign.
+8. System creates a campaign-specific copy of the selected force.
+9. System stores campaign data and campaign-specific force data.
+10. System displays the campaign dashboard.
 
 **Alternative Flows:**
 A1. User has no eligible force.
 
-1. System prevents campaign start or asks the user to create/select an eligible force.
+1. System prevents campaign creation or asks the user to create/select an eligible force.
 2. User may return to force management.
 
 A2. Campaign settings are invalid.
@@ -849,18 +850,13 @@ A2. Campaign settings are invalid.
 1. System displays validation errors.
 2. User corrects the settings and resubmits.
 
-A3. Selected campaign type has special requirements.
-
-1. System displays additional required settings for that campaign type.
-2. User completes the required settings before the campaign can begin.
-
 **Postconditions:**
 Success:
 
 * Campaign exists.
 * User is Campaign Owner.
 * Campaign-specific force instance exists.
-* Campaign remains in setup until required participants and forces are finalized.
+* Campaign enters a "Beginning" state and stays until all players are invited and forces are finalized.
 
 Failure:
 
@@ -868,11 +864,15 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-037 through FR-041
-* FR-046
-* FR-069 through FR-078
-* FR-162
-* FR-165
+* FR-037: View campaigns owned or participated in.
+* FR-038: Create campaign as Campaign Owner.
+* FR-039: Select campaign type.
+* FR-040: Configure campaign settings.
+* FR-041: Select force and duplicate it for campaign.
+* FR-046: Create campaign-specific force instance.
+* FR-098: Store campaign data.
+* FR-100: Store campaign-specific unit status separately.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High
@@ -897,7 +897,6 @@ The Campaign Owner selects friends to invite. The system sends campaign invitati
 
 * Campaign Owner is logged in.
 * Campaign exists.
-* Campaign is accepting invitations.
 * Campaign Owner has at least one friend or searchable friend connection.
 
 **Trigger:**
@@ -924,10 +923,9 @@ A2. Campaign is not accepting invitations.
 1. System prevents invitation.
 2. System explains the campaign status.
 
-A3. Invited user does not have a force matching the campaign restrictions.
-
-1. System may still allow the invitation.
-2. System notifies the user that an eligible force must be created or assigned before joining is complete.
+A3. User does not have a force that matches the restrictions of the campaign
+1. System allow player to join.
+2. Notifies user that a force must be created, then can be assigned
 
 **Postconditions:**
 Success:
@@ -940,10 +938,11 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-042
-* FR-043
-* FR-142
-* FR-018 through FR-019
+* FR-042: Invite friends to campaign.
+* FR-043: Send campaign invitation notification.
+* FR-081: Notify users when invited to campaign.
+* FR-018: Send email notifications.
+* FR-019: Receive in-app notifications.
 
 **Priority:**
 High
@@ -968,6 +967,7 @@ An invited user receives a campaign invitation, accepts or declines it, and if a
 
 * User is logged in.
 * User has received a campaign invitation.
+* User has an eligible force if accepting the invitation.
 
 **Trigger:**
 User opens a campaign invitation.
@@ -994,7 +994,7 @@ A1. User declines invitation.
 A2. User has no eligible force.
 
 1. System explains that an eligible force is required.
-2. User may create or modify a force before completing campaign entry.
+2. User may create or modify a force before accepting.
 
 A3. Invitation is expired or invalid.
 
@@ -1011,10 +1011,13 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-044 through FR-046
-* FR-143
-* FR-162
-* FR-165
+* FR-044: Accept or decline campaign invitation.
+* FR-045: Assign force to campaign.
+* FR-046: Create campaign-specific force instance.
+* FR-082: Notify users when invitation is accepted or declined.
+* FR-098: Store campaign data.
+* FR-100: Store campaign-specific unit status separately.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High
@@ -1030,10 +1033,10 @@ Campaign Participant
 System
 
 **Goal:**
-Allow campaign participants to view campaign progress, status, resources, standings, objectives, turns, and major events.
+Allow campaign participants to view campaign progress, status, resources, standings, and major events.
 
 **Brief Description:**
-A campaign participant opens the campaign dashboard. The system displays current campaign progress, score, standings, resources, status, objectives, turn information, and important events.
+A campaign participant opens the campaign dashboard. The system displays current campaign progress, score, standings, resources, status, and important events.
 
 **Preconditions:**
 
@@ -1049,7 +1052,7 @@ User selects a campaign from their campaign list.
 2. System displays campaigns the user owns or participates in.
 3. User selects a campaign.
 4. System displays the campaign dashboard.
-5. System shows campaign progress, score, resources, standings, current status, objectives, turn information, and major events.
+5. System shows campaign progress, score, resources, standings, current status, and major events.
 6. User reviews campaign information.
 
 **Alternative Flows:**
@@ -1073,12 +1076,14 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-037
-* FR-047 through FR-050
-* FR-068
-* FR-089
-* FR-098
-* FR-171 through FR-173
+* FR-037: View campaigns owned or participated in.
+* FR-047: View campaign home page or dashboard.
+* FR-048: Display campaign progress.
+* FR-049: Display campaign score or standing.
+* FR-050: View campaign resources, status, standings, and events.
+* FR-068: View completed campaigns.
+* FR-103: View campaign data according to role and permissions.
+* FR-104: Prevent non-participant access to private campaign details.
 
 **Priority:**
 High
@@ -1097,7 +1102,7 @@ System
 Allow campaign participants to view forces and units in the campaign.
 
 **Brief Description:**
-A campaign participant views their own and other players' campaign forces, including detailed unit information, damage, kills, pilot information, repair status, actual BV, full BV, and other campaign-specific statistics.
+A campaign participant views their own and other players' campaign forces, including detailed unit information, damage, kills, pilot information, repair status, and other campaign-specific statistics.
 
 **Preconditions:**
 
@@ -1110,7 +1115,7 @@ User selects Forces, Units, or a player force from the campaign dashboard.
 **Main Success Scenario:**
 
 1. User opens campaign forces view.
-2. System displays participating players and their campaign-specific forces.
+2. System displays participating players and their forces.
 3. User selects a force.
 4. System displays units in the selected force.
 5. User selects a unit.
@@ -1122,7 +1127,7 @@ A1. User attempts to view private campaign data without permission.
 1. System denies access.
 2. System displays an authorization message.
 
-A2. Unit has been destroyed, captured, damaged, or unavailable.
+A2. Unit has been destroyed, captured, or unavailable.
 
 1. System displays the unit's current status and history.
 
@@ -1137,11 +1142,12 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-053 through FR-054
-* FR-036
-* FR-132
-* FR-164 through FR-165
-* FR-171
+* FR-053: View forces and units of other players in campaign.
+* FR-054: Display detailed campaign unit information.
+* FR-036: Track campaign-specific unit status separately.
+* FR-100: Store campaign-specific unit status separately.
+* FR-103: View campaign data according to permissions.
+* FR-109: Store campaign-specific forces separately from the original forces they were copied from.
 
 **Priority:**
 High
@@ -1160,7 +1166,7 @@ System
 Allow authorized users to spend resources, repair units, and update unit statuses according to campaign rules.
 
 **Brief Description:**
-An authorized user manages campaign resources by repairing damaged units, spending resources, and updating unit statuses such as active, damaged, destroyed, captured, repaired, unavailable, or other supported statuses.
+An authorized user manages campaign resources by repairing damaged units, spending resources, and updating unit statuses such as active, damaged, destroyed, captured, repaired, or unavailable.
 
 **Preconditions:**
 
@@ -1209,10 +1215,13 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-055 through FR-058
-* FR-119 through FR-128
-* FR-168
-* FR-170 through FR-171
+* FR-055: Allow authorized users to manage campaign resources.
+* FR-056: Spend campaign resources according to campaign rules.
+* FR-057: Repair damaged units according to campaign rules.
+* FR-058: Update unit status.
+* FR-064: Update campaign and force status after confirmed battle.
+* FR-102: Ensure authorized modification.
+* FR-103: Ensure view permissions by role.
 
 **Priority:**
 High
@@ -1284,10 +1293,22 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-059 through FR-062
-* FR-099 through FR-110
-* FR-144 through FR-145
-* FR-163
+* FR-059: Log new battle for campaign.
+* FR-060: Enter battle details.
+* FR-061: Submit battle results for confirmation.
+* FR-062: Notify participants when confirmation is required.
+* FR-069: Create battle record.
+* FR-070: Input optional battle information.
+* FR-071: Select participating players.
+* FR-072: Select participating units.
+* FR-073: Record battle outcomes.
+* FR-074: Record unit kills.
+* FR-075: Record unit damage.
+* FR-076: Record destroyed, disabled, captured, or salvaged units.
+* FR-077: Add notes or battle report summary.
+* FR-078: Allow battle records to remain pending.
+* FR-079: Show effects of pending battles if confirmed.
+* FR-099: Store battle records.
 
 **Priority:**
 High
@@ -1306,7 +1327,7 @@ System, Campaign Owner
 Allow authorized users to confirm or dispute a submitted battle result.
 
 **Brief Description:**
-After a battle is logged, relevant participants review the pending battle record. They may confirm or dispute it. Confirmed battles update campaign progress, standings, force status, unit status, kills, losses, resources, objective control, and scores.
+After a battle is logged, relevant participants review the pending battle record. They may confirm or dispute it. Confirmed battles update campaign progress, standings, force status, unit status, kills, losses, resources, and scores.
 
 **Preconditions:**
 
@@ -1324,7 +1345,7 @@ User opens a battle confirmation notification or pending battle record.
 3. User reviews the record.
 4. User confirms the battle result.
 5. System marks the battle as confirmed.
-6. System updates campaign progress, force status, unit status, kills, losses, resources, objective control, and scores.
+6. System updates campaign progress, force status, unit status, kills, losses, resources, and scores.
 7. System notifies campaign participants that the battle was confirmed.
 
 **Alternative Flows:**
@@ -1357,10 +1378,14 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-061 through FR-064
-* FR-108 through FR-118
-* FR-146
-* FR-163
+* FR-061: Submit battle results for confirmation.
+* FR-063: Confirm or dispute submitted battle result.
+* FR-064: Update campaign progress after confirmed battle.
+* FR-078: Allow battle records to remain pending.
+* FR-079: Confirmed battle records affect standings and force status.
+* FR-080: Disputed battle records reviewed by authorized users.
+* FR-084: Notify when battle requires confirmation.
+* FR-085: Notify when battle is confirmed or disputed.
 
 **Priority:**
 High
@@ -1385,6 +1410,7 @@ A campaign participant opens the battle history for a campaign, views past battl
 
 * User is logged in.
 * User is a campaign participant or has permission to view campaign data.
+* Campaign has battle records, or the system can display an empty state.
 
 **Trigger:**
 User selects Battle History from the campaign.
@@ -1395,7 +1421,7 @@ User selects Battle History from the campaign.
 2. System displays past battles in the campaign.
 3. User searches, filters, or sorts battle records.
 4. User selects a battle.
-5. System displays battle details, including participating forces, units destroyed, damage results, victory result, objective effects, and confirmed status.
+5. System displays battle details, including participating forces, units destroyed, damage results, victory result, and confirmed status.
 
 **Alternative Flows:**
 A1. No battles exist.
@@ -1417,10 +1443,12 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-051 through FR-052
-* FR-157 through FR-158
-* FR-163
-* FR-171
+* FR-051: View history of past battles.
+* FR-052: View details of past battles.
+* FR-094: Search or filter battle history.
+* FR-095: Sort lists such as battles.
+* FR-099: Store battle records.
+* FR-103: Ensure campaign data permissions.
 
 **Priority:**
 Medium
@@ -1486,9 +1514,12 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-065 through FR-068
-* FR-147
-* FR-176 through FR-178
+* FR-065: Allow Campaign Owner to finalize campaign.
+* FR-066: Prevent finalized campaigns from being modified except where allowed.
+* FR-067: Preserve finalized campaign results.
+* FR-068: Allow users to view completed campaigns.
+* FR-086: Notify users when campaign status changes.
+* FR-108: Only show leaderboard statistics from confirmed and completed campaigns.
 
 **Priority:**
 High
@@ -1504,10 +1535,10 @@ Logged-in User or Visitor, depending on data type
 System
 
 **Goal:**
-Allow actors to find relevant forces, units, campaigns, battles, objectives, combat teams, and leaderboard entries efficiently.
+Allow actors to find relevant forces, units, campaigns, battles, and leaderboard entries efficiently.
 
 **Brief Description:**
-A user searches, filters, or sorts data lists such as forces, available units, campaigns, battle history, objectives, combat teams, and leaderboards.
+A user searches, filters, or sorts data lists such as forces, available units, campaigns, battle history, and leaderboards.
 
 **Preconditions:**
 
@@ -1547,840 +1578,19 @@ Failure:
 
 **Related Functional Requirements:**
 
-* FR-008
-* FR-153 through FR-158
+* FR-008: Sort and/or filter leaderboards.
+* FR-090: Search or filter forces.
+* FR-091: Search or filter available units.
+* FR-092: Filter units by supported attributes.
+* FR-093: Search or filter campaigns.
+* FR-094: Search or filter battle history.
+* FR-095: Sort lists by supported fields.
 
 **Priority:**
 Medium
 
 ---
 
-# UC-024: Configure Campaign Rules
+# Notes on Requirement Coverage
 
-**Primary Actor:**
-Campaign Owner
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow the Campaign Owner to configure the rules and settings that define how the campaign operates.
-
-**Brief Description:**
-During campaign creation or setup, the Campaign Owner selects campaign type, scoring, era, rules level, starting resources, force BV limit, objective control type, turn settings, combat team settings, and victory conditions.
-
-**Preconditions:**
-
-* Campaign Owner is logged in.
-* Campaign is being created or is still in setup.
-
-**Trigger:**
-Campaign Owner opens campaign rule configuration.
-
-**Main Success Scenario:**
-
-1. Campaign Owner selects a campaign type.
-2. System displays settings relevant to that campaign type.
-3. Campaign Owner configures scoring, era, rules level, resources, BV limit, faction restrictions, objective control, turn settings, and victory conditions as applicable.
-4. System validates the selected rules and settings.
-5. System saves the campaign settings.
-6. System shows remaining setup requirements before the campaign can begin.
-
-**Alternative Flows:**
-A1. Selected settings conflict with campaign type.
-
-1. System identifies the conflict.
-2. System displays an explanation and prevents saving until corrected.
-
-A2. Required settings are missing.
-
-1. System displays missing settings.
-2. Campaign Owner completes the settings.
-
-A3. Campaign has already started.
-
-1. System prevents changes to locked settings.
-2. System may allow only settings explicitly marked as editable after start.
-
-**Postconditions:**
-Success:
-
-* Campaign rules are configured and saved.
-
-Failure:
-
-* Campaign settings remain unchanged or incomplete.
-
-**Related Functional Requirements:**
-
-* FR-039 through FR-040
-* FR-069 through FR-078
-* FR-181 through FR-182
-
-**Priority:**
-High
-
----
-
-# UC-025: Configure Campaign Objectives
-
-**Primary Actor:**
-Campaign Owner
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow the Campaign Owner to create or select objectives for campaigns that use objectives.
-
-**Brief Description:**
-The Campaign Owner defines campaign objectives, including objective name, type, description, bonus effects, control type, and initial control rules.
-
-**Preconditions:**
-
-* Campaign Owner is logged in.
-* Campaign is in setup or allows objective editing.
-* Selected campaign type supports objectives.
-
-**Trigger:**
-Campaign Owner opens objective configuration.
-
-**Main Success Scenario:**
-
-1. Campaign Owner opens objective setup.
-2. System displays objective configuration options.
-3. Campaign Owner creates or selects objectives.
-4. Campaign Owner assigns objective types and bonus effects.
-5. Campaign Owner selects binary or varied control where applicable.
-6. System validates objective count, objective type, and control settings.
-7. System saves objectives and initial control values.
-8. System displays objective summary.
-
-**Alternative Flows:**
-A1. Objective count is invalid.
-
-1. System displays the allowed objective range.
-2. Campaign Owner adjusts the number of objectives.
-
-A2. Binary control is selected for an ineligible campaign.
-
-1. System rejects the setting.
-2. System explains that varied control is required.
-
-A3. Objective bonus values are incomplete.
-
-1. System highlights missing or invalid bonus data.
-
-**Postconditions:**
-Success:
-
-* Campaign objectives are configured and stored.
-
-Failure:
-
-* Objective configuration remains incomplete.
-
-**Related Functional Requirements:**
-
-* FR-079 through FR-090
-* FR-167
-
-**Priority:**
-High
-
----
-
-# UC-026: View and Manage Objective Control
-
-**Primary Actor:**
-Campaign Participant
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow campaign participants to view objective control and objective bonus ownership.
-
-**Brief Description:**
-A campaign participant views the objective control page or dashboard section to see current control percentages, binary ownership, bonus effects, and objective history.
-
-**Preconditions:**
-
-* User is logged in.
-* User is a campaign participant or has permission to view the campaign.
-* Campaign uses objectives.
-
-**Trigger:**
-User selects Objectives, Campaign Map, or Objective Control.
-
-**Main Success Scenario:**
-
-1. User opens objective control view.
-2. System displays campaign objectives.
-3. System displays each objective's type, bonus, and current control state.
-4. User selects an objective.
-5. System displays detailed control history and bonus ownership.
-
-**Alternative Flows:**
-A1. Campaign does not use objectives.
-
-1. System hides objective controls or displays a not-applicable message.
-
-A2. User lacks permission to view campaign objectives.
-
-1. System denies access.
-
-**Postconditions:**
-Success:
-
-* User views objective control information.
-
-Failure:
-
-* Objective information is not displayed.
-
-**Related Functional Requirements:**
-
-* FR-081 through FR-090
-* FR-149
-* FR-167
-
-**Priority:**
-High
-
----
-
-# UC-027: Resolve Objective Control After Battle
-
-**Primary Actor:**
-System
-
-**Secondary Actors:**
-Campaign Participants
-
-**Goal:**
-Update objective control after a battle is confirmed.
-
-**Brief Description:**
-After a battle involving an objective is confirmed, the system applies the campaign's objective control rules to determine whether objective ownership or control percentages change.
-
-**Preconditions:**
-
-* Battle is confirmed.
-* Campaign uses objectives.
-* Battle result identifies the objective or objective effect.
-
-**Trigger:**
-Battle result is confirmed.
-
-**Main Success Scenario:**
-
-1. System identifies the objective affected by the battle.
-2. System identifies winner, loser, current control state, and campaign control type.
-3. System applies binary or varied control rules.
-4. System prevents control values from dropping below 0% or exceeding 100%.
-5. System updates objective control.
-6. System updates objective bonus ownership if thresholds are met.
-7. System records objective control history.
-8. System notifies relevant campaign participants of the change.
-
-**Alternative Flows:**
-A1. Battle does not affect an objective.
-
-1. System skips objective control updates.
-
-A2. Control formula produces a zero swing.
-
-1. System records no control change if required.
-2. System leaves objective control unchanged.
-
-A3. Battle result is later disputed or corrected.
-
-1. System recalculates objective control if authorized correction workflow allows it.
-
-**Postconditions:**
-Success:
-
-* Objective control and bonus ownership are updated where applicable.
-
-Failure:
-
-* Objective control remains unchanged.
-
-**Related Functional Requirements:**
-
-* FR-086 through FR-090
-* FR-064
-* FR-149
-* FR-167
-
-**Priority:**
-High
-
----
-
-# UC-028: Run Chaos Campaign Cycle
-
-**Primary Actor:**
-Campaign Participant
-
-**Secondary Actors:**
-System, Other Campaign Participants
-
-**Goal:**
-Support the basic battle-and-repair cycle of a Chaos campaign.
-
-**Brief Description:**
-Players fight battles, log results, confirm outcomes, update objective control and standings, then spend Warchest Points to repair or manage units.
-
-**Preconditions:**
-
-* User is logged in.
-* User is participating in an active Chaos campaign.
-* Campaign has started.
-
-**Trigger:**
-Players complete a battle or begin post-battle management.
-
-**Main Success Scenario:**
-
-1. Players fight a battle outside the system.
-2. A participant logs the battle result or submits a battle record.
-3. System marks the battle pending.
-4. Relevant participants confirm or dispute the battle.
-5. Once confirmed, system updates campaign score, objective control, unit status, and statistics.
-6. User opens Chaos campaign resource management.
-7. System displays Warchest Point balance and eligible actions.
-8. User spends Warchest Points to repair or manage units.
-9. System updates campaign resources and force status.
-10. Campaign continues to the next battle.
-
-**Alternative Flows:**
-A1. Battle is disputed.
-
-1. System prevents final campaign updates until dispute is resolved.
-
-A2. User lacks enough Warchest Points.
-
-1. System prevents the selected action.
-2. System displays insufficient-resource message.
-
-A3. Campaign victory condition is met.
-
-1. System alerts participants or Campaign Owner that campaign can be finalized.
-
-**Postconditions:**
-Success:
-
-* Chaos campaign state is updated after battle and resource spending.
-
-Failure:
-
-* Pending or invalid actions remain unresolved.
-
-**Related Functional Requirements:**
-
-* FR-069 through FR-074
-* FR-096
-* FR-099 through FR-118
-* FR-119
-* FR-122
-* FR-174 through FR-178
-
-**Priority:**
-High
-
----
-
-# UC-029: Run Advanced Campaign Turn
-
-**Primary Actor:**
-Campaign Participant
-
-**Secondary Actors:**
-System, Other Campaign Participants
-
-**Goal:**
-Support the battle, downtime, repair, and resource cycle of an Advanced campaign.
-
-**Brief Description:**
-An Advanced campaign participant completes a battle, confirms results, manages c-bills, selects repair priorities, resolves rearming, repair, requisition, and turn advancement.
-
-**Preconditions:**
-
-* User is logged in.
-* User is participating in an active Advanced campaign.
-* Campaign has started.
-
-**Trigger:**
-A battle is completed or the user begins downtime/turn management.
-
-**Main Success Scenario:**
-
-1. Players complete a battle outside the system.
-2. Battle result is logged and confirmed.
-3. System updates unit damage, kills, objective control, resources, and standings.
-4. User opens Advanced campaign turn management.
-5. System displays c-bills, turn length, repair needs, and available actions.
-6. User selects repair priority and any allowed resource actions.
-7. System applies campaign rules for repair, rearmament, requisition, and time usage.
-8. System updates unit readiness, resources, and turn state.
-9. System checks max-turns-ahead rule if enabled.
-10. User advances or completes the turn.
-
-**Alternative Flows:**
-A1. User attempts to advance too far ahead.
-
-1. System warns or prevents advancement based on campaign settings.
-
-A2. Insufficient c-bills or time.
-
-1. System prevents unavailable actions.
-2. User chooses a different action or priority.
-
-A3. Requisition or repair action fails or is delayed.
-
-1. System records result according to campaign rules.
-2. Unit remains partially repaired or unavailable.
-
-**Postconditions:**
-Success:
-
-* Advanced campaign turn state, resources, and unit readiness are updated.
-
-Failure:
-
-* Turn remains incomplete or selected actions are not applied.
-
-**Related Functional Requirements:**
-
-* FR-091 through FR-098
-* FR-119 through FR-128
-* FR-168
-
-**Priority:**
-High
-
----
-
-# UC-030: Set Up Conquest Campaign Map
-
-**Primary Actor:**
-Campaign Owner
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow the Campaign Owner to configure the strategic map layer for a Conquest campaign.
-
-**Brief Description:**
-The Campaign Owner configures or generates the Conquest hex map, sets objective locations, hidden objective behavior, base or dropship rules, starting territory, combat team settings, and map-related victory conditions.
-
-**Preconditions:**
-
-* Campaign Owner is logged in.
-* Campaign is a Conquest campaign.
-* Campaign is in setup.
-
-**Trigger:**
-Campaign Owner opens Conquest map setup.
-
-**Main Success Scenario:**
-
-1. Campaign Owner opens Conquest setup.
-2. System displays map configuration options.
-3. Campaign Owner creates or selects a hex map.
-4. Campaign Owner places or configures objectives.
-5. Campaign Owner configures hidden objective behavior where applicable.
-6. Campaign Owner configures starting territory and base/dropship rules.
-7. Campaign Owner configures combat team rules.
-8. System validates Conquest setup.
-9. System saves map, objective, territory, and combat team settings.
-
-**Alternative Flows:**
-A1. Campaign has more than two players.
-
-1. System prevents Conquest setup.
-2. System explains that Conquest campaigns are restricted to two players.
-
-A2. Map setup is incomplete.
-
-1. System displays missing map setup requirements.
-
-A3. Combat team settings are invalid.
-
-1. System identifies the invalid setting.
-2. Campaign Owner corrects it.
-
-**Postconditions:**
-Success:
-
-* Conquest map and related settings are ready for campaign start.
-
-Failure:
-
-* Conquest map setup remains incomplete.
-
-**Related Functional Requirements:**
-
-* FR-072
-* FR-129 through FR-132
-* FR-167
-* FR-169
-
-**Priority:**
-High
-
----
-
-# UC-031: Assign Conquest Combat Team Orders
-
-**Primary Actor:**
-Conquest Campaign Participant
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow each Conquest player to assign orders to their combat teams during a turn.
-
-**Brief Description:**
-During a Conquest turn, a player reviews the map and assigns one valid order to each combat team.
-
-**Preconditions:**
-
-* User is logged in.
-* User is participating in an active Conquest campaign.
-* Campaign is waiting for orders.
-* User has at least one combat team.
-
-**Trigger:**
-User opens the Conquest order assignment screen.
-
-**Main Success Scenario:**
-
-1. User opens the Conquest map.
-2. System displays combat teams, current map control, objectives, and eligible orders.
-3. User selects a combat team.
-4. User selects an order.
-5. User selects a target hex or target context where required.
-6. System validates the order.
-7. User repeats order assignment for each combat team.
-8. User submits or locks in orders.
-9. System records submitted orders.
-10. System waits for the opposing player if their orders are not yet submitted.
-
-**Alternative Flows:**
-A1. Selected order is invalid for target hex.
-
-1. System explains the invalid condition.
-2. User selects a different order or target.
-
-A2. Combat team is unavailable.
-
-1. System prevents active map orders for that combat team.
-2. User may choose a repair, reserve, or no-action order if allowed.
-
-A3. User attempts to change locked orders.
-
-1. System prevents changes unless the campaign rules allow unlocking.
-
-**Postconditions:**
-Success:
-
-* User's combat team orders are submitted for the turn.
-
-Failure:
-
-* Orders remain incomplete or unsubmitted.
-
-**Related Functional Requirements:**
-
-* FR-131 through FR-135
-* FR-148
-* FR-169
-
-**Priority:**
-High
-
----
-
-# UC-032: Resolve Conquest Turn
-
-**Primary Actor:**
-System
-
-**Secondary Actors:**
-Conquest Campaign Participants
-
-**Goal:**
-Resolve submitted Conquest orders and update the strategic campaign state.
-
-**Brief Description:**
-After both Conquest players submit orders, the system resolves order effects, applies modifiers, determines territory changes, checks for battle triggers, creates battle records, and displays a turn resolution summary.
-
-**Preconditions:**
-
-* Campaign is an active Conquest campaign.
-* Both players have submitted required combat team orders.
-
-**Trigger:**
-All required Conquest orders are submitted or Campaign Owner initiates resolution where allowed.
-
-**Main Success Scenario:**
-
-1. System locks submitted orders.
-2. System validates all orders.
-3. System applies order interactions and modifiers.
-4. System resolves territory and objective effects according to order rules.
-5. System calculates battle trigger rolls.
-6. System creates pending battle records for triggered battles.
-7. System updates hex control and objective control where applicable.
-8. System updates repair, reserve, or support effects where applicable.
-9. System records turn resolution results.
-10. System displays a turn resolution summary.
-11. System notifies participants of results and required battles.
-
-**Alternative Flows:**
-A1. Order conflict requires battle resolution before final map update.
-
-1. System creates pending battle record.
-2. System postpones final affected state changes until battle is confirmed.
-
-A2. Invalid order is discovered during resolution.
-
-1. System blocks resolution.
-2. System notifies Campaign Owner or affected player.
-
-A3. No battles are triggered.
-
-1. System applies non-battle order results.
-2. System advances to the next turn.
-
-**Postconditions:**
-Success:
-
-* Conquest turn is resolved or pending battle records are created.
-
-Failure:
-
-* Turn remains unresolved.
-
-**Related Functional Requirements:**
-
-* FR-136 through FR-141
-* FR-148 through FR-149
-* FR-169
-
-**Priority:**
-High
-
----
-
-# UC-033: Manage Repair, Rearmament, and Requisition
-
-**Primary Actor:**
-Campaign Participant
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow a campaign participant to manage post-battle force recovery according to campaign type.
-
-**Brief Description:**
-The user manages repairs, rearming, requisition, resource spending, repair priorities, and unit readiness after battles or during campaign turns.
-
-**Preconditions:**
-
-* User is logged in.
-* User is participating in a campaign that supports repair or resource management.
-* Campaign is active.
-
-**Trigger:**
-User opens repair, rearmament, or requisition management.
-
-**Main Success Scenario:**
-
-1. User opens recovery management.
-2. System displays damaged units, ammunition needs, missing components, resources, and available actions.
-3. User selects repair priority or specific supported action.
-4. User chooses any allowed requisition or resource spending.
-5. System validates resource, time, and campaign-rule requirements.
-6. System applies repair, rearmament, and requisition rules.
-7. System updates resources, unit status, readiness, and repair history.
-8. System displays a summary of changes.
-
-**Alternative Flows:**
-A1. Campaign type uses simplified repair.
-
-1. System displays simplified repair options.
-2. User spends the required resource to repair eligible units.
-
-A2. Required parts are unavailable.
-
-1. System delays or prevents repair.
-2. System may create requisition need.
-
-A3. Objective bonus applies.
-
-1. System applies the relevant bonus to repair, stock, income, delivery, or healing.
-
-**Postconditions:**
-Success:
-
-* Repair, rearmament, requisition, and resource state are updated.
-
-Failure:
-
-* Recovery state remains unchanged or partially updated according to valid actions.
-
-**Related Functional Requirements:**
-
-* FR-119 through FR-128
-* FR-168
-* FR-179 through FR-182
-
-**Priority:**
-High
-
----
-
-# UC-034: Manage Auxiliary Forces
-
-**Primary Actor:**
-Conquest Campaign Participant
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow eligible Conquest battles to use temporary auxiliary forces when enabled by campaign settings.
-
-**Brief Description:**
-When a Conquest battle has a significant BV mismatch and auxiliary forces are enabled, the system allows the disadvantaged player to select temporary auxiliary units from an approved list.
-
-**Preconditions:**
-
-* Campaign is an active Conquest campaign.
-* Auxiliary forces are enabled.
-* A battle or pending battle has an eligible BV discrepancy.
-
-**Trigger:**
-System detects eligible auxiliary force conditions or user opens battle setup.
-
-**Main Success Scenario:**
-
-1. System identifies a qualifying BV discrepancy.
-2. System displays eligible auxiliary unit options.
-3. User selects an auxiliary unit or units within allowed limits.
-4. System adds auxiliary units to the battle only.
-5. Battle is played and logged.
-6. System removes auxiliary units after battle resolution.
-7. System applies any configured penalties or restrictions if auxiliary units are destroyed or misused.
-
-**Alternative Flows:**
-A1. Auxiliary forces are disabled.
-
-1. System does not offer auxiliary unit options.
-
-A2. No eligible units are available.
-
-1. System displays no available auxiliary forces.
-
-A3. Auxiliary unit is destroyed.
-
-1. System applies configured penalty if enabled.
-
-**Postconditions:**
-Success:
-
-* Auxiliary units are used temporarily and removed after the battle.
-
-Failure:
-
-* No auxiliary force is added.
-
-**Related Functional Requirements:**
-
-* FR-140
-* FR-179 through FR-182
-
-**Priority:**
-Low to Medium
-
----
-
-# UC-035: Manage Admin Rule Constants
-
-**Primary Actor:**
-System Administrator
-
-**Secondary Actors:**
-System
-
-**Goal:**
-Allow authorized administrators to manage backend-tunable rule constants.
-
-**Brief Description:**
-A System Administrator updates global balancing values such as objective control swing values, Conquest order modifiers, battle trigger thresholds, objective bonuses, resource income, repair values, and other configurable campaign constants.
-
-**Preconditions:**
-
-* System Administrator is authenticated.
-* Admin has permission to modify rule constants.
-
-**Trigger:**
-Administrator opens rule constant management.
-
-**Main Success Scenario:**
-
-1. Administrator opens rule constant management.
-2. System displays configurable constants and current values.
-3. Administrator edits one or more values.
-4. System validates the values.
-5. Administrator saves changes.
-6. System stores the updated constants.
-7. System preserves existing campaign-specific settings unless explicitly migrated.
-
-**Alternative Flows:**
-A1. User lacks admin permission.
-
-1. System denies access.
-
-A2. Edited value is invalid.
-
-1. System displays validation errors.
-2. Administrator corrects the value.
-
-A3. Change could affect active campaigns.
-
-1. System warns administrator.
-2. Administrator chooses whether changes apply only to future campaigns or to selected campaigns through an explicit migration process.
-
-**Postconditions:**
-Success:
-
-* Rule constants are updated and stored.
-
-Failure:
-
-* Rule constants remain unchanged.
-
-**Related Functional Requirements:**
-
-* FR-179 through FR-182
-
-**Priority:**
-Low for first implementation; High for long-term maintainability
-
----
-
-# Notes on Use Case Coverage
-
-This use case document intentionally groups related functional requirements into workflows. Not every functional requirement requires its own use case.
-
-Data persistence, access control, notifications, and validation requirements are usually referenced within the workflows they support rather than written as separate standalone use cases.
-
-The next revision should add a traceability matrix mapping each FR to one or more use cases.
+These use cases intentionally group related functional requirements into user-centered workflows. Not every functional requirement needs its own separate use case. For example, data storage, access control, and notification requirements are usually referenced inside the workflows they support rather than written as separate actor-driven use cases.
