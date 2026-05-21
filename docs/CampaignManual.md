@@ -87,7 +87,7 @@ Resources represent the player's ability to repair, reinforce, upgrade, or maint
 Different campaign types use different resource systems:
 
 * Chaos campaigns use Warchest Points or support points.
-* Advanced campaigns use c-bills, time, repairs, requisition, and possibly pilot progression.
+* Advanced campaigns use c-bills, time (repairs, requisition) and XP (pilot progression).
 * Conquest campaigns use Advanced-style resources plus map position, combat team orders, territory, and objectives.
 
 ## 2.7 Objectives
@@ -660,13 +660,15 @@ Damage tracking depends on campaign type.
 
 Destroyed units may be removed, marked destroyed, salvaged, captured, or replaced depending on campaign rules.
 
+A campaign setting may be required be required that reduces the quality of any unit that is considered destroyed. By default this should probably be off, and quality reductions should only affect units changing hands.
+
 ## 8.5 Disabled Units
 
 Disabled units are no longer combat-effective during or after a battle but may be repairable.
 
 ## 8.6 Captured Units
 
-Captured units may become available for salvage, ransom, repair, or other campaign-specific handling.
+Captured units may become available for salvage, ransom, repair, or other campaign-specific handling. Note that any unit that is captured (changes hands) receive a quality rating loss, going down one level, making it more difficult for the new owner to bring back up to fully repaired.
 
 ## 8.7 Salvaged Units
 
@@ -685,6 +687,11 @@ Players may add notes or a battle report summary to preserve narrative details.
 Repair and resource rules determine how difficult it is for players to keep a force operational over time.
 
 The level of detail depends on campaign type.
+
+Reference: 
+
+* Cam-Ops (pgs 188+) on repair rolls, unit/faction quality, tech roll targets, and the important maintenance, repair and salvage check modifiers table.
+* Strat-ops for availability and requisition
 
 ## 9.2 Chaos Resources
 
@@ -794,7 +801,35 @@ Repair-related orders include:
 
 Field repair may be faster to access but less effective or riskier. Facility repairs are safer and more comprehensive but may remove the combat team from map-related action.
 
-## 9.10 Requisition
+## 9.10 Repair Rolls
+
+As described within campaign ops rulebook, the roll required to make a successful repair is first determined by the repair team's experience [Support Personnel Experience Table]. A regular (default) experience team of techs needs a 6+ to perform a given repair. Two modifiers are applied to that (and more may be applied based on bonuses in campaign etc):
+
+* Tech Rating Modifier: Modifies the result based on the complexity of the part being repaired. Simple parts will be easier while fusion engines, etc are complicated.
+* Unit Quality Modifier: Modifies the result based on how well-kept the unit is (typically would be the equipment in question but not going that granular). So based on the faction, each unit is given a quality, which will affect the ease of repair. A mercenary will have a harder time repairing their unit compared to a Comstar line unit. Note these overlap a bit with the era modifiers (optional) table.
+
+## 9.10 Repair & Req Order of Operations
+
+Order of operations:
+1) Check if repair in question is against a repair that is currently awaiting a part. If it is, check to see if part arrived. If it has not arrived, skip this repair. If it has arrived or the repair is not matched with a repair waiting a part, move to step 2.
+2) Attempt to repair - if item cannot be repaired (due to unsuccessful attempts, or too complex, etc), proceed to next step.
+3) Stock roll - First check if there are any waiting deliveries against that specific item. If there are deliveries awaiting, then immediately move to next step. Otherwise, roll to see if the item in question is in stock. (2d6 against rarity roll with modifier based on force faction, or by default a -1 roll mod). If not in stock proceed to next step. If it is in stock, go back to step 1.
+4) Requisition roll - Esentially another roll for req. (2d6 against rarity roll)- if req is successful, move to next step. Otherwise fails and must wait to req item next turn.
+5) Delivery time roll - System rolls for delivery time. (2D6 delivery time roll, optional mods based on location of campaign). Add item to delivery queue.
+
+## 9.10 Stockpiles
+
+The unit is assumed to have brought enough ammo for the campaign so no stocks for ammunition of any type is required. But for parts (weapons, limbs and components (mek leg, jump jet, etc)), there is first an intial roll to see if the unit happens to have it in stock. This will vary depending on the unit and the part.
+
+Every part will have a rarity which represents the ease at which it can be made or found. This is between A and F. If not known, it is default C. This is also how likely the unit is to stock a given item.
+
+2D6 rolls against rarity:
+A items requires a 4+, B items requires 5+ C requires 7+, D requires 9+, E requires 10+, and F requires 11+
+Should be able to configure and tweak these as needed.
+
+A small modifier is applied to stock rolls based on the faction of the force, or by default, a -1 roll mod.
+
+## 9.11 Requisition & Delivery Time
 
 Requisition is the process of acquiring parts, components, replacement units, or other needed resources.
 
@@ -806,17 +841,37 @@ Requisition may be affected by:
 * Objective bonuses.
 * Campaign settings.
 
-Each turn, a force as a whole may make 2 requisition roll. Additional rolls may be added from orders. This should be a configurable option on the back end only.
+Each turn, a force as a whole may make 2 requisition rolls. Additional rolls may be added from orders. This should be a configurable option on the back end only.
 
-## 9.11 Tech and Availability Ratings
+2D6 rolls against rarity:
+A items requires a 4+, B items requires 5+ C requires 7+, D requires 9+, E requires 10+, and F requires 11+
+Should be able to configure and tweak these as needed.
 
-Tech Rating represents complexity and repair difficulty.
+2D6 rolls for delivery time depends on rarity:
+A items: (6+) This turn (available for immediate repairs), (4-5) Next turn, (2-3) 2 Turns
+B items: (7+) This turn, (4-5) next turn, (2-3) 2 Turns
+C items: (7+) This turn, (5-6) next turn, (3-4) 2 Turns, (2) 3 turns
+D items: (8+) This turn,  (6-7) next turn, (4-5) 2 turns, (2-3) 3 turns
+E items: (10+) this turn, (7-9) next turn, (5-6) 2 turns, (3-4) 3 turns, (2) 4 turns
+F items: (11+) this turn, (9-10) next turn, (7-8) 2 turns, (5-6) 3 turns, (2-4) 4 turns
+
+For delivery time, an optional rule can be included to add a mod to the delivery roll. Certain planets may be easier to acquire items from locally, while others might be complete backwater peripherey planets making it more difficult.
+
+A delivery queue must be maintained for each force that specifies a unit and repair job so that a delivery is matched with its req'd repair. This is to prevent one unit losing a large laser, having one shipped in 2 turns, then the following turn, another unit also needing to req a large laser and not suddenly finding that large laser in stock but also when the first one is delivered, it is assigned to the correct repair. 
+
+## 9.12 Tech, Quality and Availability Ratings
+
+Tech Rating represents complexity and repair difficulty. Each part of a unit will have a complexity A-F and the cam-ops table for tech rating modifiers determines how much harder or easier a repair job is.
 
 Availability Rating represents how easy or difficult equipment is to acquire in a given era.
 
-The project may reverse or re-label ratings for clarity if needed, but should remain internally consistent.
+Quality represents the state of a unit or part in its current condition, which reflects things like ease of maintenance (which isn't in the app) and ease of repair. Individual component quality is not planned to be modelled within the app (though could potentially be a post-launch goal), so all units are assigned a quality based on the faction of their originating force. Note that captured units have a reduction in quality.
 
-## 9.12 Repair Queue and Prioritization
+Quality of a force's unit is determined by the Faction Quality table found in cam-ops.
+
+*** The project may reverse or re-label ratings for clarity if needed, but should remain internally consistent. "A" should always represent the best / well-maintained / highest tech / advanced.
+
+## 9.13 Repair Settings
 
 Once a turn is complete and repairs are to be performed, the system runs through all necessary repairs and queues them. While queuing these repairs, it must rank them and queue them properly, based on priority (As set by the player)- So if mid-way through repairs, the system finds a limb that must be replaced, it moves to the front of the queue.
 
@@ -830,9 +885,28 @@ On the backend, there will be a few settings that can be tweaked:
 4) Max Repair Attempts - # of attempts at repairing the same part before the part is considered broken and must be replaced. Default will be 2. So if you fail the repair roll twice, the part needs to be replaced.
 5) Extra Time After Fail Toggle - This may also end up being an option that players can choose between, either way, this boolean, if true, will set the tech team to use double time to repair the second attempt, with a +1 roll modifier. A 2 always results in failure (As detailed)
 
-## 9.13 Repair vs. Replacement
+## 9.14 Repair Process / Queue
 
+The process of the system after all settings and player selection have been made is detailed here.
 
+The system first must enqueue all repairs based on priority. As each priority above dictates, a long list of repairs is established. It then calculates the time necessary for each repair in minutes. Then it runs through each of the repairs and applies the above settings to each, first determining if the time required for the repair is too high or the max thresholds mean that it's too difficult to make this repair. If for one reason or another that is the case, OR the
+
+## 9.15 Performing the Repair
+
+Repair rolls and modifiers are detailed in in cam-ops
+
+## 9.16 XP
+
+XP is earned by pilots in advanced and conquest campaigns. This system will require tweaking even post-launch with settings like:
+
+1 XP for surviving a battle
+1 XP for each kill
+
+## 9.17 XP Expenditures
+
+XP for pilots can be spent on improving the pilot's gunnery or piloting skill as well as a specific list of abilities that will be selected specifically for the campaign manager app from the Cam Ops rulebook (pg 71-72). Backend values for tweaking XP costs will allow tweaking post-launch.
+
+Overall the cost for improving pilots gunnery / piloting skill should be higher than expected, especially in Conquest, as improvements affect the unit's BV, which in turn will probably throw off combat team balance.
 
 ---
 

@@ -6,6 +6,9 @@ import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
 import campaignsRouter from "./routes/campaigns";
 import forcesRouter from "./routes/forces";
+import battlesRouter from "./routes/battles";
+import objectivesRouter from "./routes/objectives";
+import resourcesRouter from "./routes/resources";
 
 dotenv.config();
 
@@ -28,6 +31,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/campaigns", campaignsRouter);
 app.use("/api/forces", forcesRouter);
+app.use("/api/battles", battlesRouter);
+app.use("/api/objectives", objectivesRouter);
+app.use("/api/resources", resourcesRouter);
 
 app.listen(PORT, () => {
   console.log(`API server running at http://localhost:${PORT}`);

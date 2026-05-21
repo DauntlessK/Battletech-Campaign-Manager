@@ -28,10 +28,28 @@ A web application to support persistent Classic BattleTech campaigns for PvP gro
 - `docs/EmailNotificationGuide.md` — backend mail mode, mock email testing, and SMTP setup
 
 ## Codebase Overview
-- Frontend: `src/` with Vite + React + TypeScript
-- Backend: `server/` Node/Express-like routes and services
-- Data: `server/data/`, `src/assets/data/`, and generated unit catalog files
-- Scripts: `scripts/` for tooling and import automation
+- **Frontend**: `src/` with Vite + React 18 + TypeScript + Tailwind CSS + lucide-react icons
+- **Backend**: `server/` with Node.js + Express + TypeScript
+- **Data**: `server/data/store.json` (file-based JSON persistence), unit catalog in `server/data/generated/`
+- **Scripts**: `scripts/` for tooling and unit catalog generation
+
+## Current MVP Status (Completed)
+- ✅ User authentication (registration, login, logout with PBKDF2 hashing)
+- ✅ Campaign management (create, invite players, accept/decline invitations)
+- ✅ Force management (create, assign units, view force composition)
+- ✅ Battle tracking (create, confirm, finalize battles)
+- ✅ Objective tracking (create, update, delete objectives)
+- ✅ Resource accounts (track C-Bills, repair points, salvage, etc. per player per campaign)
+- ✅ Notifications system with email integration (invite, notifications polling)
+- ✅ All HTTP APIs with authentication middleware
+- ✅ File-based persistence with `loadStore()`/`saveStore()` pattern
+
+## Technology Stack
+- **Frontend**: React 18, TypeScript, Vite (dev server proxies to localhost:3001), Tailwind CSS, lucide-react
+- **Backend**: Node.js, Express, TypeScript
+- **Storage**: JSON file-based (server/data/store.json) — suitable for MVP
+- **Auth**: Bearer tokens with localStorage, PBKDF2 password hashing
+- **Email**: Configurable MAIL_MODE (smtp/mock) for notifications
 
 ## Project Focus
 - Build a campaign management UI for players and campaign owners
@@ -52,5 +70,42 @@ The repository includes a set of official rulebook PDFs under `docs/rulebook_ref
 - `docs/rulebook_references/BattleTech TechManual.pdf`: Primary reference for unit construction, component definitions, Battle Value calculations, and c-bill cost tables. Use this when modeling base unit data, BV calculations, and cost/repair estimates.
 - `docs/rulebook_references/BattleTech Campaign Operations.pdf`: Primary campaign rules reference (including Chaos campaign details). Contains campaign operation guidance and repair/maintenance rules that directly inform campaign resource and repair workflows.
 - `docs/rulebook_references/BattleTech Tactical Operations Advanced Rules.pdf`: Advanced tactical rules useful as optional reference for ejection, forced withdrawal, and other advanced combat outcomes; include when implementing optional/advanced mechanics.
+- `docs/rulebook_references/Strategic Operations.pdf`: Advanced strategic rules, contains necessary rules for maintenance (not used), salvage (not used), repair and customization. This rulebook is mainly needed for the section on repairing and replacing components (Determining if it is too badly damaged, replacement rules), rearm table, and the master repair time table.
 
 When in doubt about unit stats, BV, or repair cost behavior, consult these rulebooks and record any derived rules in `docs/CampaignManual.md` or the data dictionary.
+
+## GitHub Repository and Project Roadmap
+
+- **Repository:** `https://github.com/DauntlessK/Battletech-Campaign-Manager`
+- **Roadmap source:** `docs/btcm_github_import/data/milestones.csv`
+- **Issue import payload:** `docs/btcm_github_import/data/github_issues.csv`
+- **GitHub issue bodies:** `docs/btcm_github_import/issue_bodies/`
+- **Recommended import commands:**
+  ```powershell
+  cd docs/btcm_github_import
+  .\scripts\02_create_milestones.ps1 -Repo DauntlessK/Battletech-Campaign-Manager
+  .\scripts\03_import_issues.ps1 -Repo DauntlessK/Battletech-Campaign-Manager
+  ```
+
+## Current Implementation Status
+
+- ✅ Backend MVP completed for M1–M6: accounts, friends, notifications, unit catalog, forces, campaigns, battle logging, objectives, and resource accounts.
+- ✅ UI skeleton exists for auth, campaigns, forces, units, and account pages.
+- ⚠️ Remaining work is primarily UI and gameplay workflow implementation for M5/M6/M7.
+- 🎯 Next priority is to complete battle logging UI, objective management UI, and campaign dashboard UI, then resource/repair flows.
+
+## GitHub Project Guidance
+
+- Use milestones to reflect roadmap phases:
+  - M1: Project Foundation and Documentation
+  - M2: Accounts, Friends, and Notifications
+  - M3: Unit Catalog and Force Management
+  - M4: Campaign Setup and Campaign-Specific Forces
+  - M5: Battle Logging and Confirmation
+  - M6: Objectives, Control, and Chaos Campaign MVP
+  - M7: Advanced Campaign Resources and Repairs
+  - M8: Conquest Campaign Map and Orders
+  - M9: Leaderboards, Polish, and Final Release
+- Track progress by linking completed tasks to the appropriate epic/use case issue.
+- Keep the issue body acceptance criteria aligned with `docs/UseCases.md`, `docs/SRS.md`, and `docs/APIEndpointPlan.md`.
+

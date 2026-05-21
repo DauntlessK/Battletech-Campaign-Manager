@@ -2,7 +2,18 @@ import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import type { Force, ForceUnit } from "../types/models";
 
-export async function createForce(ownerId: string, name: string, unitIds: string[] = [], description?: string): Promise<Force> {
+export async function createForce(
+  ownerId: string,
+  name: string,
+  unitIds: string[] = [],
+  description?: string,
+  era?: string,
+  rulesLevel?: string,
+  totalBV?: number,
+  forConquest?: boolean,
+  combatTeamCount?: number,
+  combatTeamBV?: number
+): Promise<Force> {
   const store = await loadStore();
 
   const force: Force = {
@@ -10,10 +21,13 @@ export async function createForce(ownerId: string, name: string, unitIds: string
     ownerId,
     name,
     description,
-    era: undefined,
-    rulesLevel: undefined,
-    totalBV: undefined,
+    era,
+    rulesLevel,
+    totalBV,
     currencyCBills: undefined,
+    forConquest,
+    combatTeamCount,
+    combatTeamBV,
     unitIds,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

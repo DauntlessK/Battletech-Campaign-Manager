@@ -3,7 +3,7 @@ import './App.css'
 import { unitType } from './constants/enums'
 //import { Mek } from './files/mek';
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import {
   Menu,
   X,
@@ -36,9 +36,21 @@ type PageKey =
   | "units"
   | "myForces"
   | "myCampaigns"
+  | "battles"
   | "myAccount";
 
 type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace" | string;
+type Battle = {
+  id: string;
+  campaignId: string;
+  date: string;
+  location?: string;
+  status: "Proposed" | "Confirmed" | "Disputed" | "Finalized";
+  submittedByUserId: string;
+  summary?: string;
+  createdAt: string;
+  updatedAt: string;
+};
 type UnitPanelMode = "slots" | "weapons" | "details";
 type SortMode = "name" | "tonnage" | "bv" | "cost";
 
@@ -145,9 +157,20 @@ type Force = {
   name: string;
   ownerId: string;
   description?: string;
+  era?: string;
+  rulesLevel?: string;
+  totalBV?: number;
+  currencyCBills?: number;
+  forConquest?: boolean;
+  combatTeamCount?: number;
+  combatTeamBV?: number;
   unitIds?: string[];
   createdAt?: string;
   updatedAt?: string;
+  campaignId?: string;
+  originalForceId?: string;
+  origin?: string;
+  status?: string;
 };
 
 type PendingInvite = {
@@ -185,6 +208,7 @@ const navItems: Array<{ key: PageKey; label: string; icon: React.ReactNode }> = 
   { key: "units", label: "Units", icon: <Boxes size={17} /> },
   { key: "myForces", label: "My Forces", icon: <Swords size={17} /> },
   { key: "myCampaigns", label: "Campaigns", icon: <Flag size={17} /> },
+  { key: "battles", label: "Battles", icon: <Crosshair size={17} /> },
   { key: "myAccount", label: "Account", icon: <User size={17} /> },
 ];
 
@@ -232,9 +256,29 @@ export default function App() {
   const [forces, setForces] = useState<Force[]>([]);
   const [forcesLoading, setForcesLoading] = useState(false);
   const [forcesError, setForcesError] = useState<string | null>(null);
+  const [forceName, setForceName] = useState("");
+  const [forceDescription, setForceDescription] = useState("");
+  const [forceEra, setForceEra] = useState("Star League");
+  const [forceRulesLevel, setForceRulesLevel] = useState("Standard");
+  const [forceBVLimit, setForceBVLimit] = useState<number>(0);
+  const [forceForConquest, setForceForConquest] = useState(false);
+  const [forceCombatTeamCount, setForceCombatTeamCount] = useState<number>(0);
+  const [forceCombatTeamBV, setForceCombatTeamBV] = useState<number>(0);
+  const [forceFormLoading, setForceFormLoading] = useState(false);
+  const [forceFormError, setForceFormError] = useState<string | null>(null);
   const [invites, setInvites] = useState<PendingInvite[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [accountDataLoading, setAccountDataLoading] = useState(false);
+  const [battles, setBattles] = useState<Battle[]>([]);
+  const [battleCampaignId, setBattleCampaignId] = useState<string>("");
+  const [battleFormDate, setBattleFormDate] = useState<string>(new Date().toISOString().slice(0, 10));
+  const [battleFormLocation, setBattleFormLocation] = useState<string>("");
+  const [battleFormSummary, setBattleFormSummary] = useState<string>("");
+  const [battleFormLoading, setBattleFormLoading] = useState(false);
+  const [battleFormError, setBattleFormError] = useState<string | null>(null);
+  const [battleLoading, setBattleLoading] = useState(false);
+  const [battleError, setBattleError] = useState<string | null>(null);
+  const [scrollToNotificationsSignal, setScrollToNotificationsSignal] = useState(0);
 
   const AUTH_TOKEN_KEY = "bcm-auth-token";
 
@@ -401,6 +445,29 @@ export default function App() {
     }
   };
 
+  const fetchBattlesForCampaign = async (campaignId: string) => {
+    setBattleLoading(true);
+    setBattleError(null);
+    try {
+      const response = await fetch(`/api/battles/campaigns/${campaignId}/battles`, {
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Unable to load battles.");
+      }
+      const data = (await response.json()) as Battle[];
+      setBattles(data);
+    } catch (error) {
+      setBattleError(error instanceof Error ? error.message : "Unable to load battles.");
+    } finally {
+      setBattleLoading(false);
+    }
+  };
+
   const fetchAccountExtras = async () => {
     setAccountDataLoading(true);
     setAuthError(null);
@@ -451,6 +518,44 @@ export default function App() {
       setInvites([]);
       setNotifications([]);
     }
+  }, [authUser]);
+
+  useEffect(() => {
+    if (campaigns.length > 0 && !battleCampaignId) {
+      setBattleCampaignId(campaigns[0].id);
+    }
+  }, [campaigns, battleCampaignId]);
+
+  useEffect(() => {
+    if (activePage === "battles" && battleCampaignId) {
+      fetchBattlesForCampaign(battleCampaignId);
+    }
+  }, [activePage, battleCampaignId]);
+
+  // Poll for notification updates every 10 seconds
+  useEffect(() => {
+    if (!authUser) return;
+
+    const pollNotifications = async () => {
+      try {
+        const response = await fetch("/api/users/me/notifications", {
+          headers: {
+            ...authHeaders(),
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          const data = (await response.json()) as NotificationItem[];
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error("Failed to poll notifications", error);
+      }
+    };
+
+    const pollInterval = setInterval(pollNotifications, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(pollInterval);
   }, [authUser]);
 
   useEffect(() => {
@@ -526,6 +631,10 @@ export default function App() {
         setMobileMenuOpen={setMobileMenuOpen}
         authUser={authUser}
         unreadNotifications={notifications.filter((note) => !note.read).length}
+        onOpenNotifications={() => {
+          navigate("myAccount");
+          setScrollToNotificationsSignal((s) => s + 1);
+        }}
         onLogout={handleLogout}
       />
 
@@ -579,6 +688,72 @@ export default function App() {
             forces={forces}
             loading={forcesLoading}
             error={forcesError}
+            forceName={forceName}
+            forceDescription={forceDescription}
+            forceEra={forceEra}
+            forceRulesLevel={forceRulesLevel}
+            forceBVLimit={forceBVLimit}
+            forceForConquest={forceForConquest}
+            forceCombatTeamCount={forceCombatTeamCount}
+            forceCombatTeamBV={forceCombatTeamBV}
+            forceFormLoading={forceFormLoading}
+            forceFormError={forceFormError}
+            onForceNameChange={setForceName}
+            onForceDescriptionChange={setForceDescription}
+            onForceEraChange={setForceEra}
+            onForceRulesLevelChange={setForceRulesLevel}
+            onForceBVLimitChange={setForceBVLimit}
+            onForceForConquestChange={setForceForConquest}
+            onForceCombatTeamCountChange={setForceCombatTeamCount}
+            onForceCombatTeamBVChange={setForceCombatTeamBV}
+            onCreateForce={async () => {
+              if (!forceName.trim()) {
+                setForceFormError("Force name is required.");
+                return;
+              }
+
+              setForceFormLoading(true);
+              setForceFormError(null);
+
+              try {
+                const response = await fetch("/api/forces", {
+                  method: "POST",
+                  headers: {
+                    ...authHeaders(),
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    name: forceName,
+                    description: forceDescription,
+                    era: forceEra,
+                    rulesLevel: forceRulesLevel,
+                    totalBV: forceBVLimit > 0 ? forceBVLimit : undefined,
+                    forConquest: forceForConquest,
+                    combatTeamCount: forceCombatTeamCount > 0 ? forceCombatTeamCount : undefined,
+                    combatTeamBV: forceCombatTeamBV > 0 ? forceCombatTeamBV : undefined,
+                  }),
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                  throw new Error(result?.error || "Unable to create force.");
+                }
+
+                setForces((current) => [...current, result]);
+                setForceName("");
+                setForceDescription("");
+                setForceEra("Star League");
+                setForceRulesLevel("Standard");
+                setForceBVLimit(0);
+                setForceForConquest(false);
+                setForceCombatTeamCount(0);
+                setForceCombatTeamBV(0);
+              } catch (error) {
+                setForceFormError(error instanceof Error ? error.message : "Unable to create force.");
+              } finally {
+                setForceFormLoading(false);
+              }
+            }}
           />
         )}
         {activePage === "myCampaigns" && (
@@ -587,6 +762,94 @@ export default function App() {
             campaigns={campaigns}
             loading={campaignsLoading}
             error={campaignsError}
+          />
+        )}
+        {activePage === "battles" && (
+          <BattlesPage
+            authUser={authUser}
+            campaigns={campaigns}
+            battles={battles}
+            loading={battleLoading}
+            error={battleError}
+            selectedCampaignId={battleCampaignId}
+            onSelectCampaign={setBattleCampaignId}
+            battleFormDate={battleFormDate}
+            onBattleFormDateChange={setBattleFormDate}
+            battleFormLocation={battleFormLocation}
+            onBattleFormLocationChange={setBattleFormLocation}
+            battleFormSummary={battleFormSummary}
+            onBattleFormSummaryChange={setBattleFormSummary}
+            battleFormLoading={battleFormLoading}
+            battleFormError={battleFormError}
+            onCreateBattle={async () => {
+              if (!battleCampaignId) {
+                setBattleFormError("Select a campaign before creating a battle.");
+                return;
+              }
+              setBattleFormLoading(true);
+              setBattleFormError(null);
+              try {
+                const response = await fetch(`/api/battles/campaigns/${battleCampaignId}/battles`, {
+                  method: "POST",
+                  headers: {
+                    ...authHeaders(),
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    date: battleFormDate,
+                    location: battleFormLocation,
+                    summary: battleFormSummary,
+                  }),
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                  throw new Error(result?.error || "Unable to create battle.");
+                }
+                setBattles((current) => [...current, result]);
+                setBattleFormLocation("");
+                setBattleFormSummary("");
+              } catch (error) {
+                setBattleFormError(error instanceof Error ? error.message : "Unable to create battle.");
+              } finally {
+                setBattleFormLoading(false);
+              }
+            }}
+            onConfirmBattle={async (battleId) => {
+              try {
+                const response = await fetch(`/api/battles/${battleId}/confirm`, {
+                  method: "POST",
+                  headers: {
+                    ...authHeaders(),
+                    "Content-Type": "application/json",
+                  },
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                  throw new Error(result?.error || "Unable to confirm battle.");
+                }
+                setBattles((current) => current.map((battle) => (battle.id === battleId ? result : battle)));
+              } catch (error) {
+                setBattleError(error instanceof Error ? error.message : "Unable to confirm battle.");
+              }
+            }}
+            onDeleteBattle={async (battleId) => {
+              try {
+                const response = await fetch(`/api/battles/${battleId}`, {
+                  method: "DELETE",
+                  headers: {
+                    ...authHeaders(),
+                    "Content-Type": "application/json",
+                  },
+                });
+                if (!response.ok) {
+                  const body = await response.json().catch(() => null);
+                  throw new Error(body?.error || "Unable to delete battle.");
+                }
+                setBattles((current) => current.filter((battle) => battle.id !== battleId));
+              } catch (error) {
+                setBattleError(error instanceof Error ? error.message : "Unable to delete battle.");
+              }
+            }}
           />
         )}
         {activePage === "myAccount" && (
@@ -603,6 +866,7 @@ export default function App() {
             success={authSuccess}
             invites={invites}
             notifications={notifications}
+            scrollToNotificationsSignal={scrollToNotificationsSignal}
             onEmailChange={setAuthEmail}
             onPasswordChange={setAuthPassword}
             onDisplayNameChange={setAuthDisplayName}
@@ -801,6 +1065,7 @@ function AccountPage({
   notifications,
   onSubmit,
   onLogout,
+  scrollToNotificationsSignal,
 }: {
   user: User | null;
   mode: AuthMode;
@@ -819,7 +1084,16 @@ function AccountPage({
   notifications: NotificationItem[];
   onSubmit: () => void;
   onLogout: () => void;
+  scrollToNotificationsSignal?: number;
 }) {
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (scrollToNotificationsSignal && notificationsRef.current) {
+      notificationsRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      // ensure focus for screen readers
+      notificationsRef.current.focus();
+    }
+  }, [scrollToNotificationsSignal]);
   const unreadCount = notifications.filter((note) => !note.read).length;
   const hasUnreadNotifications = unreadCount > 0;
 
@@ -837,7 +1111,7 @@ function AccountPage({
       )}
 
       {user ? (
-        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] w-full xl:max-w-[50%] xl:mx-auto">
           <div className="space-y-4 xl:col-span-2">
             <div className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-5">
               <div className="text-sm text-zinc-400">Signed in as</div>
@@ -845,7 +1119,7 @@ function AccountPage({
               <div className="text-sm text-zinc-400">{user.email}</div>
             </div>
           </div>
-          <div className="grid gap-3 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-4">
+          <div ref={notificationsRef} tabIndex={-1} className="grid gap-3 rounded-3xl border border-zinc-800 bg-zinc-950/70 p-4">
             <div className="text-sm text-zinc-400">Friend code</div>
             <div className="font-semibold text-zinc-100">{user.friendCode}</div>
             <div className="text-sm text-zinc-400">Role</div>
@@ -913,7 +1187,7 @@ function AccountPage({
           </div>
         </div>
       ) : (
-        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+        <div className="grid gap-4 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 w-full xl:max-w-[50%] xl:mx-auto">
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
             <p className="text-sm text-zinc-400">You can sign in or create a new account to access campaign invites and notifications.</p>
             <div className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-2">
@@ -1039,6 +1313,183 @@ function CampaignsPage({
           )}
         </div>
       )}
+    </section>
+  );
+}
+
+function BattlesPage({
+  authUser,
+  campaigns,
+  battles,
+  loading,
+  error,
+  selectedCampaignId,
+  onSelectCampaign,
+  battleFormDate,
+  onBattleFormDateChange,
+  battleFormLocation,
+  onBattleFormLocationChange,
+  battleFormSummary,
+  onBattleFormSummaryChange,
+  battleFormLoading,
+  battleFormError,
+  onCreateBattle,
+  onConfirmBattle,
+  onDeleteBattle,
+}: {
+  authUser: User | null;
+  campaigns: Campaign[];
+  battles: Battle[];
+  loading: boolean;
+  error: string | null;
+  selectedCampaignId: string;
+  onSelectCampaign: (campaignId: string) => void;
+  battleFormDate: string;
+  onBattleFormDateChange: (value: string) => void;
+  battleFormLocation: string;
+  onBattleFormLocationChange: (value: string) => void;
+  battleFormSummary: string;
+  onBattleFormSummaryChange: (value: string) => void;
+  battleFormLoading: boolean;
+  battleFormError: string | null;
+  onCreateBattle: () => Promise<void>;
+  onConfirmBattle: (battleId: string) => Promise<void>;
+  onDeleteBattle: (battleId: string) => Promise<void>;
+}) {
+  if (!authUser) {
+    return (
+      <section className="space-y-5">
+        <PageTitle eyebrow="Battles" title="Sign in required" description="Please sign in to log or review battles." />
+        <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-zinc-400">Sign in on the Account page to continue.</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-5">
+      <PageTitle eyebrow="Battles" title="Battle Log" description="Create and review battles for your campaigns." />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,420px)]">
+        <div className="space-y-4">
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="space-y-2">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign</div>
+                <select
+                  value={selectedCampaignId}
+                  onChange={(event) => onSelectCampaign(event.target.value)}
+                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                >
+                  {campaigns.map((campaign) => (
+                    <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">New Battle</div>
+                <div className="text-sm text-zinc-400">Record a battle result for the selected campaign.</div>
+              </div>
+              <button
+                onClick={onCreateBattle}
+                disabled={battleFormLoading}
+                className="rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Create Battle
+              </button>
+            </div>
+
+            {battleFormError && <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{battleFormError}</div>}
+
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm">
+                <span>Date</span>
+                <input
+                  type="date"
+                  value={battleFormDate}
+                  onChange={(event) => onBattleFormDateChange(event.target.value)}
+                  className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span>Location</span>
+                <input
+                  type="text"
+                  value={battleFormLocation}
+                  onChange={(event) => onBattleFormLocationChange(event.target.value)}
+                  className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                  placeholder="Battlefield or sector"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span>Summary</span>
+                <textarea
+                  value={battleFormSummary}
+                  onChange={(event) => onBattleFormSummaryChange(event.target.value)}
+                  className="min-h-[120px] rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none transition focus:border-lime-400"
+                  placeholder="Add a short summary of the battle outcome"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Battle History</div>
+                <div className="text-sm text-zinc-400">Review past battles for the selected campaign.</div>
+              </div>
+            </div>
+
+            {loading && <div className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-4 text-zinc-400">Loading battles...</div>}
+            {error && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{error}</div>}
+            {!loading && !error && battles.length === 0 && (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-sm text-zinc-400">No battles recorded yet for this campaign.</div>
+            )}
+            {!loading && !error && battles.length > 0 && (
+              <div className="space-y-3">
+                {battles.map((battle) => (
+                  <div key={battle.id} className="rounded-3xl border border-zinc-800 bg-zinc-950/70 p-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <div className="text-sm font-bold text-zinc-100">{new Date(battle.date).toLocaleDateString()}</div>
+                        <div className="text-xs uppercase tracking-[0.18em] text-zinc-400">{battle.status}</div>
+                        <div className="mt-2 text-sm text-zinc-300">{battle.location || "No location specified"}</div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {battle.status !== "Finalized" && (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmBattle(battle.id)}
+                            className="rounded-2xl border border-lime-400/40 bg-lime-400/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-lime-200 transition hover:bg-lime-400/20"
+                          >
+                            Confirm
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => onDeleteBattle(battle.id)}
+                          className="rounded-2xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-red-200 transition hover:bg-red-500/20"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    {battle.summary && <p className="mt-3 text-sm leading-6 text-zinc-400">{battle.summary}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

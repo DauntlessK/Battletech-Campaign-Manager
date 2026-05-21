@@ -9,10 +9,32 @@ router.post("/", requireAuth, async (req: RequestWithUser, res) => {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "Authentication required." });
 
-    const { name, unitIds, description } = req.body;
+    const {
+      name,
+      unitIds,
+      description,
+      era,
+      rulesLevel,
+      totalBV,
+      forConquest,
+      combatTeamCount,
+      combatTeamBV,
+    } = req.body;
+
     if (!name) return res.status(400).json({ error: "Force name is required." });
 
-    const force = await createForce(user.id, name, unitIds ?? [], description);
+    const force = await createForce(
+      user.id,
+      name,
+      unitIds ?? [],
+      description,
+      era,
+      rulesLevel,
+      typeof totalBV === "number" ? totalBV : undefined,
+      typeof forConquest === "boolean" ? forConquest : undefined,
+      typeof combatTeamCount === "number" ? combatTeamCount : undefined,
+      typeof combatTeamBV === "number" ? combatTeamBV : undefined
+    );
     res.status(201).json(force);
   } catch (error) {
     console.error("[routes/forces] Create force failed:", error);

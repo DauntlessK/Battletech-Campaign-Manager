@@ -74,6 +74,9 @@ export type Force = {
   rulesLevel?: CampaignSettings["rulesLevel"];
   totalBV?: number;
   currencyCBills?: number;
+  forConquest?: boolean;
+  combatTeamCount?: number;
+  combatTeamBV?: number;
   unitIds: string[];
   createdAt: string;
   updatedAt: string;
