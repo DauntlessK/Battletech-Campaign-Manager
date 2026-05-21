@@ -146,7 +146,8 @@ Campaign settings may include:
 * Optional force affiliation or faction restrictions.
 * Max turns ahead.
 * Combat team rules for Conquest campaigns.
-* Combat team size for Conquest campaigns.
+* Combat team BV limit for Conquest campaigns.
+* Combat team size / max unit count for Conquest campaigns.
 * Objective control type.
 * Salaries enabled or disabled.
 * Victory condition or conditions.
@@ -180,7 +181,7 @@ Suggested rules levels:
 
 The force BV limit restricts the maximum total Battle Value allowed for a campaign force.
 
-For Conquest campaigns, combat team BV may also matter because combat teams operate separately and may encounter enemy combat teams independently.
+For Conquest campaigns, combat team BV will also matter because combat teams operate separately and will encounter enemy combat teams independently.
 
 ## 3.6 Starting Resources
 
@@ -543,6 +544,10 @@ The term "varied control" is temporary. Possible alternatives:
 * Proportional Control
 * Contested Control
 
+## 6.9 Hidden Caches
+
+These hexes grant a one-time bonus injection of c-bills / warchest points as a sort of "cache" that was found on the map when one player gains control of a neutral hex. There would need to be settings to enable and disable this, and a setting to allow the player creating the campaign to configure how many to randomly spawn onto the map. Also include messaging notifying everyone when one was found.
+
 ---
 
 # 7. Battle Flow
@@ -732,6 +737,8 @@ The rearm time table in strategic ops details time required.
 
 In Advanced and Conquest campaigns, players choose a broad repair priority rather than manually ordering every repair attempt. These priorities give a sense of where to spend the tech's precious time first. All repair priorities will favor reloading first, then any sort of repairs second.
 
+The general repair priority is the de facto ordering. If another priority is chosen, that particular repair type is moved from its normal ordering to the top, retaining the rest of the order.
+
 Possible repair priorities:
 
 ### General Repair Priority
@@ -740,11 +747,12 @@ The tech force chooses repairs using a general flow:
 
 1. Rearm all units.
 2. Repair or replace missing legs.
-3. Repair or replace missing arms.
-4. Replace missing weapons.
-5. Repair broken equipment.
-6. Repair armor.
-7. Repair structure.
+3. Repair gyros & engines.
+4. Repair or replace missing arms.
+5. Repair or replace weapons.
+6. Repair broken equipment / components.
+7. Repair armor.
+8. Repair structure.
 
 ### Armor and Structure Priority
 
@@ -873,7 +881,14 @@ This prevents one player from advancing too far ahead of another player who has 
 
 ## 10.5 Repair Time
 
-Based on the preset turn length for a campaign, the repair time is calculated based on tech team size. Tech team size is a backend setting that can be adjusted / tweaked as necessary. 
+Based on the preset turn length for a campaign, the repair time is calculated based on tech team size. Tech team size is a backend setting that can be adjusted / tweaked as necessary.
+
+There should be two options that may or may not be selectable at campaign setup that dictate how tech team's time is split. For launch it should be a backend property only.
+
+Repair Time Setting:
+
+1) Total Tech Time only - This is the simpler option - all techs time is pooled into one pool and then repairs are made against the entire pool. The total repair time is calculated from all techs (tech team size) * 480 min (8 hours) * days in a turn.
+2) Tech teams - Each unit, to a maximum of the original force strength, has its own tech team, and therefor has its own pool of repair time. The system runs through repairs once, then totals the remaining time as a total of the unused time across all teams. This number is halved. Then any remaining repairs can be carried out using leftover time. Note that if the player has extra units above his/her starting strength, units that aren't in a combat force must use leftover time.
 
 ---
 
@@ -1347,3 +1362,20 @@ Recommended first implementation priority:
 5. Advanced repairs/resources.
 6. Conquest map and orders.
 7. Advanced balancing and admin constants.
+
+## 17.7 Gaining Units, Swapping units and Force Size within Conquest
+
+A major issue to be resolved is if a player gains a new unit (through salvage or purchase) - how do we handle it? Allowing the player to gain enough units to create another combat force is potentially far too great of an advantage and its probably best to hand wave this as "not enough support personnel and not able to hire effective pilots" etc.
+
+It seems like, first is to forbid purchasing units or pilots as "spares" - you can only do that if you are short a unit or pilot (because you lost one, or a pilot was KIA)
+
+Second- swapping units in and out (if you manage to capture an enemy mek for example) causes several issues - mainly in terms of maintaining combat team balance.
+
+We should probably institute a penalty to discourage unit and pilot swapping- to represent that pilots are used to their machines in particular, and combat teams have trained together for a long time and making changes in the middle of a campaign would provide several challenges.
+
+Possible penalties:
+
+1. Swapping a pilot onto a new mek results in a +1 to piloting skill for several turns, while still retaining the original BV
+2. Minor initiative penalties to combat teams with new pilots / meks
+3. Repair time penalties
+4. Increased C-bill salary / maintenance costs
