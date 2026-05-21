@@ -726,11 +726,11 @@ Ammunition is assumed to be available in sufficient quantity unless the campaign
 
 The campaign system treats rearming as the process of actually reloading the unit.
 
-A suggested rule is that reloading one ammunition bin requires 15 minutes and automatically succeeds.
+The rearm time table in strategic ops details time required.
 
 ## 9.6 Repair Priorities
 
-In Advanced and Conquest campaigns, players may choose a broad repair priority rather than manually ordering every repair attempt.
+In Advanced and Conquest campaigns, players choose a broad repair priority rather than manually ordering every repair attempt. These priorities give a sense of where to spend the tech's precious time first. All repair priorities will favor reloading first, then any sort of repairs second.
 
 Possible repair priorities:
 
@@ -796,8 +796,9 @@ Requisition may be affected by:
 * Era.
 * Availability rating.
 * Objective bonuses.
-* Facilities.
 * Campaign settings.
+
+Each turn, a force as a whole may make 2 requisition roll. Additional rolls may be added from orders. This should be a configurable option on the back end only.
 
 ## 9.11 Tech and Availability Ratings
 
@@ -806,6 +807,24 @@ Tech Rating represents complexity and repair difficulty.
 Availability Rating represents how easy or difficult equipment is to acquire in a given era.
 
 The project may reverse or re-label ratings for clarity if needed, but should remain internally consistent.
+
+## 9.12 Repair Queue and Prioritization
+
+Once a turn is complete and repairs are to be performed, the system runs through all necessary repairs and queues them. While queuing these repairs, it must rank them and queue them properly, based on priority (As set by the player)- So if mid-way through repairs, the system finds a limb that must be replaced, it moves to the front of the queue.
+
+Once the system has a list of repairs, it must calculate repair time for all repairs (based on master repair chart found in strategic ops).
+
+On the backend, there will be a few settings that can be tweaked: 
+
+1) Time Repair Threshold - a time limit that, exceeding this even with other factors considered, means the part is effectively broken and must be replaced.
+2) Max Roll Threshold - a threshold that if the likelihood for sucesss on a repair is greater than, it automatically triggers a requisition rather than wasting time repairing. Example: if the MR Threshold is 12, it doesn't bother attempting to repair anything that requires a roll of 12 or higher.
+3) Extra Time Threshold - A threshold that if the roll for success is greater than it, it will automatically trigger extra time for repairing that component- giving a bit more odds to success. Example: if the ET Threshold is set to 8, any repair requiring 8 or higher will trigger extra time automatically, giving a +1 mod while using double the time to repair.
+4) Max Repair Attempts - # of attempts at repairing the same part before the part is considered broken and must be replaced. Default will be 2. So if you fail the repair roll twice, the part needs to be replaced.
+5) Extra Time After Fail Toggle - This may also end up being an option that players can choose between, either way, this boolean, if true, will set the tech team to use double time to repair the second attempt, with a +1 roll modifier. A 2 always results in failure (As detailed)
+
+## 9.13 Repair vs. Replacement
+
+
 
 ---
 
@@ -836,6 +855,8 @@ During a turn, players may:
 
 Conquest campaigns use turns for strategic map play.
 
+A turn may represent a configured number of days, usually between 1 and 5 days.
+
 Each turn:
 
 1. Players assign orders to combat teams.
@@ -849,6 +870,10 @@ Each turn:
 In multiplayer campaigns, the Campaign Owner may enable a max-turns-ahead rule.
 
 This prevents one player from advancing too far ahead of another player who has played fewer battles or turns.
+
+## 10.5 Repair Time
+
+Based on the preset turn length for a campaign, the repair time is calculated based on tech team size. Tech team size is a backend setting that can be adjusted / tweaked as necessary. 
 
 ---
 
