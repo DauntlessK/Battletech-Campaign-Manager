@@ -1,6 +1,12 @@
 import express from "express";
 import { requireAuth, RequestWithUser } from "../middleware/authMiddleware";
-import { createForce, listForcesForUser, assignForceToCampaign } from "../services/forceService";
+import {
+  createForce,
+  listForcesForUser,
+  assignForceToCampaign,
+  getForceById,
+  addUnitToForce,
+} from "../services/forceService";
 
 const router = express.Router();
 
@@ -16,6 +22,7 @@ router.post("/", requireAuth, async (req: RequestWithUser, res) => {
       era,
       rulesLevel,
       totalBV,
+      faction,
       forConquest,
       combatTeamCount,
       combatTeamBV,
@@ -31,6 +38,7 @@ router.post("/", requireAuth, async (req: RequestWithUser, res) => {
       era,
       rulesLevel,
       typeof totalBV === "number" ? totalBV : undefined,
+      typeof faction === "string" ? faction : undefined,
       typeof forConquest === "boolean" ? forConquest : undefined,
       typeof combatTeamCount === "number" ? combatTeamCount : undefined,
       typeof combatTeamBV === "number" ? combatTeamBV : undefined
@@ -52,6 +60,39 @@ router.get("/", requireAuth, async (req: RequestWithUser, res) => {
   } catch (error) {
     console.error("[routes/forces] List forces failed:", error);
     res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.get("/:id", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const force = await getForceById(req.params.id);
+    if (!force || force.ownerId !== user.id) {
+      return res.status(404).json({ error: "Force not found." });
+    }
+
+    res.json(force);
+  } catch (error) {
+    console.error("[routes/forces] Get force failed:", error);
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.post("/:id/units", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const baseUnitId = req.body.baseUnitId;
+    if (!baseUnitId) return res.status(400).json({ error: "baseUnitId is required." });
+
+    const forceUnit = await addUnitToForce(req.params.id, baseUnitId, user.id);
+    res.status(201).json(forceUnit);
+  } catch (error) {
+    console.error("[routes/forces] Add unit failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 

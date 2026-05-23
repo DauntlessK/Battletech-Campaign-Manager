@@ -28,10 +28,22 @@ A web application to support persistent Classic BattleTech campaigns for PvP gro
 - `docs/EmailNotificationGuide.md` — backend mail mode, mock email testing, and SMTP setup
 
 ## Codebase Overview
-- **Frontend**: `src/` with Vite + React 18 + TypeScript + Tailwind CSS + lucide-react icons
-- **Backend**: `server/` with Node.js + Express + TypeScript
-- **Data**: `server/data/store.json` (file-based JSON persistence), unit catalog in `server/data/generated/`
-- **Scripts**: `scripts/` for tooling and unit catalog generation
+- **Frontend**: `src/` with Vite + React 18 + TypeScript + Tailwind CSS + lucide-react icons.
+  - `src/App.tsx` is the app shell and page router.
+  - `src/pages/` contains page views: `AccountPage`, `CampaignsPage`, `ForcesPage`, `BattlesPage`, and `UnitsPage`.
+  - `src/components/` contains shared UI components like `AppHeader` and `PageTitle`.
+  - `src/types/app.ts` holds frontend TypeScript models.
+  - `src/constants/appOptions.tsx` stores navigation and static UI options.
+  - `src/utils/` stores helper functions such as unit normalization.
+- **Backend**: `server/` with Node.js + Express + TypeScript.
+  - `server/index.ts` starts the Express API and mounts route modules.
+  - `server/routes/` defines REST endpoints for auth, users, campaigns, forces, battles, objectives, resources, and units.
+  - `server/services/` implements business logic and store updates.
+  - `server/middleware/` contains authentication middleware.
+  - `server/types/models.ts` defines backend data schemas.
+- **Data**: `server/data/store.json` (file-based JSON persistence), unit catalog in `server/data/generated/`, and raw MTF files in `server/data/mtf/`.
+- **Scripts**: `scripts/` for tooling and unit catalog generation.
+- **Architecture docs**: `docs/CodebaseStructure.md` describes where frontend and backend code now live and what each folder contains.
 
 ## Current MVP Status (Completed)
 - ✅ User authentication (registration, login, logout with PBKDF2 hashing)

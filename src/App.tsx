@@ -29,7 +29,7 @@ import type {
 } from "./types/app";
 
 export default function App() {
-  const [activePage, setActivePage] = useState<PageKey>("units");
+  const [activePage, setActivePage] = useState<PageKey>("landing");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [units, setUnits] = useState<Unit[]>([]);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
@@ -54,13 +54,17 @@ export default function App() {
   const [forcesLoading, setForcesLoading] = useState(false);
   const [forcesError, setForcesError] = useState<string | null>(null);
   const [forceName, setForceName] = useState("");
+  const [forceAssignmentTarget, setForceAssignmentTarget] = useState<Force | null>(null);
+  const [forceAssignmentLoading, setForceAssignmentLoading] = useState(false);
+  const [forceAssignmentError, setForceAssignmentError] = useState<string | null>(null);
   const [forceDescription, setForceDescription] = useState("");
   const [forceEra, setForceEra] = useState("Star League");
   const [forceRulesLevel, setForceRulesLevel] = useState("Standard");
-  const [forceBVLimit, setForceBVLimit] = useState<number>(0);
+  const [forceBVLimit, setForceBVLimit] = useState<number>(15000);
+  const [forceFaction, setForceFaction] = useState("Lyran Commonwealth");
   const [forceForConquest, setForceForConquest] = useState(false);
-  const [forceCombatTeamCount, setForceCombatTeamCount] = useState<number>(0);
-  const [forceCombatTeamBV, setForceCombatTeamBV] = useState<number>(0);
+  const [forceCombatTeamCount, setForceCombatTeamCount] = useState<number>(3);
+  const [forceCombatTeamBV, setForceCombatTeamBV] = useState<number>(5000);
   const [forceFormLoading, setForceFormLoading] = useState(false);
   const [forceFormError, setForceFormError] = useState<string | null>(null);
   const [invites, setInvites] = useState<PendingInvite[]>([]);
@@ -239,6 +243,38 @@ export default function App() {
       setForcesError(error instanceof Error ? error.message : "Unable to load forces.");
     } finally {
       setForcesLoading(false);
+    }
+  };
+
+  const assignUnitToForce = async (unitId: string) => {
+    if (!forceAssignmentTarget) {
+      setForceAssignmentError("Select a force before adding units.");
+      return;
+    }
+
+    setForceAssignmentLoading(true);
+    setForceAssignmentError(null);
+
+    try {
+      const response = await fetch(`/api/forces/${forceAssignmentTarget.id}/units`, {
+        method: "POST",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ baseUnitId: unitId }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to add unit to force.");
+      }
+
+      await fetchForces();
+    } catch (error) {
+      setForceAssignmentError(error instanceof Error ? error.message : "Unable to add unit to force.");
+    } finally {
+      setForceAssignmentLoading(false);
     }
   };
 
@@ -472,8 +508,13 @@ export default function App() {
                 <UnitsPage
                   units={units}
                   selectedUnit={selectedUnit}
+                  selectedForceForUnitAdd={forceAssignmentTarget}
                   onSelectUnit={setSelectedUnitId}
                   onClearSelectedUnit={() => setSelectedUnitId(null)}
+                  onSelectForceForUnitAdd={setForceAssignmentTarget}
+                  onAddUnitToForce={assignUnitToForce}
+                  addUnitLoading={forceAssignmentLoading}
+                  addUnitError={forceAssignmentError}
                 />
               </>
             )}
@@ -483,6 +524,7 @@ export default function App() {
           <ForcesPage
             authUser={authUser}
             forces={forces}
+            units={units}
             loading={forcesLoading}
             error={forcesError}
             forceName={forceName}
@@ -490,6 +532,7 @@ export default function App() {
             forceEra={forceEra}
             forceRulesLevel={forceRulesLevel}
             forceBVLimit={forceBVLimit}
+            forceFaction={forceFaction}
             forceForConquest={forceForConquest}
             forceCombatTeamCount={forceCombatTeamCount}
             forceCombatTeamBV={forceCombatTeamBV}
@@ -500,13 +543,24 @@ export default function App() {
             onForceEraChange={setForceEra}
             onForceRulesLevelChange={setForceRulesLevel}
             onForceBVLimitChange={setForceBVLimit}
-            onForceForConquestChange={setForceForConquest}
+            onForceFactionChange={setForceFaction}
+            onForceForConquestChange={(isConquest: boolean) => {
+              setForceForConquest(isConquest);
+              if (isConquest && forceCombatTeamCount === 0) {
+                setForceCombatTeamCount(3);
+                setForceCombatTeamBV(5000);
+              }
+            }}
             onForceCombatTeamCountChange={setForceCombatTeamCount}
             onForceCombatTeamBVChange={setForceCombatTeamBV}
+            onBeginForceUnitAssignment={(force: Force) => {
+              setForceAssignmentTarget(force);
+              navigate("units");
+            }}
             onCreateForce={async () => {
               if (!forceName.trim()) {
                 setForceFormError("Force name is required.");
-                return;
+                return false;
               }
 
               setForceFormLoading(true);
@@ -524,10 +578,11 @@ export default function App() {
                     description: forceDescription,
                     era: forceEra,
                     rulesLevel: forceRulesLevel,
-                    totalBV: forceBVLimit > 0 ? forceBVLimit : undefined,
+                    totalBV: forceBVLimit,
+                    faction: forceFaction,
                     forConquest: forceForConquest,
-                    combatTeamCount: forceCombatTeamCount > 0 ? forceCombatTeamCount : undefined,
-                    combatTeamBV: forceCombatTeamBV > 0 ? forceCombatTeamBV : undefined,
+                    combatTeamCount: forceForConquest ? forceCombatTeamCount : undefined,
+                    combatTeamBV: forceForConquest ? forceCombatTeamBV : undefined,
                   }),
                 });
 
@@ -541,12 +596,15 @@ export default function App() {
                 setForceDescription("");
                 setForceEra("Star League");
                 setForceRulesLevel("Standard");
-                setForceBVLimit(0);
+                setForceBVLimit(15000);
+                setForceFaction("Lyran Commonwealth");
                 setForceForConquest(false);
-                setForceCombatTeamCount(0);
-                setForceCombatTeamBV(0);
+                setForceCombatTeamCount(3);
+                setForceCombatTeamBV(5000);
+                return true;
               } catch (error) {
                 setForceFormError(error instanceof Error ? error.message : "Unable to create force.");
+                return false;
               } finally {
                 setForceFormLoading(false);
               }
@@ -709,14 +767,33 @@ function MobileMenu({ activePage, authUser, onNavigate, onClose }: { activePage:
 
 function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-lime-950/40 p-6 shadow-2xl sm:p-10">
-      <div className="max-w-3xl">
-        <div className="mb-4 inline-flex rounded-full border border-lime-400/20 bg-lime-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign logistics, roster control, and unit validation</div>
-        <h1 className="text-4xl font-black tracking-tight text-zinc-50 sm:text-5xl lg:text-6xl">Daunt's Battletech Campaign Manager</h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">Build, test, track, and manage BattleTech campaigns from parsed unit files through playable forces.</p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <button onClick={() => onNavigate("units")} className="rounded-2xl bg-lime-400 px-5 py-3 font-bold text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300">View units</button>
-          <button onClick={() => onNavigate("about")} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 font-bold text-zinc-100 transition hover:bg-zinc-800">Read about the project</button>
+    <section className="space-y-5">
+      <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-lime-950/40 p-6 shadow-2xl sm:p-10">
+        <div className="flex h-full flex-col items-center justify-center text-center">
+          <img src="src/assets/logo_white.png" alt="Logo" className="h-60 w-auto" />
+          <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">Run a mercenary unit with deep Battletech Campaign Ops complexity, without the need for a GM, Opfor, accountant, or finance degree.</p>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">Build and manage forces, track resources, conduct campaigns for days, weeks, or even months as you battle for control of a planet against your opponent. No spreadsheets. No overhead. Just the crunch you crave.</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row justify-center">
+            <button onClick={() => onNavigate("units")} className="rounded-2xl bg-lime-400 px-5 py-3 font-bold text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300">View units</button>
+            <button onClick={() => onNavigate("about")} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 font-bold text-zinc-100 transition hover:bg-zinc-800">Read about the project</button>
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
+          <div className="text-2xl font-bold text-lime-300 mb-2">⚙️</div>
+          <div className="text-lg font-bold text-zinc-50">Campaign Logistics</div>
+          <p className="mt-2 text-sm leading-6 text-zinc-400">Manage resources, finances, and unit logistics with true Battletech complexity.</p>
+        </div>
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
+          <div className="text-2xl font-bold text-lime-300 mb-2">🤖</div>
+          <div className="text-lg font-bold text-zinc-50">Roster Control</div>
+          <p className="mt-2 text-sm leading-6 text-zinc-400">Build and maintain your mercenary forces with detailed unit tracking and validation.</p>
+        </div>
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
+          <div className="text-2xl font-bold text-lime-300 mb-2">⚔️</div>
+          <div className="text-lg font-bold text-zinc-50">Battle Management</div>
+          <p className="mt-2 text-sm leading-6 text-zinc-400">Track campaigns and battles as you compete for control with no GM needed.</p>
         </div>
       </div>
     </section>
@@ -729,8 +806,8 @@ function AboutPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
       <PageTitle eyebrow="Project overview" title="About" description="A barebones starting point for the concept pitch, creator info, and design goals." />
       <div className="grid gap-4 md:grid-cols-2">
         {aboutChildren.map((child) => (
-          <button key={child.key} onClick={() => onNavigate(child.key)} className="group rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 text-left transition hover:border-lime-400/40 hover:bg-zinc-900">
-            <div className="flex items-center justify-between gap-4">
+          <button key={child.key} onClick={() => onNavigate(child.key)} className="group rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 text-center transition hover:border-lime-400/40 hover:bg-zinc-900">
+            <div className="flex flex-col items-center justify-center gap-4">
               <div>
                 <div className="text-lg font-bold text-zinc-50">{child.label}</div>
                 <p className="mt-1 text-sm leading-6 text-zinc-400">Placeholder content ready to expand.</p>
@@ -756,7 +833,7 @@ function PlaceholderPage({ title, eyebrow }: { title: string; eyebrow: string })
   return (
     <section className="space-y-5">
       <PageTitle eyebrow={eyebrow} title={title} description="This page is intentionally minimal for now while Units becomes the first fully useful testing area." />
-      <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-zinc-400">Content coming soon.</div>
+      <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-center text-zinc-400">Content coming soon.</div>
     </section>
   );
 }

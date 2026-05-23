@@ -28,12 +28,8 @@ export default function Header({
     <header className="sticky top-0 z-40 border-b border-lime-400/10 bg-zinc-950/90 backdrop-blur">
       <div className="flex h-16 w-full max-w-none items-center justify-between gap-3 px-3 sm:px-5 2xl:px-8">
         <button onClick={() => onNavigate("landing")} className="flex min-w-0 items-center gap-3 text-left">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-lime-400/30 bg-lime-400/10 shadow-lg shadow-lime-950/40">
-            <Shield className="text-lime-300" size={21} />
-          </div>
           <div className="hidden min-w-0 sm:block">
-            <div className="truncate text-sm font-semibold uppercase tracking-[0.2em] text-lime-300">Daunt's</div>
-            <div className="truncate text-base font-bold leading-none text-zinc-50">Battletech Campaign Manager</div>
+            <img src="src/assets/logo_white.png" alt="Logo" className="h-10 w-auto" />
           </div>
           <div className="min-w-0 sm:hidden">
             <div className="truncate text-base font-bold leading-none text-zinc-50">Daunt's BCM</div>

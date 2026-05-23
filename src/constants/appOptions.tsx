@@ -30,3 +30,29 @@ export const ERA_OPTIONS = [
 ];
 
 export const RULE_OPTIONS = ["All", "Introductory", "Standard", "Advanced", "Experimental", "Unofficial"];
+
+export const FACTION_OPTIONS = [
+  "Capellan Confederation",
+  "Chaos March",
+  "ComStar",
+  "Clans",
+  "Draconis Combine",
+  "Federated Suns",
+  "Free Worlds League",
+  "Free Rasalhague Republic",
+  "Lyran Commonwealth",
+  "Terran Hegemony",
+  "Word of Blake",
+  "Outworlds Alliance",
+  "Taurian Concordat",
+  "Magistracy of Canopus",
+  "Rim Worlds Republic",
+  "Periphery (Other)",
+  "Mercenary",
+];
+
+export function getTeamLabel(faction: string): string {
+  if (faction === "Clans") return "Stars";
+  if (faction === "Lyran Commonwealth") return "Lances";
+  return "Teams";
+}

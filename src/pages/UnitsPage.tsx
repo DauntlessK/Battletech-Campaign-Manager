@@ -14,7 +14,7 @@ import {
   Cpu,
   MapPin,
 } from "lucide-react";
-import type { CriticalSlot, SortMode, Unit, UnitLocation, UnitPanelMode, UnitWeapon } from "../types/app";
+import type { CriticalSlot, SortMode, Unit, UnitLocation, UnitPanelMode, UnitWeapon, Force } from "../types/app";
 import PageTitle from "../components/PageTitle";
 import { ERA_OPTIONS, RULE_OPTIONS } from "../constants/appOptions";
 import { normalizeEra } from "../utils/unitNormalization";
@@ -22,13 +22,23 @@ import { normalizeEra } from "../utils/unitNormalization";
 export default function UnitsPage({
   units,
   selectedUnit,
+  selectedForceForUnitAdd,
   onSelectUnit,
   onClearSelectedUnit,
+  onSelectForceForUnitAdd,
+  onAddUnitToForce,
+  addUnitLoading,
+  addUnitError,
 }: {
   units: Unit[];
   selectedUnit: Unit | null;
+  selectedForceForUnitAdd: Force | null;
   onSelectUnit: (id: string) => void;
   onClearSelectedUnit: () => void;
+  onSelectForceForUnitAdd: (force: Force | null) => void;
+  onAddUnitToForce: (unitId: string) => void;
+  addUnitLoading: boolean;
+  addUnitError: string | null;
 }) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("All");
@@ -123,10 +133,44 @@ export default function UnitsPage({
           eyebrow="Unit database"
           title="Units"
           description="API-backed unit catalog loaded from generated MegaMek CSV indexes. Select a unit to parse the full MTF and load the MechLab view."
-          actions={<button className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300">Add to Force</button>}
+          actions={
+            selectedForceForUnitAdd ? (
+              <button
+                type="button"
+                onClick={() => selectedUnit && onAddUnitToForce(selectedUnit.id)}
+                disabled={!selectedUnit || addUnitLoading}
+                className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
+              >
+                {addUnitLoading ? "Adding…" : selectedUnit ? `Add ${selectedUnit.model} to ${selectedForceForUnitAdd.name}` : "Select a unit to add"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="mt-4 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-400"
+              >
+                Select a force from Forces to add units
+              </button>
+            )
+          }
         />
 
         <div className="min-w-0 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-3 sm:p-4">
+          {selectedForceForUnitAdd && (
+            <div className="mb-4 rounded-3xl border border-lime-500/20 bg-lime-500/10 p-4 text-sm text-lime-200">
+              Adding units to <strong className="text-lime-100">{selectedForceForUnitAdd.name}</strong>.
+              <button
+                type="button"
+                onClick={() => onSelectForceForUnitAdd(null)}
+                className="ml-3 underline text-lime-100 hover:text-white"
+              >
+                Clear target
+              </button>
+            </div>
+          )}
+          {addUnitError && (
+            <div className="mb-4 rounded-3xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{addUnitError}</div>
+          )}
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Find / filter a chassis</div>

@@ -122,6 +122,7 @@ export type Force = {
   rulesLevel?: string;
   totalBV?: number;
   currencyCBills?: number;
+  faction?: string;
   forConquest?: boolean;
   combatTeamCount?: number;
   combatTeamBV?: number;
