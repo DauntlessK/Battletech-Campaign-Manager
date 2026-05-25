@@ -39,6 +39,15 @@ export type WeaponDefinition = {
         ammoBV?: number;
     };
 
+    /** Optional ammunition modes for launchers that can use more than one ammo family, such as MMLs. */
+    ammoOptions?: Array<{
+        mode: string;
+        ammoType: string;
+        ammoPerTon: number | string;
+        ammoCostPerTon?: number;
+        ammoBV?: number;
+    }>;
+
     range?: WeaponRange;
 
     /** Weapon purchase cost. Present only where already verified in the existing file/source data. */
@@ -82,7 +91,11 @@ export const WEAPONS = {
         "name": "Autocannon/2",
         "altNames": [
             "IS Autocannon/2",
-            "ISAutocannon2"
+            "ISAutocannon2",
+            "AC/2",
+            "ISAC2",
+            "Auto Cannon/2",
+            "Autocannon 2"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -135,7 +148,11 @@ export const WEAPONS = {
         "name": "Autocannon/5",
         "altNames": [
             "IS Autocannon/5",
-            "ISAutocannon5"
+            "ISAutocannon5",
+            "AC/5",
+            "ISAC5",
+            "Auto Cannon/5",
+            "Autocannon 5"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -188,7 +205,11 @@ export const WEAPONS = {
         "name": "Autocannon/10",
         "altNames": [
             "IS Autocannon/10",
-            "ISAutocannon10"
+            "ISAutocannon10",
+            "AC/10",
+            "ISAC10",
+            "Auto Cannon/10",
+            "Autocannon 10"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -241,7 +262,11 @@ export const WEAPONS = {
         "name": "Autocannon/20",
         "altNames": [
             "IS Autocannon/20",
-            "ISAutocannon20"
+            "ISAutocannon20",
+            "AC/20",
+            "ISAC20",
+            "Auto Cannon/20",
+            "Autocannon 20"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -295,7 +320,11 @@ export const WEAPONS = {
         "altNames": [
             "IS LB 2-X AC",
             "ISLB2XAC",
-            "LB2XAC"
+            "LB2XAC",
+            "ISLBXAC2",
+            "LBXAC2",
+            "LB 2-X Autocannon",
+            "LB 2-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -354,7 +383,11 @@ export const WEAPONS = {
         "altNames": [
             "IS LB 5-X AC",
             "ISLB5XAC",
-            "LB5XAC"
+            "LB5XAC",
+            "ISLBXAC5",
+            "LBXAC5",
+            "LB 5-X Autocannon",
+            "LB 5-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -413,7 +446,11 @@ export const WEAPONS = {
         "altNames": [
             "IS LB 10-X AC",
             "ISLB10XAC",
-            "LB10XAC"
+            "LB10XAC",
+            "ISLBXAC10",
+            "LBXAC10",
+            "LB 10-X Autocannon",
+            "LB 10-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -472,7 +509,11 @@ export const WEAPONS = {
         "altNames": [
             "IS LB 20-X AC",
             "ISLB20XAC",
-            "LB20XAC"
+            "LB20XAC",
+            "ISLBXAC20",
+            "LBXAC20",
+            "LB 20-X Autocannon",
+            "LB 20-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -532,7 +573,10 @@ export const WEAPONS = {
             "IS Light AC/2",
             "ISLightAC2",
             "LightAC/2",
-            "ISLAC2"
+            "ISLAC2",
+            "LAC/2",
+            "Light Auto Cannon/2",
+            "Light Autocannon/2"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -587,7 +631,10 @@ export const WEAPONS = {
             "IS Light AC/5",
             "ISLightAC5",
             "LightAC/5",
-            "ISLAC5"
+            "ISLAC5",
+            "LAC/5",
+            "Light Auto Cannon/5",
+            "Light Autocannon/5"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -642,7 +689,11 @@ export const WEAPONS = {
             "IS Rotary AC/2",
             "ISRotaryAC2",
             "RotaryAC/2",
-            "ISRA2"
+            "ISRA2",
+            "RAC/2",
+            "ISRAC2",
+            "Rotary Autocannon/2",
+            "Rotary Auto Cannon/2"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -699,7 +750,11 @@ export const WEAPONS = {
             "IS Rotary AC/5",
             "ISRotaryAC5",
             "RotaryAC/5",
-            "ISRA5"
+            "ISRA5",
+            "RAC/5",
+            "ISRAC5",
+            "Rotary Autocannon/5",
+            "Rotary Auto Cannon/5"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -756,7 +811,10 @@ export const WEAPONS = {
             "IS Ultra AC/2",
             "ISUltraAC2",
             "UltraAC/2",
-            "ISUAC2"
+            "ISUAC2",
+            "UAC/2",
+            "Ultra Autocannon/2",
+            "Ultra Auto Cannon/2"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -813,7 +871,10 @@ export const WEAPONS = {
             "IS Ultra AC/5",
             "ISUltraAC5",
             "UltraAC/5",
-            "ISUAC5"
+            "ISUAC5",
+            "UAC/5",
+            "Ultra Autocannon/5",
+            "Ultra Auto Cannon/5"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -870,7 +931,10 @@ export const WEAPONS = {
             "IS Ultra AC/10",
             "ISUltraAC10",
             "UltraAC/10",
-            "ISUAC10"
+            "ISUAC10",
+            "UAC/10",
+            "Ultra Autocannon/10",
+            "Ultra Auto Cannon/10"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -926,7 +990,11 @@ export const WEAPONS = {
         "altNames": [
             "IS Ultra AC/20",
             "ISUltraAC20",
-            "UltraAC/20"
+            "UltraAC/20",
+            "ISUAC20",
+            "UAC/20",
+            "Ultra Autocannon/20",
+            "Ultra Auto Cannon/20"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -1270,7 +1338,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Machine Gun",
             "ISMachineGun",
-            "MachineGun"
+            "MachineGun",
+            "ISMG",
+            "MG"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -1426,7 +1496,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Flamer (Vehicle)",
             "ISFlamer(Vehicle)",
-            "Flamer(Vehicle)"
+            "Flamer(Vehicle)",
+            "Vehicle Flamer",
+            "IS Vehicle Flamer"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -1876,6 +1948,151 @@ export const WEAPONS = {
         "bv": 119,
         "cost": 175000
     },
+    "is_small_xpulse_laser": {
+        "id": "is_small_xpulse_laser",
+        "name": "Small X-Pulse Laser",
+        "altNames": [
+            "IS Small X-Pulse Laser",
+            "ISSmallXPulseLaser",
+            "SmallXPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 3,
+        "heat": 2,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 1,
+            "medium": 2,
+            "long": 3
+        },
+        "techRating": "E",
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "availability": {
+            "code": "X-X-E"
+        },
+        "typeCodes": [
+            "P",
+            "AI"
+        ],
+        "aerospace": {
+            "attackValue": "3",
+            "range": "Short",
+            "toHitModifier": -2
+        },
+        "bv": 12,
+        "cost": 16000
+    },
+    "is_medium_xpulse_laser": {
+        "id": "is_medium_xpulse_laser",
+        "name": "Medium X-Pulse Laser",
+        "altNames": [
+            "IS Medium X-Pulse Laser",
+            "ISMediumXPulseLaser",
+            "MediumXPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 6,
+        "heat": 4,
+        "tons": 2,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 2,
+            "medium": 4,
+            "long": 6
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "aerospace": {
+            "attackValue": "6",
+            "range": "Short",
+            "toHitModifier": -2
+        },
+        "bv": 48,
+        "cost": 60000
+    },
+    "is_large_xpulse_laser": {
+        "id": "is_large_xpulse_laser",
+        "name": "Large X-Pulse Laser",
+        "altNames": [
+            "IS Large X-Pulse Laser",
+            "ISLargeXPulseLaser",
+            "LargePulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 9,
+        "heat": 10,
+        "tons": 7,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 3,
+            "medium": 7,
+            "long": 10
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "aerospace": {
+            "attackValue": "9",
+            "range": "Medium",
+            "toHitModifier": -2
+        },
+        "bv": 119,
+        "cost": 175000
+    },
     "is_plasma_rifle": {
         "id": "is_plasma_rifle",
         "name": "Plasma Rifle",
@@ -1939,7 +2156,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Light PPC",
             "ISLightPPC",
-            "LightPPC"
+            "LightPPC",
+            "ISLPPC",
+            "LPPC"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -2070,7 +2289,9 @@ export const WEAPONS = {
         "altNames": [
             "IS ER PPC",
             "ISERPPC",
-            "ERPPC"
+            "ERPPC",
+            "ISEHERPPC",
+            "ER Particle Projector Cannon"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -2114,7 +2335,11 @@ export const WEAPONS = {
         "altNames": [
             "IS Snub-Nose PPC",
             "ISSnubNosePPC",
-            "SnubNosePPC"
+            "SnubNosePPC",
+            "ISSNPPC",
+            "SNPPC",
+            "Snub Nose PPC",
+            "Snub PPC"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -2405,20 +2630,29 @@ export const WEAPONS = {
             "code": "C-C-C"
         }
     },
-    "is_mml_3_lrm": {
-        "id": "is_mml_3_lrm",
-        "name": "MML 3 (LRM)",
+    "is_mml_3": {
+        "id": "is_mml_3",
+        "name": "MML 3",
         "altNames": [
             "IS MML 3 (LRM)",
             "ISMML3(LRM)",
-            "MML3(LRM)"
+            "MML3(LRM)",
+            "IS MML 3",
+            "ISMML3",
+            "MML3",
+            "MML 3",
+            "MML 3 (LRM)",
+            "IS MML 3 (SRM)",
+            "ISMML3(SRM)",
+            "MML3(SRM)",
+            "MML 3 (SRM)"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "lrm",
-        "damage": "1/Msl",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
         "heat": 2,
         "tons": 1.5,
         "critSlots": 2,
@@ -2451,78 +2685,54 @@ export const WEAPONS = {
             "toHitModifier": 0
         },
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 40,
-            "ammoCostPerTon": 30000,
+            "ammoType": "is_mml",
+            "ammoPerTon": "varies by LRM/SRM ammo",
             "ammoBV": 4
         },
-        "bv": 29
+        "bv": 29,
+        "ammoOptions": [
+            {
+                "mode": "LRM",
+                "ammoType": "is_mml_lrm",
+                "ammoPerTon": 40,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 4
+            },
+            {
+                "mode": "SRM",
+                "ammoType": "is_mml_srm",
+                "ammoPerTon": 33,
+                "ammoCostPerTon": 27000,
+                "ammoBV": 4
+            }
+        ],
+        "notes": [
+            "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
     },
-    "is_mml_3_srm": {
-        "id": "is_mml_3_srm",
-        "name": "MML 3 (SRM)",
-        "altNames": [
-            "IS MML 3 (SRM)",
-            "ISMML3(SRM)",
-            "MML3(SRM)"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "srm",
-        "damage": "2/Msl",
-        "heat": 2,
-        "tons": 1.5,
-        "critSlots": 2,
-        "spaceSlots": 2,
-        "range": {
-            "min": 0,
-            "short": 3,
-            "medium": 6,
-            "long": 9
-        },
-        "techRating": "E",
-        "flags": [
-            "cluster",
-            "requiresAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 317
-        },
-        "typeCodes": [
-            "M",
-            "C",
-            "S"
-        ],
-        "aerospace": {
-            "attackValue": "4/4",
-            "range": "Short",
-            "toHitModifier": 0
-        },
-        "ammo": {
-            "ammoType": "is_mml_srm",
-            "ammoPerTon": 33,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 4
-        },
-        "bv": 29
-    },
-    "is_mml_5_lrm": {
-        "id": "is_mml_5_lrm",
-        "name": "MML 5 (LRM)",
+    "is_mml_5": {
+        "id": "is_mml_5",
+        "name": "MML 5",
         "altNames": [
             "IS MML 5 (LRM)",
             "ISMML5(LRM)",
-            "MML5(LRM)"
+            "MML5(LRM)",
+            "IS MML 5",
+            "ISMML5",
+            "MML5",
+            "MML 5",
+            "MML 5 (LRM)",
+            "IS MML 5 (SRM)",
+            "ISMML5(SRM)",
+            "MML5(SRM)",
+            "MML 5 (SRM)"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "lrm",
-        "damage": "1/Msl",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
         "heat": 3,
         "tons": 3,
         "critSlots": 3,
@@ -2555,78 +2765,54 @@ export const WEAPONS = {
             "toHitModifier": 0
         },
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 24,
-            "ammoCostPerTon": 30000,
+            "ammoType": "is_mml",
+            "ammoPerTon": "varies by LRM/SRM ammo",
             "ammoBV": 6
         },
-        "bv": 45
+        "bv": 45,
+        "ammoOptions": [
+            {
+                "mode": "LRM",
+                "ammoType": "is_mml_lrm",
+                "ammoPerTon": 24,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 6
+            },
+            {
+                "mode": "SRM",
+                "ammoType": "is_mml_srm",
+                "ammoPerTon": 20,
+                "ammoCostPerTon": 27000,
+                "ammoBV": 6
+            }
+        ],
+        "notes": [
+            "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
     },
-    "is_mml_5_srm": {
-        "id": "is_mml_5_srm",
-        "name": "MML 5 (SRM)",
-        "altNames": [
-            "IS MML 5 (SRM)",
-            "ISMML5(SRM)",
-            "MML5(SRM)"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "srm",
-        "damage": "2/Msl",
-        "heat": 3,
-        "tons": 3,
-        "critSlots": 3,
-        "spaceSlots": 3,
-        "range": {
-            "min": 0,
-            "short": 3,
-            "medium": 6,
-            "long": 9
-        },
-        "techRating": "E",
-        "flags": [
-            "cluster",
-            "requiresAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 317
-        },
-        "typeCodes": [
-            "M",
-            "C",
-            "S"
-        ],
-        "aerospace": {
-            "attackValue": "6/8",
-            "range": "Short",
-            "toHitModifier": 0
-        },
-        "ammo": {
-            "ammoType": "is_mml_srm",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 6
-        },
-        "bv": 45
-    },
-    "is_mml_7_lrm": {
-        "id": "is_mml_7_lrm",
-        "name": "MML 7 (LRM)",
+    "is_mml_7": {
+        "id": "is_mml_7",
+        "name": "MML 7",
         "altNames": [
             "IS MML 7 (LRM)",
             "ISMML7(LRM)",
-            "MML7(LRM)"
+            "MML7(LRM)",
+            "IS MML 7",
+            "ISMML7",
+            "MML7",
+            "MML 7",
+            "MML 7 (LRM)",
+            "IS MML 7 (SRM)",
+            "ISMML7(SRM)",
+            "MML7(SRM)",
+            "MML 7 (SRM)"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "lrm",
-        "damage": "1/Msl",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
         "heat": 4,
         "tons": 4.5,
         "critSlots": 4,
@@ -2659,78 +2845,54 @@ export const WEAPONS = {
             "toHitModifier": 0
         },
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 17,
-            "ammoCostPerTon": 30000,
+            "ammoType": "is_mml",
+            "ammoPerTon": "varies by LRM/SRM ammo",
             "ammoBV": 8
         },
-        "bv": 67
+        "bv": 67,
+        "ammoOptions": [
+            {
+                "mode": "LRM",
+                "ammoType": "is_mml_lrm",
+                "ammoPerTon": 17,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 8
+            },
+            {
+                "mode": "SRM",
+                "ammoType": "is_mml_srm",
+                "ammoPerTon": 14,
+                "ammoCostPerTon": 27000,
+                "ammoBV": 8
+            }
+        ],
+        "notes": [
+            "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
     },
-    "is_mml_7_srm": {
-        "id": "is_mml_7_srm",
-        "name": "MML 7 (SRM)",
-        "altNames": [
-            "IS MML 7 (SRM)",
-            "ISMML7(SRM)",
-            "MML7(SRM)"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "srm",
-        "damage": "2/Msl",
-        "heat": 4,
-        "tons": 4.5,
-        "critSlots": 4,
-        "spaceSlots": 4,
-        "range": {
-            "min": 0,
-            "short": 3,
-            "medium": 6,
-            "long": 9
-        },
-        "techRating": "E",
-        "flags": [
-            "cluster",
-            "requiresAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 317
-        },
-        "typeCodes": [
-            "M",
-            "C",
-            "S"
-        ],
-        "aerospace": {
-            "attackValue": "8/12",
-            "range": "Short",
-            "toHitModifier": 0
-        },
-        "ammo": {
-            "ammoType": "is_mml_srm",
-            "ammoPerTon": 14,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 8
-        },
-        "bv": 67
-    },
-    "is_mml_9_lrm": {
-        "id": "is_mml_9_lrm",
-        "name": "MML 9 (LRM)",
+    "is_mml_9": {
+        "id": "is_mml_9",
+        "name": "MML 9",
         "altNames": [
             "IS MML 9 (LRM)",
             "ISMML9(LRM)",
-            "MML9(LRM)"
+            "MML9(LRM)",
+            "IS MML 9",
+            "ISMML9",
+            "MML9",
+            "MML 9",
+            "MML 9 (LRM)",
+            "IS MML 9 (SRM)",
+            "ISMML9(SRM)",
+            "MML9(SRM)",
+            "MML 9 (SRM)"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "lrm",
-        "damage": "1/Msl",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
         "heat": 5,
         "tons": 6,
         "critSlots": 5,
@@ -2763,63 +2925,30 @@ export const WEAPONS = {
             "toHitModifier": 0
         },
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 13,
-            "ammoCostPerTon": 30000,
+            "ammoType": "is_mml",
+            "ammoPerTon": "varies by LRM/SRM ammo",
             "ammoBV": 11
         },
-        "bv": 86
-    },
-    "is_mml_9_srm": {
-        "id": "is_mml_9_srm",
-        "name": "MML 9 (SRM)",
-        "altNames": [
-            "IS MML 9 (SRM)",
-            "ISMML9(SRM)",
-            "MML9(SRM)"
+        "bv": 86,
+        "ammoOptions": [
+            {
+                "mode": "LRM",
+                "ammoType": "is_mml_lrm",
+                "ammoPerTon": 13,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 11
+            },
+            {
+                "mode": "SRM",
+                "ammoType": "is_mml_srm",
+                "ammoPerTon": 11,
+                "ammoCostPerTon": 27000,
+                "ammoBV": 11
+            }
         ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "srm",
-        "damage": "2/Msl",
-        "heat": 5,
-        "tons": 6,
-        "critSlots": 5,
-        "spaceSlots": 5,
-        "range": {
-            "min": 0,
-            "short": 3,
-            "medium": 6,
-            "long": 9
-        },
-        "techRating": "E",
-        "flags": [
-            "cluster",
-            "requiresAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 317
-        },
-        "typeCodes": [
-            "M",
-            "C",
-            "S"
-        ],
-        "aerospace": {
-            "attackValue": "10/14",
-            "range": "Short",
-            "toHitModifier": 0
-        },
-        "ammo": {
-            "ammoType": "is_mml_srm",
-            "ammoPerTon": 11,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 11
-        },
-        "bv": 86
+        "notes": [
+            "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
     },
     "is_srm_2": {
         "id": "is_srm_2",
@@ -3591,7 +3720,10 @@ export const WEAPONS = {
         "altNames": [
             "IS Narc Missile Beacon",
             "ISNarcMissileBeacon",
-            "NarcMissileBeacon"
+            "NarcMissileBeacon",
+            "Narc",
+            "Narc Beacon",
+            "Narc Missile Beacon"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -3636,7 +3768,11 @@ export const WEAPONS = {
         "altNames": [
             "IS Improved Narc Launcher",
             "ISImprovedNarcLauncher",
-            "ImprovedNarcLauncher"
+            "ImprovedNarcLauncher",
+            "iNarc",
+            "Improved Narc",
+            "Improved Narc Launcher",
+            "ISiNarc"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
@@ -3692,7 +3828,11 @@ export const WEAPONS = {
             "Clan LB 2-X AC",
             "CL LB 2-X AC",
             "CLLB2XAC",
-            "LB2XAC"
+            "LB2XAC",
+            "CLLBXAC2",
+            "Clan LBXAC2",
+            "Clan LB 2-X Autocannon",
+            "Clan LB 2-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -3752,7 +3892,11 @@ export const WEAPONS = {
             "Clan LB 5-X AC",
             "CL LB 5-X AC",
             "CLLB5XAC",
-            "LB5XAC"
+            "LB5XAC",
+            "CLLBXAC5",
+            "Clan LBXAC5",
+            "Clan LB 5-X Autocannon",
+            "Clan LB 5-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -3812,7 +3956,11 @@ export const WEAPONS = {
             "Clan LB 10-X AC",
             "CL LB 10-X AC",
             "CLLB10XAC",
-            "LB10XAC"
+            "LB10XAC",
+            "CLLBXAC10",
+            "Clan LBXAC10",
+            "Clan LB 10-X Autocannon",
+            "Clan LB 10-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -3872,7 +4020,11 @@ export const WEAPONS = {
             "Clan LB 20-X AC",
             "CL LB 20-X AC",
             "CLLB20XAC",
-            "LB20XAC"
+            "LB20XAC",
+            "CLLBXAC20",
+            "Clan LBXAC20",
+            "Clan LB 20-X Autocannon",
+            "Clan LB 20-X Auto Cannon"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -3932,7 +4084,11 @@ export const WEAPONS = {
             "Clan Ultra AC/2",
             "CL Ultra AC/2",
             "CLUltraAC2",
-            "UltraAC/2"
+            "UltraAC/2",
+            "CLUAC2",
+            "Clan UAC/2",
+            "Clan Ultra Autocannon/2",
+            "Clan Ultra Auto Cannon/2"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -3989,7 +4145,11 @@ export const WEAPONS = {
             "Clan Ultra AC/5",
             "CL Ultra AC/5",
             "CLUltraAC5",
-            "UltraAC/5"
+            "UltraAC/5",
+            "CLUAC5",
+            "Clan UAC/5",
+            "Clan Ultra Autocannon/5",
+            "Clan Ultra Auto Cannon/5"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4046,7 +4206,11 @@ export const WEAPONS = {
             "Clan Ultra AC/10",
             "CL Ultra AC/10",
             "CLUltraAC10",
-            "UltraAC/10"
+            "UltraAC/10",
+            "CLUAC10",
+            "Clan UAC/10",
+            "Clan Ultra Autocannon/10",
+            "Clan Ultra Auto Cannon/10"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4103,7 +4267,11 @@ export const WEAPONS = {
             "Clan Ultra AC/20",
             "CL Ultra AC/20",
             "CLUltraAC20",
-            "UltraAC/20"
+            "UltraAC/20",
+            "CLUAC20",
+            "Clan UAC/20",
+            "Clan Ultra Autocannon/20",
+            "Clan Ultra Auto Cannon/20"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4279,7 +4447,10 @@ export const WEAPONS = {
             "Clan Hyper-Assault Gauss 20",
             "CL Hyper-Assault Gauss 20",
             "CLHyperAssaultGauss20",
-            "HyperAssaultGauss20"
+            "HyperAssaultGauss20",
+            "HAG/20",
+            "HAG20",
+            "CLHAG20"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4339,7 +4510,10 @@ export const WEAPONS = {
             "Clan Hyper-Assault Gauss 30",
             "CL Hyper-Assault Gauss 30",
             "CLHyperAssaultGauss30",
-            "HyperAssaultGauss30"
+            "HyperAssaultGauss30",
+            "HAG/30",
+            "HAG30",
+            "CLHAG30"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4399,7 +4573,10 @@ export const WEAPONS = {
             "Clan Hyper-Assault Gauss 40",
             "CL Hyper-Assault Gauss 40",
             "CLHyperAssaultGauss40",
-            "HyperAssaultGauss40"
+            "HyperAssaultGauss40",
+            "HAG/40",
+            "HAG40",
+            "CLHAG40"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4515,7 +4692,9 @@ export const WEAPONS = {
             "Clan Machine Gun",
             "CL Machine Gun",
             "CLMachineGun",
-            "MachineGun"
+            "MachineGun",
+            "CLMG",
+            "Clan MG"
         ],
         "category": "Ballistic",
         "techBase": "Clan",
@@ -4674,7 +4853,9 @@ export const WEAPONS = {
             "Clan Flamer (Vehicle)",
             "CL Flamer (Vehicle)",
             "CLFlamer(Vehicle)",
-            "Flamer(Vehicle)"
+            "Flamer(Vehicle)",
+            "Clan Vehicle Flamer",
+            "CL Vehicle Flamer"
         ],
         "category": "Energy",
         "techBase": "Clan",
@@ -5417,7 +5598,8 @@ export const WEAPONS = {
             "Clan ER PPC",
             "CL ER PPC",
             "CLERPPC",
-            "ERPPC"
+            "ERPPC",
+            "Clan ER Particle Projector Cannon"
         ],
         "category": "Energy",
         "techBase": "Clan",
@@ -6315,7 +6497,10 @@ export const WEAPONS = {
             "Clan Narc Missile Beacon",
             "CL Narc Missile Beacon",
             "CLNarcMissileBeacon",
-            "NarcMissileBeacon"
+            "NarcMissileBeacon",
+            "CLNarc",
+            "Clan Narc",
+            "Clan Narc Beacon"
         ],
         "category": "Equipment",
         "techBase": "Clan",
@@ -6360,7 +6545,11 @@ export const WEAPONS = {
         "altNames": [
             "IS A-Pod",
             "ISAPod",
-            "APod"
+            "APod",
+            "Anti-Personnel Pods (A-Pods)",
+            "Anti-Personnel Pod",
+            "A-Pod",
+            "A-Pods"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6394,7 +6583,12 @@ export const WEAPONS = {
         "altNames": [
             "IS B-Pod",
             "ISBPod",
-            "BPod"
+            "BPod",
+            "Anti-BattleArmor Pods (B-Pods)",
+            "Anti-Battle Armor Pods (B-Pods)",
+            "Anti-BattleArmor Pod",
+            "B-Pod",
+            "B-Pods"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6429,7 +6623,8 @@ export const WEAPONS = {
         "altNames": [
             "IS Anti-Missile System",
             "ISAntiMissileSystem",
-            "AntiMissileSystem"
+            "AntiMissileSystem",
+            "AMS"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6468,7 +6663,11 @@ export const WEAPONS = {
         "altNames": [
             "IS Machine Gun Array",
             "ISMachineGunArray",
-            "MachineGunArray"
+            "MachineGunArray",
+            "Machine Gun Array",
+            "Light Machine Gun Array",
+            "Heavy Machine Gun Array",
+            "MG Array"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6591,7 +6790,10 @@ export const WEAPONS = {
             "Clan A-Pod",
             "CL A-Pod",
             "CLAPod",
-            "APod"
+            "APod",
+            "CLAntiPersonnelPod",
+            "Clan Anti-Personnel Pod",
+            "Clan A-Pods"
         ],
         "category": "Equipment",
         "techBase": "Clan",
@@ -6626,7 +6828,10 @@ export const WEAPONS = {
             "Clan B-Pod",
             "CL B-Pod",
             "CLBPod",
-            "BPod"
+            "BPod",
+            "Clan Anti-BattleArmor Pod",
+            "Clan Anti-Battle Armor Pod",
+            "Clan B-Pods"
         ],
         "category": "Equipment",
         "techBase": "Clan",
@@ -6702,7 +6907,10 @@ export const WEAPONS = {
             "Clan Machine Gun Array",
             "CL Machine Gun Array",
             "CLMachineGunArray",
-            "MachineGunArray"
+            "MachineGunArray",
+            "Clan Light Machine Gun Array",
+            "Clan Heavy Machine Gun Array",
+            "Clan MG Array"
         ],
         "category": "Equipment",
         "techBase": "Clan",
@@ -6888,7 +7096,10 @@ export const WEAPONS = {
         "altNames": [
             "IS C3 Computer (Master)",
             "ISC3Computer(Master)",
-            "C3Computer(Master)"
+            "C3Computer(Master)",
+            "C3 Master",
+            "C3 Computer (Master)",
+            "C3 Master Computer"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6916,7 +7127,11 @@ export const WEAPONS = {
         "altNames": [
             "IS C3 Computer (Slave)",
             "ISC3Computer(Slave)",
-            "C3Computer(Slave)"
+            "C3Computer(Slave)",
+            "ISC3SlaveUnit",
+            "C3 Slave",
+            "C3 Computer (Slave)",
+            "C3 Slave Unit"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6944,7 +7159,10 @@ export const WEAPONS = {
         "altNames": [
             "IS Improved C3 Computer",
             "ISImprovedC3Computer",
-            "ImprovedC3Computer"
+            "ImprovedC3Computer",
+            "ISImprovedC3CPU",
+            "Improved C3 CPU",
+            "Improved C3 Computer"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -6972,7 +7190,8 @@ export const WEAPONS = {
         "altNames": [
             "IS Guardian ECM Suite",
             "ISGuardianECMSuite",
-            "GuardianECMSuite"
+            "GuardianECMSuite",
+            "ISGuardianECM"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",

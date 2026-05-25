@@ -975,6 +975,21 @@ function parseMekWeapons(lines: string[], locations: MekLocationMap, unitTechBas
 }
 
 /**
+ * Normalizes a declared MTF weapon name by removing a leading quantity such as "1 Small Laser" or "2 Medium Laser".
+ * @param rawName - Raw weapon name from the MTF Weapons section or related slot text.
+ * @returns Weapon name with leading quantity removed.
+ */
+function normalizeDeclaredWeaponName(rawName: string): string {
+  return String(rawName ?? "")
+    .trim()
+    .replace(/^\d+(?:\.\d+)?\s*[xX]?\s+/, "")
+    .replace(/^[xX]\s*\d+(?:\.\d+)?\s+/, "")
+    .replace(/^\(\s*\d+(?:\.\d+)?\s*\)\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
  * Parse weapons section.
  * @param lines - Input value used by parseWeaponsSection.
  * @returns ParsedWeaponEntry[] result from parseWeaponsSection.
@@ -1008,13 +1023,13 @@ function parseWeaponsSection(lines: string[]): ParsedWeaponEntry[] {
     }
 
     const parts = trimmed.split(",").map((part) => part.trim());
-    const name = parts[0] || "";
+    const name = normalizeDeclaredWeaponName(parts[0] || "");
     const location = parts[1] || "";
 
     if (!name) continue;
 
     weapons.push({
-      name: name.replace(/\s*\(R\)\s*$/i, "").trim(),
+      name: normalizeDeclaredWeaponName(name.replace(/\s*\(R\)\s*$/i, "").trim()),
       location,
       isRearFacing: /\(r\)/i.test(name),
     });
@@ -1033,7 +1048,7 @@ function parseWeaponsSection(lines: string[]): ParsedWeaponEntry[] {
 function resolveWeapon(rawName: string, possibleId?: string, unitTechBase?: string): any {
   const weaponRecord = WEAPONS as Record<string, any>;
   const desiredTechBase = inferWeaponTechBase(possibleId || rawName) || normalizeTechBase(unitTechBase || "");
-  const normalizedRawName = normalizeLookupText(rawName);
+  const normalizedRawName = normalizeLookupText(normalizeDeclaredWeaponName(rawName));
   const normalizedPossibleId = possibleId ? normalizeLookupText(possibleId) : "";
   const normalizedSearchValues = [normalizedRawName, normalizedPossibleId].filter(Boolean);
 
