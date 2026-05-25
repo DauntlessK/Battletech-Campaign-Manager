@@ -103,7 +103,11 @@ type MekLocationKey =
   | "leftArm"
   | "rightArm"
   | "leftLeg"
-  | "rightLeg";
+  | "rightLeg"
+  | "frontLeftLeg"
+  | "frontRightLeg"
+  | "rearLeftLeg"
+  | "rearRightLeg";
 
 type MekLocationRecord = {
   key: MekLocationKey;
@@ -117,23 +121,12 @@ type MekLocationRecord = {
 
 type MekLocationMap = Record<MekLocationKey, MekLocationRecord>;
 
-type MekArmorValues = {
-  head: number;
-  centerTorso: number;
-  centerTorsoRear: number;
-  leftTorso: number;
-  leftTorsoRear: number;
-  rightTorso: number;
-  rightTorsoRear: number;
-  leftArm: number;
-  rightArm: number;
-  leftLeg: number;
-  rightLeg: number;
-};
+type MekArmorValues = Record<MekLocationKey | "centerTorsoRear" | "leftTorsoRear" | "rightTorsoRear", number>;
 
 type IndexOptions = {
   rulesLevel: string | null;
   debug: boolean;
+  unitQuery: string | null;
 };
 
 
@@ -187,12 +180,14 @@ const CSV_COLUMNS: Array<keyof CatalogRow> = [
   "warnings",
 ];
 
-const LOCATION_DEFS: Array<{
+type LocationDefinition = {
   key: MekLocationKey;
   mtfName: string;
   armorKeys: string[];
   rearArmorKeys?: string[];
-}> = [
+};
+
+const TORSO_LOCATION_DEFS: LocationDefinition[] = [
   { key: "head", mtfName: "Head", armorKeys: ["HD armor", "Head armor"] },
   {
     key: "centerTorso",
@@ -212,10 +207,22 @@ const LOCATION_DEFS: Array<{
     armorKeys: ["RT armor", "Right Torso armor"],
     rearArmorKeys: ["RTR armor", "Right Torso Rear armor"],
   },
+];
+
+const BIPED_LOCATION_DEFS: LocationDefinition[] = [
+  ...TORSO_LOCATION_DEFS,
   { key: "leftArm", mtfName: "Left Arm", armorKeys: ["LA armor", "Left Arm armor"] },
   { key: "rightArm", mtfName: "Right Arm", armorKeys: ["RA armor", "Right Arm armor"] },
   { key: "leftLeg", mtfName: "Left Leg", armorKeys: ["LL armor", "Left Leg armor"] },
   { key: "rightLeg", mtfName: "Right Leg", armorKeys: ["RL armor", "Right Leg armor"] },
+];
+
+const QUAD_LOCATION_DEFS: LocationDefinition[] = [
+  ...TORSO_LOCATION_DEFS,
+  { key: "frontLeftLeg", mtfName: "Front Left Leg", armorKeys: ["FLL armor", "Front Left Leg armor"] },
+  { key: "frontRightLeg", mtfName: "Front Right Leg", armorKeys: ["FRL armor", "Front Right Leg armor"] },
+  { key: "rearLeftLeg", mtfName: "Rear Left Leg", armorKeys: ["RLL armor", "Rear Left Leg armor"] },
+  { key: "rearRightLeg", mtfName: "Rear Right Leg", armorKeys: ["RRL armor", "Rear Right Leg armor"] },
 ];
 
 /**
@@ -233,6 +240,11 @@ async function main() {
     ? [requestedType]
     : (Object.keys(UNIT_TYPE_FOLDERS) as UnitTypeKey[]);
 
+  if (options.unitQuery) {
+    await indexSpecificUnits(unitTypes, options);
+    return;
+  }
+
   if (sampleCount != null) {
     await indexRandomSample(unitTypes, sampleCount, options);
     return;
@@ -241,6 +253,83 @@ async function main() {
   for (const unitType of unitTypes) {
     await indexUnitType(unitType, options);
   }
+}
+
+
+/**
+ * Indexes one or more units matching a requested chassis, model, file name, or full display name.
+ * @param unitTypes - Unit type folders to search for the requested unit.
+ * @param options - Indexing options containing the requested unit query, rules filter, and debug flag.
+ * @returns Promise that resolves after the specific-unit catalog CSV has been written.
+ */
+async function indexSpecificUnits(unitTypes: UnitTypeKey[], options: IndexOptions): Promise<void> {
+  if (!options.unitQuery) return;
+
+  const rows: CatalogRow[] = [];
+
+  for (const unitType of unitTypes) {
+    const folderName = UNIT_TYPE_FOLDERS[unitType];
+    const root = path.join(UNITS_ROOT, folderName);
+    const files = await findFilesByExtension(root, ".mtf");
+
+    for (const filePath of files) {
+      const content = await fs.readFile(filePath, "utf-8");
+      const metadata = parseMtfMetadata(content, unitType);
+      const parsedName = parseChassisModelFromFileName(path.basename(filePath));
+
+      if (!matchesRequestedUnit(options.unitQuery, metadata, parsedName, filePath)) {
+        continue;
+      }
+
+      const row = await buildCatalogRow(unitType, filePath, options);
+      if (row) rows.push(row);
+    }
+  }
+
+  rows.sort(sortCatalogRows);
+
+  const safeQuery = slug(options.unitQuery);
+  const outputPath = path.join(OUTPUT_DIR, `testcatalog_${safeQuery}.csv`);
+  await fs.writeFile(outputPath, toCsv(rows), "utf-8");
+
+  console.log(`[indexUnits] specific unit: "${options.unitQuery}" -> ${rows.length} row(s) -> ${outputPath}`);
+  if (options.rulesLevel) {
+    console.log(`[indexUnits] specific unit: rules level filter=${options.rulesLevel}`);
+  }
+  if (rows.length === 0) {
+    console.warn(`[indexUnits] No units matched "${options.unitQuery}". Try --unit=<model>, --unit=<chassis>, or --unit="<chassis> <model>".`);
+  }
+}
+
+/**
+ * Checks whether parsed unit metadata matches a requested unit query.
+ * @param query - User-provided unit query from --unit, --model, or --unitModel.
+ * @param metadata - Parsed MTF metadata for the candidate unit.
+ * @param parsedName - Chassis/model parsed from the candidate file name, used as fallback metadata.
+ * @param filePath - Candidate MTF file path used for file-name matching.
+ * @returns True when the candidate should be indexed for the requested unit query.
+ */
+function matchesRequestedUnit(
+  query: string,
+  metadata: ParsedMtfMetadata,
+  parsedName: { chassis: string; model: string } | null,
+  filePath: string
+): boolean {
+  const normalizedQuery = normalizeLookupText(query);
+  if (!normalizedQuery) return false;
+
+  const chassis = metadata.chassis || parsedName?.chassis || "";
+  const model = metadata.model || parsedName?.model || "";
+  const fileName = path.basename(filePath).replace(/\.mtf$/i, "");
+
+  const candidates = [
+    model,
+    chassis,
+    `${chassis} ${model}`,
+    fileName,
+  ].map(normalizeLookupText);
+
+  return candidates.some((candidate) => candidate === normalizedQuery || candidate.includes(normalizedQuery));
 }
 
 /**
@@ -281,7 +370,7 @@ async function indexRandomSample(unitTypes: UnitTypeKey[], sampleCount: number, 
     `[indexUnits] test sample: ${rows.length}/${sampleCount} rows -> ${outputPath}`
   );
   console.log(
-    `[indexUnits] usage: npm run index:units -- 10 OR npm run index:units -- --sample=10 --type=meks`
+    `[indexUnits] usage: npm run index:units -- 10 OR npm run index:units -- --sample=10 --type=meks OR npm run index:units -- --type=meks --unit=XNT-3O --debug`
   );
 }
 
@@ -578,9 +667,10 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
   const cockpitType = normalizeComponentText(getValue("cockpit", "cockpit type")) || "Standard";
   const myomerType = normalizeComponentText(getValue("myomer", "myomer type")) || "Standard";
 
+  const config = getValue("config");
   const armor = parseArmorValues(lines);
-  const locations = unitType === "meks" ? parseMekLocations(lines, unitTonnage, armor) : emptyMekLocations();
-  const weapons = unitType === "meks" ? parseMekWeapons(lines, locations) : [];
+  const locations = unitType === "meks" ? parseMekLocations(lines, unitTonnage, armor, config) : emptyMekLocations(config);
+  const weapons = unitType === "meks" ? parseMekWeapons(lines, locations, techBase) : [];
   const quirks = parseRepeatedValues(lines, "quirk");
 
   return {
@@ -596,7 +686,7 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
     source,
     era: year ? yearToEraBucket(year) : "",
 
-    config: getValue("config"),
+    config,
     walkMP,
     runMP,
     jumpMP,
@@ -712,9 +802,31 @@ function parseArmorValues(lines: string[]): MekArmorValues {
     rightArm: getValue("RA armor", "Right Arm armor"),
     leftLeg: getValue("LL armor", "Left Leg armor"),
     rightLeg: getValue("RL armor", "Right Leg armor"),
+    frontLeftLeg: getValue("FLL armor", "Front Left Leg armor"),
+    frontRightLeg: getValue("FRL armor", "Front Right Leg armor"),
+    rearLeftLeg: getValue("RLL armor", "Rear Left Leg armor"),
+    rearRightLeg: getValue("RRL armor", "Rear Right Leg armor"),
   };
 }
 
+
+/**
+ * Returns the correct critical-location definition set for biped or quad BattleMechs.
+ * @param config - MTF config string, such as "Biped" or "Quad".
+ * @returns Location definitions appropriate for the unit configuration.
+ */
+function getLocationDefsForConfig(config: string): LocationDefinition[] {
+  return isQuadConfig(config) ? QUAD_LOCATION_DEFS : BIPED_LOCATION_DEFS;
+}
+
+/**
+ * Determines whether a Mek configuration should be parsed as a quad.
+ * @param config - MTF config string.
+ * @returns True when the config indicates a quad chassis.
+ */
+function isQuadConfig(config: string): boolean {
+  return String(config || "").toLowerCase().includes("quad");
+}
 /**
  * Parse mek locations.
  * @param lines - Input value used by parseMekLocations.
@@ -725,13 +837,14 @@ function parseArmorValues(lines: string[]): MekArmorValues {
 function parseMekLocations(
   lines: string[],
   unitTonnage: number,
-  armor: MekArmorValues
+  armor: MekArmorValues,
+  config: string
 ): MekLocationMap {
   const internals = getBattleMechInternalStructure(unitTonnage);
 
   const locations: Partial<MekLocationMap> = {};
 
-  for (const def of LOCATION_DEFS) {
+  for (const def of getLocationDefsForConfig(config)) {
     const slots = getSlotsForLocation(lines, def.mtfName);
     const locationArmor = armor[def.key as keyof MekArmorValues] || 0;
     const rearArmor = getRearArmorForLocation(def.key, armor);
@@ -754,9 +867,9 @@ function parseMekLocations(
  * Empty mek locations.
  * @returns MekLocationMap result from emptyMekLocations.
  */
-function emptyMekLocations(): MekLocationMap {
+function emptyMekLocations(config: string = ""): MekLocationMap {
   const locations: Partial<MekLocationMap> = {};
-  for (const def of LOCATION_DEFS) {
+  for (const def of getLocationDefsForConfig(config)) {
     locations[def.key] = {
       key: def.key,
       mtfName: def.mtfName,
@@ -811,10 +924,11 @@ function getSlotsForLocation(lines: string[], location: string): string[] {
 /**
  * Parse mek weapons.
  * @param lines - Input value used by parseMekWeapons.
- * @param locations - Input value used by parseMekWeapons.
- * @returns ParsedWeaponEntry[] result from parseMekWeapons.
+ * @param locations - Parsed location/critical-slot map for the Mek.
+ * @param unitTechBase - Normalized unit tech base from the MTF file; used to prefer Clan vs. Inner Sphere weapon definitions.
+ * @returns Parsed weapon entries with resolved weapon definitions when a reliable match is found.
  */
-function parseMekWeapons(lines: string[], locations: MekLocationMap): ParsedWeaponEntry[] {
+function parseMekWeapons(lines: string[], locations: MekLocationMap, unitTechBase: string): ParsedWeaponEntry[] {
   const weaponsFromSection = parseWeaponsSection(lines);
   const slotUsageMap: Record<string, number> = {};
 
@@ -838,7 +952,7 @@ function parseMekWeapons(lines: string[], locations: MekLocationMap): ParsedWeap
           if (instanceCount === usedIndex) {
             foundSlot = slot;
             foundWeaponId = extractWeaponId(slot);
-            weaponData = resolveWeapon(entry.name, foundWeaponId);
+            weaponData = resolveWeapon(entry.name, foundWeaponId, unitTechBase);
             slotUsageMap[slotKey] = usedIndex + 1;
             break;
           }
@@ -848,7 +962,7 @@ function parseMekWeapons(lines: string[], locations: MekLocationMap): ParsedWeap
     }
 
     if (!weaponData) {
-      weaponData = resolveWeapon(entry.name);
+      weaponData = resolveWeapon(entry.name, undefined, unitTechBase);
     }
 
     return {
@@ -911,19 +1025,19 @@ function parseWeaponsSection(lines: string[]): ParsedWeaponEntry[] {
 
 /**
  * Resolve weapon.
- * @param rawName - Input value used by resolveWeapon.
- * @param possibleId? - Input value used by resolveWeapon.
- * @returns any result from resolveWeapon.
+ * @param rawName - Weapon display name from the MTF weapons section, such as "ER PPC".
+ * @param possibleId - Optional compact slot id from a critical slot, such as "CLERPPC" or "ISLRM10".
+ * @param unitTechBase - Unit tech base from the MTF file; used to prefer Clan or Inner Sphere definitions for ambiguous shared names.
+ * @returns Best matching weapon definition, or null if no reliable match is found.
  */
-function resolveWeapon(rawName: string, possibleId?: string): any {
+function resolveWeapon(rawName: string, possibleId?: string, unitTechBase?: string): any {
   const weaponRecord = WEAPONS as Record<string, any>;
+  const desiredTechBase = inferWeaponTechBase(possibleId || rawName) || normalizeTechBase(unitTechBase || "");
+  const normalizedRawName = normalizeLookupText(rawName);
+  const normalizedPossibleId = possibleId ? normalizeLookupText(possibleId) : "";
+  const normalizedSearchValues = [normalizedRawName, normalizedPossibleId].filter(Boolean);
 
-  if (possibleId) {
-    const direct = weaponRecord[possibleId] || weaponRecord[possibleId.toLowerCase()];
-    if (direct) return direct;
-  }
-
-  const normalizedSearch = normalizeLookupText(rawName);
+  const candidates: Array<{ weapon: any; score: number }> = [];
 
   for (const key of Object.keys(weaponRecord)) {
     const weapon = weaponRecord[key];
@@ -932,32 +1046,39 @@ function resolveWeapon(rawName: string, possibleId?: string): any {
       weapon?.id,
       weapon?.name,
       ...(Array.isArray(weapon?.altNames) ? weapon.altNames : []),
-    ].filter(Boolean);
+    ].filter(Boolean).map((name) => normalizeLookupText(String(name)));
 
-    if (names.some((name) => normalizeLookupText(String(name)) === normalizedSearch)) {
-      return weapon;
+    let score = 0;
+
+    if (normalizedPossibleId && names.includes(normalizedPossibleId)) {
+      score += 120;
     }
+
+    if (normalizedRawName && names.includes(normalizedRawName)) {
+      score += 90;
+    }
+
+    const strippedNames = names.map(stripTechPrefixFromNormalizedText);
+    const strippedRawName = stripTechPrefixFromNormalizedText(normalizedRawName);
+    const strippedPossibleId = stripTechPrefixFromNormalizedText(normalizedPossibleId);
+
+    if (strippedPossibleId && strippedNames.includes(strippedPossibleId)) {
+      score += 70;
+    }
+
+    if (strippedRawName && strippedNames.includes(strippedRawName)) {
+      score += 50;
+    }
+
+    if (score <= 0) continue;
+
+    score += getTechBaseMatchScore(weapon, desiredTechBase);
+    candidates.push({ weapon, score });
   }
 
-  // Some slot IDs look like ISLRM10 / CLLRM10, while weapon names are displayed as LRM 10.
-  const clanOrIs = normalizedSearch.replace(/^(is|cl)/, "");
-  for (const key of Object.keys(weaponRecord)) {
-    const weapon = weaponRecord[key];
-    const names = [
-      key,
-      weapon?.id,
-      weapon?.name,
-      ...(Array.isArray(weapon?.altNames) ? weapon.altNames : []),
-    ].filter(Boolean);
-
-    if (names.some((name) => normalizeLookupText(String(name)).replace(/^(is|cl)/, "") === clanOrIs)) {
-      return weapon;
-    }
-  }
-
-  return null;
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0]?.weapon ?? null;
 }
-
 /**
  * Extract weapon id.
  * @param slot - Input value used by extractWeaponId.
@@ -969,6 +1090,71 @@ function extractWeaponId(slot: string): string {
     return cleaned;
   }
   return "";
+}
+
+/**
+ * Infers an explicit weapon tech base from a weapon id, compact slot id, or MTF label.
+ * @param value - Raw weapon, ammo, or critical-slot text to inspect.
+ * @returns "Clan" or "Inner Sphere" when the text explicitly identifies one, otherwise an empty string.
+ */
+function inferWeaponTechBase(value?: string): string {
+  const normalized = normalizeLookupText(value || "");
+
+  if (!normalized) return "";
+  if (normalized.startsWith("clan") || normalized.startsWith("cl")) return "Clan";
+  if (normalized.startsWith("innersphere") || normalized.startsWith("is")) return "Inner Sphere";
+
+  return "";
+}
+
+/**
+ * Removes leading Inner Sphere or Clan markers from normalized text so shared names can still be compared.
+ * @param value - Already-normalized lookup text.
+ * @returns Normalized text without a leading tech-base marker.
+ */
+function stripTechPrefixFromNormalizedText(value: string): string {
+  return value
+    .replace(/^innersphere/, "")
+    .replace(/^clan/, "")
+    .replace(/^is/, "")
+    .replace(/^cl/, "");
+}
+
+/**
+ * Scores a weapon definition against the desired unit or slot tech base.
+ * @param weapon - Weapon definition from WEAPONS.
+ * @param desiredTechBase - Preferred tech base, usually from the unit MTF or explicit IS/CL slot prefix.
+ * @returns Positive score for a match, negative score for a mismatch, and zero when no preference applies.
+ */
+function getTechBaseMatchScore(weapon: any, desiredTechBase: string): number {
+  const desired = normalizeTechBase(desiredTechBase || "");
+  const weaponTechBase = normalizeTechBase(String(weapon?.techBase || weapon?.variant || ""));
+
+  if (!desired || desired === "Mixed" || !weaponTechBase || weaponTechBase === "Mixed") {
+    return 0;
+  }
+
+  return weaponTechBase === desired ? 100 : -100;
+}
+
+/**
+ * Selects the best weapon from a small candidate list using tech-base preference.
+ * @param candidates - Candidate weapon definitions.
+ * @param desiredTechBase - Preferred tech base, usually from the unit MTF or explicit IS/CL ammo label.
+ * @returns Best matching weapon definition, or null when no candidates are provided.
+ */
+function chooseBestWeaponByTechBase(candidates: any[], desiredTechBase: string): any {
+  if (!candidates.length) return null;
+
+  const scored = candidates
+    .filter(Boolean)
+    .map((weapon) => ({
+      weapon,
+      score: getTechBaseMatchScore(weapon, desiredTechBase),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0]?.weapon ?? null;
 }
 
 /**
@@ -1051,6 +1237,15 @@ function calculateDefensiveBV(metadata: ParsedMtfMetadata): number | null {
 }
 
 /**
+ * Determines whether a location key is any biped or quad leg location.
+ * @param locationKey - Parsed Mek location key.
+ * @returns True when the location represents a leg.
+ */
+function isLegLocationKey(locationKey: MekLocationKey): boolean {
+  return ["leftLeg", "rightLeg", "frontLeftLeg", "frontRightLeg", "rearLeftLeg", "rearRightLeg"].includes(locationKey);
+}
+
+/**
  * Calculate explosive ammo subtraction.
  * @param metadata - Input value used by calculateExplosiveAmmoSubtraction.
  * @returns number result from calculateExplosiveAmmoSubtraction.
@@ -1065,8 +1260,8 @@ function calculateExplosiveAmmoSubtraction(metadata: ParsedMtfMetadata): number 
       const engineLower = metadata.engineType.toLowerCase();
       const hasCASEProtection =
         location.hasCase ||
-        (locationKey === "leftArm" && metadata.locations.leftTorso.hasCase) ||
-        (locationKey === "rightArm" && metadata.locations.rightTorso.hasCase);
+        (locationKey === "leftArm" && Boolean(metadata.locations.leftTorso?.hasCase)) ||
+        (locationKey === "rightArm" && Boolean(metadata.locations.rightTorso?.hasCase));
 
       if (!engineLower.includes("xl") && hasCASEProtection) {
         continue;
@@ -1077,8 +1272,7 @@ function calculateExplosiveAmmoSubtraction(metadata: ParsedMtfMetadata): number 
     } else {
       if (
         locationKey === "centerTorso" ||
-        locationKey === "leftLeg" ||
-        locationKey === "rightLeg" ||
+        isLegLocationKey(locationKey) ||
         locationKey === "head"
       ) {
         subtraction += 15 * getAmmoSlotCountInLocation(location.slots, true);
@@ -1183,13 +1377,14 @@ function calculateAmmoBV(metadata: ParsedMtfMetadata): number {
 
       if (!lowerSlot.includes("ammo")) continue;
 
-      const matchingWeapon = findAmmoWeaponForSlot(lowerSlot, metadata.weapons);
+      const matchingWeapon = findAmmoWeaponForSlot(lowerSlot, metadata.weapons, metadata.techBase);
       const weaponAmmoBV = matchingWeapon?.ammo?.ammoBV;
+      const ammoMultiplier = getAmmoSlotBVMultiplier(slot);
 
       if (typeof weaponAmmoBV === "number") {
-        ammoBV += weaponAmmoBV;
+        ammoBV += weaponAmmoBV * ammoMultiplier;
       } else if (weaponAmmoBV != null) {
-        ammoBV += toNumber(String(weaponAmmoBV));
+        ammoBV += toNumber(String(weaponAmmoBV)) * ammoMultiplier;
       }
     }
   }
@@ -1197,22 +1392,82 @@ function calculateAmmoBV(metadata: ParsedMtfMetadata): number {
   return ammoBV;
 }
 
+
+/**
+ * Determines how much of one ton of ammo a critical-slot label represents for BV purposes.
+ * @param slot - Raw critical-slot text from the MTF file.
+ * @returns Ammo BV multiplier, with half-ton labels returning 0.5 and normal ammo slots returning 1.
+ */
+function getAmmoSlotBVMultiplier(slot: string): number {
+  const normalized = normalizeLookupText(slot);
+  const lower = slot.toLowerCase();
+
+  if (
+    normalized.includes("half") ||
+    lower.includes("1/2") ||
+    lower.includes("0.5") ||
+    lower.includes(".5") ||
+    normalized.includes("halfton")
+  ) {
+    return 0.5;
+  }
+
+  return 1;
+}
+
 /**
  * Resolves an ammo critical-slot label such as "IS Ammo AC/5" to the matching weapon definition.
  * @param lowerSlot - Lowercase raw slot text from the MTF critical-slot list.
  * @param weapons - Mounted weapons already parsed from the unit, used as a fallback for ambiguous ammo names.
+ * @param unitTechBase - Unit tech base from the MTF file; used to prefer Clan vs. Inner Sphere ammo BV values.
  * @returns The matching weapon definition, or null when no reliable match can be made.
  */
-function findAmmoWeaponForSlot(lowerSlot: string, weapons: ParsedWeaponEntry[]): any {
+function findAmmoWeaponForSlot(lowerSlot: string, weapons: ParsedWeaponEntry[], unitTechBase: string): any {
   const weaponRecord = WEAPONS as Record<string, any>;
   const normalizedSlot = normalizeLookupText(lowerSlot);
+  const desiredTechBase = inferWeaponTechBase(lowerSlot) || normalizeTechBase(unitTechBase || "");
 
-  const getWeaponByIds = (...ids: string[]) => {
-    for (const id of ids) {
-      if (weaponRecord[id]) return weaponRecord[id];
-    }
-    return null;
-  };
+  const getWeaponByIds = (...ids: string[]) => chooseBestWeaponByTechBase(
+    ids.map((id) => weaponRecord[id]).filter(Boolean),
+    desiredTechBase
+  );
+
+  const mountedAmmoWeapons = weapons
+    .map((entry) => entry.weaponData)
+    .filter((weapon) => weapon?.ammo);
+
+  const mountedCandidates = mountedAmmoWeapons.filter((weapon) => {
+    const ammoType = weapon.ammo?.ammoType
+      ? normalizeLookupText(String(weapon.ammo.ammoType))
+      : "";
+    const family = weapon.family ? normalizeLookupText(String(weapon.family)) : "";
+    const name = weapon.name ? normalizeLookupText(String(weapon.name)) : "";
+    const id = weapon.id ? normalizeLookupText(String(weapon.id)) : "";
+    const altNames = Array.isArray(weapon.altNames)
+      ? weapon.altNames.map((altName: string) => normalizeLookupText(String(altName)))
+      : [];
+
+    return (
+      (ammoType && normalizedSlot.includes(ammoType)) ||
+      (family && normalizedSlot.includes(family)) ||
+      (name && normalizedSlot.includes(name)) ||
+      (id && normalizedSlot.includes(id)) ||
+      altNames.some((altName: string) => altName && normalizedSlot.includes(altName))
+    );
+  });
+
+  const uniqueMountedCandidates = Array.from(
+    new Map(mountedCandidates.map((weapon: any) => [weapon.id, weapon])).values()
+  );
+
+  if (uniqueMountedCandidates.length === 1) {
+    return uniqueMountedCandidates[0];
+  }
+
+  if (uniqueMountedCandidates.length > 1) {
+    const bestMounted = chooseBestWeaponByTechBase(uniqueMountedCandidates, desiredTechBase);
+    if (bestMounted) return bestMounted;
+  }
 
   const normalizedExactMatches: Array<{ tokens: string[]; ids: string[] }> = [
     { tokens: ["ac20", "autocannon20"], ids: ["is_autocannon_20", "ac20", "is_ac20"] },
@@ -1278,33 +1533,8 @@ function findAmmoWeaponForSlot(lowerSlot: string, weapons: ParsedWeaponEntry[]):
     }
   }
 
-  const mountedAmmoWeapons = weapons
-    .map((entry) => entry.weaponData)
-    .filter((weapon) => weapon?.ammo);
-
-  const candidates = mountedAmmoWeapons.filter((weapon) => {
-    const ammoType = weapon.ammo?.ammoType
-      ? normalizeLookupText(String(weapon.ammo.ammoType))
-      : "";
-    const family = weapon.family ? normalizeLookupText(String(weapon.family)) : "";
-    const name = weapon.name ? normalizeLookupText(String(weapon.name)) : "";
-    const id = weapon.id ? normalizeLookupText(String(weapon.id)) : "";
-
-    return (
-      (ammoType && normalizedSlot.includes(ammoType)) ||
-      (family && normalizedSlot.includes(family)) ||
-      (name && normalizedSlot.includes(name)) ||
-      (id && normalizedSlot.includes(id))
-    );
-  });
-
-  const uniqueCandidates = Array.from(
-    new Map(candidates.map((weapon: any) => [weapon.id, weapon])).values()
-  );
-
-  return uniqueCandidates.length === 1 ? uniqueCandidates[0] : null;
+  return null;
 }
-
 /**
  * Calculate mek cbills.
  * @param metadata - Input value used by calculateMekCBills.
@@ -1363,19 +1593,38 @@ function getActuatorCost(locations: MekLocationMap, unitTonnage: number): number
 
   let cost = 0;
 
-  for (const arm of ["leftArm", "rightArm"] as MekLocationKey[]) {
+  for (const arm of getArmLocationKeys(locations)) {
     if (hasInLocation(arm, [/upper\s+arm\s+actuator/i])) cost += 100 * unitTonnage;
     if (hasInLocation(arm, [/lower\s+arm\s+actuator/i])) cost += 50 * unitTonnage;
     if (hasInLocation(arm, [/hand\s+actuator/i])) cost += 80 * unitTonnage;
   }
 
-  for (const leg of ["leftLeg", "rightLeg"] as MekLocationKey[]) {
+  for (const leg of getLegLocationKeys(locations)) {
     if (hasInLocation(leg, [/hip/i, /upper\s+leg\s+actuator/i])) cost += 150 * unitTonnage;
     if (hasInLocation(leg, [/lower\s+leg\s+actuator/i])) cost += 80 * unitTonnage;
     if (hasInLocation(leg, [/foot\s+actuator/i])) cost += 120 * unitTonnage;
   }
 
   return cost;
+}
+
+/**
+ * Lists arm locations present on this parsed Mek. Quad Meks return none because they have no arms.
+ * @param locations - Parsed Mek location map.
+ * @returns Arm location keys that exist in the map.
+ */
+function getArmLocationKeys(locations: MekLocationMap): MekLocationKey[] {
+  return (["leftArm", "rightArm"] as MekLocationKey[]).filter((key) => Boolean(locations[key]));
+}
+
+/**
+ * Lists leg locations present on this parsed Mek, including quad front/rear legs when applicable.
+ * @param locations - Parsed Mek location map.
+ * @returns Leg location keys that exist in the map.
+ */
+function getLegLocationKeys(locations: MekLocationMap): MekLocationKey[] {
+  return (["leftLeg", "rightLeg", "frontLeftLeg", "frontRightLeg", "rearLeftLeg", "rearRightLeg"] as MekLocationKey[])
+    .filter((key) => Boolean(locations[key]));
 }
 
 /**
@@ -1691,9 +1940,9 @@ function getTotalInternal(locations: MekLocationMap): number {
  * @returns number result from getRearArmorForLocation.
  */
 function getRearArmorForLocation(key: MekLocationKey, armor: MekArmorValues): number {
-  if (key === "centerTorso") return armor.centerTorsoRear;
-  if (key === "leftTorso") return armor.leftTorsoRear;
-  if (key === "rightTorso") return armor.rightTorsoRear;
+  if (key === "centerTorso") return armor.centerTorsoRear || 0;
+  if (key === "leftTorso") return armor.leftTorsoRear || 0;
+  if (key === "rightTorso") return armor.rightTorsoRear || 0;
   return 0;
 }
 
@@ -1902,6 +2151,10 @@ function getBattleMechInternalStructure(unitTonnage: number): Record<MekLocation
     rightArm: row.arm,
     leftLeg: row.leg,
     rightLeg: row.leg,
+    frontLeftLeg: row.leg,
+    frontRightLeg: row.leg,
+    rearLeftLeg: row.leg,
+    rearRightLeg: row.leg,
   };
 }
 
@@ -2207,8 +2460,8 @@ function calculateExplosiveAmmoSubtractionDebug(metadata: ParsedMtfMetadata): { 
       const engineLower = metadata.engineType.toLowerCase();
       const hasCASEProtection =
         location.hasCase ||
-        (locationKey === "leftArm" && metadata.locations.leftTorso.hasCase) ||
-        (locationKey === "rightArm" && metadata.locations.rightTorso.hasCase);
+        (locationKey === "leftArm" && Boolean(metadata.locations.leftTorso?.hasCase)) ||
+        (locationKey === "rightArm" && Boolean(metadata.locations.rightTorso?.hasCase));
 
       if (!engineLower.includes("xl") && hasCASEProtection) continue;
 
@@ -2262,7 +2515,7 @@ function calculateOffensiveBVDebug(metadata: ParsedMtfMetadata): { total: number
     const tcMultiplier = hasTargetingComputer && isTargetingComputerEligibleWeapon(weapon) ? 1.25 : 1;
     const rearMultiplier = weaponEntry.isRearFacing ? 0.5 : 1;
     const modifiedBV = baseBV * tcMultiplier * rearMultiplier;
-    const name = weapon.name || weaponEntry.name;
+    const name = getWeaponDebugLabel(weapon, weaponEntry.name);
 
     if (heat === 0) zeroHeatWeapons.push({ name, modifiedBV, isRear: weaponEntry.isRearFacing, tcMultiplier });
     else heatWeapons.push({ name, baseBV, modifiedBV, heat, isRear: weaponEntry.isRearFacing, tcMultiplier });
@@ -2347,14 +2600,17 @@ function calculateAmmoBVDebug(metadata: ParsedMtfMetadata): { total: number; lin
       const lowerSlot = slot.toLowerCase();
       if (!lowerSlot.includes("ammo")) continue;
 
-      const matchingWeapon = findAmmoWeaponForSlot(lowerSlot, metadata.weapons);
+      const matchingWeapon = findAmmoWeaponForSlot(lowerSlot, metadata.weapons, metadata.techBase);
       const weaponAmmoBV = matchingWeapon?.ammo?.ammoBV;
-      let bv = 0;
-      if (typeof weaponAmmoBV === "number") bv = weaponAmmoBV;
-      else if (weaponAmmoBV != null) bv = toNumber(String(weaponAmmoBV));
+      const ammoMultiplier = getAmmoSlotBVMultiplier(slot);
+      let baseBV = 0;
+      if (typeof weaponAmmoBV === "number") baseBV = weaponAmmoBV;
+      else if (weaponAmmoBV != null) baseBV = toNumber(String(weaponAmmoBV));
 
+      const bv = baseBV * ammoMultiplier;
       total += bv;
-      lines.push(`${slot} (${location.mtfName}) +${formatDebugNumber(bv)}${matchingWeapon?.name ? ` [${matchingWeapon.name}]` : " [unmatched]"}`);
+      const multiplierNote = ammoMultiplier === 1 ? "" : ` x ${formatDebugNumber(ammoMultiplier)}`;
+      lines.push(`${slot} (${location.mtfName}) +${formatDebugNumber(bv)}${multiplierNote ? ` (${formatDebugNumber(baseBV)}${multiplierNote})` : ""}${matchingWeapon?.name ? ` [${matchingWeapon.name}]` : " [unmatched]"}`);
     }
   }
 
@@ -2377,6 +2633,22 @@ function isTargetingComputerEligibleWeapon(weapon: any): boolean {
   if (flags.includes("indirectfire") || flags.includes("cluster")) return false;
 
   return category === "energy" || category === "ballistic" || flags.includes("directfire");
+}
+
+
+/**
+ * Formats a weapon label for debug output, including id and tech base so Clan/Inner Sphere resolution is visible.
+ * @param weapon - Resolved weapon definition from WEAPONS.
+ * @param fallbackName - Original MTF weapon name used when the definition has no display name.
+ * @returns Printable debug label for weapon BV/cost diagnostics.
+ */
+function getWeaponDebugLabel(weapon: any, fallbackName: string): string {
+  const name = weapon?.name || fallbackName;
+  const id = weapon?.id ? `id=${weapon.id}` : "id=?";
+  const techBase = weapon?.techBase ? `tech=${weapon.techBase}` : "tech=?";
+  const bv = weapon?.bv != null ? `bv=${weapon.bv}` : "bv=?";
+
+  return `${name} [${id}, ${techBase}, ${bv}]`;
 }
 
 /**
@@ -2524,6 +2796,10 @@ function isLocationHeader(lowerLine: string): boolean {
     "right arm:",
     "left leg:",
     "right leg:",
+    "front left leg:",
+    "front right leg:",
+    "rear left leg:",
+    "rear right leg:",
   ];
   return locationHeaders.includes(lowerLine);
 }
@@ -2553,11 +2829,24 @@ function normalizeLocationName(location: string): MekLocationKey | null {
     ll: "leftLeg",
     "right leg": "rightLeg",
     rl: "rightLeg",
+    "front left leg": "frontLeftLeg",
+    fll: "frontLeftLeg",
+    "front right leg": "frontRightLeg",
+    frl: "frontRightLeg",
+    "rear left leg": "rearLeftLeg",
+    rll: "rearLeftLeg",
+    "rear right leg": "rearRightLeg",
+    rrl: "rearRightLeg",
   };
 
   return locationMap[normalized] || null;
 }
 
+/**
+ * Randomizes the order of an array using a Fisher-Yates shuffle.
+ * @param values - Source array to shuffle without mutating the original array.
+ * @returns Shuffled copy of the source array.
+ */
 function shuffle<T>(values: T[]): T[] {
   const copy = [...values];
 
@@ -2637,6 +2926,7 @@ function getIndexOptions(): IndexOptions {
   return {
     rulesLevel: getRequestedRulesLevel(),
     debug: hasDebugFlag(),
+    unitQuery: getRequestedUnitQuery(),
   };
 }
 
@@ -2668,6 +2958,26 @@ function getRequestedRulesLevel(): string | null {
   }
 
   return normalized;
+}
+
+
+/**
+ * Reads the requested specific unit query from CLI arguments.
+ * @returns Unit query string from --unit, --model, or --unitModel, or null when no specific unit was requested.
+ */
+function getRequestedUnitQuery(): string | null {
+  const unitArg = process.argv.find(
+    (arg) =>
+      arg.startsWith("--unit=") ||
+      arg.startsWith("--model=") ||
+      arg.startsWith("--unitModel=") ||
+      arg.startsWith("--unit-model=")
+  );
+
+  if (!unitArg) return null;
+
+  const value = unitArg.substring(unitArg.indexOf("=") + 1).trim();
+  return value || null;
 }
 
 /**
