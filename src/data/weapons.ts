@@ -68,12 +68,6 @@ export type WeaponDefinition = {
         reintroduced?: string;
     };
 
-    aerospace?: {
-        attackValue?: number | string;
-        range?: string;
-        toHitModifier?: number | string;
-    };
-
     source?: {
         totalWarfarePage?: number;
         weightSpacePage?: number;
@@ -126,11 +120,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_standard_ac",
             "ammoPerTon": 45,
@@ -183,11 +172,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_standard_ac",
             "ammoPerTon": 20,
@@ -240,11 +224,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_standard_ac",
             "ammoPerTon": 10,
@@ -297,11 +276,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "20",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_standard_ac",
             "ammoPerTon": 5,
@@ -361,11 +335,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Extreme",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "is_lb_x_ac",
             "ammoPerTon": 45,
@@ -424,11 +393,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Long",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "is_lb_x_ac",
             "ammoPerTon": 20,
@@ -487,11 +451,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Medium",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "is_lb_x_ac",
             "ammoPerTon": 10,
@@ -550,11 +509,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Medium",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "is_lb_x_ac",
             "ammoPerTon": 5,
@@ -608,11 +562,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_light_ac",
             "ammoPerTon": 45,
@@ -666,11 +615,6 @@ export const WEAPONS = {
             "DB",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_light_ac",
             "ammoPerTon": 20,
@@ -727,11 +671,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_rotary_ac",
             "ammoPerTon": 45,
@@ -788,11 +727,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "20",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_rotary_ac",
             "ammoPerTon": 20,
@@ -848,11 +782,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_ultra_ac",
             "ammoPerTon": 45,
@@ -908,11 +837,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "7",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_ultra_ac",
             "ammoPerTon": 20,
@@ -968,11 +892,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_ultra_ac",
             "ammoPerTon": 10,
@@ -1028,11 +947,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "30",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_ultra_ac",
             "ammoPerTon": 5,
@@ -1082,11 +996,6 @@ export const WEAPONS = {
             "DB",
             "X"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_light_gauss",
             "ammoPerTon": 16,
@@ -1139,11 +1048,6 @@ export const WEAPONS = {
             "DB",
             "X"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_gauss",
             "ammoPerTon": 8,
@@ -1198,11 +1102,6 @@ export const WEAPONS = {
             "X",
             "V"
         ],
-        "aerospace": {
-            "attackValue": "25/20/10",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_heavy_gauss",
             "ammoPerTon": 4,
@@ -1257,11 +1156,6 @@ export const WEAPONS = {
             "X",
             "V"
         ],
-        "aerospace": {
-            "attackValue": "22",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_heavy_gauss",
             "ammoPerTon": 4,
@@ -1316,11 +1210,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "1",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_machine_gun",
             "ammoPerTon": 200,
@@ -1373,11 +1262,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_machine_gun",
             "ammoPerTon": 200,
@@ -1428,11 +1312,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_machine_gun",
             "ammoPerTon": 100,
@@ -1482,11 +1361,6 @@ export const WEAPONS = {
             "H",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "cost": 7500,
         "bv": 6
     },
@@ -1532,11 +1406,6 @@ export const WEAPONS = {
             "H",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_vehicle_flamer",
             "ammoPerTon": 20,
@@ -1584,11 +1453,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "bv": 17,
         "cost": 11250
     },
@@ -1628,11 +1492,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "bv": 62,
         "cost": 80000
     },
@@ -1672,11 +1531,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "bv": 163,
         "cost": 200000
     },
@@ -1716,11 +1570,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "cost": 11250,
         "bv": 9
     },
@@ -1760,11 +1609,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "cost": 40000,
         "bv": 46
     },
@@ -1804,11 +1648,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "cost": 100000,
         "bv": 123
     },
@@ -1850,11 +1689,6 @@ export const WEAPONS = {
             "P",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 12,
         "cost": 16000
     },
@@ -1895,11 +1729,6 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 48,
         "cost": 60000
     },
@@ -1940,11 +1769,6 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "9",
-            "range": "Medium",
-            "toHitModifier": -2
-        },
         "bv": 119,
         "cost": 175000
     },
@@ -1989,11 +1813,6 @@ export const WEAPONS = {
             "P",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 12,
         "cost": 16000
     },
@@ -2037,11 +1856,6 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 48,
         "cost": 60000
     },
@@ -2085,13 +1899,268 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "9",
-            "range": "Medium",
-            "toHitModifier": -2
-        },
         "bv": 119,
         "cost": 175000
+    },
+    "is_small_vsp_laser": {     //VSP = Variable Speed Pulse - subvariant of pulse laser with different damage/heat values at range brackets
+        "id": "is_small_vsp_laser",
+        "name": "Small VSP Laser",
+        "altNames": [
+            "IS Small VSP Laser",
+            "ISSmallVSPLaser",
+            "SmallVSPLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": "5/4/3",
+        "heat": 2,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 1,
+            "medium": 2,
+            "long": 3
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P",
+            "AI"
+        ],
+        "bv": 22,
+        "cost": 60000
+    },
+    "is_medium_vsp_laser": {
+        "id": "is_medium_vsp_laser",
+        "name": "Medium VSP Laser",
+        "altNames": [
+            "IS Medium VSP Laser",
+            "ISMediumVSPLaser",
+            "MediumVSPLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": "9/7/5",
+        "heat": 4,
+        "tons": 2,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 2,
+            "medium": 5,
+            "long": 9
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 56,
+        "cost": 200000
+    },
+    "is_large_vsp_pulse_laser": {
+        "id": "is_large_vsp_pulse_laser",
+        "name": "Large VSP Pulse Laser",
+        "altNames": [
+            "IS Large VSP Pulse Laser",
+            "ISLargeVSPPulseLaser",
+            "LargeVSPLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": "11/9/7",
+        "heat": 10,
+        "tons": 7,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 4,
+            "medium": 8,
+            "long": 15
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 123,
+        "cost": 465000
+    },
+    "is_small_re-engineered_laser": {
+        "id": "is_small_re-engineered_laser",
+        "name": "Small Re-Engineered Laser",
+        "altNames": [
+            "IS Small Re-Engineered Laser",
+            "ISSmallReEngineeredLaser",
+            "SmallReEngineeredLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 4,
+        "heat": 4,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 1,
+            "medium": 2,
+            "long": 3
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P",
+            "AI"
+        ],
+        "bv": 14,
+        "cost": 25000
+    },
+    "is_medium_re-engineered_laser": {
+        "id": "is_medium_re-engineered_laser",
+        "name": "Medium Re-Engineered Laser",
+        "altNames": [
+            "IS Medium Re-Engineered Laser",
+            "ISMediumReEngineeredLaser",
+            "MediumReEngineeredLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 6,
+        "heat": 6,
+        "tons": 2.5,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 3,
+            "medium": 6,
+            "long": 9
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 65,
+        "cost": 100000
+    },
+    "is_large_re-engineered_laser": {
+        "id": "is_large_re-engineered_laser",
+        "name": "Large Re-Engineered Laser",
+        "altNames": [
+            "IS Large Re-Engineered Laser",
+            "ISLargeReEngineeredLaser",
+            "LargeReEngineeredLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 9,
+        "heat": 9,
+        "tons": 8,
+        "critSlots": 5,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 5,
+            "medium": 10,
+            "long": 15
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 161,
+        "cost": 250000
     },
     "is_plasma_rifle": {
         "id": "is_plasma_rifle",
@@ -2131,11 +2200,6 @@ export const WEAPONS = {
             "DE",
             "H"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_plasma_rifle",
             "ammoPerTon": 10,
@@ -2188,11 +2252,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "bv": 88
     },
     "is_ppc": {
@@ -2233,11 +2292,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "cost": 200000,
         "bv": 176
     },
@@ -2276,11 +2330,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "bv": 317
     },
     "is_er_ppc": {
@@ -2321,11 +2370,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "bv": 229,
         "cost": 300000
     },
@@ -2370,11 +2414,6 @@ export const WEAPONS = {
             "DE",
             "V"
         ],
-        "aerospace": {
-            "attackValue": "10/8",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "bv": 165,
         "cost": 300000
     },
@@ -2420,11 +2459,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "3/4",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_lrm",
             "ammoPerTon": 24,
@@ -2483,11 +2517,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "6/8",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_lrm",
             "ammoPerTon": 12,
@@ -2546,11 +2575,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "9/12",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_lrm",
             "ammoPerTon": 8,
@@ -2609,11 +2633,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "12/16",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_lrm",
             "ammoPerTon": 6,
@@ -2629,6 +2648,238 @@ export const WEAPONS = {
         "availability": {
             "code": "C-C-C"
         }
+    },
+    "is_elrm_5": {
+        "id": "is_elrm_5",
+        "name": "Extended LRM 5",
+        "altNames": [
+            "IS ELRM 5",
+            "ISELRM5",
+            "ELRM-5",
+            "ELRM5"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 3,
+        "tons": 6,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 10,
+            "short": 12,
+            "medium": 22,
+            "long": 38
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-F"
+        },
+        "flags": [
+            "cluster",
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "C",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 18,
+            "ammoCostPerTon": 30000,
+            "ammoBV": 8
+        },
+        "cost": 60000,
+        "bv": 67,
+        "oneShotBV": 9,
+        "notes": [
+            "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+    },
+    "is_elrm_10": {
+        "id": "is_elrm_10",
+        "name": "Extended LRM 10",
+        "altNames": [
+            "IS ELRM 10",
+            "ISELRM10",
+            "ELRM-10",
+            "ELRM10"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 6,
+        "tons": 8,
+        "critSlots": 4,
+        "spaceSlots": 2,
+        "range": {
+            "min": 10,
+            "short": 12,
+            "medium": 22,
+            "long": 38
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-F"
+        },
+        "flags": [
+            "cluster",
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "C",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 9,
+            "ammoCostPerTon": 35000,
+            "ammoBV": 16
+        },
+        "cost": 200000,
+        "bv": 133,
+        "oneShotBV": 18,
+        "notes": [
+            "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ]
+    },
+    "is_elrm_15": {
+        "id": "is_elrm_15",
+        "name": "Extended LRM 15",
+        "altNames": [
+            "IS ELRM 15",
+            "ISELRM15",
+            "ELRM-15",
+            "ELRM15"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 8,
+        "tons": 12,
+        "critSlots": 6,
+        "spaceSlots": 3,
+        "range": {
+            "min": 10,
+            "short": 12,
+            "medium": 22,
+            "long": 38
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-F"
+        },
+        "flags": [
+            "cluster",
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "C",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 6,
+            "ammoCostPerTon": 35000,
+            "ammoBV": 25
+        },
+        "cost": 350000,
+        "bv": 200,
+        "oneShotBV": 27,
+        "notes": [
+            "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ]
+    },
+    "is_elrm_20": {
+        "id": "is_elrm_20",
+        "name": "Extended LRM 20",
+        "altNames": [
+            "IS ELRM 20",
+            "ISELRM20",
+            "ELRM-20",
+            "ELRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 12,
+        "tons": 18,
+        "critSlots": 8,
+        "spaceSlots": 5,
+        "range": {
+            "min": 10,
+            "short": 12,
+            "medium": 22,
+            "long": 38
+        },
+        "techRating": "E",
+        "availability": {
+            "code": "X-X-F"
+        },
+        "flags": [
+            "cluster",
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "C",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 4,
+            "ammoCostPerTon": 35000,
+            "ammoBV": 34
+        },
+        "cost": 500000,
+        "bv": 268,
+        "oneShotBV": 36,
+        "notes": [
+            "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ]
     },
     "is_mml_3": {
         "id": "is_mml_3",
@@ -2679,11 +2930,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "2/2",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_mml",
             "ammoPerTon": "varies by LRM/SRM ammo",
@@ -2759,11 +3005,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "3/4",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_mml",
             "ammoPerTon": "varies by LRM/SRM ammo",
@@ -2839,11 +3080,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "4/6",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_mml",
             "ammoPerTon": "varies by LRM/SRM ammo",
@@ -2919,11 +3155,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "5/7",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_mml",
             "ammoPerTon": "varies by LRM/SRM ammo",
@@ -2990,11 +3221,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "2/4",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_srm",
             "ammoPerTon": 50,
@@ -3051,11 +3277,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "4/6",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_srm",
             "ammoPerTon": 25,
@@ -3112,11 +3333,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "8/10",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_srm",
             "ammoPerTon": 15,
@@ -3172,11 +3388,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_mrm",
             "ammoPerTon": 24,
@@ -3231,11 +3442,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_mrm",
             "ammoPerTon": 12,
@@ -3290,11 +3496,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "18",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_mrm",
             "ammoPerTon": 8,
@@ -3349,11 +3550,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "24",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_mrm",
             "ammoPerTon": 6,
@@ -3409,11 +3605,6 @@ export const WEAPONS = {
             "C",
             "OS"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_rocket_launcher",
             "ammoPerTon": "OS",
@@ -3464,11 +3655,6 @@ export const WEAPONS = {
             "C",
             "OS"
         ],
-        "aerospace": {
-            "attackValue": "9",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_rocket_launcher",
             "ammoPerTon": "OS",
@@ -3519,11 +3705,6 @@ export const WEAPONS = {
             "C",
             "OS"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "ammo": {
             "ammoType": "is_rocket_launcher",
             "ammoPerTon": "OS",
@@ -3574,11 +3755,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "4",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_streak_srm",
             "ammoPerTon": 50,
@@ -3634,11 +3810,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_streak_srm",
             "ammoPerTon": 25,
@@ -3694,11 +3865,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_streak_srm",
             "ammoPerTon": 15,
@@ -3804,11 +3970,6 @@ export const WEAPONS = {
             "E",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "special",
-            "range": "special",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "is_narc",
             "ammoPerTon": 4,
@@ -3869,11 +4030,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Extreme",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "clan_lb_x_ac",
             "ammoPerTon": 45,
@@ -3933,11 +4089,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Long",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "clan_lb_x_ac",
             "ammoPerTon": 20,
@@ -3997,11 +4148,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Medium",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "clan_lb_x_ac",
             "ammoPerTon": 10,
@@ -4061,11 +4207,6 @@ export const WEAPONS = {
             "S",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Medium",
-            "toHitModifier": "0/-1"
-        },
         "ammo": {
             "ammoType": "clan_lb_x_ac",
             "ammoPerTon": 5,
@@ -4122,11 +4263,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_ultra_ac",
             "ammoPerTon": 45,
@@ -4183,11 +4319,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "7",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_ultra_ac",
             "ammoPerTon": 20,
@@ -4244,11 +4375,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_ultra_ac",
             "ammoPerTon": 10,
@@ -4305,11 +4431,6 @@ export const WEAPONS = {
             "R",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "30",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_ultra_ac",
             "ammoPerTon": 5,
@@ -4362,11 +4483,6 @@ export const WEAPONS = {
             "X",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_ap_gauss",
             "ammoPerTon": 40,
@@ -4420,11 +4536,6 @@ export const WEAPONS = {
             "DB",
             "X"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_gauss",
             "ammoPerTon": 8,
@@ -4484,11 +4595,6 @@ export const WEAPONS = {
             "C",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "16/12/12",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_hag",
             "ammoPerTon": 6,
@@ -4547,11 +4653,6 @@ export const WEAPONS = {
             "C",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "24/18/18",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_hag",
             "ammoPerTon": 4,
@@ -4610,11 +4711,6 @@ export const WEAPONS = {
             "C",
             "F"
         ],
-        "aerospace": {
-            "attackValue": "32/24/24",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_hag",
             "ammoPerTon": 3,
@@ -4669,11 +4765,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "1",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_machine_gun",
             "ammoPerTon": 200,
@@ -4727,11 +4818,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_machine_gun",
             "ammoPerTon": 200,
@@ -4783,11 +4869,6 @@ export const WEAPONS = {
             "DB",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_machine_gun",
             "ammoPerTon": 100,
@@ -4838,11 +4919,6 @@ export const WEAPONS = {
             "H",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "bv": 6,
         "cost": 7500
     },
@@ -4889,11 +4965,6 @@ export const WEAPONS = {
             "H",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_vehicle_flamer",
             "ammoPerTon": 20,
@@ -4942,11 +5013,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "2",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "bv": 7,
         "cost": 10000
     },
@@ -4987,11 +5053,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "5",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "bv": 31,
         "cost": 11250
     },
@@ -5032,11 +5093,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "7",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "bv": 108,
         "cost": 80000
     },
@@ -5077,11 +5133,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "bv": 248,
         "cost": 200000
     },
@@ -5123,11 +5174,6 @@ export const WEAPONS = {
             "P",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 12
     },
     "clan_small_pulse_laser": {
@@ -5169,11 +5215,6 @@ export const WEAPONS = {
             "P",
             "AI"
         ],
-        "aerospace": {
-            "attackValue": "3",
-            "range": "Short",
-            "toHitModifier": -2
-        },
         "bv": 24,
         "cost": 16000
     },
@@ -5215,11 +5256,6 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "7",
-            "range": "Medium",
-            "toHitModifier": -2
-        },
         "bv": 111,
         "cost": 60000
     },
@@ -5261,13 +5297,147 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Long",
-            "toHitModifier": -2
-        },
         "bv": 265,
         "cost": 175000
+    },
+    "clan_small_er_pulse_laser": {
+        "id": "clan_small_er_pulse_laser",
+        "name": "Small ER Pulse Laser",
+        "altNames": [
+            "Clan Small ER Pulse Laser",
+            "CL Small ER Pulse Laser",
+            "CLSmallERPulseLaser",
+            "SmallERPulseLaser",
+            "ER Small Pulse Laser",
+            "ERSmallPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "pulseLaser",
+        "damage": 5,
+        "heat": 3,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 2,
+            "medium": 4,
+            "long": 6
+        },
+        "techRating": "F",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 343,
+            "battleValuePage": 318,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P",
+            "AI"
+        ],
+        "bv": 36,
+        "cost": 30000
+    },
+    "clan_medium_er_pulse_laser": {
+        "id": "clan_medium_er_pulse_laser",
+        "name": "Medium ER Pulse Laser",
+        "altNames": [
+            "Clan Medium ER Pulse Laser",
+            "CL Medium ER Pulse Laser",
+            "CLMediumERPulseLaser",
+            "MediumERPulseLaser",
+            "ER Medium Pulse Laser",
+            "ERMediumPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "pulseLaser",
+        "damage": 7,
+        "heat": 6,
+        "tons": 2,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 5,
+            "medium": 9,
+            "long": 14
+        },
+        "techRating": "F",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 343,
+            "battleValuePage": 318,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 117,
+        "cost": 150000
+    },
+    "clan_large_er_pulse_laser": {
+        "id": "clan_large_er_pulse_laser",
+        "name": "Large ER Pulse Laser",
+        "altNames": [
+            "Clan Large ER Pulse Laser",
+            "CL Large ER Pulse Laser",
+            "CLLargeERPulseLaser",
+            "LargeERPulseLaser",
+            "ER Large Pulse Laser",
+            "ERLargePulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "pulseLaser",
+        "damage": 10,
+        "heat": 13,
+        "tons": 6,
+        "critSlots": 3,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 7,
+            "medium": 15,
+            "long": 23
+        },
+        "techRating": "F",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "pulse"
+        ],
+        "source": {
+            "weightSpacePage": 343,
+            "battleValuePage": 318,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "P"
+        ],
+        "bv": 272,
+        "cost": 400000
     },
     "clan_heavy_small_laser": {
         "id": "clan_heavy_small_laser",
@@ -5305,11 +5475,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Short",
-            "toHitModifier": 1
-        },
         "bv": 15,
         "cost": 20000
     },
@@ -5349,11 +5514,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Short",
-            "toHitModifier": 1
-        },
         "bv": 76,
         "cost": 100000
     },
@@ -5394,11 +5554,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "16",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "bv": 244,
         "cost": 250000
     },
@@ -5438,10 +5593,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "6",
-            "range": "Short"
-        },
         "bv": 19,
         "cost": 30000
     },
@@ -5481,10 +5632,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Short"
-        },
         "bv": 93,
         "cost": 150000
     },
@@ -5525,11 +5672,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "16",
-            "range": "Medium",
-            "toHitModifier": 1
-        },
         "bv": 296,
         "cost": 350000
     },
@@ -5572,11 +5714,6 @@ export const WEAPONS = {
             "DE",
             "H"
         ],
-        "aerospace": {
-            "attackValue": "special",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_plasma_cannon",
             "ammoPerTon": 10,
@@ -5629,11 +5766,6 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "aerospace": {
-            "attackValue": "15",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "bv": 412,
         "cost": 300000
     },
@@ -5678,11 +5810,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "4",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_atm",
             "ammoPerTon": 20,
@@ -5735,11 +5862,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "10",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_atm",
             "ammoPerTon": 10,
@@ -5792,11 +5914,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "14",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_atm",
             "ammoPerTon": 7,
@@ -5849,11 +5966,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "20",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_atm",
             "ammoPerTon": 5,
@@ -5908,11 +6020,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "3/4",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_lrm",
             "ammoPerTon": 24,
@@ -5972,11 +6079,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "6/8",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_lrm",
             "ammoPerTon": 12,
@@ -6036,11 +6138,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "9/12",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_lrm",
             "ammoPerTon": 8,
@@ -6100,11 +6197,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "12/16",
-            "range": "Long",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_lrm",
             "ammoPerTon": 6,
@@ -6162,11 +6254,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "2/4",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_srm",
             "ammoPerTon": 50,
@@ -6224,11 +6311,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "4/6",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_srm",
             "ammoPerTon": 25,
@@ -6286,11 +6368,6 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "aerospace": {
-            "attackValue": "8/10",
-            "range": "Short",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_srm",
             "ammoPerTon": 15,
@@ -6348,11 +6425,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "4",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_streak_srm",
             "ammoPerTon": 50,
@@ -6409,11 +6481,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "8",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_streak_srm",
             "ammoPerTon": 25,
@@ -6470,11 +6537,6 @@ export const WEAPONS = {
             "M",
             "C"
         ],
-        "aerospace": {
-            "attackValue": "12",
-            "range": "Medium",
-            "toHitModifier": 0
-        },
         "ammo": {
             "ammoType": "clan_streak_srm",
             "ammoPerTon": 15,
@@ -7416,344 +7478,593 @@ export const WEAPONS = {
         },
         "bv": "D"
     },
-    "is_killer_whale": {
-        "id": "is_killer_whale",
-        "name": "Killer Whale",
+    "is_enhanced_lrm_5": {
+        "id": "is_enhanced_lrm_5",
+        "name": "Enhanced LRM 5",
         "altNames": [
-            "IS Killer Whale",
-            "ISKillerWhale",
-            "KillerWhale"
+                "IS Enhanced LRM 5",
+                "ISEnhancedLRM5",
+                "EnhancedLRM5",
+                "Enhanced-LRM-5",
+                "NLRM 5",
+                "NLRM-5",
+                "NLRM5",
+                "ISNLRM5"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Advanced",
         "variant": "IS",
-        "family": "killer_whale",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 150,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 5,
+        "heat": 2,
+        "tons": 3,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
         "flags": [
-            "cluster"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
         ],
         "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "is_capital_missile",
-            "ammoPerTon": "50 t/Msl",
-            "ammoBV": 96
+                "ammoType": "is_enhanced_lrm",
+                "ammoPerTon": 24,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 7
+        },
+        "bv": 52,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 769
-    },
-    "is_white_shark": {
-        "id": "is_white_shark",
-        "name": "White Shark",
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_10": {
+        "id": "is_enhanced_lrm_10",
+        "name": "Enhanced LRM 10",
         "altNames": [
-            "IS White Shark",
-            "ISWhiteShark",
-            "WhiteShark"
+                "IS Enhanced LRM 10",
+                "ISEnhancedLRM10",
+                "EnhancedLRM10",
+                "Enhanced-LRM-10",
+                "NLRM 10",
+                "NLRM-10",
+                "NLRM10",
+                "ISNLRM10"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Advanced",
         "variant": "IS",
-        "family": "white_shark",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 120,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 10,
+        "heat": 4,
+        "tons": 6,
+        "critSlots": 4,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
         "flags": [
-            "cluster"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
         ],
         "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "is_capital_missile",
-            "ammoPerTon": "40 t/Msl",
-            "ammoBV": 72
+                "ammoType": "is_enhanced_lrm",
+                "ammoPerTon": 12,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 13
+        },
+        "bv": 104,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 577
-    },
-    "is_barracuda": {
-        "id": "is_barracuda",
-        "name": "Barracuda",
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_15": {
+        "id": "is_enhanced_lrm_15",
+        "name": "Enhanced LRM 15",
         "altNames": [
-            "IS Barracuda",
-            "ISBarracuda"
+                "IS Enhanced LRM 15",
+                "ISEnhancedLRM15",
+                "EnhancedLRM15",
+                "Enhanced-LRM-15",
+                "NLRM 15",
+                "NLRM-15",
+                "NLRM15",
+                "ISNLRM15"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Advanced",
         "variant": "IS",
-        "family": "barracuda",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 90,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 15,
+        "heat": 5,
+        "tons": 9,
+        "critSlots": 6,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
         "flags": [
-            "cluster",
-            "requiresAmmo"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
         ],
         "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "is_capital_missile",
-            "ammoPerTon": "30 t/Msl",
-            "ammoBV": 65
+                "ammoType": "is_enhanced_lrm",
+                "ammoPerTon": 8,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 20
+        },
+        "bv": 157,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 522
-    },
-    "is_ar_10_launcher": {
-        "id": "is_ar_10_launcher",
-        "name": "AR-10 Launcher",
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_20": {
+        "id": "is_enhanced_lrm_20",
+        "name": "Enhanced LRM 20",
         "altNames": [
-            "IS AR-10 Launcher",
-            "ISAR10Launcher",
-            "AR10Launcher"
+                "IS Enhanced LRM 20",
+                "ISEnhancedLRM20",
+                "EnhancedLRM20",
+                "Enhanced-LRM-20",
+                "NLRM 20",
+                "NLRM-20",
+                "NLRM20",
+                "ISNLRM20"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Advanced",
         "variant": "IS",
-        "family": "ar_10_launcher",
-        "damage": "special",
-        "heat": "special",
-        "tons": 250,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 20,
+        "heat": 6,
+        "tons": 12,
+        "critSlots": 9,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
         "flags": [
-            "cluster"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
         ],
         "source": {
-            "weightSpacePage": 341,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
-        "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 961
-    },
-    "clan_killer_whale": {
-        "id": "clan_killer_whale",
-        "name": "Killer Whale",
-        "altNames": [
-            "Clan Killer Whale",
-            "CL Killer Whale",
-            "CLKillerWhale",
-            "KillerWhale"
-        ],
-        "category": "Missile",
-        "techBase": "Clan",
-        "rulesLevel": "Standard",
-        "variant": "Clan",
-        "family": "killer_whale",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 150,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
-        "flags": [
-            "cluster"
-        ],
-        "source": {
-            "weightSpacePage": 343,
-            "battleValuePage": 318
-        },
-        "typeCodes": [
-            "M"
-        ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "clan_capital_missile",
-            "ammoPerTon": "50 t/Msl",
-            "ammoBV": 96
+                "ammoType": "is_enhanced_lrm",
+                "ammoPerTon": 6,
+                "ammoCostPerTon": 30000,
+                "ammoBV": 26
+        },
+        "bv": 210,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 769
-    },
-    "clan_white_shark": {
-        "id": "clan_white_shark",
-        "name": "White Shark",
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "clan_streak_lrm_5": {
+        "id": "clan_streak_lrm_5",
+        "name": "Streak LRM 5",
         "altNames": [
-            "Clan White Shark",
-            "CL White Shark",
-            "CLWhiteShark",
-            "WhiteShark"
+                "Clan Streak LRM 5",
+                "CLANStreakLRM5",
+                "StreakLRM5",
+                "Streak-LRM-5",
+                "CL Streak LRM 5",
+                "CLStreakLRM5",
+                "Streak LRM-5",
+                "CLSRTLRM5"
         ],
         "category": "Missile",
         "techBase": "Clan",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Experimental",
         "variant": "Clan",
-        "family": "white_shark",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 120,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 5,
+        "heat": 2,
+        "tons": 2,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "F",
         "flags": [
-            "cluster"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "streak"
         ],
         "source": {
-            "weightSpacePage": 343,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "clan_capital_missile",
-            "ammoPerTon": "40 t/Msl",
-            "ammoBV": 72
+                "ammoType": "clan_streak_lrm",
+                "ammoPerTon": 24,
+                "ammoCostPerTon": 60000,
+                "ammoBV": 11
+        },
+        "cost": 75000,
+        "bv": 86,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 577
-    },
-    "clan_barracuda": {
-        "id": "clan_barracuda",
-        "name": "Barracuda",
+                "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+},
+    "clan_streak_lrm_10": {
+        "id": "clan_streak_lrm_10",
+        "name": "Streak LRM 10",
         "altNames": [
-            "Clan Barracuda",
-            "CL Barracuda",
-            "CLBarracuda"
+                "Clan Streak LRM 10",
+                "CLANStreakLRM10",
+                "StreakLRM10",
+                "Streak-LRM-10",
+                "CL Streak LRM 10",
+                "CLStreakLRM10",
+                "Streak LRM-10",
+                "CLSRTLRM10"
         ],
         "category": "Missile",
         "techBase": "Clan",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Experimental",
         "variant": "Clan",
-        "family": "barracuda",
-        "damage": "capital",
-        "heat": "NA",
-        "tons": 90,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 10,
+        "heat": 4,
+        "tons": 5,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "F",
         "flags": [
-            "cluster",
-            "requiresAmmo"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "streak"
         ],
         "source": {
-            "weightSpacePage": 343,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
-        },
         "ammo": {
-            "ammoType": "clan_capital_missile",
-            "ammoPerTon": "30 t/Msl",
-            "ammoBV": 65
+                "ammoType": "clan_streak_lrm",
+                "ammoPerTon": 12,
+                "ammoCostPerTon": 60000,
+                "ammoBV": 22
+        },
+        "cost": 225000,
+        "bv": 173,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
-        ],
-        "bv": 522
-    },
-    "clan_ar_10_launcher": {
-        "id": "clan_ar_10_launcher",
-        "name": "AR-10 Launcher",
+                "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+},
+    "clan_streak_lrm_15": {
+        "id": "clan_streak_lrm_15",
+        "name": "Streak LRM 15",
         "altNames": [
-            "Clan AR-10 Launcher",
-            "CL AR-10 Launcher",
-            "CLAR10Launcher",
-            "AR10Launcher"
+                "Clan Streak LRM 15",
+                "CLANStreakLRM15",
+                "StreakLRM15",
+                "Streak-LRM-15",
+                "CL Streak LRM 15",
+                "CLStreakLRM15",
+                "Streak LRM-15",
+                "CLSRTLRM15"
         ],
         "category": "Missile",
         "techBase": "Clan",
-        "rulesLevel": "Standard",
+        "rulesLevel": "Experimental",
         "variant": "Clan",
-        "family": "ar_10_launcher",
-        "damage": "special",
-        "heat": "special",
-        "tons": 250,
-        "critSlots": "NA",
-        "spaceSlots": "NA",
-        "techRating": "D",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 15,
+        "heat": 5,
+        "tons": 7,
+        "critSlots": 3,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "F",
         "flags": [
-            "cluster"
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "streak"
         ],
         "source": {
-            "weightSpacePage": 343,
-            "battleValuePage": 318
+                "battleValuePage": 0,
+                "weightSpacePage": 0
         },
         "typeCodes": [
-            "M"
+                "M",
+                "C",
+                "S"
         ],
-        "aerospace": {
-            "range": "Extreme",
-            "toHitModifier": 0
+        "ammo": {
+                "ammoType": "clan_streak_lrm",
+                "ammoPerTon": 8,
+                "ammoCostPerTon": 60000,
+                "ammoBV": 32
+        },
+        "cost": 400000,
+        "bv": 259,
+        "availability": {
+                "code": "X-X-E"
         },
         "notes": [
-            "Capital missile/aerospace weapon; generally not BattleMech-mounted."
+                "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+},
+    "clan_streak_lrm_20": {
+        "id": "clan_streak_lrm_20",
+        "name": "Streak LRM 20",
+        "altNames": [
+                "Clan Streak LRM 20",
+                "CLANStreakLRM20",
+                "StreakLRM20",
+                "Streak-LRM-20",
+                "CL Streak LRM 20",
+                "CLStreakLRM20",
+                "Streak LRM-20",
+                "CLSRTLRM20"
         ],
-        "bv": 961
-    }
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Experimental",
+        "variant": "Clan",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 20,
+        "heat": 6,
+        "tons": 10,
+        "critSlots": 5,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "F",
+        "flags": [
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "streak"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+                "ammoType": "clan_streak_lrm",
+                "ammoPerTon": 6,
+                "ammoCostPerTon": 60000,
+                "ammoBV": 43
+        },
+        "cost": 600000,
+        "bv": 345,
+        "availability": {
+                "code": "X-X-E"
+        },
+        "notes": [
+                "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+},
+"is_arrow_iv": {
+        "id": "is_arrow_iv",
+        "name": "Arrow IV",
+        "altNames": [
+                "IS Arrow IV",
+                "ISArrowIV",
+                "ArrowIV",
+                "Arrow-IV"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "Artillery",
+        "damage": "20/10",
+        "heat": 10,
+        "tons": 15,
+        "critSlots": 15,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+                "artillery",
+                "requiresAmmo",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+                "ammoType": "is_arrow_iv",
+                "ammoPerTon": 5,
+                "ammoCostPerTon": 10000,
+                "ammoBV": 12
+        },
+        "bv": 240,
+        "availability": {
+                "code": "E-F-E"
+        }
+},
+"clan_arrow_iv": {
+        "id": "clan_arrow_iv",
+        "name": "Arrow IV",
+        "altNames": [
+                "Clan Arrow IV",
+                "ClanArrowIV",
+                "CArrowIV",
+                "CArrow-IV"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "variant": "Clan",
+        "family": "Artillery",
+        "damage": "20/10",
+        "heat": 10,
+        "tons": 12,
+        "critSlots": 12,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+                "artillery",
+                "requiresAmmo",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+                "ammoType": "is_arrow_iv",
+                "ammoPerTon": 5,
+                "ammoCostPerTon": 10000,
+                "ammoBV": 12
+        },
+        "bv": 240,
+        "availability": {
+                "code": "E-F-E"
+        }
+}
+
 } as const satisfies Record<string, WeaponDefinition>;
 
 export function findWeaponDefinition(rawName: string, techBase?: TechBase): WeaponDefinition | undefined {

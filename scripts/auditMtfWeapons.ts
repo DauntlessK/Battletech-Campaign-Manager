@@ -119,6 +119,11 @@ type UniqueWeaponNameRow = {
 type CliOptions = {
   unitType: UnitTypeKey;
   rulesLevel: RulesLevelName;
+  /**
+   * When true, skip Meks whose MTF rules level is Experimental or Unofficial.
+   * This filters whole unit files, not individual weapons.
+   */
+  supportedMekRulesOnly: boolean;
   unitQuery: string;
   sampleSize: number | null;
   debug: boolean;
@@ -231,6 +236,10 @@ async function main(): Promise<void> {
     const unit = parseMtfUnit(content, filePath, relativePath);
 
     if (options.rulesLevel && unit.rulesLevel !== options.rulesLevel) {
+      continue;
+    }
+
+    if (options.supportedMekRulesOnly && isUnsupportedMekRulesLevel(unit.rulesLevel)) {
       continue;
     }
 
@@ -1252,6 +1261,17 @@ function unitMatchesQuery(unit: ParsedUnit, query: string): boolean {
   return haystack.includes(normalizedQuery);
 }
 
+
+/**
+ * Determines whether a parsed Mek rules level should be excluded from the supported audit set.
+ *
+ * @param rulesLevel Parsed MTF rules level.
+ * @returns True for Experimental or Unofficial Meks.
+ */
+function isUnsupportedMekRulesLevel(rulesLevel: RulesLevelName): boolean {
+  return rulesLevel === "Experimental" || rulesLevel === "Unofficial";
+}
+
 /**
  * Builds an output suffix from CLI options.
  *
@@ -1263,6 +1283,7 @@ function getOutputSuffix(options: CliOptions): string {
 
   if (options.unitQuery) parts.push(`unit-${slug(options.unitQuery)}`);
   if (options.rulesLevel) parts.push(`rules-${slug(options.rulesLevel)}`);
+  if (options.supportedMekRulesOnly) parts.push("supported-only");
   if (options.sampleSize) parts.push(`sample-${options.sampleSize}`);
 
   return parts.length > 0 ? `.${parts.join(".")}` : "";
@@ -1328,6 +1349,7 @@ function getCliOptions(): CliOptions {
   const rulesArg = args.find((arg) => arg.startsWith("--rules="));
   const unitArg = args.find((arg) => arg.startsWith("--unit=") || arg.startsWith("--model="));
   const sampleArg = args.find((arg) => arg.startsWith("--sample="));
+  const supportedMekRulesOnly = args.includes("--supported-only") || args.includes("--ignore-unsupported") || args.includes("--ignore-experimental") || args.includes("--supported-rules-only");
   const positionalNumber = args.find((arg) => /^\d+$/.test(arg));
 
   const unitType = (typeArg?.split("=")[1] ?? "meks") as UnitTypeKey;
@@ -1339,6 +1361,7 @@ function getCliOptions(): CliOptions {
   return {
     unitType,
     rulesLevel: normalizeRulesLevel(rulesArg?.split("=")[1] ?? ""),
+    supportedMekRulesOnly,
     unitQuery: unitArg ? unitArg.replace(/^--(unit|model)=/, "") : "",
     sampleSize: sampleArg
       ? Number(sampleArg.split("=")[1])
