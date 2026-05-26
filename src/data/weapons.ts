@@ -1364,6 +1364,102 @@ export const WEAPONS = {
         "cost": 7500,
         "bv": 6
     },
+    "is_er_flamer": {
+        "id": "is_er_flamer",
+        "name": "ER Flamer",
+        "altNames": [
+            "IS ER Flamer",
+            "ISERFlamer",
+            "ERFlamer"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "flamer",
+        "damage": 2,
+        "heat": 4,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 3,
+            "medium": 5,
+            "long": 7
+        },
+        "techRating": "D",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "antiInfantry"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DE",
+            "H",
+            "AI"
+        ],
+        "cost": 15000,
+        "bv": 16
+    },
+    "is_heavy_flamer": {
+        "id": "is_heavy_flamer",
+        "name": "Heavy Flamer",
+        "altNames": [
+            "IS Heavy Flamer",
+            "ISHeavyFlamer",
+            "HeavyFlamer"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "flamer",
+        "damage": 4,
+        "heat": 5,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 2,
+            "medium": 3,
+            "long": 4
+        },
+        "techRating": "C",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "antiInfantry"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DE",
+            "H",
+            "AI"
+        ],
+        "cost": 11250,
+        "bv": 15,
+        "ammo": {
+            "ammoType": "is_heavy_flamer",
+            "ammoPerTon": 10,
+            "ammoCostPerTon": 2000,
+            "ammoBV": 2
+        }
+    },
     "is_flamer_vehicle": {
         "id": "is_flamer_vehicle",
         "name": "Flamer (Vehicle)",
@@ -1908,7 +2004,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Small VSP Laser",
             "ISSmallVSPLaser",
-            "SmallVSPLaser"
+            "SmallVSPLaser",
+            "Small VSP",
+            "SmallVSP"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -1952,7 +2050,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Medium VSP Laser",
             "ISMediumVSPLaser",
-            "MediumVSPLaser"
+            "MediumVSPLaser",
+            "Medium VSP",
+            "MediumVSP"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -1995,7 +2095,9 @@ export const WEAPONS = {
         "altNames": [
             "IS Large VSP Pulse Laser",
             "ISLargeVSPPulseLaser",
-            "LargeVSPLaser"
+            "LargeVSPLaser",
+            "Large VSP",
+            "LargeVSP"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -2880,6 +2982,222 @@ export const WEAPONS = {
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ]
+    },
+    "is_thunderbolt_5": {
+        "id": "is_thunderbolt_5",
+        "name": "Thunderbolt 5",
+        "altNames": [
+            "IS Thunderbolt 5",
+            "ISThunderbolt5",
+            "Thunderbolt-5",
+            "Thunderbolt5",
+            "TB-5",
+            "TB5"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": 5,
+        "heat": 3,
+        "tons": 3,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 5,
+            "short": 6,
+            "medium": 12,
+            "long": 18
+        },
+        "techRating": "E",
+        "flags": [
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 12,
+            "ammoCostPerTon": 50000,
+            "ammoBV": 8
+        },
+        "cost": 50000,
+        "bv": 64,
+        "availability": {
+            "code": "X-X-F"
+        }
+    },
+    "is_thunderbolt_10": {
+        "id": "is_thunderbolt_10",
+        "name": "Thunderbolt 10",
+        "altNames": [
+            "IS Thunderbolt 10",
+            "ISThunderbolt10",
+            "Thunderbolt-10",
+            "Thunderbolt10",
+            "TB-10",
+            "TB10"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": 10,
+        "heat": 5,
+        "tons": 7,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 5,
+            "short": 6,
+            "medium": 12,
+            "long": 18
+        },
+        "techRating": "E",
+        "flags": [
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 6,
+            "ammoCostPerTon": 50000,
+            "ammoBV": 16
+        },
+        "cost": 175000,
+        "bv": 127,
+        "availability": {
+            "code": "X-X-F"
+        }
+    },
+    "is_thunderbolt_15": {
+        "id": "is_thunderbolt_15",
+        "name": "Thunderbolt 15",
+        "altNames": [
+            "IS Thunderbolt 15",
+            "ISThunderbolt15",
+            "Thunderbolt-15",
+            "Thunderbolt15",
+            "TB-15",
+            "TB15"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": 15,
+        "heat": 7,
+        "tons": 11,
+        "critSlots": 3,
+        "spaceSlots": 3,
+        "range": {
+            "min": 5,
+            "short": 6,
+            "medium": 12,
+            "long": 18
+        },
+        "techRating": "E",
+        "flags": [
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 4,
+            "ammoCostPerTon": 50000,
+            "ammoBV": 29
+        },
+        "cost": 325000,
+        "bv": 229,
+        "availability": {
+            "code": "X-X-F"
+        }
+    },
+    "is_thunderbolt_20": {
+        "id": "is_thunderbolt_20",
+        "name": "Thunderbolt 20",
+        "altNames": [
+            "IS Thunderbolt 20",
+            "ISThunderbolt20",
+            "Thunderbolt-20",
+            "Thunderbolt20",
+            "TB-20",
+            "TB20"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "lrm",
+        "damage": 20,
+        "heat": 8,
+        "tons": 15,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+            "min": 5,
+            "short": 6,
+            "medium": 12,
+            "long": 18
+        },
+        "techRating": "E",
+        "flags": [
+            "requiresAmmo",
+            "indirectFire",
+            "minimumRange"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+            "M",
+            "S"
+        ],
+        "ammo": {
+            "ammoType": "is_lrm",
+            "ammoPerTon": 3,
+            "ammoCostPerTon": 50000,
+            "ammoBV": 38
+        },
+        "cost": 450000,
+        "bv": 306,
+        "availability": {
+            "code": "X-X-F"
+        }
     },
     "is_mml_3": {
         "id": "is_mml_3",
@@ -4922,6 +5240,104 @@ export const WEAPONS = {
         "bv": 6,
         "cost": 7500
     },
+    "clan_er_flamer": {
+        "id": "clan_er_flamer",
+        "name": "ER Flamer",
+        "altNames": [
+            "Clan ER Flamer",
+            "CLERFlamer",
+            "ERFlamer",
+
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "variant": "Clan",
+        "family": "flamer",
+        "damage": 2,
+        "heat": 4,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 3,
+            "medium": 5,
+            "long": 7
+        },
+        "techRating": "D",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "antiInfantry"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DE",
+            "H",
+            "AI"
+        ],
+        "cost": 15000,
+        "bv": 16
+    },
+    "clan_heavy_flamer": {
+        "id": "clan_heavy_flamer",
+        "name": "Heavy Flamer",
+        "altNames": [
+            "Clan Heavy Flamer",
+            "CL Heavy Flamer",
+            "CLHeavyFlamer",
+            "HeavyFlamer"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "variant": "Clan",
+        "family": "flamer",
+        "damage": 4,
+        "heat": 5,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 2,
+            "medium": 3,
+            "long": 4
+        },
+        "techRating": "C",
+        "availability": {
+            "code": "X-X-E"
+        },
+        "flags": [
+            "directFire",
+            "antiInfantry"
+        ],
+        "source": {
+            "weightSpacePage": 341,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DE",
+            "H",
+            "AI"
+        ],
+        "cost": 11250,
+        "bv": 15,
+        "ammo": {
+            "ammoType": "clan_heavy_flamer",
+            "ammoPerTon": 10,
+            "ammoCostPerTon": 2000,
+            "ammoBV": 2
+        }
+    },
     "clan_flamer_vehicle": {
         "id": "clan_flamer_vehicle",
         "name": "Flamer (Vehicle)",
@@ -6719,6 +7135,53 @@ export const WEAPONS = {
             "code": "E-F-D"
         }
     },
+        "is_laser_ams": {
+        "id": "is_laser_ams",
+        "name": "Laser AMS",
+        "altNames": [
+            "IS Laser AMS",
+            "ISLaserAMS",
+            "Laser Anti-Missile System",
+            "IS Laser Anti-Missile System",
+            "ISLaserAntiMissileSystem",
+            "Laser Anti Missile System",
+            "IS Laser Anti Missile System"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "antiMissileSystem",
+        "damage": "special",
+        "heat": 7,
+        "tons": 1.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "E",
+        "flags": [
+            "defensive",
+            "antiMissile",
+            "laserAMS",
+            "noAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "cost": 225000,
+        "bv": 45,
+        "notes": [
+            "Laser AMS has defensive BV and does not require ammunition.",
+            "Rules level progressed over time; treated as Advanced for catalog support."
+        ]
+    },
     "is_machine_gun_array": {
         "id": "is_machine_gun_array",
         "name": "Machine Gun Array",
@@ -6962,6 +7425,54 @@ export const WEAPONS = {
             "code": "X-D-C"
         }
     },
+    "clan_laser_ams": {
+        "id": "clan_laser_ams",
+        "name": "Laser AMS",
+        "altNames": [
+            "Clan Laser AMS",
+            "CL Laser AMS",
+            "CLLaserAMS",
+            "Clan Laser Anti-Missile System",
+            "CL Laser Anti-Missile System",
+            "CLLaserAntiMissileSystem",
+            "Clan Laser Anti Missile System",
+            "CL Laser Anti Missile System"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "variant": "Clan",
+        "family": "antiMissileSystem",
+        "damage": "special",
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "F",
+        "flags": [
+            "defensive",
+            "antiMissile",
+            "laserAMS",
+            "noAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "cost": 225000,
+        "bv": 45,
+        "notes": [
+            "Laser AMS has defensive BV and does not require ammunition.",
+            "Rules level progressed over time; treated as Advanced for catalog support."
+        ]
+    },
     "clan_machine_gun_array": {
         "id": "clan_machine_gun_array",
         "name": "Machine Gun Array",
@@ -7161,7 +7672,15 @@ export const WEAPONS = {
             "C3Computer(Master)",
             "C3 Master",
             "C3 Computer (Master)",
-            "C3 Master Computer"
+            "C3 Master Computer",
+            "C3 Master with TAG",
+            "C3ComputerMaster",
+            "C3 Computer Master",
+            "C3MasterBoostedWithTAG",
+            "c3 master boosted with tag",
+            "c3boostedsystemmaster",
+            "c3 boosted system master",
+            "c3computermaster"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -7981,7 +8500,9 @@ export const WEAPONS = {
                 "IS Arrow IV",
                 "ISArrowIV",
                 "ArrowIV",
-                "Arrow-IV"
+                "Arrow-IV",
+                "isarrowivsystem",
+                "is arrow iv system"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
@@ -8015,6 +8536,7 @@ export const WEAPONS = {
                 "ammoBV": 12
         },
         "bv": 240,
+        "cost": 450000,
         "availability": {
                 "code": "E-F-E"
         }
@@ -8060,8 +8582,49 @@ export const WEAPONS = {
                 "ammoBV": 12
         },
         "bv": 240,
+        "cost": 450000,
         "availability": {
                 "code": "E-F-E"
+        }
+},
+"tsemp_cannon": {
+        "id": "tsemp_cannon",
+        "name": "TSEMP Cannon",
+        "altNames": [
+                "TSEMP Cannon",
+                "TSEMPCannon",
+                "TSEMP"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "damage": 0,
+        "heat": 10,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 5,
+                "medium": 9,
+                "long": 15
+        },
+        "techRating": "X",
+        "flags": [
+                "directFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "L"
+        ],
+        "bv": 488,
+        "cost": 800000,
+        "availability": {
+                "code": "X-X-X"
         }
 }
 
