@@ -7,8 +7,8 @@
     "dev": "vite",
     "server": "tsx watch server/index.ts",
     "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
-    "index:units": "tsx scripts/indexUnits.ts",
-    "audit:weapons": "tsx scripts/auditMtfWeapons.ts"
+    "index:units": "tsx scripts/generateUnitIndex.ts",
+    "audit:unit-index": "tsx scripts/AuditUnitIndex.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.4",

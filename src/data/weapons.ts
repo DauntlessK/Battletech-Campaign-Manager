@@ -7574,6 +7574,41 @@ export const WEAPONS = {
         ],
         "bv": "C"
     },
+    "clan_supercharger": {
+        "id": "clan_supercharger",
+        "name": "Supercharger",
+        "altNames": [
+            "Clan Supercharger",
+            "CL Supercharger",
+            "CLSupercharger",
+            "Supercharger"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "variant": "Clan",
+        "family": "supercharger",
+        "damage": "special",
+        "heat": 0,
+        "tons": "variable",
+        "critSlots": "variable",
+        "spaceSlots": "variable",
+        "techRating": "C",
+        "flags": [
+            "movementEnhancement"
+        ],
+        "source": {
+            "weightSpacePage": 343,
+            "battleValuePage": 318
+        },
+        "notes": [
+            "Variable weight/space; see construction rules."
+        ],
+        "bv": "C",
+         "availability": {
+            "code": "F-F-F"
+        }
+    },
     "clan_tag": {
         "id": "clan_tag",
         "name": "TAG",
@@ -7674,6 +7709,38 @@ export const WEAPONS = {
         },
         "bv": "C",
         "cost": 50000,
+    },
+    "is_case_ii": {
+        "id": "is_case_ii",
+        "name": "CASE II",
+        "altNames": [
+            "IS CASE II",
+            "ISCASEII",
+            "CASEII"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Experimental",
+        "variant": "IS",
+        "family": "case",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "ammoProtection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "C",
+        "cost": 175000,
+        "availability": {
+            "code": "X-X-F"
+        }
     },
     "is_c3_computer_master": {
         "id": "is_c3_computer_master",
@@ -7959,6 +8026,53 @@ export const WEAPONS = {
             "code": "E-F-D"
         }
     },
+    "clan_watchdog_ECM_suite": {
+        "id": "clan_watchdog_ECM_suite",
+        "name": "Watchdog ECM Suite",
+        "altNames": [
+            "Clan Watchdog System",
+            "CL Watchdog System",
+            "CLWatchdogSystem",
+            "WatchdogSystem",
+            "Clan Watchdog",
+            "CL Watchdog",
+            "CEWS",
+            "WatchdogECMSuite",
+            "Clan Watchdog ECM Suite",
+            "CL Watchdog ECM Suite",
+            "Watchdog ECM Suite"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "watchdog_system",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1.5,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 6
+        },
+        "techRating": "F",
+        "flags": [
+            "ecm",
+            "activeProbe"
+        ],
+        "source": {
+            "weightSpacePage": 343,
+            "battleValuePage": 318
+        },
+        "bv": 68,
+        "cost": 500000,
+        "availability": {
+            "code": "X-X-F"
+        }
+    },
     "clan_light_tag": {
         "id": "clan_light_tag",
         "name": "Light TAG",
@@ -8024,6 +8138,38 @@ export const WEAPONS = {
         },
         "bv": "D",
         "cost": 50000
+    },
+        "clan_case_ii": {
+        "id": "clan_case_ii",
+        "name": "CASE II",
+        "altNames": [
+            "Clan CASE II",
+            "CLCASEII",
+            "CASEII"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Experimental",
+        "variant": "Clan",
+        "family": "case",
+        "damage": "special",
+        "heat": 0,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "F",
+        "flags": [
+            "ammoProtection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "C",
+        "cost": 175000,
+        "availability": {
+            "code": "X-X-F"
+        }
     },
     "is_enhanced_lrm_5": {
         "id": "is_enhanced_lrm_5",

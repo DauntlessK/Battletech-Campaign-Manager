@@ -78,6 +78,7 @@ type ParsedMtfMetadata = {
   heatSinkCount: number;
   heatSinkType: string;
   armorType: string;
+  armorTonnageOverride: number;
   structureType: string;
   myomerType: string;
 
@@ -126,7 +127,7 @@ type MekLocationMap = Record<MekLocationKey, MekLocationRecord>;
 type MekArmorValues = Record<MekLocationKey | "centerTorsoRear" | "leftTorsoRear" | "rightTorsoRear", number>;
 
 type IndexOptions = {
-  rulesLevel: string | null;
+  rulesLevels: string[];
   debug: boolean;
   unitQuery: string | null;
 };
@@ -149,6 +150,7 @@ type MekCBillCalculation = {
 
 const UNITS_ROOT = path.resolve(process.cwd(), "src", "data", "units");
 const OUTPUT_DIR = path.resolve(process.cwd(), "server", "data", "generated");
+const UNIT_INDEX_OUTPUT_DIR = path.join(OUTPUT_DIR, "unitIndex");
 
 const UNIT_TYPE_FOLDERS: Record<UnitTypeKey, string> = {
   meks: "meks",
@@ -252,6 +254,7 @@ async function main() {
   const options = getIndexOptions();
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
+  await fs.mkdir(UNIT_INDEX_OUTPUT_DIR, { recursive: true });
 
   const unitTypes = requestedType
     ? [requestedType]
@@ -306,12 +309,12 @@ async function indexSpecificUnits(unitTypes: UnitTypeKey[], options: IndexOption
   rows.sort(sortCatalogRows);
 
   const safeQuery = slug(options.unitQuery);
-  const outputPath = path.join(OUTPUT_DIR, `testcatalog_${safeQuery}.csv`);
+  const outputPath = path.join(UNIT_INDEX_OUTPUT_DIR, `test_${safeQuery}.csv`);
   await fs.writeFile(outputPath, toCsv(rows), "utf-8");
 
   console.log(`[indexUnits] specific unit: "${options.unitQuery}" -> ${rows.length} row(s) -> ${outputPath}`);
-  if (options.rulesLevel) {
-    console.log(`[indexUnits] specific unit: rules level filter=${options.rulesLevel}`);
+  if (hasRulesLevelFilter(options)) {
+    console.log(`[indexUnits] specific unit: rules level filter=${getRulesLevelFilterDescription(options)}`);
   }
   if (rows.length === 0) {
     console.warn(`[indexUnits] No units matched "${options.unitQuery}". Try --unit=<model>, --unit=<chassis>, or --unit="<chassis> <model>".`);
@@ -380,14 +383,14 @@ async function indexRandomSample(unitTypes: UnitTypeKey[], sampleCount: number, 
 
   rows.sort(sortCatalogRows);
 
-  const outputPath = path.join(OUTPUT_DIR, "testcatalog.csv");
+  const outputPath = path.join(UNIT_INDEX_OUTPUT_DIR, "testSample.csv");
   await fs.writeFile(outputPath, toCsv(rows), "utf-8");
 
   console.log(
     `[indexUnits] test sample: ${rows.length}/${sampleCount} rows -> ${outputPath}`
   );
   console.log(
-    `[indexUnits] usage: npm run index:units -- 10 OR npm run index:units -- --sample=10 --type=meks OR npm run index:units -- --type=meks --unit=XNT-3O --debug`
+    `[indexUnits] usage: npm run index:units -- 10 OR npm run index:units -- --sample=10 --type=meks OR npm run index:units -- --type=meks --supported-only OR npm run index:units -- --type=meks --unit=XNT-3O --debug`
   );
 }
 
@@ -412,16 +415,17 @@ async function indexUnitType(unitType: UnitTypeKey, options: IndexOptions) {
   rows.sort(sortCatalogRows);
 
   const csv = toCsv(rows);
-  const outputPath = path.join(OUTPUT_DIR, `catalog_${unitType}.csv`);
+  const outputPath = getUnitIndexCsvPath(unitType);
 
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, csv, "utf-8");
 
   const missingBvCount = rows.filter((row) => !row.bv).length;
   const missingCostCount = rows.filter((row) => !row.costCBills).length;
 
   console.log(`[indexUnits] ${unitType}: ${rows.length} rows -> ${outputPath}`);
-  if (options.rulesLevel) {
-    console.log(`[indexUnits] ${unitType}: rules level filter=${options.rulesLevel}`);
+  if (hasRulesLevelFilter(options)) {
+    console.log(`[indexUnits] ${unitType}: rules level filter=${getRulesLevelFilterDescription(options)}`);
   }
   console.log(`[indexUnits] ${unitType}: missing BV=${missingBvCount}, missing C-bills=${missingCostCount}`);
 }
@@ -452,7 +456,7 @@ async function buildCatalogRow(
     return null;
   }
 
-  if (options.rulesLevel && metadata.rulesLevel !== options.rulesLevel) {
+  if (!shouldIncludeRulesLevel(metadata.rulesLevel, options)) {
     return null;
   }
 
@@ -529,7 +533,7 @@ async function buildCatalogRow(
     structureType: metadata.structureType,
 
     armorPoints: numberToString(getTotalArmor(metadata.armor)),
-    armorTonnage: formatNumber(getArmorTonnage(metadata.armorType, metadata.techBase, getTotalArmor(metadata.armor))),
+    armorTonnage: formatNumber(getArmorTonnage(getEffectiveArmorType(metadata), metadata.techBase, getTotalArmor(metadata.armor))),
     weaponCount: numberToString(metadata.weapons.length),
     weaponSummary: summarizeWeapons(metadata.weapons),
     warnings: warnings.join("; "),
@@ -679,6 +683,7 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
   const heatSinkCount = parseHeatSinkCount(getValue("heat sinks", "heatsinks"));
 
   const armorType = normalizeComponentText(getValue("armor", "armor type", "armortype")) || "Standard";
+  const armorTonnageOverride = parseArmorTonnageHint(lines);
   const structureType = normalizeComponentText(getValue("structure", "internal structure", "structure type")) || "Standard";
   const gyroType = normalizeComponentText(getValue("gyro", "gyro type")) || "Standard";
   const cockpitType = normalizeComponentText(getValue("cockpit", "cockpit type")) || "Standard";
@@ -716,6 +721,7 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
     heatSinkCount,
     heatSinkType,
     armorType,
+    armorTonnageOverride,
     structureType,
     myomerType,
 
@@ -1234,7 +1240,8 @@ function calculateMekBV(metadata: ParsedMtfMetadata): number | null {
 
   if (defensiveBV == null || offensiveBV == null) return null;
 
-  return Math.round(defensiveBV + offensiveBV);
+  const cockpitMultiplier = getCockpitBVMultiplier(metadata.cockpitType);
+  return Math.round((defensiveBV + offensiveBV) * cockpitMultiplier);
 }
 
 /**
@@ -1242,6 +1249,23 @@ function calculateMekBV(metadata: ParsedMtfMetadata): number | null {
  * @param metadata - Input value used by calculateDefensiveBV.
  * @returns number | null result from calculateDefensiveBV.
  */
+/**
+ * Gets the defensive internal-structure BV modifier for structure type.
+ * Reinforced structure doubles internal structure contribution before engine-type modifiers.
+ * Industrial structure halves it.
+ *
+ * @param structureType - Parsed internal structure type from the MTF.
+ * @returns Defensive BV structure modifier.
+ */
+function getDefensiveStructureModifier(structureType: string): number {
+  const lower = String(structureType || "").toLowerCase();
+
+  if (lower.includes("reinforced")) return 2.0;
+  if (lower.includes("industrial")) return 0.5;
+
+  return 1.0;
+}
+
 function calculateDefensiveBV(metadata: ParsedMtfMetadata): number | null {
   const mass = toNumber(metadata.tonnage);
   if (!mass) return null;
@@ -1251,10 +1275,7 @@ function calculateDefensiveBV(metadata: ParsedMtfMetadata): number | null {
     armorTypeModifier = 0.5;
   }
 
-  let structureModifier = 1.0;
-  if (metadata.structureType.toLowerCase().includes("industrial")) {
-    structureModifier = 0.5;
-  }
+  const structureModifier = getDefensiveStructureModifier(metadata.structureType);
 
   let engineModifier = 1.0;
   const engineLower = metadata.engineType.toLowerCase();
@@ -1321,6 +1342,22 @@ function hasMASC(myomerType: string, locations: MekLocationMap): boolean {
   );
 }
 
+/**
+ * Detects whether the Mek has a Supercharger system.
+ * MTFs usually expose this through critical slots such as Supercharger or CLSupercharger.
+ * Superchargers use the same doubled-run movement basis as MASC for BV movement factors.
+ * @param locations - Parsed critical slots by location.
+ * @returns True when a Supercharger critical slot is found.
+ */
+function hasSupercharger(locations: MekLocationMap): boolean {
+  return Object.values(locations).some((location) =>
+    location.slots.some((slot) => {
+      const normalized = normalizeLookupText(slot);
+      return normalized === "supercharger" || normalized === "clsupercharger" || normalized === "issupercharger" || normalized.includes("supercharger");
+    })
+  );
+}
+
 
 /**
  * Detects Stealth Armor from armor type or critical-slot labels.
@@ -1348,7 +1385,7 @@ function hasStealthArmor(metadata: ParsedMtfMetadata): boolean {
 function getEffectiveRunMP(walkMP: number, parsedRunMP: number, myomerType: string, locations: MekLocationMap): number {
   if (!walkMP) return 0;
   const normalRun = parsedRunMP || getRunMP(walkMP);
-  if (hasMASC(myomerType, locations)) {
+  if (hasMASC(myomerType, locations) || hasSupercharger(locations)) {
     return Math.max(normalRun, walkMP * 2);
   }
   return normalRun;
@@ -1536,6 +1573,10 @@ function isAdditionalDefensiveEquipmentBVDefinition(definition: any): boolean {
 
   if (category !== "equipment") return false;
 
+  // CASE II contributes defensive equipment BV when weapons.ts provides a numeric BV.
+  // Standard CASE is still handled by cost/protection logic and should not add BV here.
+  if (isCASEIIDefinition(definition)) return true;
+
   // Handled elsewhere or not defensive equipment BV.
   if (isDefensiveOnlyWeapon(definition)) return false;
   if (family.includes("case") || id.includes("case")) return false;
@@ -1585,7 +1626,36 @@ function getDefensiveEquipmentBVCountKey(equipment: any, locationKey: MekLocatio
     name.includes("bpod")
   );
 
+  if (isCASEIIDefinition(equipment)) {
+    return `${id}|${locationKey}|${slotIndex}`;
+  }
+
   return isPod ? `${id}|${locationKey}|${slotIndex}` : `${id}|${locationKey}`;
+}
+
+/**
+ * Determines whether a WEAPONS definition is CASE II rather than standard CASE.
+ *
+ * CASE II contributes defensive equipment BV when the equipment table provides a
+ * numeric BV. Standard CASE does not use this path.
+ *
+ * @param definition - Weapon/equipment definition from WEAPONS.
+ * @returns True when the definition represents CASE II.
+ */
+function isCASEIIDefinition(definition: any): boolean {
+  const id = normalizeLookupText(String(definition?.id || ""));
+  const name = normalizeLookupText(String(definition?.name || ""));
+  const family = normalizeLookupText(String(definition?.family || ""));
+  const altNames = Array.isArray(definition?.altNames)
+    ? definition.altNames.map((altName: any) => normalizeLookupText(String(altName)))
+    : [];
+
+  return (
+    id.includes("caseii") ||
+    name.includes("caseii") ||
+    family.includes("caseii") ||
+    altNames.some((altName: string) => altName.includes("caseii"))
+  );
 }
 
 /**
@@ -1776,7 +1846,7 @@ function calculateOffensiveBV(metadata: ParsedMtfMetadata): number | null {
     ? metadata.heatSinkCount * 2
     : metadata.heatSinkCount;
 
-  const movementHeat = metadata.jumpMP > 0 ? Math.max(3, metadata.jumpMP) : 2;
+  const movementHeat = getBVMovementHeat(metadata);
   const stealthHeat = hasStealthArmor(metadata) ? 10 : 0;
   const heatEfficiency = 6 + heatSinkCapacity - movementHeat - stealthHeat;
 
@@ -1873,6 +1943,105 @@ function getAmmoSlotBVMultiplier(slot: string): number {
 }
 
 /**
+ * Extracts a rack size from ammo labels like SRM-6, LRM 15, Streak SRM 4, or ATM-12.
+ *
+ * @param normalizedSlot - Normalized ammo slot text.
+ * @param familyToken - Normalized launcher family token to search for.
+ * @returns Rack size from the ammo label, or 0 when no explicit rack size is present.
+ */
+function getAmmoRackSizeFromSlot(normalizedSlot: string, familyToken: string): number {
+  const normalizedFamily = normalizeLookupText(familyToken);
+  if (!normalizedFamily) return 0;
+
+  const match = normalizedSlot.match(new RegExp(`${normalizedFamily}(\\d+)`));
+  return match?.[1] ? Number(match[1]) : 0;
+}
+
+/**
+ * Gets the rack size for a mounted weapon definition.
+ *
+ * @param weapon - Weapon definition resolved from weapons.ts.
+ * @returns Rack size from rackSize or the weapon name/id, or 0 when not applicable.
+ */
+function getMountedWeaponRackSize(weapon: any): number {
+  if (typeof weapon?.rackSize === "number") return weapon.rackSize;
+
+  const values = [
+    weapon?.name,
+    weapon?.id,
+    ...(Array.isArray(weapon?.altNames) ? weapon.altNames : []),
+  ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
+
+  for (const value of values) {
+    const match = value.match(/(streaksrm|streaklrm|srm|lrm|mrm|atm)(\d+)/);
+    if (match?.[2]) return Number(match[2]);
+  }
+
+  return 0;
+}
+
+/**
+ * Resolves ammo to a mounted missile launcher by explicit ammo family and rack size.
+ *
+ * This prevents labels such as "IS Ammo SRM-6" from matching the first mounted SRM
+ * launcher merely because both SRM 4 and SRM 6 share the same "srm" family.
+ *
+ * @param normalizedSlot - Normalized ammo slot text.
+ * @param mountedAmmoWeapons - Mounted weapons with ammo definitions.
+ * @param desiredTechBase - Preferred tech base for Clan/Inner Sphere ambiguity.
+ * @returns Matching mounted weapon definition, or null when no exact rack match exists.
+ */
+function findExactRackAmmoWeapon(
+  normalizedSlot: string,
+  mountedAmmoWeapons: any[],
+  desiredTechBase: string
+): any | null {
+  const rackMatchers = [
+    { family: "streaklrm", familyChecks: ["streaklrm"], tokens: ["streaklrm", "streaklrmammo"] },
+    { family: "streaksrm", familyChecks: ["streaksrm"], tokens: ["streaksrm", "ssrm", "streaksrmammo"] },
+    { family: "lrm", familyChecks: ["lrm"], tokens: ["lrm", "lrmammo"] },
+    { family: "srm", familyChecks: ["srm"], tokens: ["srm", "srmammo"] },
+    { family: "mrm", familyChecks: ["mrm"], tokens: ["mrm", "mrmammo"] },
+    { family: "atm", familyChecks: ["atm"], tokens: ["atm", "atmammo"] },
+  ];
+
+  for (const matcher of rackMatchers) {
+    const rackSize = matcher.tokens
+      .map((token) => getAmmoRackSizeFromSlot(normalizedSlot, token))
+      .find((size) => size > 0) ?? 0;
+
+    if (!rackSize) continue;
+
+    const candidates = mountedAmmoWeapons.filter((weapon) => {
+      const weaponRackSize = getMountedWeaponRackSize(weapon);
+      if (weaponRackSize !== rackSize) return false;
+
+      const weaponName = normalizeLookupText(String(weapon?.name || ""));
+      const weaponId = normalizeLookupText(String(weapon?.id || ""));
+      const weaponFamily = normalizeLookupText(String(weapon?.family || ""));
+
+      return matcher.familyChecks.some((family) => {
+        const normalizedFamily = normalizeLookupText(family);
+        return (
+          weaponFamily.includes(normalizedFamily) ||
+          weaponName.includes(normalizedFamily) ||
+          weaponId.includes(normalizedFamily)
+        );
+      });
+    });
+
+    const uniqueCandidates = Array.from(
+      new Map(candidates.map((weapon: any) => [weapon.id || weapon.name, weapon])).values()
+    );
+
+    const bestCandidate = chooseBestWeaponByTechBase(uniqueCandidates, desiredTechBase);
+    if (bestCandidate) return bestCandidate;
+  }
+
+  return null;
+}
+
+/**
  * Resolves an ammo critical-slot label such as "IS Ammo AC/5" to the matching weapon definition.
  * @param lowerSlot - Lowercase raw slot text from the MTF critical-slot list.
  * @param weapons - Mounted weapons already parsed from the unit, used as a fallback for ambiguous ammo names.
@@ -1892,6 +2061,11 @@ function findAmmoWeaponForSlot(lowerSlot: string, weapons: ParsedWeaponEntry[], 
   const mountedAmmoWeapons = weapons
     .map((entry) => entry.weaponData)
     .filter((weapon) => weapon?.ammo);
+
+  const exactRackMountedWeapon = findExactRackAmmoWeapon(normalizedSlot, mountedAmmoWeapons, desiredTechBase);
+  if (exactRackMountedWeapon) {
+    return exactRackMountedWeapon;
+  }
 
   const mountedCandidates = mountedAmmoWeapons.filter((weapon) => {
     const ammoType = weapon.ammo?.ammoType
@@ -2003,11 +2177,14 @@ function calculateMekCBills(metadata: ParsedMtfMetadata): MekCBillCalculation | 
 
   const engineRating = metadata.engineRating || unitTonnage * metadata.walkMP;
   const gyroTonnage = getGyroTonnage(engineRating, metadata.gyroType);
-  const armorTonnage = getArmorTonnage(
-    metadata.armorType,
-    metadata.techBase,
-    getTotalArmor(metadata.armor)
-  );
+  const effectiveArmorType = getEffectiveArmorType(metadata);
+  const armorTonnage = metadata.armorTonnageOverride > 0
+    ? metadata.armorTonnageOverride
+    : getArmorTonnage(
+        effectiveArmorType,
+        metadata.techBase,
+        getTotalArmor(metadata.armor)
+      );
 
   const breakdown: Record<string, number> = {};
   const costLines: CostBreakdownLine[] = [];
@@ -2025,16 +2202,19 @@ function calculateMekCBills(metadata: ParsedMtfMetadata): MekCBillCalculation | 
   addLine("actuators", "Actuators", getActuatorCost(metadata.locations, unitTonnage));
   addLine("engine", "Engine", getEngineCost(metadata.engineType, engineRating, unitTonnage));
   addLine("gyro", "Gyro", getGyroCost(metadata.gyroType, gyroTonnage));
-  addLine("jumpJets", "Jump Jets", getJumpJetCost(metadata.jumpMP, unitTonnage, "Standard"));
+  addLine("jumpJets", "Jump Jets", getJumpJetCost(metadata.jumpMP, unitTonnage, getJumpJetType(metadata)));
   addLine("heatSinks", "Heat Sinks", getHeatSinkCost(
     metadata.heatSinkType,
     metadata.heatSinkCount,
     metadata.engineType
   ));
-  addLine("armor", "Armor", getArmorCost(metadata.armorType, armorTonnage));
+  addLine("armor", "Armor", getArmorCost(effectiveArmorType, armorTonnage));
 
   const mascCost = getMASCCost(metadata, engineRating);
   addLine("masc", "MASC", mascCost, mascCost > 0 ? 1 : undefined);
+
+  const superchargerCost = getSuperchargerCost(metadata, engineRating);
+  addLine("supercharger", "Supercharger", superchargerCost, superchargerCost > 0 ? 1 : undefined);
 
   const weaponCostLines = getWeaponCostBreakdown(metadata.weapons);
   breakdown.weapons = sumCostLines(weaponCostLines);
@@ -2133,6 +2313,18 @@ function getBattleMechCostWeightMultiplier(unitTonnage: number): number {
 }
 
 /**
+ * Gets the final BV multiplier applied by cockpit type.
+ * Small Cockpits apply a 0.95 multiplier after defensive and offensive BV are totaled,
+ * before the final BV rounding step.
+ * @param cockpitType - Parsed cockpit type from the MTF.
+ * @returns Final BV multiplier for the cockpit type.
+ */
+function getCockpitBVMultiplier(cockpitType: string): number {
+  const lower = String(cockpitType || "").toLowerCase();
+  return lower.includes("small") ? 0.95 : 1;
+}
+
+/**
  * Get cockpit cost.
  * @param cockpitType - Input value used by getCockpitCost.
  * @returns number result from getCockpitCost.
@@ -2171,6 +2363,7 @@ function getMyomerCost(myomerType: string, unitTonnage: number): number {
 function getStructureCost(structureType: string, unitTonnage: number): number {
   const lower = structureType.toLowerCase();
 
+  if (lower.includes("reinforced")) return 6_400 * unitTonnage;
   if (lower.includes("endo")) return 1_600 * unitTonnage;
   if (lower.includes("industrial")) return 300 * unitTonnage;
 
@@ -2230,6 +2423,46 @@ function getJumpJetCost(jumpMP: number, unitTonnage: number, jumpJetType: string
 }
 
 /**
+ * Detects the BattleMech jump jet type from raw critical slots.
+ * Improved Jump Jets use a different C-bill formula and, in MegaMek's BV report,
+ * use the fixed 3-point jump heat burden for heat efficiency.
+ * @param metadata - Parsed Mek metadata.
+ * @returns "Improved" when improved jump jets are present; otherwise "Standard".
+ */
+function getJumpJetType(metadata: ParsedMtfMetadata): string {
+  return hasImprovedJumpJets(metadata.locations) ? "Improved" : "Standard";
+}
+
+/**
+ * Detects Improved Jump Jets from raw critical slot text.
+ * @param locations - Parsed Mek location map.
+ * @returns True when at least one improved jump jet slot is found.
+ */
+function hasImprovedJumpJets(locations: MekLocationMap): boolean {
+  return Object.values(locations).some((location) =>
+    location.slots.some((slot) => {
+      const normalized = normalizeLookupText(slot);
+      return normalized.includes("improvedjumpjet") || normalized.includes("improvedjumpjets") || normalized.includes("ijj");
+    })
+  );
+}
+
+/**
+ * Calculates the movement heat burden used for Offensive BV heat efficiency.
+ * Standard jump jets use max(3, jump MP). Improved Jump Jets match MegaMek's
+ * fixed 3-point jump burden in tested cases such as ARC-9M.
+ * @param metadata - Parsed Mek metadata.
+ * @returns Movement heat to subtract from heat efficiency.
+ */
+function getBVMovementHeat(metadata: ParsedMtfMetadata): number {
+  if (metadata.jumpMP > 0) {
+    return hasImprovedJumpJets(metadata.locations) ? 3 : Math.max(3, metadata.jumpMP);
+  }
+
+  return 2;
+}
+
+/**
  * Get heat sink cost.
  * @param heatSinkType - Input value used by getHeatSinkCost.
  * @param heatSinkCount - Input value used by getHeatSinkCost.
@@ -2251,22 +2484,158 @@ function getHeatSinkCost(heatSinkType: string, heatSinkCount: number, engineType
 }
 
 /**
- * Get armor cost.
- * @param armorType - Input value used by getArmorCost.
- * @param armorTonnage - Input value used by getArmorCost.
- * @returns number result from getArmorCost.
+ * Calculates armor C-bill cost from billable armor tonnage.
+ * Armor tonnage is billed in half-ton increments, but a few armor types such as
+ * Light Ferro-Fibrous need nearest-half behavior to match MegaMekLab examples.
+ * The passed armorTonnage may already be billable; this function normalizes it
+ * again so direct callers do not accidentally use raw fractional tonnage.
+ * @param armorType - Parsed armor type.
+ * @param armorTonnage - Raw or already-billable armor tonnage.
+ * @returns Armor cost in C-bills.
  */
+
+/**
+ * Determines the effective armor type for calculations, using both the parsed armor
+ * metadata field and raw critical-slot labels. Some MTFs expose special armor names
+ * only in the critical slots, while the top-level armor field may look generic.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Armor type name to use for armor tonnage and C-bill calculations.
+ */
+
+/**
+ * Parses explicit armor tonnage hints from MTF prose when the point totals alone
+ * cannot reconstruct the exact billable armor mass used by MegaMekLab.
+ *
+ * Some MTF files store only armor points plus armor type, but MegaMekLab may still
+ * bill the design using allocated armor tonnage that is higher than the minimum
+ * points-derived half-ton amount. Mastodon B is an example: its points fit in
+ * 15.0 tons of Clan Ferro-Fibrous, but the MTF prose states "fifteen and a half
+ * tons", and MegaMekLab bills 15.5 tons.
+ *
+ * @param lines - Raw MTF lines.
+ * @returns Parsed armor tonnage, or 0 when no reliable hint is found.
+ */
+function parseArmorTonnageHint(lines: string[]): number {
+  const text = lines.join(" ").replace(/\s+/g, " ");
+  const armorContextPattern = /(armor|armour|ferro|stealth|hardened|reflective|reactive)/i;
+
+  const numericMatches = text.matchAll(/(\d+(?:\.\d+)?)\s*(?:tons?|tonnes?)\s+(?:of\s+)?([^.;]{0,80})/gi);
+  for (const match of numericMatches) {
+    const value = toNumber(match[1]);
+    const context = match[2] || "";
+    if (value > 0 && value < 100 && armorContextPattern.test(context)) {
+      return value;
+    }
+  }
+
+  const wordNumberMatches = text.matchAll(/([a-z]+)(?:\s+and\s+a\s+half)?\s+(?:tons?|tonnes?)\s+(?:of\s+)?([^.;]{0,80})/gi);
+  for (const match of wordNumberMatches) {
+    const wholeNumber = parseSmallNumberWord(match[1]);
+    const hasHalf = /\sand\sa\shalf/i.test(match[0]);
+    const context = match[2] || "";
+
+    if (wholeNumber > 0 && wholeNumber < 100 && armorContextPattern.test(context)) {
+      return wholeNumber + (hasHalf ? 0.5 : 0);
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Parses a small English number word used in MTF prose.
+ *
+ * @param word - Number word such as "fifteen".
+ * @returns Numeric value, or 0 when unknown.
+ */
+function parseSmallNumberWord(word: string): number {
+  const normalized = String(word || "").toLowerCase();
+
+  const numbers: Record<string, number> = {
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    eleven: 11,
+    twelve: 12,
+    thirteen: 13,
+    fourteen: 14,
+    fifteen: 15,
+    sixteen: 16,
+    seventeen: 17,
+    eighteen: 18,
+    nineteen: 19,
+    twenty: 20,
+  };
+
+  return numbers[normalized] ?? 0;
+}
+
+function getEffectiveArmorType(metadata: ParsedMtfMetadata): string {
+  const parsedArmorType = metadata.armorType || "Standard";
+  const combinedText = normalizeLookupText([
+    parsedArmorType,
+    ...Object.values(metadata.locations).flatMap((location) => location.slots),
+  ].join(" "));
+
+  if (combinedText.includes("ferrolamell") || combinedText.includes("lamellor") || combinedText.includes("lamellar")) {
+    return "Ferro-Lamellor";
+  }
+
+  return parsedArmorType;
+}
+
+/**
+ * Detects Ferro-Lamellor / Ferro-Lamellar armor using normalized text.
+ * MegaMek/MTF names are not perfectly consistent, so match on "ferrolamell".
+ * @param armorType - Parsed armor type.
+ * @returns True when the armor is Ferro-Lamellor/Ferro-Lamellar.
+ */
+function isFerroLamellorArmor(armorType: string): boolean {
+  const normalized = normalizeLookupText(armorType);
+  return normalized.includes("ferrolamell") || normalized.includes("lamellor") || normalized.includes("lamellar");
+}
+
 function getArmorCost(armorType: string, armorTonnage: number): number {
   const lower = armorType.toLowerCase();
+  const billableArmorTonnage = getBillableArmorTonnageForCost(armorType, armorTonnage);
 
-  if (lower.includes("light ferro")) return Math.round(15_000 * armorTonnage);
-  if (lower.includes("heavy ferro")) return Math.round(25_000 * armorTonnage);
-  if (lower.includes("ferro")) return Math.round(20_000 * armorTonnage);
-  if (lower.includes("stealth")) return Math.round(50_000 * armorTonnage);
-  if (lower.includes("commercial")) return Math.round(3_000 * armorTonnage);
-  if (lower.includes("industrial")) return Math.round(5_000 * armorTonnage);
+  if (isFerroLamellorArmor(armorType)) return Math.round(20_000 * billableArmorTonnage);
+  if (lower.includes("light ferro")) return Math.round(15_000 * billableArmorTonnage);
+  if (lower.includes("heavy ferro")) return Math.round(25_000 * billableArmorTonnage);
+  if (lower.includes("ferro")) return Math.round(20_000 * billableArmorTonnage);
+  if (lower.includes("stealth")) return Math.round(50_000 * billableArmorTonnage);
+  if (lower.includes("commercial")) return Math.round(3_000 * billableArmorTonnage);
+  if (lower.includes("industrial")) return Math.round(5_000 * billableArmorTonnage);
 
-  return Math.round(10_000 * armorTonnage);
+  return Math.round(10_000 * billableArmorTonnage);
+}
+
+/**
+ * Converts raw armor tonnage into the armor tonnage MegaMekLab bills for cost.
+ * Most armor types round up to the next half ton. Light Ferro-Fibrous is kept as
+ * nearest-half because tested ARC-9M output bills 186 points as 11.0 tons, not 11.5.
+ * @param armorType - Parsed armor type.
+ * @param rawArmorTonnage - Raw armor tonnage before billing adjustment.
+ * @returns Billable armor tonnage.
+ */
+function getBillableArmorTonnageForCost(armorType: string, rawArmorTonnage: number): number {
+  if (!rawArmorTonnage) return 0;
+
+  const lower = armorType.toLowerCase();
+
+  if (lower.includes("light ferro")) {
+    return Math.round(rawArmorTonnage * 2) / 2;
+  }
+
+  return Math.ceil(rawArmorTonnage * 2) / 2;
 }
 
 /**
@@ -2279,6 +2648,18 @@ function getArmorCost(armorType: string, armorTonnage: number): number {
 function getMASCCost(metadata: ParsedMtfMetadata, engineRating: number): number {
   if (!hasMASC(metadata.myomerType, metadata.locations)) return 0;
   return 3_000 * engineRating;
+}
+
+/**
+ * Calculates Supercharger cost for BattleMech construction costs.
+ * Supercharger cost is formula-based rather than a fixed equipment cost.
+ * @param metadata - Parsed Mek metadata.
+ * @param engineRating - Effective engine rating used by the Mek.
+ * @returns C-bill cost for one Supercharger, or 0 when absent.
+ */
+function getSuperchargerCost(metadata: ParsedMtfMetadata, engineRating: number): number {
+  if (!hasSupercharger(metadata.locations)) return 0;
+  return 10_000 * engineRating;
 }
 
 /**
@@ -2350,29 +2731,48 @@ function getCASECost(metadata: ParsedMtfMetadata): number {
  * @returns CASE cost lines.
  */
 function getCASECostBreakdown(metadata: ParsedMtfMetadata): CostBreakdownLine[] {
-  const explicitCaseCount = countExplicitCaseSlots(metadata.locations);
-  const caseCount = explicitCaseCount > 0
-    ? explicitCaseCount
-    : metadata.techBase === "Clan"
-      ? countClanInherentCaseSystems(metadata)
-      : 0;
+  const lines: CostBreakdownLine[] = [];
 
-  return caseCount > 0
-    ? [{ label: "CASE", count: caseCount, amount: caseCount * 50_000 }]
-    : [];
+  const explicitStandardCaseCount = countExplicitStandardCaseSlots(metadata.locations);
+  if (explicitStandardCaseCount > 0) {
+    lines.push({
+      label: "CASE",
+      count: explicitStandardCaseCount,
+      amount: explicitStandardCaseCount * 50_000,
+    });
+  }
+
+  lines.push(...getExplicitCASEIICostBreakdown(metadata));
+
+  // Clan units often omit explicit standard CASE because standard CASE protection is inherent.
+  // CASE II does not replace this C-bill accounting; MegaMekLab can charge both
+  // explicit CASE II systems and standard Clan CASE protection for explosive ammo/weapon locations.
+  if (explicitStandardCaseCount === 0 && metadata.techBase === "Clan") {
+    const inferredCaseCount = countClanInherentCaseSystems(metadata);
+    if (inferredCaseCount > 0) {
+      lines.push({
+        label: "CASE",
+        count: inferredCaseCount,
+        amount: inferredCaseCount * 50_000,
+      });
+    }
+  }
+
+  return lines;
 }
 
 /**
- * Counts explicit CASE/CASE II slots, used primarily by Inner Sphere units.
+ * Counts explicit standard CASE slots, used primarily by Inner Sphere units.
+ * CASE II is costed separately from weapons.ts because it can have different cost/BV.
  * @param locations - Parsed Mek location map.
- * @returns Number of explicit CASE-style critical slots.
+ * @returns Number of explicit standard CASE critical slots.
  */
-function countExplicitCaseSlots(locations: MekLocationMap): number {
+function countExplicitStandardCaseSlots(locations: MekLocationMap): number {
   let caseCount = 0;
 
   for (const location of Object.values(locations)) {
     for (const slot of location.slots) {
-      if (isExplicitCaseSlot(slot)) {
+      if (isExplicitStandardCaseSlot(slot)) {
         caseCount++;
       }
     }
@@ -2382,22 +2782,72 @@ function countExplicitCaseSlots(locations: MekLocationMap): number {
 }
 
 /**
+ * Builds C-bill cost lines for explicit CASE II slots using weapons.ts as source data.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Grouped CASE II cost lines.
+ */
+function getExplicitCASEIICostBreakdown(metadata: ParsedMtfMetadata): CostBreakdownLine[] {
+  const grouped = new Map<string, CostBreakdownLine>();
+
+  for (const location of Object.values(metadata.locations)) {
+    for (let slotIndex = 0; slotIndex < location.slots.length; slotIndex++) {
+      const slot = location.slots[slotIndex];
+      if (!isExplicitCASEIISlot(slot)) continue;
+
+      const resolved = resolveMiscEquipmentDefinitionFromSlot(slot, metadata) ||
+        resolveDefensiveEquipmentDefinitionFromSlot(slot, metadata) ||
+        resolveWeapon(slot, extractWeaponId(slot), metadata.techBase);
+
+      const cost = getResolvedCostValue(resolved?.cost) || 50_000;
+      const label = String(resolved?.name || "CASE II");
+      const key = `${label}|${cost}`;
+      const existing = grouped.get(key);
+
+      if (existing) {
+        existing.count = (existing.count ?? 1) + 1;
+        existing.amount += cost;
+      } else {
+        grouped.set(key, { label, count: 1, amount: cost });
+      }
+    }
+  }
+
+  return [...grouped.values()].sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
  * Determines whether a raw critical slot explicitly represents CASE or CASE II.
  * @param rawSlot - Raw MTF critical slot text.
  * @returns True when the slot explicitly lists CASE/CASE II.
  */
-function isExplicitCaseSlot(rawSlot: string): boolean {
+function isExplicitStandardCaseSlot(rawSlot: string): boolean {
   const normalized = normalizeLookupText(rawSlot);
+
+  if (isExplicitCASEIISlot(rawSlot)) return false;
 
   return (
     normalized === "case" ||
     normalized === "iscase" ||
     normalized === "clcase" ||
+    normalized.includes("iscase") ||
+    normalized.includes("clcase")
+  );
+}
+
+/**
+ * Determines whether a raw critical slot explicitly represents CASE II.
+ *
+ * @param rawSlot - Raw MTF critical slot text.
+ * @returns True when the slot explicitly lists CASE II.
+ */
+function isExplicitCASEIISlot(rawSlot: string): boolean {
+  const normalized = normalizeLookupText(rawSlot);
+
+  return (
     normalized === "caseii" ||
     normalized === "iscaseii" ||
     normalized === "clcaseii" ||
-    normalized.includes("iscase") ||
-    normalized.includes("clcase") ||
     normalized.includes("caseii")
   );
 }
@@ -2694,6 +3144,7 @@ function shouldConsiderMiscEquipmentSlot(rawSlot: string, metadata: ParsedMtfMet
   if (normalized.includes("jumpjet")) return false;
   if (normalized.includes("case")) return false;
   if (normalized.includes("masc")) return false;
+  if (normalized.includes("supercharger")) return false;
   if (normalized.includes("artemis")) return false;
 
   if (isAlreadyCountedMountedWeaponOrEquipment(rawSlot, metadata)) return false;
@@ -2913,7 +3364,9 @@ function getArmorTonnage(armorType: string, techBase: string, armorPoints: numbe
 
   let pointsPerTon = 16;
 
-  if (lowerArmor.includes("light ferro")) {
+  if (isFerroLamellorArmor(armorType)) {
+    pointsPerTon = 19.2;
+  } else if (lowerArmor.includes("light ferro")) {
     pointsPerTon = 16.8;
   } else if (lowerArmor.includes("heavy ferro")) {
     pointsPerTon = 19.2;
@@ -2921,7 +3374,7 @@ function getArmorTonnage(armorType: string, techBase: string, armorPoints: numbe
     pointsPerTon = lowerTech.includes("clan") ? 20.16 : 17.92;
   }
 
-  return Math.ceil((armorPoints / pointsPerTon) * 2) / 2;
+  return getBillableArmorTonnageForCost(armorType, armorPoints / pointsPerTon);
 }
 
 /**
@@ -3150,6 +3603,21 @@ function getRunMP(walkMP: number): number {
 }
 
 /**
+ * Converts movement points to the target movement modifier used by BV defensive factor.
+ * @param mp - Movement points moved.
+ * @returns TMM value.
+ */
+function getTMMForMP(mp: number): number {
+  if (mp >= 25) return 6;
+  if (mp >= 18) return 5;
+  if (mp >= 10) return 4;
+  if (mp >= 7) return 3;
+  if (mp >= 5) return 2;
+  if (mp >= 3) return 1;
+  return 0;
+}
+
+/**
  * Get defensive movement multiplier.
  * @param walkMP - Input value used by getDefensiveMovementMultiplier.
  * @param jumpMP - Input value used by getDefensiveMovementMultiplier.
@@ -3157,18 +3625,12 @@ function getRunMP(walkMP: number): number {
  */
 function getDefensiveMovementMultiplier(walkMP: number, jumpMP: number, effectiveRunMP?: number, stealthArmor: boolean = false): number {
   const runMP = effectiveRunMP || getRunMP(walkMP);
-  const effectiveMP = Math.max(runMP, jumpMP);
+  const runTMM = getTMMForMP(runMP);
+  const jumpTMM = jumpMP > 0 ? getTMMForMP(jumpMP) + 1 : 0;
+  const stealthTMM = stealthArmor ? 2 : 0;
+  const effectiveTMM = Math.max(runTMM, jumpTMM) + stealthTMM;
 
-  let multiplier = 1.0;
-  if (effectiveMP <= 2) multiplier = 1.0;
-  else if (effectiveMP <= 4) multiplier = 1.1;
-  else if (effectiveMP <= 6) multiplier = 1.2;
-  else if (effectiveMP <= 9) multiplier = 1.3;
-  else if (effectiveMP <= 17) multiplier = 1.4;
-  else if (effectiveMP <= 24) multiplier = 1.5;
-  else multiplier = 1.6;
-
-  return multiplier + (stealthArmor ? 0.2 : 0);
+  return 1 + effectiveTMM / 10;
 }
 
 /**
@@ -3463,12 +3925,22 @@ function calculateMekBVDebug(metadata: ParsedMtfMetadata): {
 } {
   const defensive = calculateDefensiveBVDebug(metadata);
   const offensive = calculateOffensiveBVDebug(metadata);
+  const baseTotal = defensive.total + offensive.total;
+  const cockpitMultiplier = getCockpitBVMultiplier(metadata.cockpitType);
+  const totalBV = baseTotal * cockpitMultiplier;
+  const lines = [...defensive.lines, "", ...offensive.lines];
+
+  if (cockpitMultiplier !== 1) {
+    lines.push("");
+    lines.push("Battle Value Modifiers:");
+    lines.push(`  Small Cockpit:     ${formatDebugNumber(baseTotal)} x ${formatDebugNumber(cockpitMultiplier)} = ${formatDebugNumber(totalBV)}`);
+  }
 
   return {
     defensiveBV: defensive.total,
     offensiveBV: offensive.total,
-    totalBV: defensive.total + offensive.total,
-    lines: [...defensive.lines, "", ...offensive.lines],
+    totalBV,
+    lines,
   };
 }
 
@@ -3485,8 +3957,7 @@ function calculateDefensiveBVDebug(metadata: ParsedMtfMetadata): { total: number
   let armorTypeModifier = 1.0;
   if (metadata.armorType.toLowerCase().includes("commercial")) armorTypeModifier = 0.5;
 
-  let structureModifier = 1.0;
-  if (metadata.structureType.toLowerCase().includes("industrial")) structureModifier = 0.5;
+  const structureModifier = getDefensiveStructureModifier(metadata.structureType);
 
   let engineModifier = 1.0;
   const engineLower = metadata.engineType.toLowerCase();
@@ -3630,7 +4101,7 @@ function calculateOffensiveBVDebug(metadata: ParsedMtfMetadata): { total: number
   const heatSinkCapacity = metadata.heatSinkType.toLowerCase().includes("double")
     ? metadata.heatSinkCount * 2
     : metadata.heatSinkCount;
-  const movementHeat = metadata.jumpMP > 0 ? Math.max(3, metadata.jumpMP) : 2;
+  const movementHeat = getBVMovementHeat(metadata);
   const movementHeatLabel = metadata.jumpMP > 0 ? "Jump" : "Run";
   const stealthHeat = hasStealthArmor(metadata) ? 10 : 0;
   const stealthHeatText = stealthHeat > 0 ? ` - ${stealthHeat} (Stealth)` : "";
@@ -4042,17 +4513,23 @@ function getRequestedSampleCount(): number | null {
  */
 function getIndexOptions(): IndexOptions {
   return {
-    rulesLevel: getRequestedRulesLevel(),
+    rulesLevels: getRequestedRulesLevels(),
     debug: hasDebugFlag(),
     unitQuery: getRequestedUnitQuery(),
   };
 }
 
 /**
- * Get requested rules level.
- * @returns string | null result from getRequestedRulesLevel.
+ * Gets requested rules-level filters from CLI arguments.
+ * Supports --supported-only for Introductory, Standard, and Advanced Meks, and
+ * supports comma-separated values such as --rules=1,2,3.
+ * @returns Normalized rules level names to include, or an empty array when no rules filter is requested.
  */
-function getRequestedRulesLevel(): string | null {
+function getRequestedRulesLevels(): string[] {
+  if (hasSupportedOnlyFlag()) {
+    return ["Introductory", "Standard", "Advanced"];
+  }
+
   const rulesArg = process.argv.find(
     (arg) =>
       arg.startsWith("--rules=") ||
@@ -4061,21 +4538,79 @@ function getRequestedRulesLevel(): string | null {
       arg.startsWith("--level=")
   );
 
-  if (!rulesArg) return null;
+  if (!rulesArg) return [];
 
   const rawValue = rulesArg.substring(rulesArg.indexOf("=") + 1).trim();
-  const normalized = normalizeRulesLevelForCatalog(rawValue);
-
-  if (!normalized) return null;
+  if (!rawValue) return [];
 
   const allowed = ["Introductory", "Standard", "Advanced", "Experimental", "Unofficial"];
-  if (!allowed.includes(normalized)) {
-    throw new Error(
-      `Unknown rules level "${rawValue}". Use 1-5, Introductory, Standard, Advanced, Experimental, or Unofficial.`
-    );
+  const rulesLevels = rawValue
+    .split(",")
+    .map((value) => normalizeRulesLevelForCatalog(value.trim()))
+    .filter(Boolean);
+
+  for (const level of rulesLevels) {
+    if (!allowed.includes(level)) {
+      throw new Error(
+        `Unknown rules level in "${rawValue}". Use 1-5, Introductory, Standard, Advanced, Experimental, or Unofficial.`
+      );
+    }
   }
 
-  return normalized;
+  return Array.from(new Set(rulesLevels));
+}
+
+/**
+ * Determines whether supported-only indexing was requested.
+ * @returns True when --supported-only, --rules=supported, or --rules=1,2,3 style support was requested.
+ */
+function hasSupportedOnlyFlag(): boolean {
+  return process.argv.some(
+    (arg) =>
+      arg === "--supported-only" ||
+      arg === "--supportedOnly" ||
+      arg === "--intro-standard-advanced" ||
+      arg === "--rules=supported" ||
+      arg === "--rulesLevel=supported" ||
+      arg === "--rules-level=supported"
+  );
+}
+
+/**
+ * Determines whether a parsed unit should be included for the requested rules-level filters.
+ * @param rulesLevel - Parsed catalog rules level for a unit.
+ * @param options - Index options from the CLI.
+ * @returns True when no rules filter is active or the unit's rules level is included.
+ */
+function shouldIncludeRulesLevel(rulesLevel: string, options: IndexOptions): boolean {
+  return !hasRulesLevelFilter(options) || options.rulesLevels.includes(rulesLevel);
+}
+
+/**
+ * Determines whether a rules-level filter is active.
+ * @param options - Index options from the CLI.
+ * @returns True when one or more rules levels were requested.
+ */
+function hasRulesLevelFilter(options: IndexOptions): boolean {
+  return options.rulesLevels.length > 0;
+}
+
+/**
+ * Formats the active rules-level filter for console output.
+ * @param options - Index options from the CLI.
+ * @returns Printable filter description.
+ */
+function getRulesLevelFilterDescription(options: IndexOptions): string {
+  return options.rulesLevels.join(", ");
+}
+
+/**
+ * Gets the output path for the lightweight Unit Index CSV for one unit type.
+ * @param unitType - Unit type being indexed.
+ * @returns Output CSV path under server/data/generated/unitIndex.
+ */
+function getUnitIndexCsvPath(unitType: UnitTypeKey): string {
+  return path.join(UNIT_INDEX_OUTPUT_DIR, `${unitType}.csv`);
 }
 
 
