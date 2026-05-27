@@ -342,6 +342,7 @@ export const WEAPONS = {
             "ammoBV": 5
         },
         "bv": 42,
+        "cost": 150000,
         "availability": {
             "code": "X-X-E"
         }
@@ -400,6 +401,7 @@ export const WEAPONS = {
             "ammoBV": 10
         },
         "bv": 83,
+        "cost": 150000,
         "availability": {
             "code": "X-X-D"
         }
@@ -458,6 +460,7 @@ export const WEAPONS = {
             "ammoBV": 19
         },
         "bv": 148,
+        "cost": 400000,
         "availability": {
             "code": "C-E-D"
         }
@@ -516,6 +519,7 @@ export const WEAPONS = {
             "ammoBV": 30
         },
         "bv": 237,
+        "cost": 600000,
         "availability": {
             "code": "X-X-E"
         }
@@ -569,6 +573,7 @@ export const WEAPONS = {
             "ammoBV": 4
         },
         "bv": 30,
+        "cost": 100000,
         "availability": {
             "code": "X-X-F"
         }
@@ -622,6 +627,7 @@ export const WEAPONS = {
             "ammoBV": 8
         },
         "bv": 62,
+        "cost": 150000,
         "availability": {
             "code": "X-X-F"
         }
@@ -678,6 +684,7 @@ export const WEAPONS = {
             "ammoBV": 15
         },
         "bv": 118,
+        "cost": 175000,
         "availability": {
             "code": "X-X-E"
         }
@@ -734,6 +741,7 @@ export const WEAPONS = {
             "ammoBV": 31
         },
         "bv": 247,
+        "cost": 275000,
         "availability": {
             "code": "X-X-E"
         }
@@ -789,6 +797,7 @@ export const WEAPONS = {
             "ammoBV": 7
         },
         "bv": 56,
+        "cost": 120000,
         "availability": {
             "code": "X-X-E"
         }
@@ -844,6 +853,7 @@ export const WEAPONS = {
             "ammoBV": 14
         },
         "bv": 112,
+        "cost": 200000,
         "availability": {
             "code": "D-F-D"
         }
@@ -899,6 +909,7 @@ export const WEAPONS = {
             "ammoBV": 26
         },
         "bv": 210,
+        "cost": 320000,
         "availability": {
             "code": "X-X-E"
         }
@@ -954,6 +965,7 @@ export const WEAPONS = {
             "ammoBV": 35
         },
         "bv": 281,
+        "cost": 480000,
         "availability": {
             "code": "X-X-E"
         }
@@ -1003,6 +1015,7 @@ export const WEAPONS = {
             "ammoBV": 20
         },
         "bv": 159,
+        "cost": 275000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -1217,6 +1230,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 5,
+        "cost": 5000,
         "availability": {
             "code": "X-X-C"
         }
@@ -1319,6 +1333,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 6,
+        "cost": 7500,
         "availability": {
             "code": "X-X-C"
         }
@@ -1509,6 +1524,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 5,
+        "cost": 7500,
         "availability": {
             "code": "A-A-B"
         }
@@ -2309,6 +2325,7 @@ export const WEAPONS = {
             "ammoBV": 26
         },
         "bv": 210,
+        "cost": 260000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -2354,7 +2371,8 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "bv": 88
+        "bv": 88,
+        "cost": 150000
     },
     "is_ppc": {
         "id": "is_ppc",
@@ -2432,7 +2450,8 @@ export const WEAPONS = {
         "typeCodes": [
             "DE"
         ],
-        "bv": 317
+        "bv": 317,
+        "cost": 250000,
     },
     "is_er_ppc": {
         "id": "is_er_ppc",
@@ -3254,6 +3273,7 @@ export const WEAPONS = {
             "ammoBV": 4
         },
         "bv": 29,
+        "cost": 45000,
         "ammoOptions": [
             {
                 "mode": "LRM",
@@ -3329,6 +3349,7 @@ export const WEAPONS = {
             "ammoBV": 6
         },
         "bv": 45,
+        "cost": 75000,
         "ammoOptions": [
             {
                 "mode": "LRM",
@@ -3404,6 +3425,7 @@ export const WEAPONS = {
             "ammoBV": 8
         },
         "bv": 67,
+        "cost": 105000,
         "ammoOptions": [
             {
                 "mode": "LRM",
@@ -3479,6 +3501,7 @@ export const WEAPONS = {
             "ammoBV": 11
         },
         "bv": 86,
+        "cost": 125000,
         "ammoOptions": [
             {
                 "mode": "LRM",
@@ -3713,6 +3736,7 @@ export const WEAPONS = {
             "ammoBV": 7
         },
         "bv": 56,
+        "cost": 50000,
         "oneShotBV": 11,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -3767,6 +3791,7 @@ export const WEAPONS = {
             "ammoBV": 14
         },
         "bv": 112,
+        "cost": 125000,
         "oneShotBV": 22,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -3821,6 +3846,7 @@ export const WEAPONS = {
             "ammoBV": 21
         },
         "bv": 168,
+        "cost": 225000,
         "oneShotBV": 34,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -3875,6 +3901,7 @@ export const WEAPONS = {
             "ammoBV": 28
         },
         "bv": 224,
+        "cost": 350000,
         "oneShotBV": 45,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -3929,6 +3956,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 1000
         },
         "bv": 18,
+        "cost": 15000,
         "availability": {
             "code": "X-X-B"
         }
@@ -3979,6 +4007,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 1000
         },
         "bv": 23,
+        "cost": 30000,
         "availability": {
             "code": "X-X-B"
         }
@@ -4029,6 +4058,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 1000
         },
         "bv": 24,
+        "cost": 45000,
         "availability": {
             "code": "X-X-B"
         }
@@ -4080,6 +4110,7 @@ export const WEAPONS = {
             "ammoBV": 4
         },
         "bv": 30,
+        "cost": 15000,
         "oneShotBV": 6,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -4135,6 +4166,7 @@ export const WEAPONS = {
             "ammoBV": 7
         },
         "bv": 59,
+        "cost": 90000,
         "oneShotBV": 12,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -4190,6 +4222,7 @@ export const WEAPONS = {
             "ammoBV": 11
         },
         "bv": 89,
+        "cost": 120000,
         "oneShotBV": 18,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -4241,6 +4274,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 6000
         },
         "bv": 30,
+        "cost": 100000,
         "oneShotBV": 6,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -4295,6 +4329,7 @@ export const WEAPONS = {
             "ammoBV": 0
         },
         "bv": 75,
+        "cost": 250000,
         "oneShotBV": 15,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -4355,6 +4390,7 @@ export const WEAPONS = {
             "ammoBV": 6
         },
         "bv": 47,
+        "cost": 150000,
         "availability": {
             "code": "X-X-E"
         }
@@ -4414,6 +4450,7 @@ export const WEAPONS = {
             "ammoBV": 12
         },
         "bv": 93,
+        "cost": 250000,
         "availability": {
             "code": "X-X-D"
         }
@@ -4473,6 +4510,7 @@ export const WEAPONS = {
             "ammoBV": 19
         },
         "bv": 148,
+        "cost": 400000,
         "availability": {
             "code": "C-E-D"
         }
@@ -4532,6 +4570,7 @@ export const WEAPONS = {
             "ammoBV": 30
         },
         "bv": 237,
+        "cost": 600000,
         "availability": {
             "code": "X-X-E"
         }
@@ -4588,6 +4627,7 @@ export const WEAPONS = {
             "ammoBV": 8
         },
         "bv": 62,
+        "cost": 120000,
         "availability": {
             "code": "X-X-E"
         }
@@ -4644,6 +4684,7 @@ export const WEAPONS = {
             "ammoBV": 15
         },
         "bv": 122,
+        "cost": 200000,
         "availability": {
             "code": "D-F-D"
         }
@@ -4700,6 +4741,7 @@ export const WEAPONS = {
             "ammoBV": 26
         },
         "bv": 210,
+        "cost": 320000,
         "availability": {
             "code": "X-X-E"
         }
@@ -4756,6 +4798,7 @@ export const WEAPONS = {
             "ammoBV": 42
         },
         "bv": 335,
+        "cost": 480000,
         "availability": {
             "code": "X-X-E"
         }
@@ -4808,6 +4851,7 @@ export const WEAPONS = {
             "ammoBV": 3
         },
         "bv": 21,
+        "cost": 10000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -4920,6 +4964,7 @@ export const WEAPONS = {
             "ammoBV": 33
         },
         "bv": 267,
+        "cost": 400000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -4978,6 +5023,7 @@ export const WEAPONS = {
             "ammoBV": 50
         },
         "bv": 401,
+        "cost": 500000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -5036,6 +5082,7 @@ export const WEAPONS = {
             "ammoBV": 67
         },
         "bv": 535,
+        "cost": 600000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -5090,6 +5137,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 5,
+        "cost": 5000,
         "availability": {
             "code": "X-X-C"
         }
@@ -5194,6 +5242,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 6,
+        "cost": 7500,
         "availability": {
             "code": "X-X-C"
         }
@@ -5388,6 +5437,7 @@ export const WEAPONS = {
             "ammoBV": 1
         },
         "bv": 5,
+        "cost": 7500,
         "availability": {
             "code": "A-A-B"
         }
@@ -5590,7 +5640,8 @@ export const WEAPONS = {
             "P",
             "AI"
         ],
-        "bv": 12
+        "bv": 12,
+        "cost": 12500,
     },
     "clan_small_pulse_laser": {
         "id": "clan_small_pulse_laser",
@@ -6137,6 +6188,7 @@ export const WEAPONS = {
             "ammoBV": 21
         },
         "bv": 170,
+        "cost": 320000,
         "notes": [
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
@@ -6233,6 +6285,7 @@ export const WEAPONS = {
             "ammoBV": 14
         },
         "bv": 53,
+        "cost": 50000,
         "availability": {
             "code": "X-X-D"
         }
@@ -6285,6 +6338,7 @@ export const WEAPONS = {
             "ammoBV": 26
         },
         "bv": 105,
+        "cost": 125000,
         "availability": {
             "code": "X-X-D"
         }
@@ -6337,6 +6391,7 @@ export const WEAPONS = {
             "ammoBV": 36
         },
         "bv": 147,
+        "cost": 225000,
         "availability": {
             "code": "X-X-D"
         }
@@ -6389,6 +6444,7 @@ export const WEAPONS = {
             "ammoBV": 52
         },
         "bv": 212,
+        "cost": 350000,
         "availability": {
             "code": "X-X-D"
         }
@@ -6848,6 +6904,7 @@ export const WEAPONS = {
             "ammoBV": 5
         },
         "bv": 40,
+        "cost": 15000,
         "oneShotBV": 8,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -6904,6 +6961,7 @@ export const WEAPONS = {
             "ammoBV": 10
         },
         "bv": 79,
+        "cost": 90000,
         "oneShotBV": 16,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -6960,6 +7018,7 @@ export const WEAPONS = {
             "ammoBV": 15
         },
         "bv": 118,
+        "cost": 120000,
         "oneShotBV": 24,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -7012,6 +7071,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 6000
         },
         "bv": 30,
+        "cost": 100000,
         "oneShotBV": 6,
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
@@ -7053,7 +7113,8 @@ export const WEAPONS = {
             "ammoType": "is_a_pod_ammo",
             "ammoPerTon": "OS"
         },
-        "bv": 1
+        "bv": 1,
+        "cost": 1500,
     },
     "is_b_pod": {
         "id": "is_b_pod",
@@ -7093,7 +7154,8 @@ export const WEAPONS = {
             "ammoType": "is_b_pod_ammo",
             "ammoPerTon": "OS"
         },
-        "bv": 2
+        "bv": 2,
+        "cost": 2500,
     },
     "is_anti_missile_system": {
         "id": "is_anti_missile_system",
@@ -7131,6 +7193,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 2000
         },
         "bv": 32,
+        "cost": 100000,
         "availability": {
             "code": "E-F-D"
         }
@@ -7212,7 +7275,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "F"
+        "bv": "F",
+        "cost": 1250
     },
     "is_masc": {
         "id": "is_masc",
@@ -7243,37 +7307,6 @@ export const WEAPONS = {
             "Variable weight/space; see construction rules."
         ],
         "bv": "C"
-    },
-    "is_one_shot": {
-        "id": "is_one_shot",
-        "name": "One-Shot",
-        "altNames": [
-            "IS One-Shot",
-            "ISOneShot",
-            "OneShot"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "one_shot",
-        "damage": "special",
-        "heat": 0,
-        "tons": "add 0.5",
-        "critSlots": 0,
-        "spaceSlots": 0,
-        "techRating": "Special",
-        "flags": [
-            "oneShot"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "notes": [
-            "May apply to eligible missile weapons; adds 0.5 tons to the weapon."
-        ],
-        "bv": "launcherSpecific"
     },
     "is_tag": {
         "id": "is_tag",
@@ -7306,7 +7339,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "A"
+        "bv": "A",
+        "cost": 50000,
     },
     "clan_a_pod": {
         "id": "clan_a_pod",
@@ -7344,7 +7378,8 @@ export const WEAPONS = {
             "ammoType": "clan_a_pod_ammo",
             "ammoPerTon": "OS"
         },
-        "bv": 1
+        "bv": 1,
+        "cost": 1500,
     },
     "clan_b_pod": {
         "id": "clan_b_pod",
@@ -7383,7 +7418,8 @@ export const WEAPONS = {
             "ammoType": "clan_b_pod_ammo",
             "ammoPerTon": "OS"
         },
-        "bv": 2
+        "bv": 2,
+        "cost": 2500
     },
     "clan_anti_missile_system": {
         "id": "clan_anti_missile_system",
@@ -7421,6 +7457,7 @@ export const WEAPONS = {
             "ammoCostPerTon": 2000
         },
         "bv": 32,
+        "cost": 100000,
         "availability": {
             "code": "X-D-C"
         }
@@ -7503,7 +7540,8 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": "F"
+        "bv": "F",
+        "cost": 1250
     },
     "clan_masc": {
         "id": "clan_masc",
@@ -7535,38 +7573,6 @@ export const WEAPONS = {
             "Variable weight/space; see construction rules."
         ],
         "bv": "C"
-    },
-    "clan_one_shot": {
-        "id": "clan_one_shot",
-        "name": "One-Shot",
-        "altNames": [
-            "Clan One-Shot",
-            "CL One-Shot",
-            "CLOneShot",
-            "OneShot"
-        ],
-        "category": "Equipment",
-        "techBase": "Clan",
-        "rulesLevel": "Standard",
-        "variant": "Clan",
-        "family": "one_shot",
-        "damage": "special",
-        "heat": 0,
-        "tons": "add 0.5",
-        "critSlots": 0,
-        "spaceSlots": 0,
-        "techRating": "Special",
-        "flags": [
-            "oneShot"
-        ],
-        "source": {
-            "weightSpacePage": 343,
-            "battleValuePage": 318
-        },
-        "notes": [
-            "May apply to eligible missile weapons; adds 0.5 tons to the weapon."
-        ],
-        "bv": "launcherSpecific"
     },
     "clan_tag": {
         "id": "clan_tag",
@@ -7600,7 +7606,8 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": "A"
+        "bv": "A",
+        "cost": 50000,
     },
     "is_beagle_active_probe": {
         "id": "is_beagle_active_probe",
@@ -7634,7 +7641,11 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": 10
+        "bv": 10,
+        "cost": 200000,
+        "availability": {
+            "code": "E-F-D"
+        }
     },
     "is_case": {
         "id": "is_case",
@@ -7661,7 +7672,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "C"
+        "bv": "C",
+        "cost": 50000,
     },
     "is_c3_computer_master": {
         "id": "is_c3_computer_master",
@@ -7700,7 +7712,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "D"
+        "bv": "D",
+        "cost": 1500000,
     },
     "is_c3_computer_slave": {
         "id": "is_c3_computer_slave",
@@ -7732,7 +7745,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "D"
+        "bv": "D",
+        "cost": 250000,
     },
     "is_improved_c3_computer": {
         "id": "is_improved_c3_computer",
@@ -7763,7 +7777,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "D"
+        "bv": "D",
+        "cost": 750000,
     },
     "is_guardian_ecm_suite": {
         "id": "is_guardian_ecm_suite",
@@ -7798,7 +7813,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": 61
+        "bv": 61,
+        "cost": 200000
     },
     "is_targeting_computer": {
         "id": "is_targeting_computer",
@@ -7826,7 +7842,8 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "E"
+        "bv": "E",
+        "cost": 50000
     },
     "clan_active_probe": {
         "id": "clan_active_probe",
@@ -7861,7 +7878,8 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": 12
+        "bv": 12,
+        "cost": 200000
     },
     "clan_light_active_probe": {
         "id": "clan_light_active_probe",
@@ -7896,7 +7914,11 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": 7
+        "bv": 7,
+        "cost": 50000,
+        "availability": {
+            "code": "X-X-E"
+        }
     },
     "clan_ecm_suite": {
         "id": "clan_ecm_suite",
@@ -7931,7 +7953,11 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": 61
+        "bv": 61,
+        "cost": 200000,
+        "availability": {
+            "code": "E-F-D"
+        }
     },
     "clan_light_tag": {
         "id": "clan_light_tag",
@@ -7966,7 +7992,8 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": "A"
+        "bv": "A",
+        "cost": 40000,
     },
     "clan_targeting_computer": {
         "id": "clan_targeting_computer",
@@ -7995,7 +8022,8 @@ export const WEAPONS = {
             "weightSpacePage": 343,
             "battleValuePage": 318
         },
-        "bv": "D"
+        "bv": "D",
+        "cost": 50000
     },
     "is_enhanced_lrm_5": {
         "id": "is_enhanced_lrm_5",
@@ -8051,6 +8079,7 @@ export const WEAPONS = {
                 "ammoBV": 7
         },
         "bv": 52,
+        "cost": 60000,
         "availability": {
                 "code": "X-X-E"
         },
@@ -8113,6 +8142,7 @@ export const WEAPONS = {
                 "ammoBV": 13
         },
         "bv": 104,
+        "cost": 200000,
         "availability": {
                 "code": "X-X-E"
         },
@@ -8175,6 +8205,7 @@ export const WEAPONS = {
                 "ammoBV": 20
         },
         "bv": 157,
+        "cost": 350000,
         "availability": {
                 "code": "X-X-E"
         },
@@ -8626,7 +8657,45 @@ export const WEAPONS = {
         "availability": {
                 "code": "X-X-X"
         }
-}
+},
+"clan_beagle_active_probe": {
+        "id": "clan_beagle_active_probe",
+        "name": "Beagle Active Probe",
+        "altNames": [
+            "Clan Beagle Active Probe",
+            "ClanBeagleActiveProbe",
+            "BeagleActiveProbe"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "beagle_active_probe",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 5
+        },
+        "techRating": "E",
+        "flags": [
+            "activeProbe"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": 12,
+        "cost": 200000,
+        "availability": {
+            "code": "E-F-D"
+        }
+    },
 
 } as const satisfies Record<string, WeaponDefinition>;
 
