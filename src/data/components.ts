@@ -1,6 +1,12 @@
 export type TechRating = "A" | "B" | "C" | "D" | "E" | "F" | "X";
 
-export type AvailabilityCode = `${string}-${string}-${string}`;
+export type AvailabilityByEra = {
+  starLeague: string;
+  successionWars: string;
+  clanInvasion: string;
+  darkAge?: string;
+};
+
 
 export type ComponentCategory =
   | "cockpit"
@@ -37,7 +43,7 @@ export type ComponentDefinition = {
   altNames: string[];
   category: ComponentCategory;
   techRating: TechRating;
-  availability: AvailabilityCode;
+  availability: AvailabilityByEra;
   cost: CostFormula;
   notes?: string[];
 };
@@ -79,7 +85,11 @@ export const COMPONENTS = {
     altNames: ["Cockpit", "Standard"],
     category: "cockpit",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "fixed", amount: 200_000 },
   },
   smallCockpit: {
@@ -88,7 +98,11 @@ export const COMPONENTS = {
     altNames: ["Small Cockpit", "Small"],
     category: "cockpit",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "fixed", amount: 175_000 },
   },
   industrialCockpitNoFireControl: {
@@ -97,7 +111,11 @@ export const COMPONENTS = {
     altNames: ["Industrial Cockpit", "Industrial (No Fire Control)", "No Fire Control"],
     category: "cockpit",
     techRating: "C",
-    availability: "B-C-C",
+    availability: {
+      starLeague: "B",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "fixed", amount: 100_000 },
   },
   industrialCockpitAdvancedFireControl: {
@@ -106,7 +124,11 @@ export const COMPONENTS = {
     altNames: ["Industrial Advanced Fire Control", "Industrial (Advanced Fire Control)", "Advanced Fire Control"],
     category: "cockpit",
     techRating: "D",
-    availability: "D-E-E",
+    availability: {
+      starLeague: "D",
+      successionWars: "E",
+      clanInvasion: "E",
+    },
     cost: { type: "fixed", amount: 200_000 },
   },
   lifeSupport: {
@@ -115,7 +137,11 @@ export const COMPONENTS = {
     altNames: ["Life Support"],
     category: "lifeSupport",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "fixed", amount: 50_000 },
   },
   sensors: {
@@ -124,7 +150,11 @@ export const COMPONENTS = {
     altNames: ["Sensors"],
     category: "sensors",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 2_000 },
   },
 
@@ -135,7 +165,11 @@ export const COMPONENTS = {
     altNames: ["Musculature", "Standard Myomer", "Standard Musculature"],
     category: "musculature",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 2_000 },
   },
   tripleStrengthMyomer: {
@@ -144,7 +178,11 @@ export const COMPONENTS = {
     altNames: ["TSM", "Triple Strength Myomer", "Triple-Strength Myomer"],
     category: "musculature",
     techRating: "E",
-    availability: "X-X-D",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "D",
+    },
     cost: { type: "unitTonnage", multiplier: 16_000 },
   },
   industrialTripleStrengthMyomer: {
@@ -153,7 +191,11 @@ export const COMPONENTS = {
     altNames: ["Industrial TSM", "Industrial Triple Strength Myomer"],
     category: "musculature",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "unitTonnage", multiplier: 12_000 },
   },
   standardInternalStructure: {
@@ -162,7 +204,11 @@ export const COMPONENTS = {
     altNames: ["Standard Structure", "Standard Internal Structure"],
     category: "internalStructure",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 400 },
   },
   endoSteelInternalStructure: {
@@ -171,7 +217,11 @@ export const COMPONENTS = {
     altNames: ["Endo Steel", "Endo-Steel", "Endo-Steel Structure", "Endo Steel Structure"],
     category: "internalStructure",
     techRating: "E",
-    availability: "D-F-E",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
     cost: { type: "unitTonnage", multiplier: 1_600 },
   },
   industrialInternalStructure: {
@@ -180,7 +230,11 @@ export const COMPONENTS = {
     altNames: ["Industrial Structure", "Industrial Internal Structure"],
     category: "internalStructure",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 300 },
   },
   industrialEnvironmentalSealing: {
@@ -189,7 +243,11 @@ export const COMPONENTS = {
     altNames: ["Environmental Sealing", "Enviro. Sealing"],
     category: "internalStructure",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 225 },
     notes: ["IndustrialMechs only."],
   },
@@ -201,7 +259,11 @@ export const COMPONENTS = {
     altNames: ["Upper Arm Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 100 },
   },
   lowerArmActuator: {
@@ -210,7 +272,11 @@ export const COMPONENTS = {
     altNames: ["Lower Arm Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 50 },
   },
   handActuator: {
@@ -219,7 +285,11 @@ export const COMPONENTS = {
     altNames: ["Hand Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 80 },
   },
   upperLegActuator: {
@@ -228,7 +298,11 @@ export const COMPONENTS = {
     altNames: ["Hip", "Upper Leg Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 150 },
   },
   lowerLegActuator: {
@@ -237,7 +311,11 @@ export const COMPONENTS = {
     altNames: ["Lower Leg Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 80 },
   },
   footActuator: {
@@ -246,7 +324,11 @@ export const COMPONENTS = {
     altNames: ["Foot Actuator"],
     category: "actuator",
     techRating: "C",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "unitTonnage", multiplier: 120 },
   },
 
@@ -257,7 +339,11 @@ export const COMPONENTS = {
     altNames: ["Fusion", "Standard Fusion", "Fusion Engine", "Standard Engine"],
     category: "engine",
     techRating: "D",
-    availability: "C-E-D",
+    availability: {
+      starLeague: "C",
+      successionWars: "E",
+      clanInvasion: "D",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 5_000 },
   },
   lightFusionEngine: {
@@ -266,7 +352,11 @@ export const COMPONENTS = {
     altNames: ["Light", "Light Fusion", "Light Engine"],
     category: "engine",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 15_000 },
   },
   xlFusionEngine: {
@@ -275,7 +365,11 @@ export const COMPONENTS = {
     altNames: ["XL", "XL Fusion", "Extra-Light", "Extralight", "XL Engine"],
     category: "engine",
     techRating: "E",
-    availability: "D-F-E",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 20_000 },
   },
   compactFusionEngine: {
@@ -284,7 +378,11 @@ export const COMPONENTS = {
     altNames: ["Compact", "Compact Fusion", "Compact Engine"],
     category: "engine",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 10_000 },
   },
   internalCombustionEngine: {
@@ -293,7 +391,11 @@ export const COMPONENTS = {
     altNames: ["ICE", "Internal Combustion", "Combustion Engine"],
     category: "engine",
     techRating: "C",
-    availability: "A-A-A",
+    availability: {
+      starLeague: "A",
+      successionWars: "A",
+      clanInvasion: "A",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 1_250 },
   },
   fuelCellEngine: {
@@ -302,7 +404,11 @@ export const COMPONENTS = {
     altNames: ["Fuel Cell"],
     category: "engine",
     techRating: "D",
-    availability: "C-D-D",
+    availability: {
+      starLeague: "C",
+      successionWars: "D",
+      clanInvasion: "D",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 3_500 },
   },
   fissionEngine: {
@@ -311,7 +417,11 @@ export const COMPONENTS = {
     altNames: ["Fission"],
     category: "engine",
     techRating: "D",
-    availability: "E-E-D",
+    availability: {
+      starLeague: "E",
+      successionWars: "E",
+      clanInvasion: "D",
+    },
     cost: { type: "engineRatingUnitTonnageDiv75", multiplier: 7_500 },
   },
 
@@ -322,7 +432,11 @@ export const COMPONENTS = {
     altNames: ["Gyro", "Standard Gyro"],
     category: "gyro",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "gyroTonnage", multiplier: 300_000 },
   },
   compactGyro: {
@@ -331,7 +445,11 @@ export const COMPONENTS = {
     altNames: ["Compact Gyro"],
     category: "gyro",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "gyroTonnage", multiplier: 400_000 },
   },
   heavyDutyGyro: {
@@ -340,7 +458,11 @@ export const COMPONENTS = {
     altNames: ["Heavy-Duty Gyro", "Heavy Duty Gyro"],
     category: "gyro",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "gyroTonnage", multiplier: 500_000 },
   },
   xlGyro: {
@@ -349,7 +471,11 @@ export const COMPONENTS = {
     altNames: ["XL Gyro", "Extra-Light Gyro", "Extralight Gyro"],
     category: "gyro",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "gyroTonnage", multiplier: 750_000 },
   },
 
@@ -360,7 +486,11 @@ export const COMPONENTS = {
     altNames: ["Jump Jet", "Jump Jets", "Standard Jump Jet", "Standard Jump Jets"],
     category: "jumpJet",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "jumpJetsSquaredUnitTonnage", multiplier: 200 },
   },
   improvedJumpJet: {
@@ -369,7 +499,11 @@ export const COMPONENTS = {
     altNames: ["Improved Jump Jet", "Improved Jump Jets", "Improved JJ"],
     category: "jumpJet",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "jumpJetsSquaredUnitTonnage", multiplier: 500 },
   },
   masc: {
@@ -378,26 +512,38 @@ export const COMPONENTS = {
     altNames: ["MASC", "Myomer Accelerator Signal Circuitry"],
     category: "masc",
     techRating: "E",
-    availability: "D-F-E",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
     cost: { type: "masc", multiplier: 1_000 },
   },
   standardSingleHeatSinkFusion: {
     id: "standardSingleHeatSinkFusion",
-    name: "Standard Single Heat Sink with Fusion Engine",
+    name: "Heat Sink",
     altNames: ["Single Heat Sink", "Standard Heat Sink", "Heat Sink"],
     category: "heatSink",
     techRating: "C",
-    availability: "B-B-B",
+    availability: {
+      starLeague: "B",
+      successionWars: "B",
+      clanInvasion: "B",
+    },
     cost: { type: "heatSinksOverFreeFusionSinks", multiplier: 2_000, freeFusionSinks: 10 },
     notes: ["Only heat sinks over the 10 free fusion-engine heat sinks are charged."],
   },
   standardSingleHeatSinkNonFusion: {
     id: "standardSingleHeatSinkNonFusion",
-    name: "Standard Single Heat Sink with Non-Fusion Engine",
+    name: "Heat Sink",
     altNames: ["Single Heat Sink", "Standard Heat Sink", "Heat Sink"],
     category: "heatSink",
     techRating: "C",
-    availability: "B-B-B",
+    availability: {
+      starLeague: "B",
+      successionWars: "B",
+      clanInvasion: "B",
+    },
     cost: { type: "totalHeatSinks", multiplier: 2_000 },
   },
   doubleHeatSink: {
@@ -406,7 +552,11 @@ export const COMPONENTS = {
     altNames: ["Double Heat Sink", "Double Heat Sinks", "DHS"],
     category: "heatSink",
     techRating: "E",
-    availability: "C-E-D",
+    availability: {
+      starLeague: "C",
+      successionWars: "E",
+      clanInvasion: "D",
+    },
     cost: { type: "totalHeatSinks", multiplier: 6_000 },
   },
   powerAmplifier: {
@@ -415,7 +565,11 @@ export const COMPONENTS = {
     altNames: ["Power Amplifier", "Power Amplifiers"],
     category: "powerAmplifier",
     techRating: "D",
-    availability: "B-C-B",
+    availability: {
+      starLeague: "B",
+      successionWars: "C",
+      clanInvasion: "B",
+    },
     cost: { type: "amplifierTonnage", multiplier: 20_000 },
   },
   tracks: {
@@ -424,7 +578,11 @@ export const COMPONENTS = {
     altNames: ["Tracks", "Track"],
     category: "track",
     techRating: "C",
-    availability: "D-E-E",
+    availability: {
+      starLeague: "D",
+      successionWars: "E",
+      clanInvasion: "E",
+    },
     cost: { type: "track", multiplier: 500 },
   },
 
@@ -435,7 +593,11 @@ export const COMPONENTS = {
     altNames: ["Standard", "Standard Armor"],
     category: "armor",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "armorTonnage", multiplier: 10_000 },
   },
   heavyIndustrialArmor: {
@@ -444,7 +606,11 @@ export const COMPONENTS = {
     altNames: ["Heavy Industrial", "Heavy Industrial Armor"],
     category: "armor",
     techRating: "D",
-    availability: "C-C-C",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
     cost: { type: "armorTonnage", multiplier: 10_000 },
   },
   ferroFibrousArmor: {
@@ -453,7 +619,11 @@ export const COMPONENTS = {
     altNames: ["Ferro-Fibrous", "Ferro Fibrous", "Ferro"],
     category: "armor",
     techRating: "E",
-    availability: "D-F-D",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
     cost: { type: "armorTonnage", multiplier: 20_000 },
   },
   lightFerroFibrousArmor: {
@@ -462,7 +632,11 @@ export const COMPONENTS = {
     altNames: ["Light Ferro-Fibrous", "Light Ferro Fibrous"],
     category: "armor",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "armorTonnage", multiplier: 15_000 },
   },
   heavyFerroFibrousArmor: {
@@ -471,7 +645,11 @@ export const COMPONENTS = {
     altNames: ["Heavy Ferro-Fibrous", "Heavy Ferro Fibrous"],
     category: "armor",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "armorTonnage", multiplier: 25_000 },
   },
   stealthArmor: {
@@ -480,7 +658,11 @@ export const COMPONENTS = {
     altNames: ["Stealth", "Stealth Armor"],
     category: "armor",
     techRating: "E",
-    availability: "X-X-E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
     cost: { type: "armorTonnage", multiplier: 50_000 },
   },
   commercialArmor: {
@@ -489,7 +671,11 @@ export const COMPONENTS = {
     altNames: ["Commercial", "Commercial Armor"],
     category: "armor",
     techRating: "B",
-    availability: "B-B-A",
+    availability: {
+      starLeague: "B",
+      successionWars: "B",
+      clanInvasion: "A",
+    },
     cost: { type: "armorTonnage", multiplier: 3_000 },
   },
   industrialArmor: {
@@ -498,7 +684,11 @@ export const COMPONENTS = {
     altNames: ["Industrial", "Industrial Armor"],
     category: "armor",
     techRating: "C",
-    availability: "B-C-B",
+    availability: {
+      starLeague: "B",
+      successionWars: "C",
+      clanInvasion: "B",
+    },
     cost: { type: "armorTonnage", multiplier: 5_000 },
   },
 } satisfies Record<string, ComponentDefinition>;

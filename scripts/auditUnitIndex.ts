@@ -147,15 +147,38 @@ function parseMegaMekLabReport(text: string, filePath: string, reportsDir: strin
 
 /**
  * Extracts final Battle Value from a MegaMekLab report.
+ *
+ * Prefer the explicit "--- Base Unit BV:" final line. Some reports include an
+ * intermediate "Defensive BR + Offensive BR" line before cockpit modifiers, so
+ * the parser must not grab the first equals value in the Battle Value section.
+ *
+ * Supported examples:
+ *   --- Base Unit BV:        806.488 + 1004.758, rn = 1811
+ *   --- Base Unit BV:                                      1708
+ *
  * @param text - Report text.
  * @returns Final rounded BV string.
  */
 function extractMegaMekLabBV(text: string): string {
-  const baseUnitMatch = text.match(/Base\s+Unit\s+BV:[\s\S]*?=\s*([\d,]+)\b/i);
-  if (baseUnitMatch?.[1]) return normalizeIntegerString(baseUnitMatch[1]);
+  const baseUnitLineMatch = text.match(/^\s*---\s*Base\s+Unit\s+BV:\s*(.+)$/im);
+  if (baseUnitLineMatch?.[1]) {
+    const line = baseUnitLineMatch[1];
 
-  const battleValueSection = text.match(/Battle\s+Value:[\s\S]{0,400}?=\s*([\d,]+)\b/i);
-  if (battleValueSection?.[1]) return normalizeIntegerString(battleValueSection[1]);
+    const equalsValue = line.match(/=\s*([\d,]+)\b/);
+    if (equalsValue?.[1]) {
+      return normalizeIntegerString(equalsValue[1]);
+    }
+
+    const trailingInteger = line.match(/([\d,]+)\s*$/);
+    if (trailingInteger?.[1]) {
+      return normalizeIntegerString(trailingInteger[1]);
+    }
+  }
+
+  const baseUnitBlockMatch = text.match(/---\s*Base\s+Unit\s+BV:[\s\S]{0,300}?=\s*([\d,]+)\b/i);
+  if (baseUnitBlockMatch?.[1]) {
+    return normalizeIntegerString(baseUnitBlockMatch[1]);
+  }
 
   return "";
 }

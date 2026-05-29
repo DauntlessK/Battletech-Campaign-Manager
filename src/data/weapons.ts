@@ -3,6 +3,19 @@ export type WeaponCategory = "Energy" | "Ballistic" | "Missile" | "Equipment";
 export type TechBase = "Inner Sphere" | "Clan" | "Mixed";
 export type RulesLevel = "Introductory" | "Standard" | "Advanced" | "Experimental";
 
+export type AvailabilityByEra = {
+    starLeague: string;
+    successionWars: string;
+    clanInvasion: string;
+    darkAge?: string;
+};
+
+export type WeaponAvailability = AvailabilityByEra & {
+    introduced?: string;
+    extinct?: string;
+    reintroduced?: string;
+};
+
 export type WeaponRange = {
     min?: number;
     short?: number;
@@ -61,12 +74,7 @@ export type WeaponDefinition = {
     ammoBV?: number | string;
 
     techRating?: string;
-    availability?: {
-        code?: string;
-        introduced?: string;
-        extinct?: string;
-        reintroduced?: string;
-    };
+    availability?: WeaponAvailability;
 
     source?: {
         totalWarfarePage?: number;
@@ -129,7 +137,13 @@ export const WEAPONS = {
         "cost": 75000,
         "bv": 37,
         "availability": {
-            "code": "C-D-D"
+
+            "starLeague": "C",
+
+            "successionWars": "D",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_autocannon_5": {
@@ -181,7 +195,13 @@ export const WEAPONS = {
         "cost": 125000,
         "bv": 70,
         "availability": {
-            "code": "C-C-D"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_autocannon_10": {
@@ -233,7 +253,13 @@ export const WEAPONS = {
         "cost": 200000,
         "bv": 123,
         "availability": {
-            "code": "C-D-D"
+
+            "starLeague": "C",
+
+            "successionWars": "D",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_autocannon_20": {
@@ -285,7 +311,13 @@ export const WEAPONS = {
         "cost": 300000,
         "bv": 178,
         "availability": {
-            "code": "D-E-D"
+
+            "starLeague": "D",
+
+            "successionWars": "E",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_lb_2_x_ac": {
@@ -344,7 +376,13 @@ export const WEAPONS = {
         "bv": 42,
         "cost": 150000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_lb_5_x_ac": {
@@ -403,7 +441,13 @@ export const WEAPONS = {
         "bv": 83,
         "cost": 150000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_lb_10_x_ac": {
@@ -462,7 +506,13 @@ export const WEAPONS = {
         "bv": 148,
         "cost": 400000,
         "availability": {
-            "code": "C-E-D"
+
+            "starLeague": "C",
+
+            "successionWars": "E",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_lb_20_x_ac": {
@@ -521,7 +571,13 @@ export const WEAPONS = {
         "bv": 237,
         "cost": 600000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_light_ac_2": {
@@ -575,7 +631,13 @@ export const WEAPONS = {
         "bv": 30,
         "cost": 100000,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_light_ac_5": {
@@ -629,7 +691,13 @@ export const WEAPONS = {
         "bv": 62,
         "cost": 150000,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_rotary_ac_2": {
@@ -686,7 +754,13 @@ export const WEAPONS = {
         "bv": 118,
         "cost": 175000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_rotary_ac_5": {
@@ -743,7 +817,13 @@ export const WEAPONS = {
         "bv": 247,
         "cost": 275000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_ultra_ac_2": {
@@ -799,7 +879,13 @@ export const WEAPONS = {
         "bv": 56,
         "cost": 120000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_ultra_ac_5": {
@@ -855,7 +941,13 @@ export const WEAPONS = {
         "bv": 112,
         "cost": 200000,
         "availability": {
-            "code": "D-F-D"
+
+            "starLeague": "D",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_ultra_ac_10": {
@@ -911,7 +1003,13 @@ export const WEAPONS = {
         "bv": 210,
         "cost": 320000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_ultra_ac_20": {
@@ -967,7 +1065,13 @@ export const WEAPONS = {
         "bv": 281,
         "cost": 480000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_light_gauss_rifle": {
@@ -1020,7 +1124,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_gauss_rifle": {
@@ -1073,7 +1183,13 @@ export const WEAPONS = {
         ],
         "cost": 300000,
         "availability": {
-            "code": "D-F-D"
+
+            "starLeague": "D",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_heavy_gauss_rifle": {
@@ -1127,7 +1243,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_improved_heavy_gauss_rifle": {
@@ -1181,7 +1303,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_light_machine_gun": {
@@ -1232,7 +1360,13 @@ export const WEAPONS = {
         "bv": 5,
         "cost": 5000,
         "availability": {
-            "code": "X-X-C"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_machine_gun": {
@@ -1285,7 +1419,13 @@ export const WEAPONS = {
         "cost": 5000,
         "bv": 5,
         "availability": {
-            "code": "A-A-B"
+
+            "starLeague": "A",
+
+            "successionWars": "A",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_heavy_machine_gun": {
@@ -1335,7 +1475,13 @@ export const WEAPONS = {
         "bv": 6,
         "cost": 7500,
         "availability": {
-            "code": "X-X-C"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_flamer": {
@@ -1405,7 +1551,13 @@ export const WEAPONS = {
         },
         "techRating": "D",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -1450,7 +1602,13 @@ export const WEAPONS = {
         },
         "techRating": "C",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -1526,7 +1684,13 @@ export const WEAPONS = {
         "bv": 5,
         "cost": 7500,
         "availability": {
-            "code": "A-A-B"
+
+            "starLeague": "A",
+
+            "successionWars": "A",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_er_small_laser": {
@@ -1898,7 +2062,7 @@ export const WEAPONS = {
         "variant": "IS",
         "family": "pulseLaser",
         "damage": 3,
-        "heat": 2,
+        "heat": 3,
         "tons": 1,
         "critSlots": 1,
         "spaceSlots": 1,
@@ -1919,13 +2083,19 @@ export const WEAPONS = {
             "costAvailabilityPage": 0
         },
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "typeCodes": [
             "P",
             "AI"
         ],
-        "bv": 12,
+        "bv": 21,
         "cost": 31000
     },
     "is_medium_xpulse_laser": {
@@ -1942,7 +2112,7 @@ export const WEAPONS = {
         "variant": "IS",
         "family": "pulseLaser",
         "damage": 6,
-        "heat": 4,
+        "heat": 6,
         "tons": 2,
         "critSlots": 1,
         "spaceSlots": 1,
@@ -1954,7 +2124,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -1968,7 +2144,7 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "bv": 48,
+        "bv": 71,
         "cost": 110000
     },
     "is_large_xpulse_laser": {
@@ -1985,7 +2161,7 @@ export const WEAPONS = {
         "variant": "IS",
         "family": "pulseLaser",
         "damage": 9,
-        "heat": 10,
+        "heat": 14,
         "tons": 7,
         "critSlots": 2,
         "spaceSlots": 2,
@@ -1997,7 +2173,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2011,7 +2193,7 @@ export const WEAPONS = {
         "typeCodes": [
             "P"
         ],
-        "bv": 119,
+        "bv": 178,
         "cost": 275000
     },
     "is_small_vsp_laser": {     //VSP = Variable Speed Pulse - subvariant of pulse laser with different damage/heat values at range brackets
@@ -2042,7 +2224,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2088,7 +2276,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2133,7 +2327,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2176,7 +2376,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2220,7 +2426,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2263,7 +2475,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -2330,7 +2548,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_light_ppc": {
@@ -2593,7 +2817,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_lrm_10": {
@@ -2651,7 +2881,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_lrm_15": {
@@ -2709,7 +2945,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_lrm_20": {
@@ -2767,7 +3009,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "is_elrm_5": {
@@ -2797,7 +3045,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         },
         "flags": [
             "cluster",
@@ -2855,7 +3109,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         },
         "flags": [
             "cluster",
@@ -2913,7 +3173,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         },
         "flags": [
             "cluster",
@@ -2971,7 +3237,13 @@ export const WEAPONS = {
         },
         "techRating": "E",
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         },
         "flags": [
             "cluster",
@@ -3053,7 +3325,13 @@ export const WEAPONS = {
         "cost": 50000,
         "bv": 64,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_thunderbolt_10": {
@@ -3107,7 +3385,13 @@ export const WEAPONS = {
         "cost": 175000,
         "bv": 127,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_thunderbolt_15": {
@@ -3161,7 +3445,13 @@ export const WEAPONS = {
         "cost": 325000,
         "bv": 229,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_thunderbolt_20": {
@@ -3215,7 +3505,13 @@ export const WEAPONS = {
         "cost": 450000,
         "bv": 306,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_mml_3": {
@@ -3575,7 +3871,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_srm_4": {
@@ -3631,7 +3933,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_srm_6": {
@@ -3687,7 +3995,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_mrm_10": {
@@ -3742,7 +4056,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_mrm_20": {
@@ -3797,7 +4117,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_mrm_30": {
@@ -3852,7 +4178,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_mrm_40": {
@@ -3907,7 +4239,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_rocket_launcher_10": {
@@ -3958,7 +4296,13 @@ export const WEAPONS = {
         "bv": 18,
         "cost": 15000,
         "availability": {
-            "code": "X-X-B"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_rocket_launcher_15": {
@@ -4009,7 +4353,13 @@ export const WEAPONS = {
         "bv": 23,
         "cost": 30000,
         "availability": {
-            "code": "X-X-B"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_rocket_launcher_20": {
@@ -4060,7 +4410,13 @@ export const WEAPONS = {
         "bv": 24,
         "cost": 45000,
         "availability": {
-            "code": "X-X-B"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "B",
+
         }
     },
     "is_streak_srm_2": {
@@ -4116,7 +4472,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_streak_srm_4": {
@@ -4172,7 +4534,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_streak_srm_6": {
@@ -4228,7 +4596,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "is_narc_missile_beacon": {
@@ -4392,7 +4766,13 @@ export const WEAPONS = {
         "bv": 47,
         "cost": 150000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_lb_5_x_ac": {
@@ -4452,7 +4832,13 @@ export const WEAPONS = {
         "bv": 93,
         "cost": 250000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_lb_10_x_ac": {
@@ -4512,7 +4898,13 @@ export const WEAPONS = {
         "bv": 148,
         "cost": 400000,
         "availability": {
-            "code": "C-E-D"
+
+            "starLeague": "C",
+
+            "successionWars": "E",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_lb_20_x_ac": {
@@ -4572,7 +4964,13 @@ export const WEAPONS = {
         "bv": 237,
         "cost": 600000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_ultra_ac_2": {
@@ -4629,7 +5027,13 @@ export const WEAPONS = {
         "bv": 62,
         "cost": 120000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_ultra_ac_5": {
@@ -4686,7 +5090,13 @@ export const WEAPONS = {
         "bv": 122,
         "cost": 200000,
         "availability": {
-            "code": "D-F-D"
+
+            "starLeague": "D",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_ultra_ac_10": {
@@ -4743,7 +5153,13 @@ export const WEAPONS = {
         "bv": 210,
         "cost": 320000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_ultra_ac_20": {
@@ -4800,7 +5216,13 @@ export const WEAPONS = {
         "bv": 335,
         "cost": 480000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_ap_gauss_rifle": {
@@ -4856,7 +5278,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_gauss_rifle": {
@@ -4910,7 +5338,13 @@ export const WEAPONS = {
         ],
         "cost": 300000,
         "availability": {
-            "code": "D-F-D"
+
+            "starLeague": "D",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_hyper_assault_gauss_20": {
@@ -4969,7 +5403,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_hyper_assault_gauss_30": {
@@ -5028,7 +5468,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_hyper_assault_gauss_40": {
@@ -5087,7 +5533,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_light_machine_gun": {
@@ -5139,7 +5591,13 @@ export const WEAPONS = {
         "bv": 5,
         "cost": 5000,
         "availability": {
-            "code": "X-X-C"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_machine_gun": {
@@ -5193,7 +5651,13 @@ export const WEAPONS = {
         "bv": 5,
         "cost": 5000,
         "availability": {
-            "code": "A-A-B"
+
+            "starLeague": "A",
+
+            "successionWars": "A",
+
+            "clanInvasion": "B",
+
         }
     },
     "clan_heavy_machine_gun": {
@@ -5244,7 +5708,13 @@ export const WEAPONS = {
         "bv": 6,
         "cost": 7500,
         "availability": {
-            "code": "X-X-C"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_flamer": {
@@ -5316,7 +5786,13 @@ export const WEAPONS = {
         },
         "techRating": "D",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -5362,7 +5838,13 @@ export const WEAPONS = {
         },
         "techRating": "C",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -5439,7 +5921,13 @@ export const WEAPONS = {
         "bv": 5,
         "cost": 7500,
         "availability": {
-            "code": "A-A-B"
+
+            "starLeague": "A",
+
+            "successionWars": "A",
+
+            "clanInvasion": "B",
+
         }
     },
     "clan_er_micro_laser": {
@@ -5796,7 +6284,13 @@ export const WEAPONS = {
         },
         "techRating": "F",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -5843,7 +6337,13 @@ export const WEAPONS = {
         },
         "techRating": "F",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -5889,7 +6389,13 @@ export const WEAPONS = {
         },
         "techRating": "F",
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "flags": [
             "directFire",
@@ -6193,7 +6699,13 @@ export const WEAPONS = {
             "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_er_ppc": {
@@ -6287,7 +6799,13 @@ export const WEAPONS = {
         "bv": 53,
         "cost": 50000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_atm_6": {
@@ -6340,7 +6858,13 @@ export const WEAPONS = {
         "bv": 105,
         "cost": 125000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_atm_9": {
@@ -6393,7 +6917,13 @@ export const WEAPONS = {
         "bv": 147,
         "cost": 225000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_atm_12": {
@@ -6446,7 +6976,13 @@ export const WEAPONS = {
         "bv": 212,
         "cost": 350000,
         "availability": {
-            "code": "X-X-D"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_lrm_5": {
@@ -6505,7 +7041,13 @@ export const WEAPONS = {
         ],
         "cost": 30000,
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_lrm_10": {
@@ -6564,7 +7106,13 @@ export const WEAPONS = {
         ],
         "cost": 100000,
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_lrm_15": {
@@ -6623,7 +7171,13 @@ export const WEAPONS = {
         ],
         "cost": 175000,
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_lrm_20": {
@@ -6682,7 +7236,13 @@ export const WEAPONS = {
         ],
         "cost": 250000,
         "availability": {
-            "code": "C-C-C"
+
+            "starLeague": "C",
+
+            "successionWars": "C",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_srm_2": {
@@ -6739,7 +7299,13 @@ export const WEAPONS = {
         ],
         "cost": 10000,
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "clan_srm_4": {
@@ -6796,7 +7362,13 @@ export const WEAPONS = {
         ],
         "cost": 60000,
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "clan_srm_6": {
@@ -6853,7 +7425,13 @@ export const WEAPONS = {
         ],
         "cost": 80000,
         "availability": {
-            "code": "B-B-B"
+
+            "starLeague": "B",
+
+            "successionWars": "B",
+
+            "clanInvasion": "B",
+
         }
     },
     "clan_streak_srm_2": {
@@ -6910,7 +7488,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_streak_srm_4": {
@@ -6967,7 +7551,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_streak_srm_6": {
@@ -7024,7 +7614,13 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ],
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_narc_missile_beacon": {
@@ -7195,7 +7791,13 @@ export const WEAPONS = {
         "bv": 32,
         "cost": 100000,
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
         "is_laser_ams": {
@@ -7459,7 +8061,13 @@ export const WEAPONS = {
         "bv": 32,
         "cost": 100000,
         "availability": {
-            "code": "X-D-C"
+
+            "starLeague": "X",
+
+            "successionWars": "D",
+
+            "clanInvasion": "C",
+
         }
     },
     "clan_laser_ams": {
@@ -7606,8 +8214,14 @@ export const WEAPONS = {
         ],
         "bv": "C",
          "availability": {
-            "code": "F-F-F"
-        }
+
+             "starLeague": "F",
+
+             "successionWars": "F",
+
+             "clanInvasion": "F",
+
+         }
     },
     "clan_tag": {
         "id": "clan_tag",
@@ -7679,7 +8293,13 @@ export const WEAPONS = {
         "bv": 10,
         "cost": 200000,
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_case": {
@@ -7739,7 +8359,13 @@ export const WEAPONS = {
         "bv": "C",
         "cost": 175000,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_c3_computer_master": {
@@ -7987,7 +8613,13 @@ export const WEAPONS = {
         "bv": 7,
         "cost": 50000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_ecm_suite": {
@@ -8026,7 +8658,13 @@ export const WEAPONS = {
         "bv": 61,
         "cost": 200000,
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "clan_watchdog_ECM_suite": {
@@ -8073,7 +8711,13 @@ export const WEAPONS = {
         "bv": 68,
         "cost": 500000,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "clan_light_tag": {
@@ -8170,7 +8814,13 @@ export const WEAPONS = {
         "bv": "C",
         "cost": 175000,
         "availability": {
-            "code": "X-X-F"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
         }
     },
     "is_enhanced_lrm_5": {
@@ -8229,7 +8879,13 @@ export const WEAPONS = {
         "bv": 52,
         "cost": 60000,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
@@ -8292,7 +8948,13 @@ export const WEAPONS = {
         "bv": 104,
         "cost": 200000,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
@@ -8355,7 +9017,13 @@ export const WEAPONS = {
         "bv": 157,
         "cost": 350000,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
@@ -8417,7 +9085,13 @@ export const WEAPONS = {
         },
         "bv": 210,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
@@ -8480,7 +9154,13 @@ export const WEAPONS = {
         "cost": 75000,
         "bv": 86,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
@@ -8542,7 +9222,13 @@ export const WEAPONS = {
         "cost": 225000,
         "bv": 173,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
@@ -8604,7 +9290,13 @@ export const WEAPONS = {
         "cost": 400000,
         "bv": 259,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
@@ -8666,7 +9358,13 @@ export const WEAPONS = {
         "cost": 600000,
         "bv": 345,
         "availability": {
-                "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         },
         "notes": [
                 "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
@@ -8717,7 +9415,13 @@ export const WEAPONS = {
         "bv": 240,
         "cost": 450000,
         "availability": {
-                "code": "E-F-E"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "E",
+
         }
 },
 "clan_arrow_iv": {
@@ -8763,7 +9467,13 @@ export const WEAPONS = {
         "bv": 240,
         "cost": 450000,
         "availability": {
-                "code": "E-F-E"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "E",
+
         }
 },
 "tsemp_cannon": {
@@ -8803,7 +9513,13 @@ export const WEAPONS = {
         "bv": 488,
         "cost": 800000,
         "availability": {
-                "code": "X-X-X"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "X",
+
         }
 },
 "clan_beagle_active_probe": {
@@ -8841,7 +9557,13 @@ export const WEAPONS = {
         "bv": 12,
         "cost": 200000,
         "availability": {
-            "code": "E-F-D"
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
         }
     },
     "is_full_head_ejection_system": {
@@ -8879,7 +9601,13 @@ export const WEAPONS = {
         "bv": "G",
         "cost": 1725000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
     "clan_full_head_ejection_system": {
@@ -8917,7 +9645,13 @@ export const WEAPONS = {
         "bv": "G",
         "cost": 1725000,
         "availability": {
-            "code": "X-X-E"
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
         }
     },
 
