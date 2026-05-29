@@ -1926,7 +1926,7 @@ export const WEAPONS = {
             "AI"
         ],
         "bv": 12,
-        "cost": 16000
+        "cost": 31000
     },
     "is_medium_xpulse_laser": {
         "id": "is_medium_xpulse_laser",
@@ -1969,7 +1969,7 @@ export const WEAPONS = {
             "P"
         ],
         "bv": 48,
-        "cost": 60000
+        "cost": 110000
     },
     "is_large_xpulse_laser": {
         "id": "is_large_xpulse_laser",
@@ -2012,7 +2012,7 @@ export const WEAPONS = {
             "P"
         ],
         "bv": 119,
-        "cost": 175000
+        "cost": 275000
     },
     "is_small_vsp_laser": {     //VSP = Variable Speed Pulse - subvariant of pulse laser with different damage/heat values at range brackets
         "id": "is_small_vsp_laser",
@@ -7824,7 +7824,11 @@ export const WEAPONS = {
             "ImprovedC3Computer",
             "ISImprovedC3CPU",
             "Improved C3 CPU",
-            "Improved C3 Computer"
+            "Improved C3 Computer",
+            "Improved C3 Computer (C3I)",
+            "improvedc3computerc3i",
+            "improved c3 computer c3i",
+            "ISC3iUnit"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -7909,8 +7913,7 @@ export const WEAPONS = {
             "weightSpacePage": 342,
             "battleValuePage": 317
         },
-        "bv": "E",
-        "cost": 50000
+        "bv": "E"
     },
     "clan_active_probe": {
         "id": "clan_active_probe",
@@ -8137,7 +8140,6 @@ export const WEAPONS = {
             "battleValuePage": 318
         },
         "bv": "D",
-        "cost": 50000
     },
         "clan_case_ii": {
         "id": "clan_case_ii",
@@ -8842,6 +8844,83 @@ export const WEAPONS = {
             "code": "E-F-D"
         }
     },
+    "is_full_head_ejection_system": {
+        "id": "is_full_head_ejection_system",
+        "name": "Full Head Ejection System",
+        "altNames": [
+            "Inner Sphere Full Head Ejection System",
+            "ISFullHeadEjectionSystem",
+            "FullHeadEjectionSystem"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "Ejection",
+        "damage": 0,
+        "heat": 0,
+        "tons": 0,
+        "critSlots": 0,
+        "spaceSlots": 0,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "D",
+        "flags": [
+            "ejection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "G",
+        "cost": 1725000,
+        "availability": {
+            "code": "X-X-E"
+        }
+    },
+    "clan_full_head_ejection_system": {
+        "id": "clan_full_head_ejection_system",
+        "name": "Full Head Ejection System",
+        "altNames": [
+            "Clan Full Head Ejection System",
+            "ClanFullHeadEjectionSystem",
+            "FullHeadEjectionSystem"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "Ejection",
+        "damage": 0,
+        "heat": 0,
+        "tons": 0,
+        "critSlots": 0,
+        "spaceSlots": 0,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "D",
+        "flags": [
+            "ejection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "G",
+        "cost": 1725000,
+        "availability": {
+            "code": "X-X-E"
+        }
+    },
+
 
 } as const satisfies Record<string, WeaponDefinition>;
 

@@ -40,6 +40,7 @@ type CatalogRow = {
   engineType: string;
   gyroType: string;
   cockpitType: string;
+  ejectionType: string;
   heatSinkCount: string;
   heatSinkType: string;
   armorType: string;
@@ -687,6 +688,7 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
   const structureType = normalizeComponentText(getValue("structure", "internal structure", "structure type")) || "Standard";
   const gyroType = normalizeComponentText(getValue("gyro", "gyro type")) || "Standard";
   const cockpitType = normalizeComponentText(getValue("cockpit", "cockpit type")) || "Standard";
+  const ejectionType = normalizeComponentText(getValue("ejection", "ejection system", "ejection type"));
   const myomerType = normalizeComponentText(getValue("myomer", "myomer type")) || "Standard";
 
   const config = getValue("config");
@@ -718,6 +720,7 @@ function parseMtfMetadata(content: string, unitType: UnitTypeKey): ParsedMtfMeta
     engineRating,
     gyroType,
     cockpitType,
+    ejectionType,
     heatSinkCount,
     heatSinkType,
     armorType,
@@ -1266,15 +1269,30 @@ function getDefensiveStructureModifier(structureType: string): number {
   return 1.0;
 }
 
+/**
+ * Gets the armor modifier used in Defensive Battle Rating.
+ *
+ * Most armor types use x1.0. Commercial armor uses x0.5. Ferro-Lamellor uses
+ * x1.2, matching MegaMekLab's Defensive Battle Rating output.
+ *
+ * @param armorType - Effective armor type.
+ * @returns Defensive armor BV modifier.
+ */
+function getDefensiveArmorBVModifier(armorType: string): number {
+  const normalized = normalizeLookupText(armorType);
+
+  if (normalized.includes("commercial")) return 0.5;
+  if (normalized.includes("ferrolamell")) return 1.2;
+
+  return 1.0;
+}
+
 function calculateDefensiveBV(metadata: ParsedMtfMetadata): number | null {
   const mass = toNumber(metadata.tonnage);
   if (!mass) return null;
 
-  let armorTypeModifier = 1.0;
-  if (metadata.armorType.toLowerCase().includes("commercial")) {
-    armorTypeModifier = 0.5;
-  }
-
+  const effectiveArmorType = getEffectiveArmorType(metadata);
+  const armorTypeModifier = getDefensiveArmorBVModifier(effectiveArmorType);
   const structureModifier = getDefensiveStructureModifier(metadata.structureType);
 
   let engineModifier = 1.0;
@@ -1769,11 +1787,6 @@ function weaponGetsArtemisModifier(weaponEntry: ParsedWeaponEntry, metadata: Par
   });
 }
 
-/**
- * Calculate explosive ammo subtraction.
- * @param metadata - Input value used by calculateExplosiveAmmoSubtraction.
- * @returns number result from calculateExplosiveAmmoSubtraction.
- */
 function calculateExplosiveAmmoSubtraction(metadata: ParsedMtfMetadata): number {
   let subtraction = 0;
 
@@ -1791,14 +1804,18 @@ function calculateExplosiveAmmoSubtraction(metadata: ParsedMtfMetadata): number 
         continue;
       }
 
-      subtraction += 15 * getAmmoSlotCountInLocation(location.slots, true);
+      subtraction +=
+        15 * getAmmoSlotCountInLocation(location.slots, true) +
+        getExplosiveWeaponSlotCountInLocation(location.slots);
     } else {
       if (
         locationKey === "centerTorso" ||
         isLegLocationKey(locationKey) ||
         locationKey === "head"
       ) {
-        subtraction += 15 * getAmmoSlotCountInLocation(location.slots, true);
+        subtraction +=
+          15 * getAmmoSlotCountInLocation(location.slots, true) +
+          getExplosiveWeaponSlotCountInLocation(location.slots);
       }
     }
   }
@@ -1943,105 +1960,6 @@ function getAmmoSlotBVMultiplier(slot: string): number {
 }
 
 /**
- * Extracts a rack size from ammo labels like SRM-6, LRM 15, Streak SRM 4, or ATM-12.
- *
- * @param normalizedSlot - Normalized ammo slot text.
- * @param familyToken - Normalized launcher family token to search for.
- * @returns Rack size from the ammo label, or 0 when no explicit rack size is present.
- */
-function getAmmoRackSizeFromSlot(normalizedSlot: string, familyToken: string): number {
-  const normalizedFamily = normalizeLookupText(familyToken);
-  if (!normalizedFamily) return 0;
-
-  const match = normalizedSlot.match(new RegExp(`${normalizedFamily}(\\d+)`));
-  return match?.[1] ? Number(match[1]) : 0;
-}
-
-/**
- * Gets the rack size for a mounted weapon definition.
- *
- * @param weapon - Weapon definition resolved from weapons.ts.
- * @returns Rack size from rackSize or the weapon name/id, or 0 when not applicable.
- */
-function getMountedWeaponRackSize(weapon: any): number {
-  if (typeof weapon?.rackSize === "number") return weapon.rackSize;
-
-  const values = [
-    weapon?.name,
-    weapon?.id,
-    ...(Array.isArray(weapon?.altNames) ? weapon.altNames : []),
-  ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
-
-  for (const value of values) {
-    const match = value.match(/(streaksrm|streaklrm|srm|lrm|mrm|atm)(\d+)/);
-    if (match?.[2]) return Number(match[2]);
-  }
-
-  return 0;
-}
-
-/**
- * Resolves ammo to a mounted missile launcher by explicit ammo family and rack size.
- *
- * This prevents labels such as "IS Ammo SRM-6" from matching the first mounted SRM
- * launcher merely because both SRM 4 and SRM 6 share the same "srm" family.
- *
- * @param normalizedSlot - Normalized ammo slot text.
- * @param mountedAmmoWeapons - Mounted weapons with ammo definitions.
- * @param desiredTechBase - Preferred tech base for Clan/Inner Sphere ambiguity.
- * @returns Matching mounted weapon definition, or null when no exact rack match exists.
- */
-function findExactRackAmmoWeapon(
-  normalizedSlot: string,
-  mountedAmmoWeapons: any[],
-  desiredTechBase: string
-): any | null {
-  const rackMatchers = [
-    { family: "streaklrm", familyChecks: ["streaklrm"], tokens: ["streaklrm", "streaklrmammo"] },
-    { family: "streaksrm", familyChecks: ["streaksrm"], tokens: ["streaksrm", "ssrm", "streaksrmammo"] },
-    { family: "lrm", familyChecks: ["lrm"], tokens: ["lrm", "lrmammo"] },
-    { family: "srm", familyChecks: ["srm"], tokens: ["srm", "srmammo"] },
-    { family: "mrm", familyChecks: ["mrm"], tokens: ["mrm", "mrmammo"] },
-    { family: "atm", familyChecks: ["atm"], tokens: ["atm", "atmammo"] },
-  ];
-
-  for (const matcher of rackMatchers) {
-    const rackSize = matcher.tokens
-      .map((token) => getAmmoRackSizeFromSlot(normalizedSlot, token))
-      .find((size) => size > 0) ?? 0;
-
-    if (!rackSize) continue;
-
-    const candidates = mountedAmmoWeapons.filter((weapon) => {
-      const weaponRackSize = getMountedWeaponRackSize(weapon);
-      if (weaponRackSize !== rackSize) return false;
-
-      const weaponName = normalizeLookupText(String(weapon?.name || ""));
-      const weaponId = normalizeLookupText(String(weapon?.id || ""));
-      const weaponFamily = normalizeLookupText(String(weapon?.family || ""));
-
-      return matcher.familyChecks.some((family) => {
-        const normalizedFamily = normalizeLookupText(family);
-        return (
-          weaponFamily.includes(normalizedFamily) ||
-          weaponName.includes(normalizedFamily) ||
-          weaponId.includes(normalizedFamily)
-        );
-      });
-    });
-
-    const uniqueCandidates = Array.from(
-      new Map(candidates.map((weapon: any) => [weapon.id || weapon.name, weapon])).values()
-    );
-
-    const bestCandidate = chooseBestWeaponByTechBase(uniqueCandidates, desiredTechBase);
-    if (bestCandidate) return bestCandidate;
-  }
-
-  return null;
-}
-
-/**
  * Resolves an ammo critical-slot label such as "IS Ammo AC/5" to the matching weapon definition.
  * @param lowerSlot - Lowercase raw slot text from the MTF critical-slot list.
  * @param weapons - Mounted weapons already parsed from the unit, used as a fallback for ambiguous ammo names.
@@ -2061,11 +1979,6 @@ function findAmmoWeaponForSlot(lowerSlot: string, weapons: ParsedWeaponEntry[], 
   const mountedAmmoWeapons = weapons
     .map((entry) => entry.weaponData)
     .filter((weapon) => weapon?.ammo);
-
-  const exactRackMountedWeapon = findExactRackAmmoWeapon(normalizedSlot, mountedAmmoWeapons, desiredTechBase);
-  if (exactRackMountedWeapon) {
-    return exactRackMountedWeapon;
-  }
 
   const mountedCandidates = mountedAmmoWeapons.filter((weapon) => {
     const ammoType = weapon.ammo?.ammoType
@@ -2178,13 +2091,11 @@ function calculateMekCBills(metadata: ParsedMtfMetadata): MekCBillCalculation | 
   const engineRating = metadata.engineRating || unitTonnage * metadata.walkMP;
   const gyroTonnage = getGyroTonnage(engineRating, metadata.gyroType);
   const effectiveArmorType = getEffectiveArmorType(metadata);
-  const armorTonnage = metadata.armorTonnageOverride > 0
-    ? metadata.armorTonnageOverride
-    : getArmorTonnage(
-        effectiveArmorType,
-        metadata.techBase,
-        getTotalArmor(metadata.armor)
-      );
+  const armorTonnage = getArmorTonnage(
+    effectiveArmorType,
+    metadata.techBase,
+    getTotalArmor(metadata.armor)
+  );
 
   const breakdown: Record<string, number> = {};
   const costLines: CostBreakdownLine[] = [];
@@ -2208,6 +2119,7 @@ function calculateMekCBills(metadata: ParsedMtfMetadata): MekCBillCalculation | 
     metadata.heatSinkCount,
     metadata.engineType
   ));
+  addLine("fullHeadEjectionSystem", "Full Head Ejection System", getFullHeadEjectionSystemCost(metadata));
   addLine("armor", "Armor", getArmorCost(effectiveArmorType, armorTonnage));
 
   const mascCost = getMASCCost(metadata, engineRating);
@@ -2603,19 +2515,56 @@ function isFerroLamellorArmor(armorType: string): boolean {
   return normalized.includes("ferrolamell") || normalized.includes("lamellor") || normalized.includes("lamellar");
 }
 
+/**
+ * Rounds raw armor tonnage up to the next legal half-ton increment for C-bill billing.
+ *
+ * @param rawArmorTonnage - Raw armor tonnage from armor points / points per ton.
+ * @returns Armor tonnage rounded up to the nearest half ton.
+ */
+function roundArmorTonnageUpToHalfTon(rawArmorTonnage: number): number {
+  if (!rawArmorTonnage || rawArmorTonnage <= 0) return 0;
+  return Math.ceil(rawArmorTonnage * 2) / 2;
+}
+
+/**
+ * Gets C-bill cost per ton for the effective armor type.
+ *
+ * @param armorType - Effective armor type.
+ * @returns C-bill cost per ton.
+ */
+function getArmorCostPerTon(armorType: string): number {
+  const normalized = normalizeLookupText(armorType);
+
+  if (normalized.includes("commercial")) return 3_000;
+  if (normalized.includes("heavyindustrial")) return 10_000;
+  if (normalized.includes("industrial")) return 5_000;
+
+  if (normalized.includes("lightferro")) return 15_000;
+  if (normalized.includes("heavyferro")) return 25_000;
+  if (normalized.includes("stealth")) return 50_000;
+
+  // Ferro-Lamellor is priced separately from standard Ferro-Fibrous.
+  if (normalized.includes("ferrolamell")) return 50_000;
+
+  if (normalized.includes("ferro")) return 20_000;
+
+  return 10_000;
+}
+
+/**
+ * Calculates armor C-bill cost from raw armor tonnage and effective armor type.
+ *
+ * @param armorType - Effective armor type.
+ * @param armorTonnage - Raw armor tonnage before billable rounding.
+ * @returns Armor C-bill cost.
+ */
 function getArmorCost(armorType: string, armorTonnage: number): number {
-  const lower = armorType.toLowerCase();
-  const billableArmorTonnage = getBillableArmorTonnageForCost(armorType, armorTonnage);
+  const normalized = normalizeLookupText(armorType);
+  const billableArmorTonnage = normalized.includes("ferrolamell")
+    ? armorTonnage
+    : roundArmorTonnageUpToHalfTon(armorTonnage);
 
-  if (isFerroLamellorArmor(armorType)) return Math.round(20_000 * billableArmorTonnage);
-  if (lower.includes("light ferro")) return Math.round(15_000 * billableArmorTonnage);
-  if (lower.includes("heavy ferro")) return Math.round(25_000 * billableArmorTonnage);
-  if (lower.includes("ferro")) return Math.round(20_000 * billableArmorTonnage);
-  if (lower.includes("stealth")) return Math.round(50_000 * billableArmorTonnage);
-  if (lower.includes("commercial")) return Math.round(3_000 * billableArmorTonnage);
-  if (lower.includes("industrial")) return Math.round(5_000 * billableArmorTonnage);
-
-  return Math.round(10_000 * billableArmorTonnage);
+  return Math.round(getArmorCostPerTon(armorType) * billableArmorTonnage);
 }
 
 /**
@@ -2852,12 +2801,6 @@ function isExplicitCASEIISlot(rawSlot: string): boolean {
   );
 }
 
-/**
- * Counts inherent Clan CASE systems for C-bill cost. Clan Meks often omit explicit CASE slots,
- * so infer one CASE system per location containing explosive/protected ammo or an explosive weapon.
- * @param metadata - Parsed Mek metadata.
- * @returns Number of inferred Clan CASE systems.
- */
 function countClanInherentCaseSystems(metadata: ParsedMtfMetadata): number {
   let caseCount = 0;
 
@@ -2896,16 +2839,47 @@ function isAmmoSlotForCaseCost(rawSlot: string): boolean {
 }
 
 /**
- * Determines whether a weapon slot should trigger CASE cost. Gauss ammo is non-explosive,
- * but Gauss weapons themselves are explosive.
+ * Detects explosive weapons that behave like Gauss weapons for defensive BV and CASE.
+ *
+ * Improved Heavy Lasers are treated as explosive equipment like Gauss weaponry.
+ * MegaMek critical-slot labels can use several orders/spellings, including:
+ * - CLImprovedMediumHeavyLaser
+ * - Improved Heavy Medium Laser
+ * - Improved Medium Heavy Laser
+ *
  * @param rawSlot - Raw critical slot text.
  * @returns True when the slot contains an explosive weapon.
  */
-function isExplosiveWeaponSlotForCaseCost(rawSlot: string): boolean {
+function isExplosiveWeaponSlot(rawSlot: string): boolean {
   const normalized = normalizeLookupText(rawSlot);
 
-  if (normalized.includes("ammo")) return false;
-  return normalized.includes("gauss");
+  if (!normalized || normalized.includes("ammo")) return false;
+
+  const isGaussWeapon = normalized.includes("gauss");
+  const isImprovedHeavyLaser =
+    normalized.includes("laser") &&
+    (
+      normalized.includes("improvedheavy") ||
+      normalized.includes("impheavy") ||
+      (normalized.includes("improved") && normalized.includes("heavy")) ||
+      (normalized.includes("imp") && normalized.includes("heavy"))
+    );
+
+  return isGaussWeapon || isImprovedHeavyLaser;
+}
+
+/**
+ * Counts explosive weapon critical slots in one location.
+ *
+ * @param slots - Critical slots in a location.
+ * @returns Number of explosive weapon critical slots.
+ */
+function getExplosiveWeaponSlotCountInLocation(slots: string[]): number {
+  return slots.filter((slot) => isExplosiveWeaponSlot(slot)).length;
+}
+
+function isExplosiveWeaponSlotForCaseCost(rawSlot: string): boolean {
+  return isExplosiveWeaponSlot(rawSlot);
 }
 
 /**
@@ -2988,6 +2962,80 @@ function getResolvedCostValue(value: unknown): number {
  */
 function getMiscEquipmentCost(metadata: ParsedMtfMetadata): number {
   return sumCostLines(getMiscEquipmentCostBreakdown(metadata));
+}
+
+/**
+ * Calculates Full Head Ejection System C-bill cost by resolving the installed
+ * critical-slot equipment against weapons.ts.
+ *
+ * This keeps the equipment definition, cost, tech rating, and availability in
+ * weapons.ts rather than hardcoding those values in the indexer.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Full Head Ejection System C-bill cost, or 0 when not installed.
+ */
+function getFullHeadEjectionSystemCost(metadata: ParsedMtfMetadata): number {
+  const equipment = getFullHeadEjectionSystemDefinition(metadata);
+  return equipment ? getResolvedCostValue(equipment.cost) : 0;
+}
+
+/**
+ * Resolves Full Head Ejection System equipment from the MTF ejection field or critical slots.
+ *
+ * MegaMek MTFs may represent this as a top-level field:
+ *   ejection:Full Head Ejection System
+ * rather than as a head critical slot.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Matching weapons.ts equipment definition, or null when absent.
+ */
+function getFullHeadEjectionSystemDefinition(metadata: ParsedMtfMetadata): any | null {
+  if (isFullHeadEjectionSystemSlot(metadata.ejectionType)) {
+    const resolved =
+      resolveWeapon(metadata.ejectionType, undefined, metadata.techBase) ||
+      resolveWeapon("Full Head Ejection System", undefined, metadata.techBase);
+
+    if (resolved && getResolvedCostValue(resolved.cost) > 0) {
+      return resolved;
+    }
+  }
+
+  for (const location of Object.values(metadata.locations)) {
+    for (const rawSlot of location.slots) {
+      if (!isFullHeadEjectionSystemSlot(rawSlot)) continue;
+
+      const cleanedSlot = cleanMiscEquipmentSlotText(rawSlot);
+      const possibleId = extractWeaponId(rawSlot) || extractWeaponId(cleanedSlot);
+
+      const resolved =
+        resolveWeapon(rawSlot, possibleId, metadata.techBase) ||
+        resolveWeapon(cleanedSlot, possibleId, metadata.techBase) ||
+        resolveWeapon("Full Head Ejection System", undefined, metadata.techBase);
+
+      if (resolved && getResolvedCostValue(resolved.cost) > 0) {
+        return resolved;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Detects Full Head Ejection System labels.
+ *
+ * @param rawSlot - Raw critical slot text or ejection field value.
+ * @returns True when the text represents a Full Head Ejection System.
+ */
+function isFullHeadEjectionSystemSlot(rawSlot: string): boolean {
+  const normalized = normalizeLookupText(rawSlot);
+
+  return (
+    normalized.includes("fullheadejectionsystem") ||
+    normalized.includes("headejectionsystem") ||
+    normalized.includes("fullejectionsystem") ||
+    normalized.includes("fhes")
+  );
 }
 
 /**
@@ -3145,6 +3193,7 @@ function shouldConsiderMiscEquipmentSlot(rawSlot: string, metadata: ParsedMtfMet
   if (normalized.includes("case")) return false;
   if (normalized.includes("masc")) return false;
   if (normalized.includes("supercharger")) return false;
+  if (isFullHeadEjectionSystemSlot(rawSlot)) return false;
   if (normalized.includes("artemis")) return false;
 
   if (isAlreadyCountedMountedWeaponOrEquipment(rawSlot, metadata)) return false;
@@ -3155,15 +3204,89 @@ function shouldConsiderMiscEquipmentSlot(rawSlot: string, metadata: ParsedMtfMet
 }
 
 /**
- * Gets the C-bill cost for one miscellaneous equipment item using WEAPONS as source data.
+ * Detects a Targeting Computer definition or slot.
+ *
  * @param rawSlot - Raw critical slot text.
- * @param metadata - Parsed Mek metadata.
- * @param resolved - Resolved equipment definition from WEAPONS.
- * @returns Equipment cost, or 0 when missing.
+ * @param resolved - Optional resolved equipment definition.
+ * @returns True when the slot/equipment represents a Targeting Computer.
  */
+function isTargetingComputerEquipment(rawSlot: string, resolved?: any | null): boolean {
+  const normalizedSlot = normalizeLookupText(rawSlot);
+  const id = normalizeLookupText(String(resolved?.id || ""));
+  const name = normalizeLookupText(String(resolved?.name || ""));
+  const family = normalizeLookupText(String(resolved?.family || ""));
+  const category = normalizeLookupText(String(resolved?.category || ""));
+
+  return (
+    normalizedSlot.includes("targetingcomputer") ||
+    id.includes("targetingcomputer") ||
+    name.includes("targetingcomputer") ||
+    family.includes("targetingcomputer") ||
+    (category.includes("targeting") && name.includes("computer"))
+  );
+}
+
+/**
+ * Calculates Targeting Computer C-bill cost.
+ *
+ * Formula:
+ *   targeted weapon tonnage / 5 = targeting computer weight
+ *   targeting computer weight x 10,000 = C-bill cost
+ *
+ * Weight is rounded up to the next full ton, with a minimum of 1 ton and maximum
+ * of 20 tons.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Targeting Computer C-bill cost.
+ */
+function getTargetingComputerCost(metadata: ParsedMtfMetadata): number {
+  if (!hasTargetingComputer(metadata)) return 0;
+
+  const targetedWeaponTonnage = getTargetingComputerEligibleWeaponTonnage(metadata);
+  const targetingComputerTonnage = Math.min(20, Math.max(1, Math.ceil(targetedWeaponTonnage / 5)));
+
+  return targetingComputerTonnage * 10_000;
+}
+
+/**
+ * Gets total tonnage of weapons eligible for Targeting Computer support.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns Total eligible weapon tonnage.
+ */
+function getTargetingComputerEligibleWeaponTonnage(metadata: ParsedMtfMetadata): number {
+  return metadata.weapons.reduce((total, entry) => {
+    const weapon = entry.weaponData;
+    if (!weapon) return total;
+    if (!isTargetingComputerEligibleWeapon(weapon)) return total;
+
+    const tons = typeof weapon.tons === "number" ? weapon.tons : toNumber(String(weapon.tons || 0));
+    return total + tons;
+  }, 0);
+}
+
+/**
+ * Detects whether a Mek has a Targeting Computer installed.
+ *
+ * @param metadata - Parsed Mek metadata.
+ * @returns True when a Targeting Computer is present.
+ */
+function hasTargetingComputer(metadata: ParsedMtfMetadata): boolean {
+  return Object.values(metadata.locations).some((location) =>
+    location.slots.some((slot) => {
+      const resolved = resolveMiscEquipmentDefinitionFromSlot(slot, metadata);
+      return isTargetingComputerEquipment(slot, resolved);
+    })
+  );
+}
+
 function getMiscEquipmentSlotCost(rawSlot: string, metadata: ParsedMtfMetadata, resolved?: any | null): number {
   const equipment = resolved ?? resolveMiscEquipmentDefinitionFromSlot(rawSlot, metadata);
   if (!equipment || !isCostedMiscEquipmentDefinition(equipment)) return 0;
+
+  if (isTargetingComputerEquipment(rawSlot, equipment)) {
+    return getTargetingComputerCost(metadata);
+  }
 
   return getResolvedCostValue(equipment.cost);
 }
@@ -3175,7 +3298,15 @@ function getMiscEquipmentSlotCost(rawSlot: string, metadata: ParsedMtfMetadata, 
  */
 function isCostedMiscEquipmentDefinition(definition: any): boolean {
   if (!definition) return false;
-  if (getResolvedCostValue(definition.cost) <= 0) return false;
+  const idForCostCheck = normalizeLookupText(String(definition?.id || ""));
+  const nameForCostCheck = normalizeLookupText(String(definition?.name || ""));
+  const familyForCostCheck = normalizeLookupText(String(definition?.family || ""));
+  const isTargetingComputerForCostCheck =
+    idForCostCheck.includes("targetingcomputer") ||
+    nameForCostCheck.includes("targetingcomputer") ||
+    familyForCostCheck.includes("targetingcomputer");
+
+  if (!isTargetingComputerForCostCheck && getResolvedCostValue(definition.cost) <= 0) return false;
   if (isNormalWeaponForCost(definition)) return false;
 
   const category = String(definition?.category || "").toLowerCase();
@@ -3246,17 +3377,13 @@ function cleanMiscEquipmentSlotText(rawSlot: string): string {
     .trim();
 }
 
-/**
- * Creates a stable key so multi-slot equipment is only charged once per location.
- * Identical items in different locations are grouped by display name and count.
- * @param rawSlot - Raw critical slot text.
- * @param metadata - Parsed Mek metadata.
- * @param locationKey - Location containing the slot.
- * @param resolved - Optional resolved equipment definition from WEAPONS.
- * @returns Normalized equipment key.
- */
 function getMiscEquipmentCountKey(rawSlot: string, metadata: ParsedMtfMetadata, locationKey: MekLocationKey, resolved?: any | null): string {
   const equipment = resolved ?? resolveMiscEquipmentDefinitionFromSlot(rawSlot, metadata);
+
+  if (isTargetingComputerEquipment(rawSlot, equipment)) {
+    return "targetingcomputer|unit";
+  }
+
   const equipmentId = equipment?.id ? normalizeLookupText(String(equipment.id)) : normalizeLookupText(cleanMiscEquipmentSlotText(rawSlot));
 
   if (!equipmentId) return "";
@@ -3356,25 +3483,52 @@ function getGyroTonnage(engineRating: number, gyroType: string): number {
  * @param armorPoints - Input value used by getArmorTonnage.
  * @returns number result from getArmorTonnage.
  */
-function getArmorTonnage(armorType: string, techBase: string, armorPoints: number): number {
-  if (!armorPoints) return 0;
+/**
+ * Gets armor points per ton for armor tonnage calculation.
+ *
+ * This is separate from armor C-bill cost per ton. Armor cost is calculated from
+ * armor tonnage, while defensive BV still uses armor points directly.
+ *
+ * @param armorType - Effective armor type.
+ * @param techBase - Unit tech base.
+ * @returns Armor points per ton.
+ */
+function getArmorPointsPerTon(armorType: string, techBase: string): number {
+  const normalizedArmorType = normalizeLookupText(armorType);
+  const normalizedTechBase = normalizeTechBase(techBase);
 
-  const lowerArmor = armorType.toLowerCase();
-  const lowerTech = techBase.toLowerCase();
+  if (normalizedArmorType.includes("commercial")) return 16;
+  if (normalizedArmorType.includes("heavyindustrial")) return 16;
+  if (normalizedArmorType.includes("industrial")) return 16;
 
-  let pointsPerTon = 16;
+  if (normalizedArmorType.includes("stealth")) return 16;
 
-  if (isFerroLamellorArmor(armorType)) {
-    pointsPerTon = 19.2;
-  } else if (lowerArmor.includes("light ferro")) {
-    pointsPerTon = 16.8;
-  } else if (lowerArmor.includes("heavy ferro")) {
-    pointsPerTon = 19.2;
-  } else if (lowerArmor.includes("ferro")) {
-    pointsPerTon = lowerTech.includes("clan") ? 20.16 : 17.92;
+  if (normalizedArmorType.includes("lightferro")) return 16.96;
+  if (normalizedArmorType.includes("heavyferro")) return 19.84;
+
+  // Ferro-Lamellor matches MegaMekLab's cost output as 20 armor points per ton.
+  if (normalizedArmorType.includes("ferrolamell")) return 20;
+
+  if (normalizedArmorType.includes("ferro")) {
+    return normalizedTechBase === "Clan" ? 19.2 : 17.92;
   }
 
-  return getBillableArmorTonnageForCost(armorType, armorPoints / pointsPerTon);
+  return 16;
+}
+
+/**
+ * Calculates raw armor tonnage from armor points.
+ *
+ * @param armorType - Effective armor type.
+ * @param techBase - Unit tech base.
+ * @param armorPoints - Total armor points.
+ * @returns Raw armor tonnage before billable half-ton rounding.
+ */
+function getArmorTonnage(armorType: string, techBase: string, armorPoints: number): number {
+  const pointsPerTon = getArmorPointsPerTon(armorType, techBase);
+  if (!pointsPerTon || !armorPoints) return 0;
+
+  return armorPoints / pointsPerTon;
 }
 
 /**
