@@ -75,7 +75,7 @@ export type ArmorType =
   | "Commercial"
   | "Industrial";
 
-export type InternalStructureType = "Standard" | "Endo-Steel" | "Industrial";
+export type InternalStructureType = "Standard" | "Endo-Steel" | "Endo-Composite" | "Industrial";
 
 export const COMPONENTS = {
   // Cockpit / Control Systems
@@ -224,6 +224,33 @@ export const COMPONENTS = {
     },
     cost: { type: "unitTonnage", multiplier: 1_600 },
   },
+  endoCompositeInternalStructure: {
+    id: "endoCompositeInternalStructure",
+    name: "Endo-Composite Internal Structure",
+    altNames: [
+      "Endo-Composite",
+      "Endo Composite",
+      "Endo-Composite Structure",
+      "Endo Composite Structure",
+      "Endo-Composite Internal Structure",
+      "Endo Composite Internal Structure",
+      "ISEndoComposite",
+      "CLEndoComposite",
+      "IS Endo-Composite",
+      "Clan Endo-Composite",
+      "IS Endo Composite",
+      "Clan Endo Composite"
+    ],
+    category: "internalStructure",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "unitTonnage", multiplier: 800 },
+  },
+
   industrialInternalStructure: {
     id: "industrialInternalStructure",
     name: "Industrial Internal Structure",
@@ -704,6 +731,492 @@ export type ComponentCostContext = {
   armorTonnage?: number;
   amplifierTonnage?: number;
   mascTonnage?: number;
+
+  // Slot auditor additions / advanced and industrial equipment
+  artemisIVFCS: {
+    id: "artemisIVFCS",
+    name: "Artemis IV FCS",
+    altNames: [
+      "Artemis IV",
+      "Artemis IV FCS",
+      "ISArtemisIV",
+      "CLArtemisIV",
+      "CLArtemisIV (OMNIPOD)",
+      "IS Artemis IV",
+      "Clan Artemis IV"
+    ],
+    category: "fireControl",
+    techRating: "E",
+    availability: {
+      starLeague: "E",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 100_000 },
+  },
+
+  hatchet: {
+    id: "hatchet",
+    name: "Hatchet",
+    altNames: [
+      "Hatchet",
+      "ISHatchet",
+      "CLHatchet"
+    ],
+    category: "physicalWeapon",
+    techRating: "C",
+    availability: {
+      starLeague: "X",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
+    cost: { type: "equipmentTonnage", multiplier: 5_000 },
+  },
+
+  sword: {
+    id: "sword",
+    name: "Sword",
+    altNames: [
+      "Sword",
+      "ISSword",
+      "CLSword"
+    ],
+    category: "physicalWeapon",
+    techRating: "D",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "D",
+    },
+    cost: { type: "equipmentTonnage", multiplier: 10_000 },
+  },
+
+  mace: {
+    id: "mace",
+    name: "Mace",
+    altNames: [
+      "Mace",
+      "ISMace",
+      "CLMace"
+    ],
+    category: "physicalWeapon",
+    techRating: "B",
+    availability: {
+      starLeague: "X",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 130_000 },
+  },
+
+  claws: {
+    id: "claws",
+    name: "Claws",
+    altNames: [
+      "Claw",
+      "Claws",
+      "ISClaw",
+      "ISClaws",
+      "CLClaw",
+      "CLClaws"
+    ],
+    category: "physicalWeapon",
+    techRating: "B",
+    availability: {
+      starLeague: "X",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
+    cost: { type: "unitTonnage", multiplier: 200 },
+  },
+
+  retractableBlade: {
+    id: "retractableBlade",
+    name: "Retractable Blade",
+    altNames: [
+      "Retractable Blade",
+      "Retractable Blade (OMNIPOD)",
+      "ISRetractableBlade",
+      "CLRetractableBlade"
+    ],
+    category: "physicalWeapon",
+    techRating: "D",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "equipmentTonnage", multiplier: 10_000 },
+  },
+
+  chainsaw: {
+    id: "chainsaw",
+    name: "Chainsaw",
+    altNames: [
+      "Chainsaw",
+      "ISChainsaw",
+      "CLChainsaw"
+    ],
+    category: "industrialEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "D",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 100_000 },
+  },
+
+  dualSaw: {
+    id: "dualSaw",
+    name: "Dual Saw",
+    altNames: [
+      "Dual Saw",
+      "DualSaw",
+      "ISDualSaw",
+      "CLDualSaw"
+    ],
+    category: "industrialEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "D",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 100_000 },
+  },
+
+  miningDrill: {
+    id: "miningDrill",
+    name: "Mining Drill",
+    altNames: [
+      "Mining Drill",
+      "MiningDrill",
+      "ISMiningDrill",
+      "CLMiningDrill"
+    ],
+    category: "industrialEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "D",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 150_000 },
+  },
+
+  rockCutter: {
+    id: "rockCutter",
+    name: "Rock Cutter",
+    altNames: [
+      "Rock Cutter",
+      "RockCutter",
+      "ISRockCutter",
+      "CLRockCutter"
+    ],
+    category: "industrialEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "D",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 150_000 },
+  },
+
+  backhoe: {
+    id: "backhoe",
+    name: "Backhoe",
+    altNames: [
+      "Backhoe",
+      "ISBackhoe",
+      "CLBackhoe"
+    ],
+    category: "industrialEquipment",
+    techRating: "B",
+    availability: {
+      starLeague: "B",
+      successionWars: "B",
+      clanInvasion: "B",
+    },
+    cost: { type: "fixed", amount: 50_000 },
+  },
+
+  liftHoist: {
+    id: "liftHoist",
+    name: "Lift Hoist",
+    altNames: [
+      "Lift Hoist",
+      "LiftHoist",
+      "Lift Hoist/Arresting Hoist",
+      "Arresting Hoist",
+      "ISLiftHoist",
+      "CLLiftHoist"
+    ],
+    category: "industrialEquipment",
+    techRating: "A",
+    availability: {
+      starLeague: "A",
+      successionWars: "A",
+      clanInvasion: "A",
+    },
+    cost: { type: "fixed", amount: 50_000 },
+  },
+
+  arrestingHoist: {
+    id: "arrestingHoist",
+    name: "Arresting Hoist",
+    altNames: [
+      "Arresting Hoist",
+      "ArrestingHoist"
+    ],
+    category: "industrialEquipment",
+    techRating: "C",
+    availability: {
+      starLeague: "C",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 90_000 },
+  },
+
+  cargoOneTon: {
+    id: "cargoOneTon",
+    name: "Cargo (1 ton)",
+    altNames: [
+      "Cargo (1 ton)",
+      "Cargo",
+      "CargoOneTon"
+    ],
+    category: "cargo",
+    techRating: "A",
+    availability: {
+      starLeague: "A",
+      successionWars: "A",
+      clanInvasion: "A",
+    },
+    cost: { type: "fixed", amount: 0 },
+  },
+
+  partialWing: {
+    id: "partialWing",
+    name: "Partial Wing",
+    altNames: [
+      "Partial Wing",
+      "ISPartialWing",
+      "CLPartialWing",
+      "PartialWing",
+      "Partial Wing (\u2019Mech)",
+      "Partial Wing ('Mech)"
+    ],
+    category: "motiveSystem",
+    techRating: "F",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "internalStructure", multiplier: 50_000 },
+  },
+
+  actuatorEnhancementSystem: {
+    id: "actuatorEnhancementSystem",
+    name: "Actuator Enhancement System",
+    altNames: [
+      "Actuator Enhancement System",
+      "AES",
+      "ISAES",
+      "CLAES",
+      "Actuator Enhancement Sys. (Arm)",
+      "Actuator Enhancement Sys. (Leg)"
+    ],
+    category: "actuatorEnhancement",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "F",
+    },
+    cost: { type: "unitTonnage", multiplier: 500 },
+  },
+
+  ballisticReinforcedArmor: {
+    id: "ballisticReinforcedArmor",
+    name: "Ballistic-Reinforced Armor",
+    altNames: [
+      "Ballistic-Reinforced",
+      "Ballistic Reinforced",
+      "IS Ballistic-Reinforced",
+      "Clan Ballistic-Reinforced",
+      "ISBallisticReinforced",
+      "CLBallisticReinforced"
+    ],
+    category: "armor",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "F",
+    },
+    cost: { type: "armorTonnage", multiplier: 35_000 },
+  },
+
+  impactResistantArmor: {
+    id: "impactResistantArmor",
+    name: "Impact-Resistant Armor",
+    altNames: [
+      "Impact-Resistant",
+      "Impact Resistant",
+      "IS Impact-Resistant",
+      "Clan Impact-Resistant",
+      "ISImpactResistant",
+      "CLImpactResistant"
+    ],
+    category: "armor",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "F",
+    },
+    cost: { type: "armorTonnage", multiplier: 35_000 },
+  },
+
+  avionics: {
+    id: "avionics",
+    name: "Avionics",
+    altNames: [
+      "Avionics",
+      "ISAvionics",
+      "CLAvionics"
+    ],
+    category: "lamSystem",
+    techRating: "E",
+    availability: {
+      starLeague: "E",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 0 },
+  },
+
+  landingGear: {
+    id: "landingGear",
+    name: "Landing Gear",
+    altNames: [
+      "Landing Gear",
+      "LandingGear",
+      "ISLandingGear",
+      "CLLandingGear"
+    ],
+    category: "lamSystem",
+    techRating: "E",
+    availability: {
+      starLeague: "E",
+      successionWars: "F",
+      clanInvasion: "D",
+    },
+    cost: { type: "fixed", amount: 0 },
+  },
+
+  rl10: {
+    id: "rl10",
+    name: "Rocket Launcher 10",
+    altNames: [
+      "RL10",
+      "Rocket Launcher 10",
+      "RocketLauncher10",
+      "ISRL10",
+      "CLRL10"
+    ],
+    category: "oneShotLauncher",
+    techRating: "B",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "B",
+    },
+    cost: { type: "fixed", amount: 15_000 },
+  },
+
+  vehicularGrenadeLauncher: {
+    id: "vehicularGrenadeLauncher",
+    name: "Vehicular Grenade Launcher",
+    altNames: [
+      "Vehicular Grenade Launcher",
+      "ISVehicularGrenadeLauncher",
+      "CLVehicularGrenadeLauncher"
+    ],
+    category: "weapon",
+    techRating: "C",
+    availability: {
+      starLeague: "D",
+      successionWars: "E",
+      clanInvasion: "F",
+    },
+    cost: { type: "fixed", amount: 10_000 },
+  },
+
+  mekTaser: {
+    id: "mekTaser",
+    name: "Mek Taser",
+    altNames: [
+      "Mek Taser",
+      "BattleMech Taser",
+      "Taser (BattleMech)",
+      "ISMekTaser",
+      "CLMekTaser"
+    ],
+    category: "weapon",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 200_000 },
+  },
+
+  mechMortar4: {
+    id: "mechMortar4",
+    name: "Mech Mortar/4",
+    altNames: [
+      "Mech Mortar-4",
+      "Clan Mech Mortar-4",
+      "Clan Mech Mortar-4 (OMNIPOD)",
+      "ISMechMortar4",
+      "CLMechMortar4"
+    ],
+    category: "weapon",
+    techRating: "B",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
+    cost: { type: "fixed", amount: 75_000 },
+  },
+
+  mechMortar8: {
+    id: "mechMortar8",
+    name: "Mech Mortar/8",
+    altNames: [
+      "Mech Mortar-8",
+      "Clan Mech Mortar-8",
+      "Clan Mech Mortar-8 (OMNIPOD)",
+      "ISMechMortar8",
+      "CLMechMortar8"
+    ],
+    category: "weapon",
+    techRating: "B",
+    availability: {
+      starLeague: "C",
+      successionWars: "C",
+      clanInvasion: "C",
+    },
+    cost: { type: "fixed", amount: 150_000 },
+  },
+
 };
 
 function requireNumber(value: number | undefined, field: string, componentId: string): number {

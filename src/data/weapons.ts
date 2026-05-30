@@ -1,94 +1,22 @@
-export type WeaponCategory = "Energy" | "Ballistic" | "Missile" | "Equipment";
+import type { TechBase, WeaponDefinition } from "./weaponTypes";
+export type {
+  WeaponCategory,
+  TechBase,
+  RulesLevel,
+  AvailabilityByEra,
+  WeaponAvailability,
+  WeaponCost,
+  WeaponRange,
+  AmmoDefinition,
+  AmmoReference,
+  AmmoOptionReference,
+  WeaponDefinition,
+} from "./weaponTypes";
+export { AMMO, getAmmoDefinition } from "./ammo";
 
-export type TechBase = "Inner Sphere" | "Clan" | "Mixed";
-export type RulesLevel = "Introductory" | "Standard" | "Advanced" | "Experimental";
-
-export type AvailabilityByEra = {
-    starLeague: string;
-    successionWars: string;
-    clanInvasion: string;
-    darkAge?: string;
-};
-
-export type WeaponAvailability = AvailabilityByEra & {
-    introduced?: string;
-    extinct?: string;
-    reintroduced?: string;
-};
-
-export type WeaponRange = {
-    min?: number;
-    short?: number;
-    medium?: number;
-    long?: number;
-    extreme?: number;
-};
-
-export type WeaponDefinition = {
-    id: string;
-    name: string;
-    altNames: string[];
-    category: WeaponCategory;
-    techBase: TechBase;
-    rulesLevel?: RulesLevel;
-    variant?: string;
-    family?: string;
-    typeCodes?: string[];
-
-    /** Values like "1/Msl", "2/Shot", "25/20/10", "special", or "C5/20" are intentionally kept as strings. */
-    damage: number | string;
-    rackSize?: number;
-    heat: number | string;
-
-    /** BattleMech/IndustrialMech critical slots from the M column of the construction table. */
-    tons: number | string;
-    critSlots: number | string;
-    spaceSlots?: number | string;
-
-    ammo?: {
-        ammoType: string;
-        ammoPerTon: number | string;
-        ammoCostPerTon?: number;
-        ammoBV?: number;
-    };
-
-    /** Optional ammunition modes for launchers that can use more than one ammo family, such as MMLs. */
-    ammoOptions?: Array<{
-        mode: string;
-        ammoType: string;
-        ammoPerTon: number | string;
-        ammoCostPerTon?: number;
-        ammoBV?: number;
-    }>;
-
-    range?: WeaponRange;
-
-    /** Weapon purchase cost. Present only where already verified in the existing file/source data. */
-    cost?: number;
-
-    /** Weapon BV/WBR from the Weapons and Equipment Battle Value tables. Some equipment uses rule-code values (A-F) from table notes instead of standalone numeric BV. */
-    bv: number | string;
-    /** Single-shot/one-shot missile launcher BV, when the BV table lists a second value after a slash. */
-    oneShotBV?: number;
-    /** Standalone ammo BV for equipment entries that do not have an ammo object. */
-    ammoBV?: number | string;
-
-    techRating?: string;
-    availability?: WeaponAvailability;
-
-    source?: {
-        totalWarfarePage?: number;
-        weightSpacePage?: number;
-        costAvailabilityPage?: number;
-        battleValuePage?: number;
-    };
-
-    flags?: string[];
-    notes?: string[];
-};
-
-export const WEAPONS = {
-    "is_autocannon_2": {
+export const WEAPONS: Record<string, WeaponDefinition> = {
+    // Inner Sphere weapons
+"is_autocannon_2": {
         "id": "is_autocannon_2",
         "name": "Autocannon/2",
         "altNames": [
@@ -129,10 +57,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_standard_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 5
+            "ammoId": "is_autocannon_2_ammo"
         },
         "cost": 75000,
         "bv": 37,
@@ -187,10 +112,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_standard_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 4500,
-            "ammoBV": 9
+            "ammoId": "is_autocannon_5_ammo"
         },
         "cost": 125000,
         "bv": 70,
@@ -245,10 +167,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_standard_ac",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 6000,
-            "ammoBV": 15
+            "ammoId": "is_autocannon_10_ammo"
         },
         "cost": 200000,
         "bv": 123,
@@ -303,10 +222,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_standard_ac",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 10000,
-            "ammoBV": 22
+            "ammoId": "is_autocannon_20_ammo"
         },
         "cost": 300000,
         "bv": 178,
@@ -368,10 +284,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "is_lb_x_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 2000,
-            "ammoBV": 5
+            "ammoId": "is_lb_2_x_ac_ammo"
         },
         "bv": 42,
         "cost": 150000,
@@ -433,10 +346,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "is_lb_x_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 9000,
-            "ammoBV": 10
+            "ammoId": "is_lb_5_x_ac_ammo"
         },
         "bv": 83,
         "cost": 150000,
@@ -498,10 +408,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "is_lb_x_ac",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 19
+            "ammoId": "is_lb_10_x_ac_ammo"
         },
         "bv": 148,
         "cost": 400000,
@@ -563,10 +470,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "is_lb_x_ac",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 30
+            "ammoId": "is_lb_20_x_ac_ammo"
         },
         "bv": 237,
         "cost": 600000,
@@ -623,10 +527,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_light_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 4
+            "ammoId": "is_light_ac_2_ammo"
         },
         "bv": 30,
         "cost": 100000,
@@ -683,10 +584,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_light_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 4500,
-            "ammoBV": 8
+            "ammoId": "is_light_ac_5_ammo"
         },
         "bv": 62,
         "cost": 150000,
@@ -746,10 +644,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_rotary_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 3000,
-            "ammoBV": 15
+            "ammoId": "is_rotary_ac_2_ammo"
         },
         "bv": 118,
         "cost": 175000,
@@ -809,10 +704,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_rotary_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 31
+            "ammoId": "is_rotary_ac_5_ammo"
         },
         "bv": 247,
         "cost": 275000,
@@ -871,10 +763,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_ultra_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 7
+            "ammoId": "is_ultra_ac_2_ammo"
         },
         "bv": 56,
         "cost": 120000,
@@ -933,10 +822,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_ultra_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 9000,
-            "ammoBV": 14
+            "ammoId": "is_ultra_ac_5_ammo"
         },
         "bv": 112,
         "cost": 200000,
@@ -995,10 +881,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_ultra_ac",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 26
+            "ammoId": "is_ultra_ac_10_ammo"
         },
         "bv": 210,
         "cost": 320000,
@@ -1057,10 +940,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_ultra_ac",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 35
+            "ammoId": "is_ultra_ac_20_ammo"
         },
         "bv": 281,
         "cost": 480000,
@@ -1113,10 +993,7 @@ export const WEAPONS = {
             "X"
         ],
         "ammo": {
-            "ammoType": "is_light_gauss",
-            "ammoPerTon": 16,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 20
+            "ammoId": "is_light_gauss_rifle_ammo"
         },
         "bv": 159,
         "cost": 275000,
@@ -1172,10 +1049,7 @@ export const WEAPONS = {
             "X"
         ],
         "ammo": {
-            "ammoType": "is_gauss",
-            "ammoPerTon": 8,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 40
+            "ammoId": "is_gauss_rifle_ammo"
         },
         "bv": 320,
         "notes": [
@@ -1232,10 +1106,7 @@ export const WEAPONS = {
             "V"
         ],
         "ammo": {
-            "ammoType": "is_heavy_gauss",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 43
+            "ammoId": "is_heavy_gauss_rifle_ammo"
         },
         "bv": 346,
         "cost": 500000,
@@ -1292,10 +1163,7 @@ export const WEAPONS = {
             "V"
         ],
         "ammo": {
-            "ammoType": "is_heavy_gauss",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 48
+            "ammoId": "is_improved_heavy_gauss_rifle_ammo"
         },
         "bv": 385,
         "cost": 700000,
@@ -1352,10 +1220,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "is_machine_gun",
-            "ammoPerTon": 200,
-            "ammoCostPerTon": 500,
-            "ammoBV": 1
+            "ammoId": "is_light_machine_gun_ammo"
         },
         "bv": 5,
         "cost": 5000,
@@ -1411,10 +1276,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "is_machine_gun",
-            "ammoPerTon": 200,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "is_machine_gun_ammo"
         },
         "cost": 5000,
         "bv": 5,
@@ -1467,10 +1329,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "is_machine_gun",
-            "ammoPerTon": 100,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "is_heavy_machine_gun_ammo"
         },
         "bv": 6,
         "cost": 7500,
@@ -1627,10 +1486,7 @@ export const WEAPONS = {
         "cost": 11250,
         "bv": 15,
         "ammo": {
-            "ammoType": "is_heavy_flamer",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 2000,
-            "ammoBV": 2
+            "ammoId": "is_heavy_flamer_ammo"
         }
     },
     "is_flamer_vehicle": {
@@ -1676,10 +1532,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "is_vehicle_flamer",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "is_flamer_vehicle_ammo"
         },
         "bv": 5,
         "cost": 7500,
@@ -2537,10 +2390,7 @@ export const WEAPONS = {
             "H"
         ],
         "ammo": {
-            "ammoType": "is_plasma_rifle",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 10000,
-            "ammoBV": 26
+            "ammoId": "is_plasma_rifle_ammo"
         },
         "bv": 210,
         "cost": 260000,
@@ -2805,10 +2655,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 24,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 6
+            "ammoId": "is_lrm_5_ammo"
         },
         "cost": 30000,
         "bv": 45,
@@ -2869,10 +2716,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 12,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 11
+            "ammoId": "is_lrm_10_ammo"
         },
         "cost": 100000,
         "bv": 90,
@@ -2933,10 +2777,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 8,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 17
+            "ammoId": "is_lrm_15_ammo"
         },
         "cost": 175000,
         "bv": 136,
@@ -2997,10 +2838,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 23
+            "ammoId": "is_lrm_20_ammo"
         },
         "cost": 250000,
         "bv": 181,
@@ -3070,10 +2908,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 18,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 8
+            "ammoId": "is_elrm_5_ammo"
         },
         "cost": 60000,
         "bv": 67,
@@ -3134,10 +2969,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 9,
-            "ammoCostPerTon": 35000,
-            "ammoBV": 16
+            "ammoId": "is_elrm_10_ammo"
         },
         "cost": 200000,
         "bv": 133,
@@ -3198,10 +3030,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 35000,
-            "ammoBV": 25
+            "ammoId": "is_elrm_15_ammo"
         },
         "cost": 350000,
         "bv": 200,
@@ -3262,10 +3091,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 35000,
-            "ammoBV": 34
+            "ammoId": "is_elrm_20_ammo"
         },
         "cost": 500000,
         "bv": 268,
@@ -3317,10 +3143,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 12,
-            "ammoCostPerTon": 50000,
-            "ammoBV": 8
+            "ammoId": "is_thunderbolt_5_ammo"
         },
         "cost": 50000,
         "bv": 64,
@@ -3377,10 +3200,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 50000,
-            "ammoBV": 16
+            "ammoId": "is_thunderbolt_10_ammo"
         },
         "cost": 175000,
         "bv": 127,
@@ -3437,10 +3257,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 50000,
-            "ammoBV": 29
+            "ammoId": "is_thunderbolt_15_ammo"
         },
         "cost": 325000,
         "bv": 229,
@@ -3497,10 +3314,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_lrm",
-            "ammoPerTon": 3,
-            "ammoCostPerTon": 50000,
-            "ammoBV": 38
+            "ammoId": "is_thunderbolt_20_ammo"
         },
         "cost": 450000,
         "bv": 306,
@@ -3563,27 +3377,16 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "ammo": {
-            "ammoType": "is_mml",
-            "ammoPerTon": "varies by LRM/SRM ammo",
-            "ammoBV": 4
-        },
-        "bv": 29,
+"bv": 29,
         "cost": 45000,
         "ammoOptions": [
             {
                 "mode": "LRM",
-                "ammoType": "is_mml_lrm",
-                "ammoPerTon": 40,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 4
+                "ammoId": "is_mml_3_lrm_ammo"
             },
             {
                 "mode": "SRM",
-                "ammoType": "is_mml_srm",
-                "ammoPerTon": 33,
-                "ammoCostPerTon": 27000,
-                "ammoBV": 4
+                "ammoId": "is_mml_3_srm_ammo"
             }
         ],
         "notes": [
@@ -3639,27 +3442,16 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "ammo": {
-            "ammoType": "is_mml",
-            "ammoPerTon": "varies by LRM/SRM ammo",
-            "ammoBV": 6
-        },
-        "bv": 45,
+"bv": 45,
         "cost": 75000,
         "ammoOptions": [
             {
                 "mode": "LRM",
-                "ammoType": "is_mml_lrm",
-                "ammoPerTon": 24,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 6
+                "ammoId": "is_mml_5_lrm_ammo"
             },
             {
                 "mode": "SRM",
-                "ammoType": "is_mml_srm",
-                "ammoPerTon": 20,
-                "ammoCostPerTon": 27000,
-                "ammoBV": 6
+                "ammoId": "is_mml_5_srm_ammo"
             }
         ],
         "notes": [
@@ -3715,27 +3507,16 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "ammo": {
-            "ammoType": "is_mml",
-            "ammoPerTon": "varies by LRM/SRM ammo",
-            "ammoBV": 8
-        },
-        "bv": 67,
+"bv": 67,
         "cost": 105000,
         "ammoOptions": [
             {
                 "mode": "LRM",
-                "ammoType": "is_mml_lrm",
-                "ammoPerTon": 17,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 8
+                "ammoId": "is_mml_7_lrm_ammo"
             },
             {
                 "mode": "SRM",
-                "ammoType": "is_mml_srm",
-                "ammoPerTon": 14,
-                "ammoCostPerTon": 27000,
-                "ammoBV": 8
+                "ammoId": "is_mml_7_srm_ammo"
             }
         ],
         "notes": [
@@ -3791,27 +3572,16 @@ export const WEAPONS = {
             "C",
             "S"
         ],
-        "ammo": {
-            "ammoType": "is_mml",
-            "ammoPerTon": "varies by LRM/SRM ammo",
-            "ammoBV": 11
-        },
-        "bv": 86,
+"bv": 86,
         "cost": 125000,
         "ammoOptions": [
             {
                 "mode": "LRM",
-                "ammoType": "is_mml_lrm",
-                "ammoPerTon": 13,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 11
+                "ammoId": "is_mml_9_lrm_ammo"
             },
             {
                 "mode": "SRM",
-                "ammoType": "is_mml_srm",
-                "ammoPerTon": 11,
-                "ammoCostPerTon": 27000,
-                "ammoBV": 11
+                "ammoId": "is_mml_9_srm_ammo"
             }
         ],
         "notes": [
@@ -3859,10 +3629,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_srm",
-            "ammoPerTon": 50,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 3
+            "ammoId": "is_srm_2_ammo"
         },
         "cost": 10000,
         "bv": 21,
@@ -3921,10 +3688,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_srm",
-            "ammoPerTon": 25,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 5
+            "ammoId": "is_srm_4_ammo"
         },
         "cost": 60000,
         "bv": 39,
@@ -3983,10 +3747,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_srm",
-            "ammoPerTon": 15,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 7
+            "ammoId": "is_srm_6_ammo"
         },
         "cost": 80000,
         "bv": 59,
@@ -4044,10 +3805,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_mrm",
-            "ammoPerTon": 24,
-            "ammoCostPerTon": 5000,
-            "ammoBV": 7
+            "ammoId": "is_mrm_10_ammo"
         },
         "bv": 56,
         "cost": 50000,
@@ -4105,10 +3863,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_mrm",
-            "ammoPerTon": 12,
-            "ammoCostPerTon": 5000,
-            "ammoBV": 14
+            "ammoId": "is_mrm_20_ammo"
         },
         "bv": 112,
         "cost": 125000,
@@ -4166,10 +3921,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_mrm",
-            "ammoPerTon": 8,
-            "ammoCostPerTon": 5000,
-            "ammoBV": 21
+            "ammoId": "is_mrm_30_ammo"
         },
         "bv": 168,
         "cost": 225000,
@@ -4227,10 +3979,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_mrm",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 5000,
-            "ammoBV": 28
+            "ammoId": "is_mrm_40_ammo"
         },
         "bv": 224,
         "cost": 350000,
@@ -4289,9 +4038,7 @@ export const WEAPONS = {
             "OS"
         ],
         "ammo": {
-            "ammoType": "is_rocket_launcher",
-            "ammoPerTon": "OS",
-            "ammoCostPerTon": 1000
+            "ammoId": "is_rocket_launcher_10_ammo"
         },
         "bv": 18,
         "cost": 15000,
@@ -4346,9 +4093,7 @@ export const WEAPONS = {
             "OS"
         ],
         "ammo": {
-            "ammoType": "is_rocket_launcher",
-            "ammoPerTon": "OS",
-            "ammoCostPerTon": 1000
+            "ammoId": "is_rocket_launcher_15_ammo"
         },
         "bv": 23,
         "cost": 30000,
@@ -4403,9 +4148,7 @@ export const WEAPONS = {
             "OS"
         ],
         "ammo": {
-            "ammoType": "is_rocket_launcher",
-            "ammoPerTon": "OS",
-            "ammoCostPerTon": 1000
+            "ammoId": "is_rocket_launcher_20_ammo"
         },
         "bv": 24,
         "cost": 45000,
@@ -4460,10 +4203,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_streak_srm",
-            "ammoPerTon": 50,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 4
+            "ammoId": "is_streak_srm_2_ammo"
         },
         "bv": 30,
         "cost": 15000,
@@ -4522,10 +4262,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_streak_srm",
-            "ammoPerTon": 25,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 7
+            "ammoId": "is_streak_srm_4_ammo"
         },
         "bv": 59,
         "cost": 90000,
@@ -4584,10 +4321,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "is_streak_srm",
-            "ammoPerTon": 15,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 11
+            "ammoId": "is_streak_srm_6_ammo"
         },
         "bv": 89,
         "cost": 120000,
@@ -4642,10 +4376,7 @@ export const WEAPONS = {
             "battleValuePage": 317
         },
         "ammo": {
-            "ammoType": "is_narc_missile_beacon_ammo",
-            "ammoPerTon": 6,
-            "ammoBV": 0,
-            "ammoCostPerTon": 6000
+            "ammoId": "is_narc_missile_beacon_ammo"
         },
         "bv": 30,
         "cost": 100000,
@@ -4697,10 +4428,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "is_narc",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 7500,
-            "ammoBV": 0
+            "ammoId": "is_improved_narc_launcher_ammo"
         },
         "bv": 75,
         "cost": 250000,
@@ -4709,7 +4437,1316 @@ export const WEAPONS = {
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ]
     },
-    "clan_lb_2_x_ac": {
+    "is_a_pod": {
+        "id": "is_a_pod",
+        "name": "A-Pod",
+        "altNames": [
+            "IS A-Pod",
+            "ISAPod",
+            "APod",
+            "Anti-Personnel Pods (A-Pods)",
+            "Anti-Personnel Pod",
+            "A-Pod",
+            "A-Pods"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "a_pod",
+        "damage": "special",
+        "heat": 0,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "B",
+        "flags": [
+            "oneShot",
+            "antiInfantry",
+            "pointBlank"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "ammo": {
+            "ammoId": "is_a_pod_ammo"
+        },
+        "bv": 1,
+        "cost": 1500,
+    },
+    "is_b_pod": {
+        "id": "is_b_pod",
+        "name": "B-Pod",
+        "altNames": [
+            "IS B-Pod",
+            "ISBPod",
+            "BPod",
+            "Anti-BattleArmor Pods (B-Pods)",
+            "Anti-Battle Armor Pods (B-Pods)",
+            "Anti-BattleArmor Pod",
+            "B-Pod",
+            "B-Pods"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "b_pod",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "oneShot",
+            "antiInfantry",
+            "pointBlank",
+            "explosive"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "ammo": {
+            "ammoId": "is_b_pod_ammo"
+        },
+        "bv": 2,
+        "cost": 2500,
+    },
+    "is_anti_missile_system": {
+        "id": "is_anti_missile_system",
+        "name": "Anti-Missile System",
+        "altNames": [
+            "IS Anti-Missile System",
+            "ISAntiMissileSystem",
+            "AntiMissileSystem",
+            "AMS"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "anti_missile_system",
+        "damage": "special",
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "pointDefense",
+            "requiresAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317,
+            "costAvailabilityPage": 295
+        },
+        "ammo": {
+            "ammoId": "is_anti_missile_system_ammo"
+        },
+        "bv": 32,
+        "cost": 100000,
+        "availability": {
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
+        }
+    },
+    "is_laser_ams": {
+        "id": "is_laser_ams",
+        "name": "Laser AMS",
+        "altNames": [
+            "IS Laser AMS",
+            "ISLaserAMS",
+            "Laser Anti-Missile System",
+            "IS Laser Anti-Missile System",
+            "ISLaserAntiMissileSystem",
+            "Laser Anti Missile System",
+            "IS Laser Anti Missile System"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "antiMissileSystem",
+        "damage": "special",
+        "heat": 7,
+        "tons": 1.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "E",
+        "flags": [
+            "defensive",
+            "antiMissile",
+            "laserAMS",
+            "noAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "cost": 225000,
+        "bv": 45,
+        "notes": [
+            "Laser AMS has defensive BV and does not require ammunition.",
+            "Rules level progressed over time; treated as Advanced for catalog support."
+        ]
+    },
+    "is_machine_gun_array": {
+        "id": "is_machine_gun_array",
+        "name": "Machine Gun Array",
+        "altNames": [
+            "IS Machine Gun Array",
+            "ISMachineGunArray",
+            "MachineGunArray",
+            "Machine Gun Array",
+            "Light Machine Gun Array",
+            "Heavy Machine Gun Array",
+            "MG Array"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "machine_gun_array",
+        "damage": "special",
+        "heat": 0,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "targetingSystem"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "F",
+        "cost": 1250
+    },
+    "is_masc": {
+        "id": "is_masc",
+        "name": "MASC",
+        "altNames": [
+            "IS MASC",
+            "ISMASC"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "masc",
+        "damage": "special",
+        "heat": 0,
+        "tons": "variable",
+        "critSlots": "variable",
+        "spaceSlots": "variable",
+        "techRating": "E",
+        "flags": [
+            "movementEnhancement"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "notes": [
+            "Variable weight/space; see construction rules."
+        ],
+        "bv": "C"
+    },
+    "is_tag": {
+        "id": "is_tag",
+        "name": "TAG",
+        "altNames": [
+            "IS TAG",
+            "ISTAG"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "tag",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+            "min": 0,
+            "short": 5,
+            "medium": 9,
+            "long": 15
+        },
+        "techRating": "E",
+        "flags": [
+            "tag"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "A",
+        "cost": 50000,
+    },
+    "is_beagle_active_probe": {
+        "id": "is_beagle_active_probe",
+        "name": "Beagle Active Probe",
+        "altNames": [
+            "IS Beagle Active Probe",
+            "ISBeagleActiveProbe",
+            "BeagleActiveProbe"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "beagle_active_probe",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 4
+        },
+        "techRating": "E",
+        "flags": [
+            "activeProbe"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": 10,
+        "cost": 200000,
+        "availability": {
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "D",
+
+        }
+    },
+    "is_case": {
+        "id": "is_case",
+        "name": "CASE",
+        "altNames": [
+            "IS CASE",
+            "ISCASE"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "case",
+        "damage": "special",
+        "heat": 0,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "D",
+        "flags": [
+            "ammoProtection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "C",
+        "cost": 50000,
+    },
+    "is_case_ii": {
+        "id": "is_case_ii",
+        "name": "CASE II",
+        "altNames": [
+            "IS CASE II",
+            "ISCASEII",
+            "CASEII"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Experimental",
+        "variant": "IS",
+        "family": "case",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "ammoProtection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "C",
+        "cost": 175000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "F",
+
+        }
+    },
+    "is_c3_computer_master": {
+        "id": "is_c3_computer_master",
+        "name": "C3 Computer (Master)",
+        "altNames": [
+            "IS C3 Computer (Master)",
+            "ISC3Computer(Master)",
+            "C3Computer(Master)",
+            "C3 Master",
+            "C3 Computer (Master)",
+            "C3 Master Computer",
+            "C3 Master with TAG",
+            "C3ComputerMaster",
+            "C3 Computer Master",
+            "C3MasterBoostedWithTAG",
+            "c3 master boosted with tag",
+            "c3boostedsystemmaster",
+            "c3 boosted system master",
+            "c3computermaster"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "c3_computer_master",
+        "damage": "special",
+        "heat": 0,
+        "tons": 5,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "techRating": "E",
+        "flags": [
+            "c3"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "D",
+        "cost": 1500000,
+    },
+    "is_c3_computer_slave": {
+        "id": "is_c3_computer_slave",
+        "name": "C3 Computer (Slave)",
+        "altNames": [
+            "IS C3 Computer (Slave)",
+            "ISC3Computer(Slave)",
+            "C3Computer(Slave)",
+            "ISC3SlaveUnit",
+            "C3 Slave",
+            "C3 Computer (Slave)",
+            "C3 Slave Unit"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "c3_computer_slave",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "c3"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "D",
+        "cost": 250000,
+    },
+    "is_improved_c3_computer": {
+        "id": "is_improved_c3_computer",
+        "name": "Improved C3 Computer",
+        "altNames": [
+            "IS Improved C3 Computer",
+            "ISImprovedC3Computer",
+            "ImprovedC3Computer",
+            "ISImprovedC3CPU",
+            "Improved C3 CPU",
+            "Improved C3 Computer",
+            "Improved C3 Computer (C3I)",
+            "improvedc3computerc3i",
+            "improved c3 computer c3i",
+            "ISC3iUnit"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "improved_c3_computer",
+        "damage": "special",
+        "heat": 0,
+        "tons": 2.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "techRating": "E",
+        "flags": [
+            "c3"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "D",
+        "cost": 750000,
+    },
+    "is_guardian_ecm_suite": {
+        "id": "is_guardian_ecm_suite",
+        "name": "Guardian ECM Suite",
+        "altNames": [
+            "IS Guardian ECM Suite",
+            "ISGuardianECMSuite",
+            "GuardianECMSuite",
+            "ISGuardianECM"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "guardian_ecm_suite",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 6
+        },
+        "techRating": "E",
+        "flags": [
+            "ecm"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": 61,
+        "cost": 200000
+    },
+    "is_targeting_computer": {
+        "id": "is_targeting_computer",
+        "name": "Targeting Computer",
+        "altNames": [
+            "IS Targeting Computer",
+            "ISTargetingComputer",
+            "TargetingComputer"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "targeting_computer",
+        "damage": "special",
+        "heat": 0,
+        "tons": "variable",
+        "critSlots": "variable",
+        "spaceSlots": "variable",
+        "techRating": "E",
+        "flags": [
+            "targetingComputer"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "E"
+    },
+    "is_enhanced_lrm_5": {
+        "id": "is_enhanced_lrm_5",
+        "name": "Enhanced LRM 5",
+        "altNames": [
+                "IS Enhanced LRM 5",
+                "ISEnhancedLRM5",
+                "EnhancedLRM5",
+                "Enhanced-LRM-5",
+                "NLRM 5",
+                "NLRM-5",
+                "NLRM5",
+                "ISNLRM5"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 5,
+        "heat": 2,
+        "tons": 3,
+        "critSlots": 2,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
+        "flags": [
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+            "ammoId": "is_enhanced_lrm_5_ammo"
+        },
+        "bv": 52,
+        "cost": 60000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
+        },
+        "notes": [
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_10": {
+        "id": "is_enhanced_lrm_10",
+        "name": "Enhanced LRM 10",
+        "altNames": [
+                "IS Enhanced LRM 10",
+                "ISEnhancedLRM10",
+                "EnhancedLRM10",
+                "Enhanced-LRM-10",
+                "NLRM 10",
+                "NLRM-10",
+                "NLRM10",
+                "ISNLRM10"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 10,
+        "heat": 4,
+        "tons": 6,
+        "critSlots": 4,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
+        "flags": [
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+            "ammoId": "is_enhanced_lrm_10_ammo"
+        },
+        "bv": 104,
+        "cost": 200000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
+        },
+        "notes": [
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_15": {
+        "id": "is_enhanced_lrm_15",
+        "name": "Enhanced LRM 15",
+        "altNames": [
+                "IS Enhanced LRM 15",
+                "ISEnhancedLRM15",
+                "EnhancedLRM15",
+                "Enhanced-LRM-15",
+                "NLRM 15",
+                "NLRM-15",
+                "NLRM15",
+                "ISNLRM15"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 15,
+        "heat": 5,
+        "tons": 9,
+        "critSlots": 6,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
+        "flags": [
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+            "ammoId": "is_enhanced_lrm_15_ammo"
+        },
+        "bv": 157,
+        "cost": 350000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
+        },
+        "notes": [
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_enhanced_lrm_20": {
+        "id": "is_enhanced_lrm_20",
+        "name": "Enhanced LRM 20",
+        "altNames": [
+                "IS Enhanced LRM 20",
+                "ISEnhancedLRM20",
+                "EnhancedLRM20",
+                "Enhanced-LRM-20",
+                "NLRM 20",
+                "NLRM-20",
+                "NLRM20",
+                "ISNLRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "enhancedLrm",
+        "damage": "1/Msl",
+        "rackSize": 20,
+        "heat": 6,
+        "tons": 12,
+        "critSlots": 9,
+        "spaceSlots": 1,
+        "range": {
+                "min": 3,
+                "short": 7,
+                "medium": 14,
+                "long": 21,
+                "extreme": 28
+        },
+        "techRating": "E",
+        "flags": [
+                "cluster",
+                "requiresAmmo",
+                "minimumRange",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+            "ammoId": "is_enhanced_lrm_20_ammo"
+        },
+        "bv": 210,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
+        },
+        "notes": [
+                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
+                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
+        ]
+},
+    "is_arrow_iv": {
+        "id": "is_arrow_iv",
+        "name": "Arrow IV",
+        "altNames": [
+                "IS Arrow IV",
+                "ISArrowIV",
+                "ArrowIV",
+                "Arrow-IV",
+                "isarrowivsystem",
+                "is arrow iv system"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "Artillery",
+        "damage": "20/10",
+        "heat": 10,
+        "tons": 15,
+        "critSlots": 15,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+                "artillery",
+                "requiresAmmo",
+                "indirectFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "M",
+                "C",
+                "S"
+        ],
+        "ammo": {
+            "ammoId": "is_arrow_iv_ammo"
+        },
+        "bv": 240,
+        "cost": 450000,
+        "availability": {
+
+            "starLeague": "E",
+
+            "successionWars": "F",
+
+            "clanInvasion": "E",
+
+        }
+},
+    "tsemp_cannon": {
+        "id": "tsemp_cannon",
+        "name": "TSEMP Cannon",
+        "altNames": [
+                "TSEMP Cannon",
+                "TSEMPCannon",
+                "TSEMP"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "damage": 0,
+        "heat": 10,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 1,
+        "range": {
+                "min": 0,
+                "short": 5,
+                "medium": 9,
+                "long": 15
+        },
+        "techRating": "X",
+        "flags": [
+                "directFire"
+        ],
+        "source": {
+                "battleValuePage": 0,
+                "weightSpacePage": 0
+        },
+        "typeCodes": [
+                "L"
+        ],
+        "bv": 488,
+        "cost": 800000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "X",
+
+        }
+},
+    "is_full_head_ejection_system": {
+        "id": "is_full_head_ejection_system",
+        "name": "Full Head Ejection System",
+        "altNames": [
+            "Inner Sphere Full Head Ejection System",
+            "ISFullHeadEjectionSystem",
+            "FullHeadEjectionSystem"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "Ejection",
+        "damage": 0,
+        "heat": 0,
+        "tons": 0,
+        "critSlots": 0,
+        "spaceSlots": 0,
+        "range": {
+            "min": 0,
+            "short": 0,
+            "medium": 0,
+            "long": 0
+        },
+        "techRating": "D",
+        "flags": [
+            "ejection"
+        ],
+        "source": {
+            "weightSpacePage": 342,
+            "battleValuePage": 317
+        },
+        "bv": "G",
+        "cost": 1725000,
+        "availability": {
+
+            "starLeague": "X",
+
+            "successionWars": "X",
+
+            "clanInvasion": "E",
+
+        }
+    },
+    "is_sniper_artillery": {
+        "id": "is_sniper_artillery",
+        "name": "Sniper",
+        "altNames": [
+            "ISSniper",
+            "Sniper",
+            "Sniper Artillery"
+        ],
+        "category": "Artillery",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "damage": "20A",
+        "heat": 10,
+        "tons": 20,
+        "critSlots": 20,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "B",
+        "flags": [],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["AE", "S", "F"],
+        "ammo": {
+            "ammoId": "is_sniper_artillery_ammo"
+        },
+        "bv": 0,
+        "cost": 300000,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+
+        }
+    },
+    "is_sniper_cannon": {
+        "id": "is_sniper_cannon",
+        "name": "Sniper Cannon",
+        "altNames": [
+            "ISSniperCannon",
+            "Sniper Cannon",
+            "Sniper Artillery Cannon"
+        ],
+        "category": "Ballistic",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Experimental",
+        "damage": "10A",
+        "heat": 10,
+        "tons": 15,
+        "critSlots": 10,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "B",
+        "flags": ["directFire"],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["DB", "AE", "F"],
+        "ammo": {
+            "ammoId": "is_sniper_cannon_ammo"
+        },
+        "bv": 0,
+        "cost": 475000,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "E"
+
+        }
+    },
+    "is_long_tom_cannon": {
+        "id": "is_long_tom_cannon",
+        "name": "Long Tom Cannon",
+        "altNames": [
+            "ISLongTomCannon",
+            "ISLongTomCannon (OMNIPOD)",
+            "Long Tom Cannon",
+            "Long Tom Artillery Cannon"
+        ],
+        "category": "Ballistic",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Experimental",
+        "damage": "20A",
+        "heat": 20,
+        "tons": 20,
+        "critSlots": 15,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "B",
+        "flags": ["directFire"],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["DB", "AE", "F"],
+        "ammo": {
+            "ammoId": "is_long_tom_cannon_ammo"
+        },
+        "bv": 0,
+        "cost": 650000,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "E"
+
+        }
+    },
+    "is_thumper_cannon": {
+        "id": "is_thumper_cannon",
+        "name": "Thumper Cannon",
+        "altNames": [
+            "ISThumperCannon",
+            "Thumper Cannon",
+            "Thumper Artillery Cannon"
+        ],
+        "category": "Ballistic",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Experimental",
+        "damage": "5A",
+        "heat": 5,
+        "tons": 10,
+        "critSlots": 7,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "B",
+        "flags": ["directFire"],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["DB", "AE", "F"],
+        "ammo": {
+            "ammoId": "is_thumper_cannon_ammo"
+        },
+        "bv": 0,
+        "cost": 200000,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "E"
+
+        }
+    },
+    "hatchet": {
+        "id": "hatchet",
+        "name": "Hatchet",
+        "altNames": [
+            "Hatchet",
+            "ISHatchet",
+            "CLHatchet"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "physicalWeapon",
+        "damage": "physical",
+        "heat": 0,
+        "tons": "\"unitTonnage/15\"",
+        "critSlots": "\"unitTonnage/15\"",
+        "spaceSlots": "\"unitTonnage/15\"",
+        "techRating": "C",
+        "flags": [
+            "physicalWeapon"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": "Damage x 1.5",
+        "cost": {"type": "equipmentTonnage", "multiplier": 5000},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "D"
+        },
+        "notes": [
+            "BattleMech melee weapon; BV is damage-based rather than a flat item BV."
+        ]
+    },
+    "sword": {
+        "id": "sword",
+        "name": "Sword",
+        "altNames": [
+            "Sword",
+            "ISSword",
+            "CLSword"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "physicalWeapon",
+        "damage": "physical",
+        "heat": 0,
+        "tons": "\"unitTonnage/20\"",
+        "critSlots": "\"unitTonnage/20\"",
+        "spaceSlots": "\"unitTonnage/20\"",
+        "techRating": "D",
+        "flags": [
+            "physicalWeapon"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": "Damage x 1.725",
+        "cost": {"type": "equipmentTonnage", "multiplier": 10000},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "D"
+        },
+        "notes": [
+            "BattleMech melee weapon; BV is damage-based rather than a flat item BV."
+        ]
+    },
+    "mace": {
+        "id": "mace",
+        "name": "Mace",
+        "altNames": [
+            "Mace",
+            "ISMace",
+            "CLMace"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "physicalWeapon",
+        "damage": "1/4T",
+        "heat": 0,
+        "tons": "\"unitTonnage/10\"",
+        "critSlots": "\"unitTonnage/10\"",
+        "spaceSlots": "\"unitTonnage/10\"",
+        "techRating": "B",
+        "flags": [
+            "physicalWeapon"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": "damage-based",
+        "cost": {"type": "fixed", "amount": 130000},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "D"
+        },
+        "notes": [
+            "BattleMech melee weapon; construction data lists fixed item cost and tonnage/slots based on unit tonnage."
+        ]
+    },
+    "claws": {
+        "id": "claws",
+        "name": "Claws",
+        "altNames": [
+            "Claw",
+            "Claws",
+            "ISClaw",
+            "ISClaws",
+            "CLClaw",
+            "CLClaws"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "physicalWeapon",
+        "damage": "1/7T",
+        "heat": 0,
+        "tons": "\"unitTonnage/15\"",
+        "critSlots": "\"unitTonnage/15\"",
+        "spaceSlots": "\"unitTonnage/15\"",
+        "techRating": "B",
+        "flags": [
+            "physicalWeapon"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": "damage-based",
+        "cost": {"type": "unitTonnage", "multiplier": 200},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "F",
+            "clanInvasion": "E"
+        },
+        "notes": [
+            "BattleMech melee weapon; usually appears in MTF critical slots as ISClaw/CLClaw."
+        ]
+    },
+    "retractable_blade": {
+        "id": "retractable_blade",
+        "name": "Retractable Blade",
+        "altNames": [
+            "Retractable Blade",
+            "Retractable Blade (OMNIPOD)",
+            "ISRetractableBlade",
+            "CLRetractableBlade"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "variant": "IS",
+        "family": "physicalWeapon",
+        "damage": "physical",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "D",
+        "flags": [
+            "physicalWeapon"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": "Damage x 1.725",
+        "cost": {"type": "equipmentTonnage", "multiplier": 10000},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+        },
+        "notes": [
+            "BattleMech melee weapon; BV is damage-based rather than a flat item BV."
+        ]
+    },
+
+    // Clan weapons
+"clan_lb_2_x_ac": {
         "id": "clan_lb_2_x_ac",
         "name": "LB 2-X AC",
         "altNames": [
@@ -4758,10 +5795,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_lb_x_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 2000,
-            "ammoBV": 6
+            "ammoId": "clan_lb_2_x_ac_ammo"
         },
         "bv": 47,
         "cost": 150000,
@@ -4824,10 +5858,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_lb_x_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 9000,
-            "ammoBV": 12
+            "ammoId": "clan_lb_5_x_ac_ammo"
         },
         "bv": 93,
         "cost": 250000,
@@ -4890,10 +5921,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_lb_x_ac",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 19
+            "ammoId": "clan_lb_10_x_ac_ammo"
         },
         "bv": 148,
         "cost": 400000,
@@ -4956,10 +5984,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_lb_x_ac",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 30
+            "ammoId": "clan_lb_20_x_ac_ammo"
         },
         "bv": 237,
         "cost": 600000,
@@ -5019,10 +6044,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_ultra_ac",
-            "ammoPerTon": 45,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 8
+            "ammoId": "clan_ultra_ac_2_ammo"
         },
         "bv": 62,
         "cost": 120000,
@@ -5082,10 +6104,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_ultra_ac",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 9000,
-            "ammoBV": 15
+            "ammoId": "clan_ultra_ac_5_ammo"
         },
         "bv": 122,
         "cost": 200000,
@@ -5145,10 +6164,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_ultra_ac",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 26
+            "ammoId": "clan_ultra_ac_10_ammo"
         },
         "bv": 210,
         "cost": 320000,
@@ -5208,10 +6224,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_ultra_ac",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 42
+            "ammoId": "clan_ultra_ac_20_ammo"
         },
         "bv": 335,
         "cost": 480000,
@@ -5267,10 +6280,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "clan_ap_gauss",
-            "ammoPerTon": 40,
-            "ammoCostPerTon": 3000,
-            "ammoBV": 3
+            "ammoId": "clan_ap_gauss_rifle_ammo"
         },
         "bv": 21,
         "cost": 10000,
@@ -5327,10 +6337,7 @@ export const WEAPONS = {
             "X"
         ],
         "ammo": {
-            "ammoType": "clan_gauss",
-            "ammoPerTon": 8,
-            "ammoCostPerTon": 20000,
-            "ammoBV": 40
+            "ammoId": "clan_gauss_rifle_ammo"
         },
         "bv": 320,
         "notes": [
@@ -5392,10 +6399,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_hag",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 33
+            "ammoId": "clan_hyper_assault_gauss_20_ammo"
         },
         "bv": 267,
         "cost": 400000,
@@ -5457,10 +6461,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_hag",
-            "ammoPerTon": 4,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 50
+            "ammoId": "clan_hyper_assault_gauss_30_ammo"
         },
         "bv": 401,
         "cost": 500000,
@@ -5522,10 +6523,7 @@ export const WEAPONS = {
             "F"
         ],
         "ammo": {
-            "ammoType": "clan_hag",
-            "ammoPerTon": 3,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 67
+            "ammoId": "clan_hyper_assault_gauss_40_ammo"
         },
         "bv": 535,
         "cost": 600000,
@@ -5583,10 +6581,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "clan_machine_gun",
-            "ammoPerTon": 200,
-            "ammoCostPerTon": 500,
-            "ammoBV": 1
+            "ammoId": "clan_light_machine_gun_ammo"
         },
         "bv": 5,
         "cost": 5000,
@@ -5643,10 +6638,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "clan_machine_gun",
-            "ammoPerTon": 200,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "clan_machine_gun_ammo"
         },
         "bv": 5,
         "cost": 5000,
@@ -5700,10 +6692,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "clan_machine_gun",
-            "ammoPerTon": 100,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "clan_heavy_machine_gun_ammo"
         },
         "bv": 6,
         "cost": 7500,
@@ -5863,10 +6852,7 @@ export const WEAPONS = {
         "cost": 11250,
         "bv": 15,
         "ammo": {
-            "ammoType": "clan_heavy_flamer",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 2000,
-            "ammoBV": 2
+            "ammoId": "clan_heavy_flamer_ammo"
         }
     },
     "clan_flamer_vehicle": {
@@ -5913,10 +6899,7 @@ export const WEAPONS = {
             "AI"
         ],
         "ammo": {
-            "ammoType": "clan_vehicle_flamer",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 1000,
-            "ammoBV": 1
+            "ammoId": "clan_flamer_vehicle_ammo"
         },
         "bv": 5,
         "cost": 7500,
@@ -6688,10 +7671,7 @@ export const WEAPONS = {
             "H"
         ],
         "ammo": {
-            "ammoType": "clan_plasma_cannon",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 12000,
-            "ammoBV": 21
+            "ammoId": "clan_plasma_cannon_ammo"
         },
         "bv": 170,
         "cost": 320000,
@@ -6791,10 +7771,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_atm",
-            "ammoPerTon": 20,
-            "ammoCostPerTon": 75000,
-            "ammoBV": 14
+            "ammoId": "clan_atm_3_ammo"
         },
         "bv": 53,
         "cost": 50000,
@@ -6850,10 +7827,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_atm",
-            "ammoPerTon": 10,
-            "ammoCostPerTon": 75000,
-            "ammoBV": 26
+            "ammoId": "clan_atm_6_ammo"
         },
         "bv": 105,
         "cost": 125000,
@@ -6909,10 +7883,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_atm",
-            "ammoPerTon": 7,
-            "ammoCostPerTon": 75000,
-            "ammoBV": 36
+            "ammoId": "clan_atm_9_ammo"
         },
         "bv": 147,
         "cost": 225000,
@@ -6968,10 +7939,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_atm",
-            "ammoPerTon": 5,
-            "ammoCostPerTon": 75000,
-            "ammoBV": 52
+            "ammoId": "clan_atm_12_ammo"
         },
         "bv": 212,
         "cost": 350000,
@@ -7029,10 +7997,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_lrm",
-            "ammoPerTon": 24,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 7
+            "ammoId": "clan_lrm_5_ammo"
         },
         "bv": 55,
         "oneShotBV": 11,
@@ -7094,10 +8059,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_lrm",
-            "ammoPerTon": 12,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 14
+            "ammoId": "clan_lrm_10_ammo"
         },
         "bv": 109,
         "oneShotBV": 22,
@@ -7159,10 +8121,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_lrm",
-            "ammoPerTon": 8,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 21
+            "ammoId": "clan_lrm_15_ammo"
         },
         "bv": 164,
         "oneShotBV": 33,
@@ -7224,10 +8183,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_lrm",
-            "ammoPerTon": 6,
-            "ammoCostPerTon": 30000,
-            "ammoBV": 27
+            "ammoId": "clan_lrm_20_ammo"
         },
         "bv": 220,
         "oneShotBV": 44,
@@ -7287,10 +8243,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_srm",
-            "ammoPerTon": 50,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 3
+            "ammoId": "clan_srm_2_ammo"
         },
         "bv": 21,
         "oneShotBV": 4,
@@ -7350,10 +8303,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_srm",
-            "ammoPerTon": 25,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 5
+            "ammoId": "clan_srm_4_ammo"
         },
         "bv": 39,
         "oneShotBV": 8,
@@ -7413,10 +8363,7 @@ export const WEAPONS = {
             "S"
         ],
         "ammo": {
-            "ammoType": "clan_srm",
-            "ammoPerTon": 15,
-            "ammoCostPerTon": 27000,
-            "ammoBV": 7
+            "ammoId": "clan_srm_6_ammo"
         },
         "bv": 59,
         "oneShotBV": 12,
@@ -7476,10 +8423,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_streak_srm",
-            "ammoPerTon": 50,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 5
+            "ammoId": "clan_streak_srm_2_ammo"
         },
         "bv": 40,
         "cost": 15000,
@@ -7539,10 +8483,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_streak_srm",
-            "ammoPerTon": 25,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 10
+            "ammoId": "clan_streak_srm_4_ammo"
         },
         "bv": 79,
         "cost": 90000,
@@ -7602,10 +8543,7 @@ export const WEAPONS = {
             "C"
         ],
         "ammo": {
-            "ammoType": "clan_streak_srm",
-            "ammoPerTon": 15,
-            "ammoCostPerTon": 54000,
-            "ammoBV": 15
+            "ammoId": "clan_streak_srm_6_ammo"
         },
         "bv": 118,
         "cost": 120000,
@@ -7661,10 +8599,7 @@ export const WEAPONS = {
             "battleValuePage": 318
         },
         "ammo": {
-            "ammoType": "clan_narc_missile_beacon_ammo",
-            "ammoPerTon": 6,
-            "ammoBV": 0,
-            "ammoCostPerTon": 6000
+            "ammoId": "clan_narc_missile_beacon_ammo"
         },
         "bv": 30,
         "cost": 100000,
@@ -7672,277 +8607,6 @@ export const WEAPONS = {
         "notes": [
             "BV after slash in the rules table is the single-shot/one-shot launcher BV."
         ]
-    },
-    "is_a_pod": {
-        "id": "is_a_pod",
-        "name": "A-Pod",
-        "altNames": [
-            "IS A-Pod",
-            "ISAPod",
-            "APod",
-            "Anti-Personnel Pods (A-Pods)",
-            "Anti-Personnel Pod",
-            "A-Pod",
-            "A-Pods"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "a_pod",
-        "damage": "special",
-        "heat": 0,
-        "tons": 0.5,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "B",
-        "flags": [
-            "oneShot",
-            "antiInfantry",
-            "pointBlank"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "ammo": {
-            "ammoType": "is_a_pod_ammo",
-            "ammoPerTon": "OS"
-        },
-        "bv": 1,
-        "cost": 1500,
-    },
-    "is_b_pod": {
-        "id": "is_b_pod",
-        "name": "B-Pod",
-        "altNames": [
-            "IS B-Pod",
-            "ISBPod",
-            "BPod",
-            "Anti-BattleArmor Pods (B-Pods)",
-            "Anti-Battle Armor Pods (B-Pods)",
-            "Anti-BattleArmor Pod",
-            "B-Pod",
-            "B-Pods"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "b_pod",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-            "oneShot",
-            "antiInfantry",
-            "pointBlank",
-            "explosive"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "ammo": {
-            "ammoType": "is_b_pod_ammo",
-            "ammoPerTon": "OS"
-        },
-        "bv": 2,
-        "cost": 2500,
-    },
-    "is_anti_missile_system": {
-        "id": "is_anti_missile_system",
-        "name": "Anti-Missile System",
-        "altNames": [
-            "IS Anti-Missile System",
-            "ISAntiMissileSystem",
-            "AntiMissileSystem",
-            "AMS"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "anti_missile_system",
-        "damage": "special",
-        "heat": 1,
-        "tons": 0.5,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-            "pointDefense",
-            "requiresAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317,
-            "costAvailabilityPage": 295
-        },
-        "ammo": {
-            "ammoType": "is_anti_missile_system_ammo",
-            "ammoPerTon": 12,
-            "ammoBV": 11,
-            "ammoCostPerTon": 2000
-        },
-        "bv": 32,
-        "cost": 100000,
-        "availability": {
-
-            "starLeague": "E",
-
-            "successionWars": "F",
-
-            "clanInvasion": "D",
-
-        }
-    },
-        "is_laser_ams": {
-        "id": "is_laser_ams",
-        "name": "Laser AMS",
-        "altNames": [
-            "IS Laser AMS",
-            "ISLaserAMS",
-            "Laser Anti-Missile System",
-            "IS Laser Anti-Missile System",
-            "ISLaserAntiMissileSystem",
-            "Laser Anti Missile System",
-            "IS Laser Anti Missile System"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "antiMissileSystem",
-        "damage": "special",
-        "heat": 7,
-        "tons": 1.5,
-        "critSlots": 2,
-        "spaceSlots": 2,
-        "range": {
-            "min": 0,
-            "short": 0,
-            "medium": 0,
-            "long": 0
-        },
-        "techRating": "E",
-        "flags": [
-            "defensive",
-            "antiMissile",
-            "laserAMS",
-            "noAmmo"
-        ],
-        "source": {
-            "weightSpacePage": 0,
-            "battleValuePage": 0,
-            "costAvailabilityPage": 0
-        },
-        "cost": 225000,
-        "bv": 45,
-        "notes": [
-            "Laser AMS has defensive BV and does not require ammunition.",
-            "Rules level progressed over time; treated as Advanced for catalog support."
-        ]
-    },
-    "is_machine_gun_array": {
-        "id": "is_machine_gun_array",
-        "name": "Machine Gun Array",
-        "altNames": [
-            "IS Machine Gun Array",
-            "ISMachineGunArray",
-            "MachineGunArray",
-            "Machine Gun Array",
-            "Light Machine Gun Array",
-            "Heavy Machine Gun Array",
-            "MG Array"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "machine_gun_array",
-        "damage": "special",
-        "heat": 0,
-        "tons": 0.5,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-            "targetingSystem"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "F",
-        "cost": 1250
-    },
-    "is_masc": {
-        "id": "is_masc",
-        "name": "MASC",
-        "altNames": [
-            "IS MASC",
-            "ISMASC"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "masc",
-        "damage": "special",
-        "heat": 0,
-        "tons": "variable",
-        "critSlots": "variable",
-        "spaceSlots": "variable",
-        "techRating": "E",
-        "flags": [
-            "movementEnhancement"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "notes": [
-            "Variable weight/space; see construction rules."
-        ],
-        "bv": "C"
-    },
-    "is_tag": {
-        "id": "is_tag",
-        "name": "TAG",
-        "altNames": [
-            "IS TAG",
-            "ISTAG"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "tag",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "range": {
-            "min": 0,
-            "short": 5,
-            "medium": 9,
-            "long": 15
-        },
-        "techRating": "E",
-        "flags": [
-            "tag"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "A",
-        "cost": 50000,
     },
     "clan_a_pod": {
         "id": "clan_a_pod",
@@ -7977,8 +8641,7 @@ export const WEAPONS = {
             "battleValuePage": 318
         },
         "ammo": {
-            "ammoType": "clan_a_pod_ammo",
-            "ammoPerTon": "OS"
+            "ammoId": "clan_a_pod_ammo"
         },
         "bv": 1,
         "cost": 1500,
@@ -8017,8 +8680,7 @@ export const WEAPONS = {
             "battleValuePage": 318
         },
         "ammo": {
-            "ammoType": "clan_b_pod_ammo",
-            "ammoPerTon": "OS"
+            "ammoId": "clan_b_pod_ammo"
         },
         "bv": 2,
         "cost": 2500
@@ -8053,10 +8715,7 @@ export const WEAPONS = {
             "costAvailabilityPage": 295
         },
         "ammo": {
-            "ammoType": "clan_anti_missile_system_ammo",
-            "ammoPerTon": 24,
-            "ammoBV": 22,
-            "ammoCostPerTon": 2000
+            "ammoId": "clan_anti_missile_system_ammo"
         },
         "bv": 32,
         "cost": 100000,
@@ -8257,289 +8916,6 @@ export const WEAPONS = {
         },
         "bv": "A",
         "cost": 50000,
-    },
-    "is_beagle_active_probe": {
-        "id": "is_beagle_active_probe",
-        "name": "Beagle Active Probe",
-        "altNames": [
-            "IS Beagle Active Probe",
-            "ISBeagleActiveProbe",
-            "BeagleActiveProbe"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "beagle_active_probe",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1.5,
-        "critSlots": 2,
-        "spaceSlots": 2,
-        "range": {
-            "min": 0,
-            "short": 0,
-            "medium": 0,
-            "long": 4
-        },
-        "techRating": "E",
-        "flags": [
-            "activeProbe"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": 10,
-        "cost": 200000,
-        "availability": {
-
-            "starLeague": "E",
-
-            "successionWars": "F",
-
-            "clanInvasion": "D",
-
-        }
-    },
-    "is_case": {
-        "id": "is_case",
-        "name": "CASE",
-        "altNames": [
-            "IS CASE",
-            "ISCASE"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "case",
-        "damage": "special",
-        "heat": 0,
-        "tons": 0.5,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "D",
-        "flags": [
-            "ammoProtection"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "C",
-        "cost": 50000,
-    },
-    "is_case_ii": {
-        "id": "is_case_ii",
-        "name": "CASE II",
-        "altNames": [
-            "IS CASE II",
-            "ISCASEII",
-            "CASEII"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Experimental",
-        "variant": "IS",
-        "family": "case",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-            "ammoProtection"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "C",
-        "cost": 175000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "F",
-
-        }
-    },
-    "is_c3_computer_master": {
-        "id": "is_c3_computer_master",
-        "name": "C3 Computer (Master)",
-        "altNames": [
-            "IS C3 Computer (Master)",
-            "ISC3Computer(Master)",
-            "C3Computer(Master)",
-            "C3 Master",
-            "C3 Computer (Master)",
-            "C3 Master Computer",
-            "C3 Master with TAG",
-            "C3ComputerMaster",
-            "C3 Computer Master",
-            "C3MasterBoostedWithTAG",
-            "c3 master boosted with tag",
-            "c3boostedsystemmaster",
-            "c3 boosted system master",
-            "c3computermaster"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "c3_computer_master",
-        "damage": "special",
-        "heat": 0,
-        "tons": 5,
-        "critSlots": 5,
-        "spaceSlots": 5,
-        "techRating": "E",
-        "flags": [
-            "c3"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "D",
-        "cost": 1500000,
-    },
-    "is_c3_computer_slave": {
-        "id": "is_c3_computer_slave",
-        "name": "C3 Computer (Slave)",
-        "altNames": [
-            "IS C3 Computer (Slave)",
-            "ISC3Computer(Slave)",
-            "C3Computer(Slave)",
-            "ISC3SlaveUnit",
-            "C3 Slave",
-            "C3 Computer (Slave)",
-            "C3 Slave Unit"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "c3_computer_slave",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1,
-        "critSlots": 1,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-            "c3"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "D",
-        "cost": 250000,
-    },
-    "is_improved_c3_computer": {
-        "id": "is_improved_c3_computer",
-        "name": "Improved C3 Computer",
-        "altNames": [
-            "IS Improved C3 Computer",
-            "ISImprovedC3Computer",
-            "ImprovedC3Computer",
-            "ISImprovedC3CPU",
-            "Improved C3 CPU",
-            "Improved C3 Computer",
-            "Improved C3 Computer (C3I)",
-            "improvedc3computerc3i",
-            "improved c3 computer c3i",
-            "ISC3iUnit"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "improved_c3_computer",
-        "damage": "special",
-        "heat": 0,
-        "tons": 2.5,
-        "critSlots": 2,
-        "spaceSlots": 2,
-        "techRating": "E",
-        "flags": [
-            "c3"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "D",
-        "cost": 750000,
-    },
-    "is_guardian_ecm_suite": {
-        "id": "is_guardian_ecm_suite",
-        "name": "Guardian ECM Suite",
-        "altNames": [
-            "IS Guardian ECM Suite",
-            "ISGuardianECMSuite",
-            "GuardianECMSuite",
-            "ISGuardianECM"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "guardian_ecm_suite",
-        "damage": "special",
-        "heat": 0,
-        "tons": 1.5,
-        "critSlots": 2,
-        "spaceSlots": 2,
-        "range": {
-            "min": 0,
-            "short": 0,
-            "medium": 0,
-            "long": 6
-        },
-        "techRating": "E",
-        "flags": [
-            "ecm"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": 61,
-        "cost": 200000
-    },
-    "is_targeting_computer": {
-        "id": "is_targeting_computer",
-        "name": "Targeting Computer",
-        "altNames": [
-            "IS Targeting Computer",
-            "ISTargetingComputer",
-            "TargetingComputer"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "targeting_computer",
-        "damage": "special",
-        "heat": 0,
-        "tons": "variable",
-        "critSlots": "variable",
-        "spaceSlots": "variable",
-        "techRating": "E",
-        "flags": [
-            "targetingComputer"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "E"
     },
     "clan_active_probe": {
         "id": "clan_active_probe",
@@ -8785,7 +9161,7 @@ export const WEAPONS = {
         },
         "bv": "D",
     },
-        "clan_case_ii": {
+    "clan_case_ii": {
         "id": "clan_case_ii",
         "name": "CASE II",
         "altNames": [
@@ -8823,281 +9199,6 @@ export const WEAPONS = {
 
         }
     },
-    "is_enhanced_lrm_5": {
-        "id": "is_enhanced_lrm_5",
-        "name": "Enhanced LRM 5",
-        "altNames": [
-                "IS Enhanced LRM 5",
-                "ISEnhancedLRM5",
-                "EnhancedLRM5",
-                "Enhanced-LRM-5",
-                "NLRM 5",
-                "NLRM-5",
-                "NLRM5",
-                "ISNLRM5"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "enhancedLrm",
-        "damage": "1/Msl",
-        "rackSize": 5,
-        "heat": 2,
-        "tons": 3,
-        "critSlots": 2,
-        "spaceSlots": 1,
-        "range": {
-                "min": 3,
-                "short": 7,
-                "medium": 14,
-                "long": 21,
-                "extreme": 28
-        },
-        "techRating": "E",
-        "flags": [
-                "cluster",
-                "requiresAmmo",
-                "minimumRange",
-                "indirectFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "M",
-                "C",
-                "S"
-        ],
-        "ammo": {
-                "ammoType": "is_enhanced_lrm",
-                "ammoPerTon": 24,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 7
-        },
-        "bv": 52,
-        "cost": 60000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "E",
-
-        },
-        "notes": [
-                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
-                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
-        ]
-},
-    "is_enhanced_lrm_10": {
-        "id": "is_enhanced_lrm_10",
-        "name": "Enhanced LRM 10",
-        "altNames": [
-                "IS Enhanced LRM 10",
-                "ISEnhancedLRM10",
-                "EnhancedLRM10",
-                "Enhanced-LRM-10",
-                "NLRM 10",
-                "NLRM-10",
-                "NLRM10",
-                "ISNLRM10"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "enhancedLrm",
-        "damage": "1/Msl",
-        "rackSize": 10,
-        "heat": 4,
-        "tons": 6,
-        "critSlots": 4,
-        "spaceSlots": 1,
-        "range": {
-                "min": 3,
-                "short": 7,
-                "medium": 14,
-                "long": 21,
-                "extreme": 28
-        },
-        "techRating": "E",
-        "flags": [
-                "cluster",
-                "requiresAmmo",
-                "minimumRange",
-                "indirectFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "M",
-                "C",
-                "S"
-        ],
-        "ammo": {
-                "ammoType": "is_enhanced_lrm",
-                "ammoPerTon": 12,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 13
-        },
-        "bv": 104,
-        "cost": 200000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "E",
-
-        },
-        "notes": [
-                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
-                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
-        ]
-},
-    "is_enhanced_lrm_15": {
-        "id": "is_enhanced_lrm_15",
-        "name": "Enhanced LRM 15",
-        "altNames": [
-                "IS Enhanced LRM 15",
-                "ISEnhancedLRM15",
-                "EnhancedLRM15",
-                "Enhanced-LRM-15",
-                "NLRM 15",
-                "NLRM-15",
-                "NLRM15",
-                "ISNLRM15"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "enhancedLrm",
-        "damage": "1/Msl",
-        "rackSize": 15,
-        "heat": 5,
-        "tons": 9,
-        "critSlots": 6,
-        "spaceSlots": 1,
-        "range": {
-                "min": 3,
-                "short": 7,
-                "medium": 14,
-                "long": 21,
-                "extreme": 28
-        },
-        "techRating": "E",
-        "flags": [
-                "cluster",
-                "requiresAmmo",
-                "minimumRange",
-                "indirectFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "M",
-                "C",
-                "S"
-        ],
-        "ammo": {
-                "ammoType": "is_enhanced_lrm",
-                "ammoPerTon": 8,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 20
-        },
-        "bv": 157,
-        "cost": 350000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "E",
-
-        },
-        "notes": [
-                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
-                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
-        ]
-},
-    "is_enhanced_lrm_20": {
-        "id": "is_enhanced_lrm_20",
-        "name": "Enhanced LRM 20",
-        "altNames": [
-                "IS Enhanced LRM 20",
-                "ISEnhancedLRM20",
-                "EnhancedLRM20",
-                "Enhanced-LRM-20",
-                "NLRM 20",
-                "NLRM-20",
-                "NLRM20",
-                "ISNLRM20"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "enhancedLrm",
-        "damage": "1/Msl",
-        "rackSize": 20,
-        "heat": 6,
-        "tons": 12,
-        "critSlots": 9,
-        "spaceSlots": 1,
-        "range": {
-                "min": 3,
-                "short": 7,
-                "medium": 14,
-                "long": 21,
-                "extreme": 28
-        },
-        "techRating": "E",
-        "flags": [
-                "cluster",
-                "requiresAmmo",
-                "minimumRange",
-                "indirectFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "M",
-                "C",
-                "S"
-        ],
-        "ammo": {
-                "ammoType": "is_enhanced_lrm",
-                "ammoPerTon": 6,
-                "ammoCostPerTon": 30000,
-                "ammoBV": 26
-        },
-        "bv": 210,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "E",
-
-        },
-        "notes": [
-                "Enhanced LRM/NLRM launcher family. Added for MTF matching; verify cost before making cost required.",
-                "Enhanced LRM costs were unavailable in the source consulted; ammo cost is temporarily aligned to standard LRM ammo until verified."
-        ]
-},
     "clan_streak_lrm_5": {
         "id": "clan_streak_lrm_5",
         "name": "Streak LRM 5",
@@ -9146,10 +9247,7 @@ export const WEAPONS = {
                 "S"
         ],
         "ammo": {
-                "ammoType": "clan_streak_lrm",
-                "ammoPerTon": 24,
-                "ammoCostPerTon": 60000,
-                "ammoBV": 11
+            "ammoId": "clan_streak_lrm_5_ammo"
         },
         "cost": 75000,
         "bv": 86,
@@ -9214,10 +9312,7 @@ export const WEAPONS = {
                 "S"
         ],
         "ammo": {
-                "ammoType": "clan_streak_lrm",
-                "ammoPerTon": 12,
-                "ammoCostPerTon": 60000,
-                "ammoBV": 22
+            "ammoId": "clan_streak_lrm_10_ammo"
         },
         "cost": 225000,
         "bv": 173,
@@ -9282,10 +9377,7 @@ export const WEAPONS = {
                 "S"
         ],
         "ammo": {
-                "ammoType": "clan_streak_lrm",
-                "ammoPerTon": 8,
-                "ammoCostPerTon": 60000,
-                "ammoBV": 32
+            "ammoId": "clan_streak_lrm_15_ammo"
         },
         "cost": 400000,
         "bv": 259,
@@ -9350,10 +9442,7 @@ export const WEAPONS = {
                 "S"
         ],
         "ammo": {
-                "ammoType": "clan_streak_lrm",
-                "ammoPerTon": 6,
-                "ammoCostPerTon": 60000,
-                "ammoBV": 43
+            "ammoId": "clan_streak_lrm_20_ammo"
         },
         "cost": 600000,
         "bv": 345,
@@ -9370,61 +9459,7 @@ export const WEAPONS = {
                 "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
         ]
 },
-"is_arrow_iv": {
-        "id": "is_arrow_iv",
-        "name": "Arrow IV",
-        "altNames": [
-                "IS Arrow IV",
-                "ISArrowIV",
-                "ArrowIV",
-                "Arrow-IV",
-                "isarrowivsystem",
-                "is arrow iv system"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "family": "Artillery",
-        "damage": "20/10",
-        "heat": 10,
-        "tons": 15,
-        "critSlots": 15,
-        "spaceSlots": 1,
-        "techRating": "E",
-        "flags": [
-                "artillery",
-                "requiresAmmo",
-                "indirectFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "M",
-                "C",
-                "S"
-        ],
-        "ammo": {
-                "ammoType": "is_arrow_iv",
-                "ammoPerTon": 5,
-                "ammoCostPerTon": 10000,
-                "ammoBV": 12
-        },
-        "bv": 240,
-        "cost": 450000,
-        "availability": {
-
-            "starLeague": "E",
-
-            "successionWars": "F",
-
-            "clanInvasion": "E",
-
-        }
-},
-"clan_arrow_iv": {
+    "clan_arrow_iv": {
         "id": "clan_arrow_iv",
         "name": "Arrow IV",
         "altNames": [
@@ -9459,10 +9494,7 @@ export const WEAPONS = {
                 "S"
         ],
         "ammo": {
-                "ammoType": "is_arrow_iv",
-                "ammoPerTon": 5,
-                "ammoCostPerTon": 10000,
-                "ammoBV": 12
+            "ammoId": "clan_arrow_iv_ammo"
         },
         "bv": 240,
         "cost": 450000,
@@ -9476,53 +9508,7 @@ export const WEAPONS = {
 
         }
 },
-"tsemp_cannon": {
-        "id": "tsemp_cannon",
-        "name": "TSEMP Cannon",
-        "altNames": [
-                "TSEMP Cannon",
-                "TSEMPCannon",
-                "TSEMP"
-        ],
-        "category": "Energy",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Advanced",
-        "variant": "IS",
-        "damage": 0,
-        "heat": 10,
-        "tons": 6,
-        "critSlots": 5,
-        "spaceSlots": 1,
-        "range": {
-                "min": 0,
-                "short": 5,
-                "medium": 9,
-                "long": 15
-        },
-        "techRating": "X",
-        "flags": [
-                "directFire"
-        ],
-        "source": {
-                "battleValuePage": 0,
-                "weightSpacePage": 0
-        },
-        "typeCodes": [
-                "L"
-        ],
-        "bv": 488,
-        "cost": 800000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "X",
-
-        }
-},
-"clan_beagle_active_probe": {
+    "clan_beagle_active_probe": {
         "id": "clan_beagle_active_probe",
         "name": "Beagle Active Probe",
         "altNames": [
@@ -9563,50 +9549,6 @@ export const WEAPONS = {
             "successionWars": "F",
 
             "clanInvasion": "D",
-
-        }
-    },
-    "is_full_head_ejection_system": {
-        "id": "is_full_head_ejection_system",
-        "name": "Full Head Ejection System",
-        "altNames": [
-            "Inner Sphere Full Head Ejection System",
-            "ISFullHeadEjectionSystem",
-            "FullHeadEjectionSystem"
-        ],
-        "category": "Equipment",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "Ejection",
-        "damage": 0,
-        "heat": 0,
-        "tons": 0,
-        "critSlots": 0,
-        "spaceSlots": 0,
-        "range": {
-            "min": 0,
-            "short": 0,
-            "medium": 0,
-            "long": 0
-        },
-        "techRating": "D",
-        "flags": [
-            "ejection"
-        ],
-        "source": {
-            "weightSpacePage": 342,
-            "battleValuePage": 317
-        },
-        "bv": "G",
-        "cost": 1725000,
-        "availability": {
-
-            "starLeague": "X",
-
-            "successionWars": "X",
-
-            "clanInvasion": "E",
 
         }
     },
@@ -9654,17 +9596,537 @@ export const WEAPONS = {
 
         }
     },
+    "clan_protomech_ac_8": {
+        "id": "clan_protomech_ac_8",
+        "name": "ProtoMech AC/8",
+        "altNames": [
+            "CLProtoMechAC8",
+            "CLProtoMechAC8 (OMNIPOD)",
+            "ProtoMech AC/8",
+            "Clan ProtoMech AC/8"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "damage": 8,
+        "heat": 2,
+        "tons": 5.5,
+        "critSlots": 4,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "F",
+        "flags": ["directFire"],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["DB", "S"],
+        "ammo": {
+            "ammoId": "clan_protomech_ac_8_ammo"
+        },
+        "bv": 0,
+        "cost": 175000,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "F"
 
+        }
+    },
+    "clan_protomech_ac_4": {
+        "id": "clan_protomech_ac_4",
+        "name": "ProtoMech AC/4",
+        "altNames": [
+            "CLProtoMechAC4",
+            "CLProtoMechAC4 (OMNIPOD)",
+            "ProtoMech AC/4",
+            "Clan ProtoMech AC/4"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "damage": 4,
+        "heat": 1,
+        "tons": 4.5,
+        "critSlots": 3,
+"range": { "min": 0, "short": 0, "medium": 0, "long": 0 },
+        "techRating": "F",
+        "flags": ["directFire"],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": ["DB", "S"],
+        "ammo": {
+            "ammoId": "clan_protomech_ac_4_ammo"
+        },
+        "bv": 0,
+        "cost": 133000,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "F"
 
-} as const satisfies Record<string, WeaponDefinition>;
+        }
+    },
+
+    // Mixed/common equipment
+"artemis_iv_fcs": {
+        "id": "artemis_iv_fcs",
+        "name": "Artemis IV FCS",
+        "altNames": [
+            "Artemis IV",
+            "Artemis IV FCS",
+            "ISArtemisIV",
+            "CLArtemisIV",
+            "CLArtemisIV (OMNIPOD)",
+            "IS Artemis IV",
+            "Clan Artemis IV"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Standard",
+        "variant": "Mixed",
+        "family": "fireControl",
+        "damage": 0,
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "fireControl"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "T"
+        ],
+        "bv": "B",
+        "cost": {"type": "fixed", "amount": 100000},
+        "availability": {
+            "starLeague": "E",
+            "successionWars": "F",
+            "clanInvasion": "D"
+        },
+        "notes": [
+            "BV is applied as a 20 percent modifier to compatible missile launchers; ammo is not modified."
+        ]
+    },
+    "chainsaw": {
+        "id": "chainsaw",
+        "name": "Chainsaw",
+        "altNames": [
+            "Chainsaw",
+            "ISChainsaw",
+            "CLChainsaw"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": "industrial",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "D",
+        "flags": [
+            "industrialEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": 7,
+        "cost": {"type": "fixed", "amount": 100000},
+        "availability": {
+            "starLeague": "D",
+            "successionWars": "D",
+            "clanInvasion": "D"
+        }
+    },
+    "dual_saw": {
+        "id": "dual_saw",
+        "name": "Dual Saw",
+        "altNames": [
+            "Dual Saw",
+            "DualSaw",
+            "ISDualSaw",
+            "CLDualSaw"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": "industrial",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "D",
+        "flags": [
+            "industrialEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": 9,
+        "cost": {"type": "fixed", "amount": 100000},
+        "availability": {
+            "starLeague": "D",
+            "successionWars": "D",
+            "clanInvasion": "D"
+        }
+    },
+    "mining_drill": {
+        "id": "mining_drill",
+        "name": "Mining Drill",
+        "altNames": [
+            "Mining Drill",
+            "MiningDrill",
+            "ISMiningDrill",
+            "CLMiningDrill"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": "industrial",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "D",
+        "flags": [
+            "industrialEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": 6,
+        "cost": {"type": "fixed", "amount": 150000},
+        "availability": {
+            "starLeague": "D",
+            "successionWars": "D",
+            "clanInvasion": "D"
+        }
+    },
+    "rock_cutter": {
+        "id": "rock_cutter",
+        "name": "Rock Cutter",
+        "altNames": [
+            "Rock Cutter",
+            "RockCutter",
+            "ISRockCutter",
+            "CLRockCutter"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": "industrial",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "D",
+        "flags": [
+            "industrialEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": 6,
+        "cost": {"type": "fixed", "amount": 150000},
+        "availability": {
+            "starLeague": "D",
+            "successionWars": "D",
+            "clanInvasion": "D"
+        }
+    },
+    "backhoe": {
+        "id": "backhoe",
+        "name": "Backhoe",
+        "altNames": [
+            "Backhoe",
+            "ISBackhoe",
+            "CLBackhoe"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": "industrial",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "B",
+        "flags": [
+            "industrialEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "ME"
+        ],
+        "bv": 8,
+        "cost": {"type": "fixed", "amount": 50000},
+        "availability": {
+            "starLeague": "B",
+            "successionWars": "B",
+            "clanInvasion": "B"
+        }
+    },
+    "lift_hoist": {
+        "id": "lift_hoist",
+        "name": "Lift Hoist",
+        "altNames": [
+            "Lift Hoist",
+            "LiftHoist",
+            "Lift Hoist/Arresting Hoist",
+            "ISLiftHoist",
+            "CLLiftHoist"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": 0,
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "A",
+        "flags": [
+            "industrialEquipment",
+            "utility"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "PE"
+        ],
+        "bv": 0,
+        "cost": {"type": "fixed", "amount": 50000},
+        "availability": {
+            "starLeague": "A",
+            "successionWars": "A",
+            "clanInvasion": "A"
+        }
+    },
+    "arresting_hoist": {
+        "id": "arresting_hoist",
+        "name": "Arresting Hoist",
+        "altNames": [
+            "Arresting Hoist",
+            "ArrestingHoist"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "industrialEquipment",
+        "damage": 0,
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "C",
+        "flags": [
+            "industrialEquipment",
+            "utility"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "PE"
+        ],
+        "bv": 0,
+        "cost": {"type": "fixed", "amount": 90000},
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "F",
+            "clanInvasion": "E"
+        }
+    },
+    "mek_taser": {
+        "id": "mek_taser",
+        "name": "Mek Taser",
+        "altNames": [
+            "Mek Taser",
+            "BattleMech Taser",
+            "Taser (BattleMech)",
+            "ISMekTaser",
+            "CLMekTaser"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Experimental",
+        "variant": "Mixed",
+        "family": "taser",
+        "damage": "1*",
+        "heat": 6,
+        "tons": 4,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "directFire",
+            "requiresAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DB",
+            "X"
+        ],
+        "bv": 0,
+        "cost": {"type": "fixed", "amount": 200000},
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+        },
+        "notes": [
+            "Added for MTF slot resolution; verify BV/ammo details against final BattleMech Taser table before using for BV calculations."
+        ]
+    },
+    "mech_mortar_4": {
+        "id": "mech_mortar_4",
+        "name": "Mech Mortar/4",
+        "altNames": [
+            "Mech Mortar-4",
+            "Mech Mortar/4",
+            "Clan Mech Mortar-4",
+            "Clan Mech Mortar-4 (OMNIPOD)",
+            "ISMechMortar4",
+            "CLMechMortar4"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "mortar",
+        "damage": "special",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "B",
+        "flags": [
+            "requiresAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DB",
+            "AE"
+        ],
+        "bv": 0,
+        "cost": {"type": "fixed", "amount": 75000},
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        }
+    },
+    "mech_mortar_8": {
+        "id": "mech_mortar_8",
+        "name": "Mech Mortar/8",
+        "altNames": [
+            "Mech Mortar-8",
+            "Mech Mortar/8",
+            "Clan Mech Mortar-8",
+            "Clan Mech Mortar-8 (OMNIPOD)",
+            "ISMechMortar8",
+            "CLMechMortar8"
+        ],
+        "category": "Equipment",
+        "techBase": "Mixed",
+        "rulesLevel": "Advanced",
+        "variant": "Mixed",
+        "family": "mortar",
+        "damage": "special",
+        "heat": 0,
+        "tons": "\"varies\"",
+        "critSlots": "\"varies\"",
+        "spaceSlots": "\"varies\"",
+        "techRating": "B",
+        "flags": [
+            "requiresAmmo"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "DB",
+            "AE"
+        ],
+        "bv": 0,
+        "cost": {"type": "fixed", "amount": 150000},
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        }
+    }
+};
 
 export function findWeaponDefinition(rawName: string, techBase?: TechBase): WeaponDefinition | undefined {
-    const normalized = rawName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normalized = rawName.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-    return (Object.values(WEAPONS) as WeaponDefinition[]).find((weapon: WeaponDefinition) => {
-        if (techBase && weapon.techBase !== techBase && weapon.techBase !== "Mixed") return false;
+  return (Object.values(WEAPONS) as WeaponDefinition[]).find((weapon: WeaponDefinition) => {
+    if (techBase && weapon.techBase !== techBase && weapon.techBase !== "Mixed") return false;
 
-        const names = [weapon.name, ...weapon.altNames];
-        return names.some((name) => name.toLowerCase().replace(/[^a-z0-9]/g, "") === normalized);
-    });
+    const names = [weapon.name, ...weapon.altNames];
+    return names.some((name) => name.toLowerCase().replace(/[^a-z0-9]/g, "") === normalized);
+  });
 }

@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { WEAPONS } from "../src/data/weapons";
+import { WEAPONS, AMMO } from "../src/data/weapons";
 import { COMPONENTS } from "../src/data/components";
 
 type CsvRow = Record<string, string>;
@@ -11,6 +11,8 @@ type CliOptions = {
   unitQuery: string | null;
   chassisQuery: string | null;
   unitIds: string[];
+  randomCount: number;
+  randomSeed: string;
   embedDefinitions: boolean;
   pretty: boolean;
 };
@@ -22,7 +24,8 @@ type MtfKeyValue = {
 
 type WeaponDefinition = Record<string, any>;
 type ComponentDefinition = Record<string, any>;
-type DefinitionSource = "weapon" | "component";
+type AmmoDefinition = Record<string, any>;
+type DefinitionSource = "weapon" | "component" | "ammo";
 
 type AvailabilityByEra = {
   starLeague: string;
@@ -45,6 +48,7 @@ type DetailLocationSlot = {
   referenceName: string;
   referenceSource: DefinitionSource | "";
   weaponRef?: string;
+  ammoRef?: string;
   techRating?: string;
   availability?: AvailabilityByEra;
   cost?: any;
@@ -135,7 +139,8 @@ async function main(): Promise<void> {
   const options = getCliOptions();
   const csvText = await fs.readFile(options.unitIndexPath, "utf-8");
   const rows = parseCsv(csvText);
-  const selectedRows = rows.filter((row) => row.unitType === "meks" && matchesUnitSelection(row, options));
+  let selectedRows = rows.filter((row) => row.unitType === "meks" && matchesUnitSelection(row, options));
+  selectedRows = applyRandomSelection(selectedRows, options);
   const manifest: Array<Record<string, string>> = [];
 
   await fs.mkdir(options.outputDir, { recursive: true });
@@ -146,6 +151,7 @@ async function main(): Promise<void> {
     if (options.unitQuery) console.warn(`[generateUnitDetails] unit query: ${options.unitQuery}`);
     if (options.chassisQuery) console.warn(`[generateUnitDetails] chassis query: ${options.chassisQuery}`);
     if (options.unitIds.length) console.warn(`[generateUnitDetails] explicit ids: ${options.unitIds.join(", ")}`);
+    if (options.randomCount > 0) console.warn(`[generateUnitDetails] random sample: ${options.randomCount} seed=${options.randomSeed}`);
   }
 
   for (const [index, row] of selectedRows.entries()) {
@@ -187,6 +193,7 @@ async function main(): Promise<void> {
   if (options.unitQuery) console.log(`[generateUnitDetails] unit query: ${options.unitQuery}`);
   if (options.chassisQuery) console.log(`[generateUnitDetails] chassis query: ${options.chassisQuery}`);
   if (options.unitIds.length) console.log(`[generateUnitDetails] explicit ids: ${options.unitIds.join(", ")}`);
+  if (options.randomCount > 0) console.log(`[generateUnitDetails] random sample: ${options.randomCount} seed=${options.randomSeed}`);
   console.log(`[generateUnitDetails] generated details: ${selectedRows.length}`);
   console.log(`[generateUnitDetails] output: ${options.outputDir}`);
 }
@@ -205,7 +212,7 @@ async function buildUnitDetail(row: CsvRow, options: CliOptions): Promise<UnitDe
   const warnings: string[] = [];
   const weapons = buildWeapons(lines, row.techBase, options.embedDefinitions, row.name, warnings);
   const weaponSlotRefMap = buildWeaponSlotRefMap(weapons);
-  const locations = buildLocations(lines, keyValues, row.techBase, options.embedDefinitions, row.name, warnings, weaponSlotRefMap);
+  const locations = buildLocations(lines, keyValues, row.techBase, options.embedDefinitions, row.name, warnings, weaponSlotRefMap, weapons);
 
   return {
     schemaVersion: 1,
@@ -258,7 +265,8 @@ function buildLocations(
   embedDefinitions: boolean,
   unitName: string,
   warnings: string[],
-  weaponSlotRefMap: Map<string, string>
+  weaponSlotRefMap: Map<string, string>,
+  weapons: DetailWeapon[]
 ): Partial<Record<MekLocationKey, DetailLocation>> {
   const slotSections = parseLocationSlotSections(lines);
   const config = getFieldValue(keyValues, "config");
@@ -273,7 +281,7 @@ function buildLocations(
       armor: getFirstNumberField(keyValues, definition.armorKeys),
       slotCapacity: getLocationSlotCapacity(definition.key),
       slots: rawSlots.map((slot, index) =>
-        buildLocationSlot(slot, index + 1, techBase, embedDefinitions, unitName, definition.mtfName, warnings, weaponSlotRefMap)
+        buildLocationSlot(slot, index + 1, techBase, embedDefinitions, unitName, definition.mtfName, warnings, weaponSlotRefMap, weapons)
       ),
     };
 
@@ -295,9 +303,33 @@ function buildLocationSlot(
   unitName: string,
   locationName: string,
   warnings: string[],
-  weaponSlotRefMap: Map<string, string>
+  weaponSlotRefMap: Map<string, string>,
+  weapons: DetailWeapon[]
 ): DetailLocationSlot {
   const normalized = normalizeLookupText(rawSlot);
+  const rawType = classifyRawSlotForDetail(rawSlot);
+
+  if (rawType === "ammo") {
+    const ammo = resolveAmmoDefinition(rawSlot, techBase);
+    const weaponRef = findWeaponRefForAmmoSlot(ammo, weapons);
+
+    return {
+      slotIndex,
+      raw: rawSlot,
+      normalized,
+      type: "ammo",
+      displayName: ammo?.name ?? stripSlotAnnotations(rawSlot),
+      referenceId: ammo?.id ?? "",
+      referenceName: ammo?.name ?? "",
+      referenceSource: ammo ? "ammo" : "",
+      ...(ammo ? { ammoRef: ammo.id } : {}),
+      ...(weaponRef ? { weaponRef } : {}),
+      ...(ammo?.bv !== undefined ? { bv: ammo.bv } as any : {}),
+      ...(ammo?.costPerTon !== undefined ? { costPerTon: ammo.costPerTon } as any : {}),
+      ...(ammo?.shotsPerTon !== undefined ? { shotsPerTon: ammo.shotsPerTon } as any : {}),
+    } as DetailLocationSlot;
+  }
+
   const resolved = resolveDefinition(rawSlot, techBase);
   const type = classifySlot(rawSlot, resolved);
   const isRearFacing = isRearFacingText(rawSlot);
@@ -369,7 +401,7 @@ function buildWeapons(
 
 function buildWeaponSlotRefMap(weapons: DetailWeapon[]): Map<string, string> {
   const map = new Map<string, string>();
-  const fallbackByWeaponName = new Map<string, string[]>();
+  const fallbackByWeaponName = new Map<string, Set<string>>();
 
   for (const weapon of weapons) {
     const locationKey = normalizeLookupText(weapon.location);
@@ -382,17 +414,20 @@ function buildWeaponSlotRefMap(weapons: DetailWeapon[]): Map<string, string> {
       ...(Array.isArray(weapon.definition?.altNames) ? weapon.definition.altNames : []),
     ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
 
-    for (const nameKey of nameKeys) {
+    for (const nameKey of new Set(nameKeys)) {
       if (!nameKey) continue;
       map.set(`${locationKey}|${nameKey}`, weapon.ref);
-      const existing = fallbackByWeaponName.get(nameKey) ?? [];
-      existing.push(weapon.ref);
+
+      const existing = fallbackByWeaponName.get(nameKey) ?? new Set<string>();
+      existing.add(weapon.ref);
       fallbackByWeaponName.set(nameKey, existing);
     }
   }
 
   for (const [nameKey, refs] of fallbackByWeaponName.entries()) {
-    if (refs.length === 1) map.set(`*|${nameKey}`, refs[0]);
+    if (refs.size === 1) {
+      map.set(`*|${nameKey}`, [...refs][0]);
+    }
   }
 
   return map;
@@ -643,7 +678,12 @@ function isTopLevelMtfFieldBoundary(line: string): boolean {
   return new Set([
     "overview", "capabilities", "deployment", "history", "variants", "variant",
     "notables", "notable", "battlehistory", "fluff", "manufacturer", "primaryfactory",
-    "systemmanufacturer", "source", "sourcebook", "ruleslevel", "rules", "role", "quirks",
+    "systemmanufacturer",
+    "masterunitlistid",
+    "mulid",
+    "notes",
+    "fluffimage",
+    "imagefile", "source", "sourcebook", "ruleslevel", "rules", "role", "quirks",
   ]).has(key);
 }
 
@@ -683,6 +723,73 @@ function normalizeLocationHeader(line: string): MekLocationKey | null {
     rrl: "rearRightLeg",
   };
   return map[normalized] ?? null;
+}
+
+function resolveAmmoDefinition(rawValue: string, unitTechBase: string): AmmoDefinition | null {
+  const normalized = normalizeLookupText(rawValue);
+  if (!normalized.includes("ammo")) return null;
+
+  const cleaned = normalizeAmmoLookupText(rawValue);
+  const desiredTechBase = inferTechBaseFromRawText(rawValue) || normalizeTechBase(unitTechBase);
+  const candidates: Array<{ definition: AmmoDefinition; score: number }> = [];
+
+  for (const [key, definition] of Object.entries(AMMO as Record<string, AmmoDefinition>)) {
+    const values = [
+      key,
+      definition.id,
+      definition.name,
+      definition.ammoType,
+      ...(Array.isArray(definition.compatibleWeaponNames) ? definition.compatibleWeaponNames : []),
+      ...(Array.isArray(definition.weaponIds) ? definition.weaponIds : []),
+    ].filter(Boolean).map((value) => normalizeAmmoLookupText(String(value)));
+
+    let score = 0;
+    if (values.some((value) => value === cleaned)) {
+      score = 260;
+    } else if (values.some((value) => cleaned.includes(value) || value.includes(cleaned))) {
+      score = 160;
+    } else {
+      const withoutAmmo = cleaned.replace(/ammo/g, "");
+      if (values.some((value) => {
+        const candidate = value.replace(/ammo/g, "");
+        return withoutAmmo && (withoutAmmo.includes(candidate) || candidate.includes(withoutAmmo));
+      })) {
+        score = 130;
+      }
+    }
+
+    if (score <= 0) continue;
+    score += getTechBaseScore(definition, desiredTechBase);
+    candidates.push({ definition, score });
+  }
+
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0]?.definition ?? null;
+}
+
+function normalizeAmmoLookupText(value: string): string {
+  return normalizeLookupText(value)
+    .replace(/^clanammo/, "clan")
+    .replace(/^isammo/, "is")
+    .replace(/^ammo/, "");
+}
+
+function findWeaponRefForAmmoSlot(ammo: AmmoDefinition | null, weapons: DetailWeapon[]): string {
+  if (!ammo) return "";
+
+  const weaponIds = Array.isArray(ammo.weaponIds)
+    ? ammo.weaponIds.map((value) => normalizeLookupText(String(value)))
+    : [];
+  if (weaponIds.length === 0) return "";
+
+  const matchingRefs = new Set<string>();
+  for (const weapon of weapons) {
+    if (weaponIds.includes(normalizeLookupText(weapon.referenceId))) {
+      matchingRefs.add(weapon.ref);
+    }
+  }
+
+  return matchingRefs.size === 1 ? [...matchingRefs][0] : "";
 }
 
 function resolveDefinition(rawValue: string, unitTechBase: string): { source: DefinitionSource; definition: WeaponDefinition } | null {
@@ -743,6 +850,13 @@ function findBestDefinitionMatch<T extends Record<string, any>>(
   return candidates[0]?.definition ?? null;
 }
 
+function classifyRawSlotForDetail(rawSlot: string): DetailLocationSlot["type"] {
+  const normalized = normalizeLookupText(rawSlot);
+  if (!normalized || normalized === "empty" || normalized === "none") return "empty";
+  if (normalized.includes("ammo")) return "ammo";
+  return "equipment";
+}
+
 function classifySlot(rawSlot: string, resolved?: { source: DefinitionSource; definition: WeaponDefinition } | null): DetailLocationSlot["type"] {
   const normalized = normalizeLookupText(rawSlot);
   if (!normalized || normalized === "empty" || normalized === "none") return "empty";
@@ -789,7 +903,16 @@ function shouldWarnForUnresolvedSlot(rawSlot: string, type: DetailLocationSlot["
 
   const knownSystemFragments = [
     "engine", "gyro", "cockpit", "lifesupport", "sensors", "shoulder", "upperarm",
-    "lowerarm", "hand", "hip", "upperleg", "lowerleg", "foot",
+    "lowerarm", "hand", "hip", "upperleg", "lowerleg", "foot", "endosteel",
+    "avionics",
+    "landinggear",
+    "arrestinghoist",
+    "lifthoist",
+    "artemisiv",
+    "aes",
+    "partialwing",
+    "impactresistant",
+    "ballisticreinforced", "endocomposite",
   ];
 
   return !knownSystemFragments.some((fragment) => normalized.includes(fragment));
@@ -860,6 +983,41 @@ function getFirstNumberField(fields: MtfKeyValue[], keys: string[]): number {
     if (value) return toNumber(value);
   }
   return 0;
+}
+
+function applyRandomSelection(rows: CsvRow[], options: CliOptions): CsvRow[] {
+  if (options.randomCount <= 0) return rows;
+  if (options.randomCount >= rows.length) return rows;
+
+  const random = createSeededRandom(options.randomSeed);
+  const shuffled = [...rows];
+
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled.slice(0, options.randomCount);
+}
+
+function createSeededRandom(seedText: string): () => number {
+  let seed = hashSeed(seedText || "default");
+
+  return () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0x100000000;
+  };
+}
+
+function hashSeed(seedText: string): number {
+  let hash = 2166136261;
+
+  for (let index = 0; index < seedText.length; index++) {
+    hash ^= seedText.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
 }
 
 function matchesUnitSelection(row: CsvRow, options: CliOptions): boolean {
@@ -958,6 +1116,8 @@ function getCliOptions(): CliOptions {
   const unitQuery = getArg("model") || getArg("unit") || getArg("name") || "";
   const chassisQuery = getArg("chassis") || "";
   const unitIds = [...getCsvArg("id"), ...getCsvArg("ids")];
+  const randomCount = parsePositiveInteger(getArg("random", getArg("random-count", getArg("sample", "0"))));
+  const randomSeed = getArg("seed", String(Date.now()));
 
   return {
     unitIndexPath: path.resolve(process.cwd(), getArg("unit-index", getArg("index", DEFAULT_UNIT_INDEX_PATH))),
@@ -965,6 +1125,8 @@ function getCliOptions(): CliOptions {
     unitQuery: unitQuery || null,
     chassisQuery: chassisQuery || null,
     unitIds,
+    randomCount,
+    randomSeed,
     embedDefinitions: !args.includes("--refs-only"),
     pretty: !args.includes("--minify"),
   };
@@ -978,6 +1140,11 @@ function shouldOmitFromRawFields(key: string): boolean {
     "variant", "notables", "notable", "battlehistory", "fluff", "manufacturer",
     "primaryfactory", "systemmanufacturer",
   ]).has(normalized);
+}
+
+function parsePositiveInteger(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
 function normalizeMtfKey(value: string): string {
