@@ -9,6 +9,7 @@ export type UnitCatalogItem = {
   name: string;
   fileName: string;
   relativePath: string;
+  detailPath?: string;
   tonnage: number;
   weightClass: string;
   bv: number;
@@ -33,12 +34,16 @@ export type UnitCatalogItem = {
 const GENERATED_DIR = path.resolve(process.cwd(), "server", "data", "generated");
 
 const CATALOG_FILES: Record<string, string> = {
-  meks: "catalog_meks.csv",
+  meks: path.join("unitIndex", "meks.csv"),
   vehicles: "catalog_vehicles.csv",
   aerospace: "catalog_aerospace.csv",
   battlearmor: "catalog_battlearmor.csv",
   infantry: "catalog_infantry.csv",
   protomeks: "catalog_protomeks.csv",
+};
+
+const UNIT_DETAIL_MANIFESTS: Record<string, string> = {
+  meks: path.join(GENERATED_DIR, "unitDetails", "meks", "manifest.json"),
 };
 
 let catalogCache: UnitCatalogItem[] | null = null;
@@ -56,8 +61,9 @@ export async function getUnitCatalog(unitType = "meks"): Promise<UnitCatalogItem
 
   const filePath = path.join(GENERATED_DIR, fileName);
   const csv = await fs.readFile(filePath, "utf-8");
+  const detailPathMap = await loadUnitDetailManifest(unitType);
 
-  return parseCatalogCsv(csv);
+  return parseCatalogCsv(csv, detailPathMap);
 }
 
 export async function getAllCatalogs(): Promise<UnitCatalogItem[]> {
@@ -65,12 +71,13 @@ export async function getAllCatalogs(): Promise<UnitCatalogItem[]> {
 
   const allRows: UnitCatalogItem[] = [];
 
-  for (const fileName of Object.values(CATALOG_FILES)) {
+  for (const [unitType, fileName] of Object.entries(CATALOG_FILES)) {
     const filePath = path.join(GENERATED_DIR, fileName);
 
     try {
       const csv = await fs.readFile(filePath, "utf-8");
-      allRows.push(...parseCatalogCsv(csv));
+      const detailPathMap = await loadUnitDetailManifest(unitType);
+      allRows.push(...parseCatalogCsv(csv, detailPathMap));
     } catch {
       // It's fine if some catalogs don't exist yet.
     }
@@ -78,6 +85,22 @@ export async function getAllCatalogs(): Promise<UnitCatalogItem[]> {
 
   catalogCache = allRows;
   return allRows;
+}
+
+async function loadUnitDetailManifest(unitType: string): Promise<Map<string, string> | undefined> {
+  const manifestPath = UNIT_DETAIL_MANIFESTS[unitType];
+
+  if (!manifestPath) {
+    return undefined;
+  }
+
+  try {
+    const manifestContent = await fs.readFile(manifestPath, "utf-8");
+    const manifestEntries = JSON.parse(manifestContent) as Array<{ id: string; detailPath: string }>;
+    return new Map(manifestEntries.map((entry) => [entry.id, path.resolve(process.cwd(), entry.detailPath)]));
+  } catch {
+    return undefined;
+  }
 }
 
 export async function findCatalogItemById(id: string): Promise<UnitCatalogItem | null> {
@@ -89,7 +112,7 @@ export function clearUnitCatalogCache() {
   catalogCache = null;
 }
 
-function parseCatalogCsv(csv: string): UnitCatalogItem[] {
+function parseCatalogCsv(csv: string, detailPathMap?: Map<string, string>): UnitCatalogItem[] {
   const rows = parseCsv(csv);
 
   if (rows.length === 0) return [];
@@ -113,6 +136,7 @@ function parseCatalogCsv(csv: string): UnitCatalogItem[] {
         name: record.name || record.chassis,
         fileName: record.fileName,
         relativePath: record.relativePath,
+        detailPath: detailPathMap?.get(record.id),
         tonnage: toNumber(record.tonnage),
         weightClass: record.weightClass,
         bv: toNumber(record.bv || record.totalBV),

@@ -74,6 +74,7 @@ export type Unit = {
   sourceFile?: string;
   fileName?: string;
   relativePath?: string;
+  detailSource?: "json" | "mtf" | string;
   mulId?: string | number;
   sourceBook?: string;
   overview?: string;

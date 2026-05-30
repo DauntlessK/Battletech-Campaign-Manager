@@ -16,16 +16,14 @@ export { AMMO, getAmmoDefinition } from "./ammo";
 
 export const WEAPONS: Record<string, WeaponDefinition> = {
     // Inner Sphere weapons
-"is_autocannon_2": {
-        "id": "is_autocannon_2",
-        "name": "Autocannon/2",
+"is_ac_2": {
+        "id": "is_ac_2",
+        "name": "AC/2",
         "altNames": [
             "IS Autocannon/2",
-            "ISAutocannon2",
             "AC/2",
             "ISAC2",
-            "Auto Cannon/2",
-            "Autocannon 2"
+            "Auto Cannon/2"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -57,7 +55,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "S"
         ],
         "ammo": {
-            "ammoId": "is_autocannon_2_ammo"
+            "ammoId": "is_ac_2_ammo"
         },
         "cost": 75000,
         "bv": 37,
@@ -71,16 +69,14 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
 
         }
     },
-    "is_autocannon_5": {
-        "id": "is_autocannon_5",
-        "name": "Autocannon/5",
+    "is_ac_5": {
+        "id": "is_ac_5",
+        "name": "AC/5",
         "altNames": [
             "IS Autocannon/5",
-            "ISAutocannon5",
             "AC/5",
             "ISAC5",
-            "Auto Cannon/5",
-            "Autocannon 5"
+            "Auto Cannon/5"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -112,7 +108,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "S"
         ],
         "ammo": {
-            "ammoId": "is_autocannon_5_ammo"
+            "ammoId": "is_ac_5_ammo"
         },
         "cost": 125000,
         "bv": 70,
@@ -126,16 +122,14 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
 
         }
     },
-    "is_autocannon_10": {
-        "id": "is_autocannon_10",
-        "name": "Autocannon/10",
+    "is_ac_10": {
+        "id": "is_ac_10",
+        "name": "AC/10",
         "altNames": [
             "IS Autocannon/10",
-            "ISAutocannon10",
             "AC/10",
             "ISAC10",
-            "Auto Cannon/10",
-            "Autocannon 10"
+            "Auto Cannon/10"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -167,7 +161,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "S"
         ],
         "ammo": {
-            "ammoId": "is_autocannon_10_ammo"
+            "ammoId": "is_ac_10_ammo"
         },
         "cost": 200000,
         "bv": 123,
@@ -181,16 +175,14 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
 
         }
     },
-    "is_autocannon_20": {
-        "id": "is_autocannon_20",
-        "name": "Autocannon/20",
+    "is_ac_20": {
+        "id": "is_ac_20",
+        "name": "AC/20",
         "altNames": [
             "IS Autocannon/20",
-            "ISAutocannon20",
             "AC/20",
             "ISAC20",
-            "Auto Cannon/20",
-            "Autocannon 20"
+            "Auto Cannon/20"
         ],
         "category": "Ballistic",
         "techBase": "Inner Sphere",
@@ -222,7 +214,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "S"
         ],
         "ammo": {
-            "ammoId": "is_autocannon_20_ammo"
+            "ammoId": "is_ac_20_ammo"
         },
         "cost": 300000,
         "bv": 178,

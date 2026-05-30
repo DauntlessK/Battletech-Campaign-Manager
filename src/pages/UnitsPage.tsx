@@ -571,7 +571,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Complete record</div>
           <h3 className="mt-1 text-2xl font-black text-zinc-50">{unit.model} Full Information</h3>
         </div>
-        <Badge>{unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
+        <Badge>{unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : "MTF fallback") : unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -596,8 +596,8 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
 
         <InfoSection
           title="Rules / Source"
-          items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Source Book", "MUL ID"]}
-          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.mulId ? String(unit.mulId) : "—"]}
+          items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Source Book", "Detail Source", "MUL ID"]}
+          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : "MTF fallback") : "—", unit.mulId ? String(unit.mulId) : "—"]}
         />
       </div>
     </section>
@@ -665,15 +665,18 @@ function LocationGrid({ unit }: { unit: Unit }) {
         ))}
       </div>
 
-      <div className="hidden min-w-0 w-full max-w-full xl:block">
-        <div className="relative z-10 mx-auto -mb-10 max-w-[260px]">
-          {byId.head && <LocationCard location={byId.head} mode="slots" compact head />}
-        </div>
-
-        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3 pt-16">
+      <div className="hidden min-w-0 w-full max-w-full xl:mt-2 xl:block" data-layout="head-ct-shared-column-v7">
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="slots" compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="slots" compact />}{byId.ll && <LocationCard location={byId.ll} mode="slots" compact />}</div>
-          <div className="space-y-3 pt-10">{byId.ct && <LocationCard location={byId.ct} mode="slots" compact tall />}</div>
+          <div className="space-y-3 -mt-8">
+            {byId.head && (
+              <div className="relative -top-4 2xl:-top-3">
+                <LocationCard location={byId.head} mode="slots" compact head />
+              </div>
+            )}
+            {byId.ct && <LocationCard location={byId.ct} mode="slots" compact tall />}
+          </div>
           <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="slots" compact />}{byId.rl && <LocationCard location={byId.rl} mode="slots" compact />}</div>
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="slots" compact />}</div>
         </div>
@@ -701,15 +704,18 @@ function WeaponPlacementGrid({ unit }: { unit: Unit }) {
         ))}
       </div>
 
-      <div className="hidden min-w-0 w-full max-w-full xl:block">
-        <div className="relative z-10 mx-auto -mb-10 max-w-[260px]">
-          {byId.head && <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />}
-        </div>
-
-        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3 pt-16">
+      <div className="hidden min-w-0 w-full max-w-full xl:mt-2 xl:block" data-layout="head-ct-shared-column-v7">
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact />}{byId.ll && <LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact />}</div>
-          <div className="space-y-3 pt-10">{byId.ct && <LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall />}</div>
+          <div className="space-y-3 -mt-8">
+            {byId.head && (
+              <div className="relative -top-4 2xl:-top-3">
+                <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />
+              </div>
+            )}
+            {byId.ct && <LocationCard location={byId.ct} mode="weapons" weapons={weaponsFor(byId.ct)} compact tall />}
+          </div>
           <div className="space-y-3">{byId.rt && <LocationCard location={byId.rt} mode="weapons" weapons={weaponsFor(byId.rt)} compact />}{byId.rl && <LocationCard location={byId.rl} mode="weapons" weapons={weaponsFor(byId.rl)} compact />}</div>
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.ra && <LocationCard location={byId.ra} mode="weapons" weapons={weaponsFor(byId.ra)} compact />}</div>
         </div>

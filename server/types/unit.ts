@@ -55,6 +55,9 @@ export type Unit = {
   gyro: string;
   cockpit: string;
   sourceFile?: string;
+  fileName?: string;
+  relativePath?: string;
+  detailSource?: "json" | "mtf";
 
   clanName?: string;
   mulId?: string | number;

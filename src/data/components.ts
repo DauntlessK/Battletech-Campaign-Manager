@@ -718,6 +718,32 @@ export const COMPONENTS = {
     },
     cost: { type: "armorTonnage", multiplier: 5_000 },
   },
+  antiPenetrativeAblationArmor: {
+    id: "antiPenetrativeAblationArmor",
+    name: "Anti-Penetrative Ablation Armor",
+    altNames: [
+      "Anti-Penetrative Ablation",
+      "Anti Penetrative Ablation",
+      "Anti-Penetrative Ablation Armor",
+      "Anti Penetrative Ablation Armor",
+      "IS Anti-Penetrative Ablation",
+      "IS Anti Penetrative Ablation",
+      "ISAntiPenetrativeAblation",
+      "ISAntiPenetrativeAblationArmor",
+      "Clan Anti-Penetrative Ablation",
+      "Clan Anti Penetrative Ablation",
+      "CLAntiPenetrativeAblation",
+      "CLAntiPenetrativeAblationArmor"
+    ],
+    category: "armor",
+    techRating: "F",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "F",
+    },
+    cost: { type: "armorTonnage", multiplier: 120000 },
+  },
 } satisfies Record<string, ComponentDefinition>;
 
 export type ComponentId = keyof typeof COMPONENTS;
@@ -1138,7 +1164,6 @@ export type ComponentCostContext = {
     },
     cost: { type: "fixed", amount: 15_000 },
   },
-
   vehicularGrenadeLauncher: {
     id: "vehicularGrenadeLauncher",
     name: "Vehicular Grenade Launcher",

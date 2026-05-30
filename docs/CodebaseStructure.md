@@ -115,6 +115,177 @@ Business logic and persistence operations:
 
 ---
 
+### Scripts
+
+generateUnitIndex
+Responsible for generating the main unit index CSV, such as meks.csv. It parses MTF files, extracts high-level unit data, performs BV and C-bill calculations, and writes summary catalog rows used by the app/API.
+
+Common command:
+
+npm run index:units -- --type=meks
+
+Useful optional parameters:
+
+npm run index:units -- --type=meks --model=AS7-D
+npm run index:units -- --type=meks --model=ARC-9M --debug
+npm run index:units -- --type=meks --debug
+
+Notes:
+
+--type=meks       Limits indexing to BattleMechs
+--model=AS7-D     Runs only matching model(s), useful for testing
+--debug           Prints detailed BV and C-bill calculation breakdowns
+
+auditMtfWeapons
+Runs through MTF unit files and checks weapon/equipment names found in the MTF against entries in weapons.ts. Useful for finding missing altNames, shorthand names, or equipment that needs to be added to the weapon definitions.
+
+Example:
+
+npm run audit:mtf-weapons
+
+Possible examples depending on how the script is wired:
+
+npm run audit:mtf-weapons -- --type=meks
+npm run audit:mtf-weapons -- --model=AS7-D
+npm run audit:mtf-weapons -- --out reports/mtfWeaponAudit.json
+
+Purpose:
+
+Finds names like ISSRM6, ISLBXAC10, CLERMediumLaser, etc.
+Helps identify missing altNames or missing weapon definitions.
+
+unitIndexAudit
+Compares generated unit index values against known/audited expected values, usually from MegaMekLab text reports. This is mainly used to validate calculated BV and C-bill cost after changes to the indexer.
+
+Example:
+
+npm run audit:unit-index
+
+Useful examples:
+
+npm run audit:unit-index -- --unit "Atlas AS7-D"
+npm run audit:unit-index -- --model=AS7-D
+npm run audit:unit-index -- --verbose
+
+Purpose:
+
+Confirms generated BV/cost against known expected values.
+Flags mismatches.
+Helps catch calculation regressions in generateUnitIndex.
+
+generateUnitDetails
+Generates full per-unit JSON files from MTFs and the unit index CSV. These are detailed unit records for the app, including catalog data, fluff, mounted weapons, locations, armor, critical slots, normalized weapon/ammo/component IDs, and warnings.
+
+Common command:
+
+npm run details:units
+
+Generate one unit:
+
+npm run details:units -- --unit "Atlas AS7-D"
+
+Generate a random sample:
+
+npm run details:units -- --random 25
+
+Repeat the same random sample:
+
+npm run details:units -- --random 25 --seed test-run-1
+
+Generate random units from one chassis:
+
+npm run details:units -- --chassis Atlas --random 10 --seed atlas-test
+
+Useful optional parameters:
+
+--unit "Atlas AS7-D"      Strict unit/name/model match
+--model AS7-D             Model-specific test run
+--chassis Atlas           All units with matching chassis
+--id some-unit-id         Specific catalog id
+--ids id1,id2,id3         Multiple specific catalog ids
+--random 25               Generate X random units
+--random-count 25         Same as --random
+--sample 25               Same as --random
+--seed test1              Repeatable random selection
+--out path/to/output      Custom output directory
+--refs-only               Do not embed full weapon definitions
+--minify                  Minified JSON output
+
+Purpose:
+
+Produces the detailed JSON that the frontend/API will use for full unit pages.
+Normalizes raw slot names into weapon/ammo/component IDs while preserving raw MTF text.
+
+slotAuditor
+Runs through MTF critical slots and reports unmatched or suspicious slot entries. This is used before generating the full detail catalog to find missing weapons, ammo, components, armor systems, industrial equipment, or bad parser boundaries.
+
+Common command:
+
+npm run audit:slots
+
+Test one unit:
+
+npm run audit:slots -- --unit "Atlas AS7-D"
+
+Test a chassis:
+
+npm run audit:slots -- --chassis Atlas
+
+Include matched slots too:
+
+npm run audit:slots -- --include-matched
+
+Output to a custom file:
+
+npm run audit:slots -- --out server/data/generated/unitDetails/slotAudit.test.json
+
+Useful optional parameters:
+
+--unit "Atlas AS7-D"      Audit one unit
+--chassis Atlas           Audit one chassis
+--id some-unit-id         Audit one catalog id
+--ids id1,id2,id3         Audit multiple ids
+--out path/to/file.json   Custom report path
+--include-matched         Include matched/resolved slots in report
+--max-examples 25         More examples per unmatched slot
+
+Purpose:
+
+Finds unresolved slots like ISArtemisIV, ISClaw, CLPartialWing, unusual ammo names, etc.
+Helps decide whether to add altNames, add missing weapons/ammo/components, or fix parsing.
+
+generateUnitDetails / slotAuditor random sampling workflow
+Useful workflow before processing the whole catalog:
+
+npm run details:units -- --random 25 --seed sanity-1
+npm run audit:slots -- --random 50 --seed sanity-1
+
+Purpose:
+
+Spot-check a repeatable random batch before running the entire catalog.
+Good for catching parser regressions without waiting on thousands of units.
+
+weapon/ammo/component data files
+These are not scripts, but they are central to the scripts.
+
+src/data/weapons.ts       All weapon and mounted-equipment definitions
+src/data/ammo.ts          All ammo definitions
+src/data/components.ts    Component/system definitions
+src/data/weaponTypes.ts   Shared weapon/ammo TypeScript types
+
+Scripts that resolve MTF slot names should generally use:
+
+import { WEAPONS, AMMO } from "../src/data/weapons";
+import { COMPONENTS } from "../src/data/components";
+
+Purpose:
+
+WEAPONS resolves weapon slots and mounted weapons.
+AMMO resolves ammo bins and ammo BV/cost/shots-per-ton.
+COMPONENTS resolves systems like Endo-Composite, CASE, cockpit systems, heat sinks, etc.
+
+---
+
 ## Documentation Relationship
 
 The current docs are intended to map directly to the code:

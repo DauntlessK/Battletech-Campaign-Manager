@@ -41,6 +41,7 @@ type DetailLocationSlot = {
   slotIndex: number;
   raw: string;
   normalized: string;
+  normalizedId?: string;
   isRearFacing?: boolean;
   type: "empty" | "weapon" | "ammo" | "equipment" | "system";
   displayName: string;
@@ -151,7 +152,6 @@ async function main(): Promise<void> {
     if (options.unitQuery) console.warn(`[generateUnitDetails] unit query: ${options.unitQuery}`);
     if (options.chassisQuery) console.warn(`[generateUnitDetails] chassis query: ${options.chassisQuery}`);
     if (options.unitIds.length) console.warn(`[generateUnitDetails] explicit ids: ${options.unitIds.join(", ")}`);
-    if (options.randomCount > 0) console.warn(`[generateUnitDetails] random sample: ${options.randomCount} seed=${options.randomSeed}`);
   }
 
   for (const [index, row] of selectedRows.entries()) {
@@ -306,23 +306,28 @@ function buildLocationSlot(
   weaponSlotRefMap: Map<string, string>,
   weapons: DetailWeapon[]
 ): DetailLocationSlot {
-  const normalized = normalizeLookupText(rawSlot);
+  const rawNormalized = normalizeLookupText(rawSlot);
   const rawType = classifyRawSlotForDetail(rawSlot);
 
   if (rawType === "ammo") {
     const ammo = resolveAmmoDefinition(rawSlot, techBase);
     const weaponRef = findWeaponRefForAmmoSlot(ammo, weapons);
 
+    if (!ammo) {
+      warnings.push(`Unresolved ammo slot: ${unitName} ${locationName} slot ${slotIndex}: "${rawSlot}"`);
+    }
+
     return {
       slotIndex,
       raw: rawSlot,
-      normalized,
+      normalized: ammo?.id ?? rawNormalized,
+      ...(ammo ? { normalizedId: String(ammo.id) } : {}),
       type: "ammo",
       displayName: ammo?.name ?? stripSlotAnnotations(rawSlot),
       referenceId: ammo?.id ?? "",
       referenceName: ammo?.name ?? "",
       referenceSource: ammo ? "ammo" : "",
-      ...(ammo ? { ammoRef: ammo.id } : {}),
+      ...(ammo ? { ammoRef: String(ammo.id) } : {}),
       ...(weaponRef ? { weaponRef } : {}),
       ...(ammo?.bv !== undefined ? { bv: ammo.bv } as any : {}),
       ...(ammo?.costPerTon !== undefined ? { costPerTon: ammo.costPerTon } as any : {}),
@@ -333,9 +338,12 @@ function buildLocationSlot(
   const resolved = resolveDefinition(rawSlot, techBase);
   const type = classifySlot(rawSlot, resolved);
   const isRearFacing = isRearFacingText(rawSlot);
-  const baseDisplayName = resolved?.definition?.name ? String(resolved.definition.name) : getFallbackSlotDisplayName(rawSlot, type);
+  const baseDisplayName = resolved?.definition?.name
+    ? String(resolved.definition.name)
+    : getFallbackSlotDisplayName(rawSlot, type);
   const displayName = withRearFacingSuffix(baseDisplayName, isRearFacing);
   const weaponRef = findWeaponRefForSlot(rawSlot, locationName, resolved, weaponSlotRefMap);
+  const resolvedId = resolved?.definition?.id ? String(resolved.definition.id) : "";
 
   if (!resolved && shouldWarnForUnresolvedSlot(rawSlot, type)) {
     warnings.push(`Unresolved slot: ${unitName} ${locationName} slot ${slotIndex}: "${rawSlot}"`);
@@ -348,11 +356,12 @@ function buildLocationSlot(
   return {
     slotIndex,
     raw: rawSlot,
-    normalized,
+    normalized: resolvedId || rawNormalized,
+    ...(resolvedId ? { normalizedId: resolvedId } : {}),
     ...(isRearFacing ? { isRearFacing: true } : {}),
     type,
     displayName,
-    referenceId: resolved?.definition?.id ?? "",
+    referenceId: resolvedId,
     referenceName: resolved?.definition?.name ?? "",
     referenceSource: resolved?.source ?? "",
     ...(weaponRef ? { weaponRef } : {}),
@@ -405,28 +414,26 @@ function buildWeaponSlotRefMap(weapons: DetailWeapon[]): Map<string, string> {
 
   for (const weapon of weapons) {
     const locationKey = normalizeLookupText(weapon.location);
-    const nameKeys = [
-      weapon.name,
-      weapon.displayName,
-      weapon.referenceName,
-      weapon.referenceId,
-      stripTechPrefixFromNormalizedText(normalizeLookupText(weapon.referenceId)),
-      ...(Array.isArray(weapon.definition?.altNames) ? weapon.definition.altNames : []),
-    ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
+    const fallbackDefinition = {
+      id: weapon.referenceId || weapon.name,
+      name: weapon.referenceName || weapon.displayName || weapon.name,
+      altNames: [weapon.name, weapon.displayName, weapon.referenceName, weapon.referenceId].filter(Boolean),
+    };
+    const keys = getDefinitionLookupKeys(weapon.definition ?? fallbackDefinition);
 
-    for (const nameKey of new Set(nameKeys)) {
-      if (!nameKey) continue;
-      map.set(`${locationKey}|${nameKey}`, weapon.ref);
+    for (const key of keys) {
+      if (!key) continue;
+      map.set(`${locationKey}|${key}`, weapon.ref);
 
-      const existing = fallbackByWeaponName.get(nameKey) ?? new Set<string>();
+      const existing = fallbackByWeaponName.get(key) ?? new Set<string>();
       existing.add(weapon.ref);
-      fallbackByWeaponName.set(nameKey, existing);
+      fallbackByWeaponName.set(key, existing);
     }
   }
 
-  for (const [nameKey, refs] of fallbackByWeaponName.entries()) {
+  for (const [key, refs] of fallbackByWeaponName.entries()) {
     if (refs.size === 1) {
-      map.set(`*|${nameKey}`, [...refs][0]);
+      map.set(`*|${key}`, [...refs][0]);
     }
   }
 
@@ -442,25 +449,92 @@ function findWeaponRefForSlot(
   if (resolved?.source !== "weapon") return "";
 
   const locationKey = normalizeLookupText(locationName);
-  const keys = [
-    rawSlot,
-    stripSlotAnnotations(rawSlot),
-    resolved.definition.id,
-    resolved.definition.name,
-    ...(Array.isArray(resolved.definition.altNames) ? resolved.definition.altNames : []),
-  ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
+  const slotKeys = getDefinitionLookupKeys(resolved.definition, rawSlot);
 
-  for (const key of keys) {
+  for (const key of slotKeys) {
     const locationMatch = weaponSlotRefMap.get(`${locationKey}|${key}`);
     if (locationMatch) return locationMatch;
   }
 
-  for (const key of keys) {
+  for (const key of slotKeys) {
     const fallbackMatch = weaponSlotRefMap.get(`*|${key}`);
     if (fallbackMatch) return fallbackMatch;
   }
 
   return "";
+}
+
+function getDefinitionLookupKeys(definition: Record<string, any>, rawValue?: string): string[] {
+  const rawValues = [
+    rawValue,
+    rawValue ? cleanMountedWeaponName(String(rawValue)) : "",
+    definition.id,
+    definition.name,
+    ...(Array.isArray(definition.altNames) ? definition.altNames : []),
+  ].filter(Boolean).map((value) => String(value));
+
+  const keys = new Set<string>();
+
+  for (const value of rawValues) {
+    const normalized = normalizeLookupText(value);
+    const canonical = canonicalLookupKey(value);
+
+    if (normalized) keys.add(normalized);
+    if (canonical) keys.add(canonical);
+
+    const stripped = stripTechPrefixFromNormalizedText(normalized);
+    const strippedCanonical = stripTechPrefixFromNormalizedText(canonical);
+    if (stripped) keys.add(stripped);
+    if (strippedCanonical) keys.add(strippedCanonical);
+  }
+
+  return [...keys];
+}
+
+function canonicalLookupKey(value: string | undefined): string {
+  let normalized = normalizeLookupText(value);
+
+  normalized = normalized
+    .replace(/omnipod/g, "")
+    .replace(/^isammo/, "is")
+    .replace(/^clanammo/, "clan")
+    .replace(/^ammo/, "")
+    .replace(/^clan/, "cl")
+    .replace(/^innersphere/, "is");
+
+  normalized = normalized
+    .replace(/lb(\d+)xac/g, "lb$1xautocannon")
+    .replace(/lbxac(\d+)/g, "lb$1xautocannon")
+    .replace(/lb(\d+)x/g, "lb$1xautocannon")
+    .replace(/ultraac(\d+)/g, "ultraautocannon$1")
+    .replace(/ac(\d+)/g, "autocannon$1");
+
+  return normalized;
+}
+
+function resolveAmmoDefinition(rawValue: string, unitTechBase: string): AmmoDefinition | null {
+  const normalized = normalizeLookupText(rawValue);
+  if (!normalized.includes("ammo")) return null;
+
+  return findBestDefinitionMatch(rawValue, AMMO as Record<string, AmmoDefinition>, unitTechBase);
+}
+
+function findWeaponRefForAmmoSlot(ammo: AmmoDefinition | null, weapons: DetailWeapon[]): string {
+  if (!ammo) return "";
+
+  const weaponIds = Array.isArray(ammo.weaponIds)
+    ? ammo.weaponIds.map((value) => normalizeLookupText(String(value)))
+    : [];
+  if (weaponIds.length === 0) return "";
+
+  const matchingRefs = new Set<string>();
+  for (const weapon of weapons) {
+    if (weaponIds.includes(normalizeLookupText(weapon.referenceId))) {
+      matchingRefs.add(weapon.ref);
+    }
+  }
+
+  return matchingRefs.size === 1 ? [...matchingRefs][0] : "";
 }
 
 function parseAllKeyValues(lines: string[]): MtfKeyValue[] {
@@ -523,16 +597,30 @@ function parseWeaponsSection(lines: string[]): string[] {
 }
 
 function parseWeaponLine(line: string): { name: string; location: string; isRearFacing: boolean } {
-  const parts = line.split(",").map((part) => part.trim());
-  const name = parts[0] ?? "";
-  const location = parts.slice(1).join(", ") || "";
+  const parts = line.split(",").map((part) => part.trim()).filter(Boolean);
+  const rawName = parts[0] ?? "";
+  const rawLocation = parts.slice(1).join(", ") || "";
   const isRearFacing = isRearFacingText(line);
 
   return {
-    name: stripSlotAnnotations(name),
-    location: location.replace(/\(R\)/gi, "").trim(),
+    name: cleanMountedWeaponName(rawName),
+    location: cleanMountedWeaponLocation(rawLocation),
     isRearFacing,
   };
+}
+
+function cleanMountedWeaponName(rawName: string): string {
+  return stripSlotAnnotations(rawName)
+    .replace(/^\d+\s+/, "")
+    .trim();
+}
+
+function cleanMountedWeaponLocation(rawLocation: string): string {
+  return rawLocation
+    .replace(/\(R\)/gi, "")
+    .replace(/,\s*ammo\s*:?\s*\d+.*$/i, "")
+    .replace(/\bammo\s*:?\s*\d+.*$/i, "")
+    .trim();
 }
 
 function parseFluffSections(lines: string[]): Record<string, any> {
@@ -678,12 +766,7 @@ function isTopLevelMtfFieldBoundary(line: string): boolean {
   return new Set([
     "overview", "capabilities", "deployment", "history", "variants", "variant",
     "notables", "notable", "battlehistory", "fluff", "manufacturer", "primaryfactory",
-    "systemmanufacturer",
-    "masterunitlistid",
-    "mulid",
-    "notes",
-    "fluffimage",
-    "imagefile", "source", "sourcebook", "ruleslevel", "rules", "role", "quirks",
+    "systemmanufacturer", "source", "sourcebook", "ruleslevel", "rules", "role", "quirks",
   ]).has(key);
 }
 
@@ -725,74 +808,39 @@ function normalizeLocationHeader(line: string): MekLocationKey | null {
   return map[normalized] ?? null;
 }
 
-function resolveAmmoDefinition(rawValue: string, unitTechBase: string): AmmoDefinition | null {
-  const normalized = normalizeLookupText(rawValue);
-  if (!normalized.includes("ammo")) return null;
+function isSystemSlotName(rawSlot: string): boolean {
+  const normalized = normalizeLookupText(rawSlot);
 
-  const cleaned = normalizeAmmoLookupText(rawValue);
-  const desiredTechBase = inferTechBaseFromRawText(rawValue) || normalizeTechBase(unitTechBase);
-  const candidates: Array<{ definition: AmmoDefinition; score: number }> = [];
-
-  for (const [key, definition] of Object.entries(AMMO as Record<string, AmmoDefinition>)) {
-    const values = [
-      key,
-      definition.id,
-      definition.name,
-      definition.ammoType,
-      ...(Array.isArray(definition.compatibleWeaponNames) ? definition.compatibleWeaponNames : []),
-      ...(Array.isArray(definition.weaponIds) ? definition.weaponIds : []),
-    ].filter(Boolean).map((value) => normalizeAmmoLookupText(String(value)));
-
-    let score = 0;
-    if (values.some((value) => value === cleaned)) {
-      score = 260;
-    } else if (values.some((value) => cleaned.includes(value) || value.includes(cleaned))) {
-      score = 160;
-    } else {
-      const withoutAmmo = cleaned.replace(/ammo/g, "");
-      if (values.some((value) => {
-        const candidate = value.replace(/ammo/g, "");
-        return withoutAmmo && (withoutAmmo.includes(candidate) || candidate.includes(withoutAmmo));
-      })) {
-        score = 130;
-      }
-    }
-
-    if (score <= 0) continue;
-    score += getTechBaseScore(definition, desiredTechBase);
-    candidates.push({ definition, score });
-  }
-
-  candidates.sort((a, b) => b.score - a.score);
-  return candidates[0]?.definition ?? null;
-}
-
-function normalizeAmmoLookupText(value: string): string {
-  return normalizeLookupText(value)
-    .replace(/^clanammo/, "clan")
-    .replace(/^isammo/, "is")
-    .replace(/^ammo/, "");
-}
-
-function findWeaponRefForAmmoSlot(ammo: AmmoDefinition | null, weapons: DetailWeapon[]): string {
-  if (!ammo) return "";
-
-  const weaponIds = Array.isArray(ammo.weaponIds)
-    ? ammo.weaponIds.map((value) => normalizeLookupText(String(value)))
-    : [];
-  if (weaponIds.length === 0) return "";
-
-  const matchingRefs = new Set<string>();
-  for (const weapon of weapons) {
-    if (weaponIds.includes(normalizeLookupText(weapon.referenceId))) {
-      matchingRefs.add(weapon.ref);
-    }
-  }
-
-  return matchingRefs.size === 1 ? [...matchingRefs][0] : "";
+  return [
+    "engine",
+    "gyro",
+    "cockpit",
+    "lifesupport",
+    "sensors",
+    "shoulder",
+    "upperarmactuator",
+    "lowerarmactuator",
+    "handactuator",
+    "hip",
+    "upperlegactuator",
+    "lowerlegactuator",
+    "footactuator",
+    "upperarm",
+    "lowerarm",
+    "upperleg",
+    "lowerleg",
+    "foot",
+  ].some((fragment) => normalized === fragment || normalized.includes(fragment));
 }
 
 function resolveDefinition(rawValue: string, unitTechBase: string): { source: DefinitionSource; definition: WeaponDefinition } | null {
+  if (isSystemSlotName(rawValue)) {
+    const component = resolveComponentDefinition(rawValue);
+    if (component) return { source: "component", definition: component };
+
+    return null;
+  }
+
   const weapon = resolveWeaponDefinition(rawValue, unitTechBase);
   if (weapon) return { source: "weapon", definition: weapon };
 
@@ -815,33 +863,26 @@ function findBestDefinitionMatch<T extends Record<string, any>>(
   definitions: Record<string, T>,
   unitTechBase: string
 ): T | null {
-  const cleaned = stripSlotAnnotations(rawValue);
-  const normalizedRaw = normalizeLookupText(rawValue);
-  const normalizedCleaned = normalizeLookupText(cleaned);
-  const strippedCleaned = stripTechPrefixFromNormalizedText(normalizedCleaned);
   const desiredTechBase = inferTechBaseFromRawText(rawValue) || normalizeTechBase(unitTechBase);
+  const rawKeys = getDefinitionLookupKeys({ id: rawValue, name: cleanMountedWeaponName(rawValue), altNames: [rawValue] }, rawValue);
   const candidates: Array<{ definition: T; score: number }> = [];
 
-  for (const [key, definition] of Object.entries(definitions)) {
-    const values = [
-      key,
-      definition.id,
-      definition.name,
-      definition.family,
-      ...(Array.isArray(definition.altNames) ? definition.altNames : []),
-    ].filter(Boolean).map((value) => normalizeLookupText(String(value)));
-
+  for (const definition of Object.values(definitions)) {
+    const definitionKeys = getDefinitionLookupKeys(definition);
     let score = 0;
 
-    if (values.some((value) => value === normalizedRaw || value === normalizedCleaned || value === strippedCleaned)) {
-      score = 240;
-    } else if (values.some((value) => normalizedCleaned.includes(value) || value.includes(normalizedCleaned))) {
-      score = 140;
-    } else if (values.some((value) => strippedCleaned && (strippedCleaned.includes(value) || value.includes(strippedCleaned)))) {
-      score = 120;
+    if (rawKeys.some((key) => definitionKeys.includes(key))) {
+      score = 300;
+    } else {
+      const longRawKeys = rawKeys.filter((key) => key.length >= 6);
+      const longDefinitionKeys = definitionKeys.filter((key) => key.length >= 6);
+      if (longRawKeys.some((rawKey) => longDefinitionKeys.some((definitionKey) => rawKey.includes(definitionKey) || definitionKey.includes(rawKey)))) {
+        score = 120;
+      }
     }
 
     if (score <= 0) continue;
+
     score += getTechBaseScore(definition, desiredTechBase);
     candidates.push({ definition, score });
   }
@@ -862,31 +903,24 @@ function classifySlot(rawSlot: string, resolved?: { source: DefinitionSource; de
   if (!normalized || normalized === "empty" || normalized === "none") return "empty";
   if (normalized.includes("ammo")) return "ammo";
 
+  if (isSystemSlotName(rawSlot)) return "system";
+
   const category = normalizeLookupText(String(resolved?.definition?.category || ""));
 
   if (resolved?.source === "weapon") {
-    if (category.includes("energy") || category.includes("ballistic") || category.includes("missile") || category.includes("weapon")) return "weapon";
+    if (
+      category.includes("energy") ||
+      category.includes("ballistic") ||
+      category.includes("missile") ||
+      category.includes("weapon")
+    ) {
+      return "weapon";
+    }
+
     return "equipment";
   }
 
   if (resolved?.source === "component") return "system";
-
-  if (
-    normalized.includes("engine") ||
-    normalized.includes("gyro") ||
-    normalized.includes("cockpit") ||
-    normalized.includes("lifesupport") ||
-    normalized.includes("sensors") ||
-    normalized.includes("actuator") ||
-    normalized.includes("shoulder") ||
-    normalized.includes("upperarm") ||
-    normalized.includes("lowerarm") ||
-    normalized.includes("hand") ||
-    normalized.includes("hip") ||
-    normalized.includes("upperleg") ||
-    normalized.includes("lowerleg") ||
-    normalized.includes("foot")
-  ) return "system";
 
   return "equipment";
 }
@@ -903,16 +937,7 @@ function shouldWarnForUnresolvedSlot(rawSlot: string, type: DetailLocationSlot["
 
   const knownSystemFragments = [
     "engine", "gyro", "cockpit", "lifesupport", "sensors", "shoulder", "upperarm",
-    "lowerarm", "hand", "hip", "upperleg", "lowerleg", "foot", "endosteel",
-    "avionics",
-    "landinggear",
-    "arrestinghoist",
-    "lifthoist",
-    "artemisiv",
-    "aes",
-    "partialwing",
-    "impactresistant",
-    "ballisticreinforced", "endocomposite",
+    "lowerarm", "hand", "hip", "upperleg", "lowerleg", "foot",
   ];
 
   return !knownSystemFragments.some((fragment) => normalized.includes(fragment));

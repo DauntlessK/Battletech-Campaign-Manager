@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { X, ChevronRight } from "lucide-react";
 import Header from "./components/AppHeader";
 import PageTitle from "./components/PageTitle";
+import Footer from "./components/Footer";
 import AccountPage from "./pages/AccountPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import ForcesPage from "./pages/ForcesPage";
@@ -732,6 +733,7 @@ export default function App() {
       </main>
 
       {mobileMenuOpen && <MobileMenu activePage={activePage} authUser={authUser} onNavigate={navigate} onClose={() => setMobileMenuOpen(false)} />}
+      <Footer />
     </div>
   );
 }

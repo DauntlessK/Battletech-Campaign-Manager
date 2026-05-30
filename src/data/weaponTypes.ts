@@ -36,6 +36,7 @@ export type WeaponRange = {
 export type AmmoDefinition = {
     id: string;
     name: string;
+    altNames?: string[];
     ammoType: string;
     weaponIds: string[];
     compatibleWeaponNames?: string[];
