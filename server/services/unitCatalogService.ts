@@ -10,7 +10,6 @@ export type UnitCatalogItem = {
   fileName: string;
   relativePath: string;
   detailPath?: string;
-  mulId?: string;
   tonnage: number;
   weightClass: string;
   bv: number;
@@ -27,6 +26,8 @@ export type UnitCatalogItem = {
   heatSinks: number;
   heatSinkType: string;
   engine: string;
+  engineRating?: string | number;
+  engineType?: string;
   gyro: string;
   armorType: string;
   structureType: string;
@@ -205,7 +206,6 @@ function parseCatalogCsv(csv: string, detailPathMap?: Map<string, string>): Unit
         fileName: record.fileName,
         relativePath: record.relativePath,
         detailPath: detailPathMap?.get(record.id),
-        mulId: record.mulId,
         tonnage: toNumber(record.tonnage),
         weightClass: record.weightClass,
         bv: toNumber(record.bv || record.totalBV),
@@ -221,8 +221,10 @@ function parseCatalogCsv(csv: string, detailPathMap?: Map<string, string>): Unit
         jump: toNumber(record.jump),
         heatSinks: toNumber(record.heatSinks),
         heatSinkType: record.heatSinkType,
-        engine: record.engine,
-        gyro: record.gyro,
+        engine: record.engine || record.engineType,
+        engineRating: record.engineRating,
+        engineType: record.engineType || record.engine,
+        gyro: record.gyro || record.gyroType,
         armorType: record.armorType,
         structureType: record.structureType,
       };

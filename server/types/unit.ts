@@ -52,6 +52,8 @@ export type Unit = {
   totalBV: number;
   role: string;
   engine: string;
+  engineRating?: string | number;
+  engineType?: string;
   gyro: string;
   cockpit: string;
   sourceFile?: string;

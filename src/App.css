@@ -182,3 +182,28 @@
     border-right-color: var(--border);
   }
 }
+
+.btcm-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(163, 230, 53, 0.75) rgba(39, 39, 42, 0.95);
+}
+
+.btcm-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.btcm-scrollbar::-webkit-scrollbar-track {
+  background: rgba(39, 39, 42, 0.95);
+  border-radius: 999px;
+}
+
+.btcm-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(163, 230, 53, 0.75);
+  border: 2px solid rgba(39, 39, 42, 0.95);
+  border-radius: 999px;
+}
+
+.btcm-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(190, 242, 100, 0.95);
+}

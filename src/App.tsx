@@ -249,7 +249,7 @@ export default function App() {
 
   const assignUnitToForce = async (unitId: string) => {
     if (!forceAssignmentTarget) {
-      setForceAssignmentError("Select a force before adding units.");
+      setForceAssignmentError("Add Unit to Force");
       return;
     }
 
