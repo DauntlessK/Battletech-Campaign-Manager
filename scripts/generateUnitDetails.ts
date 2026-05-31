@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { WEAPONS, AMMO } from "../src/data/weapons";
 import { COMPONENTS } from "../src/data/components";
+import { BATTLEMECH_INTERNAL_STRUCTURE } from "../src/constants/enums";
 
 type CsvRow = Record<string, string>;
 
@@ -59,6 +60,7 @@ type DetailLocation = {
   key: MekLocationKey;
   name: string;
   armor: number;
+  structure: number;
   rearArmor?: number;
   slotCapacity: number;
   slots: DetailLocationSlot[];
@@ -115,7 +117,7 @@ type LocationDefinition = {
   rearArmorKeys?: string[];
 };
 
-const UNITS_ROOT = path.resolve(process.cwd(), "src", "data", "units");
+const UNITS_ROOT = path.resolve(process.cwd(), "server", "data", "units");
 const DEFAULT_UNIT_INDEX_PATH = path.resolve(process.cwd(), "server", "data", "generated", "unitIndex", "meks.csv");
 const DEFAULT_OUTPUT_DIR = path.resolve(process.cwd(), "server", "data", "generated", "unitDetails", "meks");
 
@@ -210,9 +212,10 @@ async function buildUnitDetail(row: CsvRow, options: CliOptions): Promise<UnitDe
   );
 
   const warnings: string[] = [];
+  const unitMass = getUnitMass(row, keyValues);
   const weapons = buildWeapons(lines, row.techBase, options.embedDefinitions, row.name, warnings);
   const weaponSlotRefMap = buildWeaponSlotRefMap(weapons);
-  const locations = buildLocations(lines, keyValues, row.techBase, options.embedDefinitions, row.name, warnings, weaponSlotRefMap, weapons);
+  const locations = buildLocations(lines, keyValues, row.techBase, options.embedDefinitions, row.name, unitMass, warnings, weaponSlotRefMap, weapons);
 
   return {
     schemaVersion: 1,
@@ -233,6 +236,42 @@ async function buildUnitDetail(row: CsvRow, options: CliOptions): Promise<UnitDe
 
 function getCatalogPayload(row: CsvRow): Record<string, string> {
   return Object.fromEntries(Object.entries(row).filter(([key]) => !CATALOG_FIELDS_TO_OMIT.has(key)));
+}
+
+function getUnitMass(row: CsvRow, keyValues: MtfKeyValue[]): number {
+  return (
+    toNumber(row.mass) ||
+    toNumber(row.tons) ||
+    toNumber(row.tonnage) ||
+    toNumber(getFieldValue(keyValues, "mass", "tons", "tonnage"))
+  );
+}
+
+function getLocationStructurePoints(locationKey: MekLocationKey, unitMass: number): number {
+  const structure = BATTLEMECH_INTERNAL_STRUCTURE[unitMass as keyof typeof BATTLEMECH_INTERNAL_STRUCTURE];
+  if (!structure) return 0;
+
+  switch (locationKey) {
+    case "head":
+      return structure.head;
+    case "centerTorso":
+      return structure.ct;
+    case "leftTorso":
+    case "rightTorso":
+      return structure.sideTorso;
+    case "leftArm":
+    case "rightArm":
+      return structure.arm;
+    case "leftLeg":
+    case "rightLeg":
+    case "frontLeftLeg":
+    case "frontRightLeg":
+    case "rearLeftLeg":
+    case "rearRightLeg":
+      return structure.leg;
+    default:
+      return 0;
+  }
 }
 
 function isQuadMekConfig(config: string, slotSections: Map<MekLocationKey, string[]>): boolean {
@@ -264,6 +303,7 @@ function buildLocations(
   techBase: string,
   embedDefinitions: boolean,
   unitName: string,
+  unitMass: number,
   warnings: string[],
   weaponSlotRefMap: Map<string, string>,
   weapons: DetailWeapon[]
@@ -279,6 +319,7 @@ function buildLocations(
       key: definition.key,
       name: definition.mtfName,
       armor: getFirstNumberField(keyValues, definition.armorKeys),
+      structure: getLocationStructurePoints(definition.key, unitMass),
       slotCapacity: getLocationSlotCapacity(definition.key),
       slots: rawSlots.map((slot, index) =>
         buildLocationSlot(slot, index + 1, techBase, embedDefinitions, unitName, definition.mtfName, warnings, weaponSlotRefMap, weapons)
@@ -514,7 +555,7 @@ function canonicalLookupKey(value: string | undefined): string {
 
 function resolveAmmoDefinition(rawValue: string, unitTechBase: string): AmmoDefinition | null {
   const normalized = normalizeLookupText(rawValue);
-  if (!normalized.includes("ammo")) return null;
+  if (!normalized.includes("ammo") && !isNarcPodAmmoSlot(rawValue)) return null;
 
   return findBestDefinitionMatch(rawValue, AMMO as Record<string, AmmoDefinition>, unitTechBase);
 }
@@ -891,17 +932,30 @@ function findBestDefinitionMatch<T extends Record<string, any>>(
   return candidates[0]?.definition ?? null;
 }
 
+function isNarcPodAmmoSlot(rawSlot: string): boolean {
+  const normalized = normalizeLookupText(rawSlot);
+
+  return (
+    normalized.includes("narcpod") ||
+    normalized.includes("narcpods") ||
+    normalized.includes("inarcpod") ||
+    normalized.includes("inarcpods") ||
+    normalized.includes("improvednarcpod") ||
+    normalized.includes("improvednarcpods")
+  );
+}
+
 function classifyRawSlotForDetail(rawSlot: string): DetailLocationSlot["type"] {
   const normalized = normalizeLookupText(rawSlot);
   if (!normalized || normalized === "empty" || normalized === "none") return "empty";
-  if (normalized.includes("ammo")) return "ammo";
+  if (normalized.includes("ammo") || isNarcPodAmmoSlot(rawSlot)) return "ammo";
   return "equipment";
 }
 
 function classifySlot(rawSlot: string, resolved?: { source: DefinitionSource; definition: WeaponDefinition } | null): DetailLocationSlot["type"] {
   const normalized = normalizeLookupText(rawSlot);
   if (!normalized || normalized === "empty" || normalized === "none") return "empty";
-  if (normalized.includes("ammo")) return "ammo";
+  if (normalized.includes("ammo") || isNarcPodAmmoSlot(rawSlot)) return "ammo";
 
   if (isSystemSlotName(rawSlot)) return "system";
 

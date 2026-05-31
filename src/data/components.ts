@@ -22,7 +22,9 @@ export type ComponentCategory =
   | "heatSink"
   | "powerAmplifier"
   | "track"
-  | "armor";
+  | "armor"
+  | "weaponEnhancement"
+  | "flightEquipment";
 
 export type CostFormula =
   | { type: "fixed"; amount: number }
@@ -743,6 +745,87 @@ export const COMPONENTS = {
       clanInvasion: "F",
     },
     cost: { type: "armorTonnage", multiplier: 120000 },
+  },
+
+  // Weapon Enhancement
+  ppcCapacitor: {
+    id: "ppcCapacitor",
+    name: "PPC Capacitor",
+    altNames: [
+      "PPC Capacitor",
+      "ISPPC Capacitor",
+      "CLPPC Capacitor",
+      "ISPPC Capacitor",
+      "CLPPC Capacitor",
+      "ISPPCcapacitor",
+      "CLPPCcapacitor",
+      "IS PPC Capacitor",
+      "Clan PPC Capacitor",
+      "PPC Capacitor (OMNIPOD)",
+      "CLPPC Capacitor (OMNIPOD)",
+      "ISPPC Capacitor (OMNIPOD)"
+    ],
+    category: "weaponEnhancement",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 45000 },
+  },
+
+  //Equipment
+    avionics: {
+    id: "avionics",
+    name: "Avionics",
+    altNames: [
+      "Avionics",
+      "IS Avionics",
+      "Clan Avionics",
+      "ISAvionics",
+      "CLAvionics",
+      "LAM Avionics",
+      "IS LAM Avionics",
+      "Clan LAM Avionics"
+    ],
+    category: "flightEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 0 },
+    notes: [
+      "LAM-specific critical slot component. Cost is handled as part of the LAM/conversion system if applicable."
+    ],
+  },
+
+  landingGear: {
+    id: "landingGear",
+    name: "Landing Gear",
+    altNames: [
+      "Landing Gear",
+      "IS Landing Gear",
+      "Clan Landing Gear",
+      "ISLandingGear",
+      "CLLandingGear",
+      "LAM Landing Gear",
+      "IS LAM Landing Gear",
+      "Clan LAM Landing Gear"
+    ],
+    category: "flightEquipment",
+    techRating: "D",
+    availability: {
+      starLeague: "D",
+      successionWars: "F",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 0 },
+    notes: [
+      "LAM-specific critical slot component. Cost is handled as part of the LAM/conversion system if applicable."
+    ],
   },
 } satisfies Record<string, ComponentDefinition>;
 

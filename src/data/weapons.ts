@@ -3995,7 +3995,9 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
         "altNames": [
             "IS Rocket Launcher 10",
             "ISRocketLauncher10",
-            "RocketLauncher10"
+            "RocketLauncher10",
+            "RL-10",
+            "RL10"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
@@ -4050,7 +4052,9 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
         "altNames": [
             "IS Rocket Launcher 15",
             "ISRocketLauncher15",
-            "RocketLauncher15"
+            "RocketLauncher15",
+            "RL-15",
+            "RL15"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
@@ -4105,7 +4109,9 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
         "altNames": [
             "IS Rocket Launcher 20",
             "ISRocketLauncher20",
-            "RocketLauncher20"
+            "RocketLauncher20",
+            "RL-20",
+            "RL20"
         ],
         "category": "Missile",
         "techBase": "Inner Sphere",
@@ -4368,7 +4374,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "battleValuePage": 317
         },
         "ammo": {
-            "ammoId": "is_narc_missile_beacon_ammo"
+            "ammoId": "is_narc_pod_ammo"
         },
         "bv": 30,
         "cost": 100000,
@@ -4420,7 +4426,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "S"
         ],
         "ammo": {
-            "ammoId": "is_improved_narc_launcher_ammo"
+            "ammoId": "is_inarc_pod_ammo"
         },
         "bv": 75,
         "cost": 250000,
@@ -8591,7 +8597,7 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "battleValuePage": 318
         },
         "ammo": {
-            "ammoId": "clan_narc_missile_beacon_ammo"
+            "ammoId": "clan_narc_pod_ammo"
         },
         "bv": 30,
         "cost": 100000,

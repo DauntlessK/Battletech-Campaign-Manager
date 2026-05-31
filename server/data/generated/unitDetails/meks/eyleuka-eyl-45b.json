@@ -1,76 +1,76 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-30T14:19:28.404Z",
+  "generatedAt": "2026-05-31T03:34:18.608Z",
   "catalog": {
-    "id": "meks-meks-3060u-toyama-tym-1b",
+    "id": "meks-meks-3075-eyleuka-eyl-45b",
     "unitType": "meks",
-    "chassis": "Toyama",
-    "model": "TYM-1B",
-    "name": "Toyama TYM-1B",
-    "fileName": "Toyama TYM-1B.mtf",
-    "relativePath": "meks/3060u/Toyama TYM-1B.mtf",
-    "mulId": "3279",
-    "tonnage": "75",
-    "weightClass": "Heavy",
-    "bv": "1788",
+    "chassis": "Eyleuka",
+    "model": "EYL-45B",
+    "name": "Eyleuka EYL-45B",
+    "fileName": "Eyleuka EYL-45B.mtf",
+    "relativePath": "meks/3075/Eyleuka EYL-45B.mtf",
+    "mulId": "1010",
+    "tonnage": "55",
+    "weightClass": "Medium",
+    "bv": "1615",
     "bvSource": "calculated",
-    "costCBills": "15659875",
+    "costCBills": "14220682",
     "costSource": "calculated",
     "techBase": "Inner Sphere",
     "rulesLevel": "Standard",
-    "year": "3070",
+    "year": "3075",
     "era": "Jihad",
-    "role": "Sniper",
-    "source": "TR:3060",
-    "walkMP": "4",
-    "runMP": "6",
-    "jumpMP": "",
-    "engineRating": "300",
-    "engineType": "Light Fusion",
+    "role": "Striker",
+    "source": "TR:3075",
+    "walkMP": "5",
+    "runMP": "8",
+    "jumpMP": "7",
+    "engineRating": "275",
+    "engineType": "XL Fusion",
     "gyroType": "Compact Gyro",
-    "cockpitType": "Standard Cockpit",
-    "heatSinkCount": "16",
+    "cockpitType": "Small Cockpit",
+    "heatSinkCount": "13",
     "heatSinkType": "Double",
-    "armorType": "Standard(Inner Sphere)",
-    "structureType": "Endo Steel",
-    "armorPoints": "208",
-    "armorTonnage": "13",
+    "armorType": "Stealth",
+    "structureType": "Standard",
+    "armorPoints": "152",
+    "armorTonnage": "9.5",
     "warnings": ""
   },
   "mtf": {
-    "fileName": "Toyama TYM-1B.mtf",
-    "relativePath": "meks/3060u/Toyama TYM-1B.mtf",
-    "sourcePath": "src/data/units/meks/3060u/Toyama TYM-1B.mtf",
+    "fileName": "Eyleuka EYL-45B.mtf",
+    "relativePath": "meks/3075/Eyleuka EYL-45B.mtf",
+    "sourcePath": "server/data/units/meks/3075/Eyleuka EYL-45B.mtf",
     "rawFields": {
-      "chassis": "Toyama",
-      "model": "TYM-1B",
-      "mul id": "3279",
+      "chassis": "Eyleuka",
+      "model": "EYL-45B",
+      "mul id": "1010",
       "TechBase": "Inner Sphere",
-      "Era": "3070",
-      "Source": "TR:3060",
+      "Era": "3075",
+      "Source": "TR:3075",
       "Rules Level": "2",
-      "role": "Sniper",
-      "quirk": "bad_rep_is",
-      "Mass": "75",
-      "Structure": "Endo Steel",
-      "Cockpit": "Standard Cockpit",
+      "role": "Striker",
+      "quirk": "exp_actuator",
+      "Mass": "55",
+      "Structure": "Standard",
+      "Cockpit": "Small Cockpit",
       "Gyro": "Compact Gyro",
-      "Heat Sinks": "16 Double",
-      "Walk MP": "4",
-      "Jump MP": "0",
-      "Armor": "Standard(Inner Sphere)",
-      "LA Armor": "22",
-      "RA Armor": "22",
-      "LT Armor": "22",
-      "RT Armor": "22",
-      "CT Armor": "29",
+      "Heat Sinks": "13 Double",
+      "Walk MP": "5",
+      "Jump MP": "7",
+      "Armor": "Stealth",
+      "LA Armor": "15",
+      "RA Armor": "15",
+      "LT Armor": "16",
+      "RT Armor": "16",
+      "CT Armor": "22",
       "HD Armor": "9",
-      "LL Armor": "29",
-      "RL Armor": "29",
-      "RTL Armor": "7",
-      "RTR Armor": "7",
-      "RTC Armor": "10",
-      "Weapons": "6",
+      "LL Armor": "21",
+      "RL Armor": "21",
+      "RTL Armor": "5",
+      "RTR Armor": "5",
+      "RTC Armor": "7",
+      "Weapons": "5",
       "Left Arm": "",
       "Right Arm": "",
       "Left Torso": "",
@@ -86,140 +86,81 @@
     {
       "ref": "weapon-1",
       "index": 1,
-      "name": "Light PPC",
-      "location": "Right Arm",
+      "name": "TAG",
+      "location": "Left Torso",
       "quantityIndex": 1,
-      "referenceId": "is_light_ppc",
-      "referenceName": "Light PPC",
+      "referenceId": "is_tag",
+      "referenceName": "TAG",
       "referenceSource": "weapon",
-      "displayName": "Light PPC",
+      "displayName": "TAG",
       "definition": {
-        "id": "is_light_ppc",
-        "name": "Light PPC",
+        "id": "is_tag",
+        "name": "TAG",
         "altNames": [
-          "IS Light PPC",
-          "ISLightPPC",
-          "LightPPC",
-          "ISLPPC",
-          "LPPC"
+          "IS TAG",
+          "ISTAG"
         ],
-        "category": "Energy",
+        "category": "Equipment",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "ppc",
-        "damage": 5,
-        "heat": 5,
-        "tons": 3,
-        "critSlots": 2,
-        "spaceSlots": 2,
+        "family": "tag",
+        "damage": "special",
+        "heat": 0,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
         "range": {
-          "min": 3,
-          "short": 6,
-          "medium": 12,
-          "long": 18
+          "min": 0,
+          "short": 5,
+          "medium": 9,
+          "long": 15
         },
         "techRating": "E",
         "flags": [
-          "directFire",
-          "minimumRange"
+          "tag"
         ],
         "source": {
-          "weightSpacePage": 341,
+          "weightSpacePage": 342,
           "battleValuePage": 317
         },
-        "typeCodes": [
-          "DE"
-        ],
-        "bv": 88,
-        "cost": 150000
+        "bv": "A",
+        "cost": 50000
       }
     },
     {
       "ref": "weapon-2",
       "index": 2,
-      "name": "Light PPC",
+      "name": "ER Large Laser",
       "location": "Right Arm",
-      "quantityIndex": 2,
-      "referenceId": "is_light_ppc",
-      "referenceName": "Light PPC",
+      "quantityIndex": 1,
+      "referenceId": "is_er_large_laser",
+      "referenceName": "ER Large Laser",
       "referenceSource": "weapon",
-      "displayName": "Light PPC",
+      "displayName": "ER Large Laser",
       "definition": {
-        "id": "is_light_ppc",
-        "name": "Light PPC",
+        "id": "is_er_large_laser",
+        "name": "ER Large Laser",
         "altNames": [
-          "IS Light PPC",
-          "ISLightPPC",
-          "LightPPC",
-          "ISLPPC",
-          "LPPC"
+          "IS ER Large Laser",
+          "ISERLargeLaser",
+          "ERLargeLaser"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "ppc",
-        "damage": 5,
-        "heat": 5,
-        "tons": 3,
+        "family": "laser",
+        "damage": 8,
+        "heat": 12,
+        "tons": 5,
         "critSlots": 2,
         "spaceSlots": 2,
         "range": {
-          "min": 3,
-          "short": 6,
-          "medium": 12,
-          "long": 18
-        },
-        "techRating": "E",
-        "flags": [
-          "directFire",
-          "minimumRange"
-        ],
-        "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317
-        },
-        "typeCodes": [
-          "DE"
-        ],
-        "bv": 88,
-        "cost": 150000
-      }
-    },
-    {
-      "ref": "weapon-3",
-      "index": 3,
-      "name": "Heavy PPC",
-      "location": "Left Arm",
-      "quantityIndex": 1,
-      "referenceId": "is_heavy_ppc",
-      "referenceName": "Heavy PPC",
-      "referenceSource": "weapon",
-      "displayName": "Heavy PPC",
-      "definition": {
-        "id": "is_heavy_ppc",
-        "name": "Heavy PPC",
-        "altNames": [
-          "IS Heavy PPC",
-          "ISHeavyPPC",
-          "HeavyPPC"
-        ],
-        "category": "Energy",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "ppc",
-        "damage": 15,
-        "heat": 15,
-        "tons": 10,
-        "critSlots": 4,
-        "spaceSlots": 4,
-        "range": {
-          "min": 3,
-          "short": 6,
-          "medium": 12,
-          "long": 18
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 19
         },
         "techRating": "E",
         "flags": [
@@ -227,20 +168,71 @@
         ],
         "source": {
           "weightSpacePage": 341,
-          "battleValuePage": 317
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
         },
         "typeCodes": [
           "DE"
         ],
-        "bv": 317,
-        "cost": 250000
+        "bv": 163,
+        "cost": 200000
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "ER Medium Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_er_medium_laser",
+      "referenceName": "ER Medium Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Medium Laser",
+      "definition": {
+        "id": "is_er_medium_laser",
+        "name": "ER Medium Laser",
+        "altNames": [
+          "IS ER Medium Laser",
+          "ISERMediumLaser",
+          "ERMediumLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 5,
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 4,
+          "medium": 8,
+          "long": 12
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 62,
+        "cost": 80000
       }
     },
     {
       "ref": "weapon-4",
       "index": 4,
       "name": "ER Medium Laser",
-      "location": "Left Torso",
+      "location": "Right Torso",
       "quantityIndex": 1,
       "referenceId": "is_er_medium_laser",
       "referenceName": "ER Medium Laser",
@@ -289,36 +281,40 @@
     {
       "ref": "weapon-5",
       "index": 5,
-      "name": "ER Medium Laser",
-      "location": "Left Torso",
-      "quantityIndex": 2,
-      "referenceId": "is_er_medium_laser",
-      "referenceName": "ER Medium Laser",
+      "name": "Snub-Nose PPC",
+      "location": "Head",
+      "quantityIndex": 1,
+      "referenceId": "is_snub_nose_ppc",
+      "referenceName": "Snub-Nose PPC",
       "referenceSource": "weapon",
-      "displayName": "ER Medium Laser",
+      "displayName": "Snub-Nose PPC",
       "definition": {
-        "id": "is_er_medium_laser",
-        "name": "ER Medium Laser",
+        "id": "is_snub_nose_ppc",
+        "name": "Snub-Nose PPC",
         "altNames": [
-          "IS ER Medium Laser",
-          "ISERMediumLaser",
-          "ERMediumLaser"
+          "IS Snub-Nose PPC",
+          "ISSnubNosePPC",
+          "SnubNosePPC",
+          "ISSNPPC",
+          "SNPPC",
+          "Snub Nose PPC",
+          "Snub PPC"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
         "rulesLevel": "Standard",
         "variant": "IS",
-        "family": "laser",
-        "damage": 5,
-        "heat": 5,
-        "tons": 1,
-        "critSlots": 1,
-        "spaceSlots": 1,
+        "family": "ppc",
+        "damage": "10/8/5",
+        "heat": 10,
+        "tons": 6,
+        "critSlots": 2,
+        "spaceSlots": 2,
         "range": {
           "min": 0,
-          "short": 4,
-          "medium": 8,
-          "long": 12
+          "short": 9,
+          "medium": 13,
+          "long": 15
         },
         "techRating": "E",
         "flags": [
@@ -330,78 +326,11 @@
           "costAvailabilityPage": 0
         },
         "typeCodes": [
-          "DE"
+          "DE",
+          "V"
         ],
-        "bv": 62,
-        "cost": 80000
-      }
-    },
-    {
-      "ref": "weapon-6",
-      "index": 6,
-      "name": "LRM 15",
-      "location": "Right Torso",
-      "quantityIndex": 1,
-      "referenceId": "is_lrm_15",
-      "referenceName": "LRM 15",
-      "referenceSource": "weapon",
-      "displayName": "LRM 15",
-      "definition": {
-        "id": "is_lrm_15",
-        "name": "LRM 15",
-        "altNames": [
-          "IS LRM 15",
-          "ISLRM15",
-          "LRM-15",
-          "LRM15"
-        ],
-        "category": "Missile",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Introductory",
-        "variant": "IS",
-        "family": "lrm",
-        "damage": "1/Msl",
-        "heat": 5,
-        "tons": 7,
-        "critSlots": 3,
-        "spaceSlots": 3,
-        "range": {
-          "min": 6,
-          "short": 7,
-          "medium": 14,
-          "long": 21
-        },
-        "techRating": "C",
-        "flags": [
-          "cluster",
-          "requiresAmmo",
-          "indirectFire",
-          "minimumRange"
-        ],
-        "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317,
-          "costAvailabilityPage": 295
-        },
-        "typeCodes": [
-          "M",
-          "C",
-          "S"
-        ],
-        "ammo": {
-          "ammoId": "is_lrm_15_ammo"
-        },
-        "cost": 175000,
-        "bv": 136,
-        "oneShotBV": 27,
-        "notes": [
-          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
-        ],
-        "availability": {
-          "starLeague": "C",
-          "successionWars": "C",
-          "clanInvasion": "C"
-        }
+        "bv": 165,
+        "cost": 300000
       }
     }
   ],
@@ -410,6 +339,7 @@
       "key": "head",
       "name": "Head",
       "armor": 9,
+      "structure": 3,
       "slotCapacity": 6,
       "slots": [
         {
@@ -477,16 +407,6 @@
         },
         {
           "slotIndex": 4,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
-        },
-        {
-          "slotIndex": 5,
           "raw": "Sensors",
           "normalized": "sensors",
           "normalizedId": "sensors",
@@ -507,32 +427,36 @@
           }
         },
         {
+          "slotIndex": 5,
+          "raw": "ISSNPPC",
+          "normalized": "is_snub_nose_ppc",
+          "normalizedId": "is_snub_nose_ppc",
+          "type": "weapon",
+          "displayName": "Snub-Nose PPC",
+          "referenceId": "is_snub_nose_ppc",
+          "referenceName": "Snub-Nose PPC",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
           "slotIndex": 6,
-          "raw": "Life Support",
-          "normalized": "lifeSupport",
-          "normalizedId": "lifeSupport",
-          "type": "system",
-          "displayName": "Life Support",
-          "referenceId": "lifeSupport",
-          "referenceName": "Life Support",
-          "referenceSource": "component",
-          "techRating": "C",
-          "availability": {
-            "starLeague": "C",
-            "successionWars": "C",
-            "clanInvasion": "C"
-          },
-          "cost": {
-            "type": "fixed",
-            "amount": 50000
-          }
+          "raw": "ISSNPPC",
+          "normalized": "is_snub_nose_ppc",
+          "normalizedId": "is_snub_nose_ppc",
+          "type": "weapon",
+          "displayName": "Snub-Nose PPC",
+          "referenceId": "is_snub_nose_ppc",
+          "referenceName": "Snub-Nose PPC",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
         }
       ]
     },
     "centerTorso": {
       "key": "centerTorso",
       "name": "Center Torso",
-      "armor": 29,
+      "armor": 22,
+      "structure": 18,
       "slotCapacity": 12,
       "slots": [
         {
@@ -705,84 +629,76 @@
         },
         {
           "slotIndex": 9,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 10,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 11,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "ISGuardianECMSuite",
+          "normalized": "is_guardian_ecm_suite",
+          "normalizedId": "is_guardian_ecm_suite",
+          "type": "equipment",
+          "displayName": "Guardian ECM Suite",
+          "referenceId": "is_guardian_ecm_suite",
+          "referenceName": "Guardian ECM Suite",
+          "referenceSource": "weapon"
         },
         {
           "slotIndex": 12,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
+          "raw": "ISGuardianECMSuite",
+          "normalized": "is_guardian_ecm_suite",
+          "normalizedId": "is_guardian_ecm_suite",
+          "type": "equipment",
+          "displayName": "Guardian ECM Suite",
+          "referenceId": "is_guardian_ecm_suite",
+          "referenceName": "Guardian ECM Suite",
+          "referenceSource": "weapon"
         }
       ],
-      "rearArmor": 10
+      "rearArmor": 7
     },
     "leftTorso": {
       "key": "leftTorso",
       "name": "Left Torso",
-      "armor": 22,
+      "armor": 16,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -829,192 +745,213 @@
         },
         {
           "slotIndex": 3,
-          "raw": "ISERMediumLaser",
-          "normalized": "is_er_medium_laser",
-          "normalizedId": "is_er_medium_laser",
-          "type": "weapon",
-          "displayName": "ER Medium Laser",
-          "referenceId": "is_er_medium_laser",
-          "referenceName": "ER Medium Laser",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-5"
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
         },
         {
           "slotIndex": 4,
-          "raw": "ISERMediumLaser",
-          "normalized": "is_er_medium_laser",
-          "normalizedId": "is_er_medium_laser",
-          "type": "weapon",
-          "displayName": "ER Medium Laser",
-          "referenceId": "is_er_medium_laser",
-          "referenceName": "ER Medium Laser",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-5"
-        },
-        {
-          "slotIndex": 5,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 6,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 7,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 8,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 9,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
           }
         },
         {
           "slotIndex": 10,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "ISTAG",
+          "normalized": "is_tag",
+          "normalizedId": "is_tag",
+          "type": "equipment",
+          "displayName": "TAG",
+          "referenceId": "is_tag",
+          "referenceName": "TAG",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
         },
         {
           "slotIndex": 11,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {
           "slotIndex": 12,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         }
       ],
-      "rearArmor": 7
+      "rearArmor": 5
     },
     "rightTorso": {
       "key": "rightTorso",
       "name": "Right Torso",
-      "armor": 22,
+      "armor": 16,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1061,132 +998,213 @@
         },
         {
           "slotIndex": 3,
-          "raw": "LRM 15",
-          "normalized": "is_lrm_15",
-          "normalizedId": "is_lrm_15",
-          "type": "weapon",
-          "displayName": "LRM 15",
-          "referenceId": "is_lrm_15",
-          "referenceName": "LRM 15",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-6"
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
         },
         {
           "slotIndex": 4,
-          "raw": "LRM 15",
-          "normalized": "is_lrm_15",
-          "normalizedId": "is_lrm_15",
-          "type": "weapon",
-          "displayName": "LRM 15",
-          "referenceId": "is_lrm_15",
-          "referenceName": "LRM 15",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-6"
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 5,
-          "raw": "LRM 15",
-          "normalized": "is_lrm_15",
-          "normalizedId": "is_lrm_15",
-          "type": "weapon",
-          "displayName": "LRM 15",
-          "referenceId": "is_lrm_15",
-          "referenceName": "LRM 15",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-6"
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 6,
-          "raw": "IS Ammo LRM-15",
-          "normalized": "is_lrm_15_ammo",
-          "normalizedId": "is_lrm_15_ammo",
-          "type": "ammo",
-          "displayName": "LRM 15 Ammo",
-          "referenceId": "is_lrm_15_ammo",
-          "referenceName": "LRM 15 Ammo",
-          "referenceSource": "ammo",
-          "ammoRef": "is_lrm_15_ammo",
-          "weaponRef": "weapon-6",
-          "bv": 17,
-          "costPerTon": 30000,
-          "shotsPerTon": 8
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 7,
-          "raw": "IS Ammo LRM-15",
-          "normalized": "is_lrm_15_ammo",
-          "normalizedId": "is_lrm_15_ammo",
-          "type": "ammo",
-          "displayName": "LRM 15 Ammo",
-          "referenceId": "is_lrm_15_ammo",
-          "referenceName": "LRM 15 Ammo",
-          "referenceSource": "ammo",
-          "ammoRef": "is_lrm_15_ammo",
-          "weaponRef": "weapon-6",
-          "bv": 17,
-          "costPerTon": 30000,
-          "shotsPerTon": 8
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 8,
-          "raw": "ISC3iUnit",
-          "normalized": "is_improved_c3_computer",
-          "normalizedId": "is_improved_c3_computer",
-          "type": "equipment",
-          "displayName": "Improved C3 Computer",
-          "referenceId": "is_improved_c3_computer",
-          "referenceName": "Improved C3 Computer",
-          "referenceSource": "weapon"
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 9,
-          "raw": "ISC3iUnit",
-          "normalized": "is_improved_c3_computer",
-          "normalizedId": "is_improved_c3_computer",
-          "type": "equipment",
-          "displayName": "Improved C3 Computer",
-          "referenceId": "is_improved_c3_computer",
-          "referenceName": "Improved C3 Computer",
-          "referenceSource": "weapon"
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
         },
         {
           "slotIndex": 10,
-          "raw": "ISCASE",
-          "normalized": "is_case",
-          "normalizedId": "is_case",
-          "type": "equipment",
-          "displayName": "CASE",
-          "referenceId": "is_case",
-          "referenceName": "CASE",
-          "referenceSource": "weapon"
+          "raw": "ISERMediumLaser",
+          "normalized": "is_er_medium_laser",
+          "normalizedId": "is_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "is_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
         },
         {
           "slotIndex": 11,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         },
         {
           "slotIndex": 12,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         }
       ],
-      "rearArmor": 7
+      "rearArmor": 5
     },
     "leftArm": {
       "key": "leftArm",
       "name": "Left Arm",
-      "armor": 22,
+      "armor": 15,
+      "structure": 9,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1222,44 +1240,44 @@
         },
         {
           "slotIndex": 3,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
           "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
           "referenceSource": "component",
-          "techRating": "E",
+          "techRating": "C",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
+            "type": "unitTonnage",
+            "multiplier": 50
           }
         },
         {
           "slotIndex": 4,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
+          "raw": "Hand Actuator",
+          "normalized": "handActuator",
+          "normalizedId": "handActuator",
           "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
+          "displayName": "Hand Actuator",
+          "referenceId": "handActuator",
+          "referenceName": "Hand Actuator",
           "referenceSource": "component",
-          "techRating": "E",
+          "techRating": "C",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
+            "type": "unitTonnage",
+            "multiplier": 80
           }
         },
         {
@@ -1327,79 +1345,83 @@
         },
         {
           "slotIndex": 8,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
           },
           "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {
           "slotIndex": 9,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-3"
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         },
         {
           "slotIndex": 10,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-3"
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
         },
         {
           "slotIndex": 11,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-3"
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
         },
         {
           "slotIndex": 12,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-3"
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
         }
       ]
     },
     "rightArm": {
       "key": "rightArm",
       "name": "Right Arm",
-      "armor": 22,
+      "armor": 15,
+      "structure": 9,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1435,44 +1457,44 @@
         },
         {
           "slotIndex": 3,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
           "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
           "referenceSource": "component",
-          "techRating": "E",
+          "techRating": "C",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
+            "type": "unitTonnage",
+            "multiplier": 50
           }
         },
         {
           "slotIndex": 4,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
+          "raw": "Hand Actuator",
+          "normalized": "handActuator",
+          "normalizedId": "handActuator",
           "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
+          "displayName": "Hand Actuator",
+          "referenceId": "handActuator",
+          "referenceName": "Hand Actuator",
           "referenceSource": "component",
-          "techRating": "E",
+          "techRating": "C",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
+            "type": "unitTonnage",
+            "multiplier": 80
           }
         },
         {
@@ -1540,79 +1562,89 @@
         },
         {
           "slotIndex": 8,
-          "raw": "ISDoubleHeatSink",
-          "normalized": "doubleHeatSink",
-          "normalizedId": "doubleHeatSink",
-          "type": "system",
-          "displayName": "Double Heat Sink",
-          "referenceId": "doubleHeatSink",
-          "referenceName": "Double Heat Sink",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
-          },
-          "cost": {
-            "type": "totalHeatSinks",
-            "multiplier": 6000
-          }
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
         },
         {
           "slotIndex": 9,
-          "raw": "Light PPC",
-          "normalized": "is_light_ppc",
-          "normalizedId": "is_light_ppc",
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
           "type": "weapon",
-          "displayName": "Light PPC",
-          "referenceId": "is_light_ppc",
-          "referenceName": "Light PPC",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
           "referenceSource": "weapon",
           "weaponRef": "weapon-2"
         },
         {
           "slotIndex": 10,
-          "raw": "Light PPC",
-          "normalized": "is_light_ppc",
-          "normalizedId": "is_light_ppc",
+          "raw": "ISERMediumLaser",
+          "normalized": "is_er_medium_laser",
+          "normalizedId": "is_er_medium_laser",
           "type": "weapon",
-          "displayName": "Light PPC",
-          "referenceId": "is_light_ppc",
-          "referenceName": "Light PPC",
+          "displayName": "ER Medium Laser",
+          "referenceId": "is_er_medium_laser",
+          "referenceName": "ER Medium Laser",
           "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
+          "weaponRef": "weapon-3"
         },
         {
           "slotIndex": 11,
-          "raw": "Light PPC",
-          "normalized": "is_light_ppc",
-          "normalizedId": "is_light_ppc",
-          "type": "weapon",
-          "displayName": "Light PPC",
-          "referenceId": "is_light_ppc",
-          "referenceName": "Light PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         },
         {
           "slotIndex": 12,
-          "raw": "Light PPC",
-          "normalized": "is_light_ppc",
-          "normalizedId": "is_light_ppc",
-          "type": "weapon",
-          "displayName": "Light PPC",
-          "referenceId": "is_light_ppc",
-          "referenceName": "Light PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
+          "type": "system",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 50000
+          }
         }
       ]
     },
     "leftLeg": {
       "key": "leftLeg",
       "name": "Left Leg",
-      "armor": 29,
+      "armor": 21,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1701,44 +1733,44 @@
         },
         {
           "slotIndex": 5,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {
           "slotIndex": 6,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {
@@ -1806,7 +1838,8 @@
     "rightLeg": {
       "key": "rightLeg",
       "name": "Right Leg",
-      "armor": 29,
+      "armor": 21,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1895,44 +1928,44 @@
         },
         {
           "slotIndex": 5,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {
           "slotIndex": 6,
-          "raw": "Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Stealth",
+          "normalized": "stealthArmor",
+          "normalizedId": "stealthArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Stealth Armor",
+          "referenceId": "stealthArmor",
+          "referenceName": "Stealth Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
+            "starLeague": "X",
+            "successionWars": "X",
             "clanInvasion": "E"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 50000
           }
         },
         {

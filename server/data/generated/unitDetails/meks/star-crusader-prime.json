@@ -1,74 +1,75 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-30T14:42:24.302Z",
+  "generatedAt": "2026-05-31T03:33:56.592Z",
   "catalog": {
-    "id": "meks-meks-3145-ntnu-rs-peacekeeper-pkp-2k",
+    "id": "meks-meks-rec-guides-ilclan-vol-23-star-crusader-prime",
     "unitType": "meks",
-    "chassis": "Peacekeeper",
-    "model": "PKP-2K",
-    "name": "Peacekeeper PKP-2K",
-    "fileName": "Peacekeeper PKP-2K.mtf",
-    "relativePath": "meks/3145/NTNU RS/Peacekeeper PKP-2K.mtf",
-    "mulId": "6836",
-    "tonnage": "95",
+    "chassis": "Star Crusader",
+    "model": "Prime",
+    "name": "Star Crusader Prime",
+    "fileName": "Star Crusader Prime.mtf",
+    "relativePath": "meks/Rec Guides ilClan/Vol 23/Star Crusader Prime.mtf",
+    "mulId": "8425",
+    "tonnage": "80",
     "weightClass": "Assault",
-    "bv": "2283",
+    "bv": "3325",
     "bvSource": "calculated",
-    "costCBills": "30956575",
+    "costCBills": "26137500",
     "costSource": "calculated",
-    "techBase": "Inner Sphere",
-    "rulesLevel": "Advanced",
-    "year": "3116",
-    "era": "Republic",
+    "techBase": "Clan",
+    "rulesLevel": "Standard",
+    "year": "3146",
+    "era": "Dark Age",
     "role": "Sniper",
-    "source": "RS:3145-NTNU",
+    "source": "RG23",
     "walkMP": "4",
     "runMP": "6",
     "jumpMP": "3",
-    "engineRating": "380",
+    "engineRating": "320",
     "engineType": "XL Fusion",
     "gyroType": "Standard",
     "cockpitType": "Standard",
-    "heatSinkCount": "15",
+    "heatSinkCount": "13",
     "heatSinkType": "Double",
-    "armorType": "Anti-Penetrative Ablation(Inner Sphere)",
-    "structureType": "IS Endo Steel",
-    "armorPoints": "270",
-    "armorTonnage": "16.88",
+    "armorType": "Ferro-Fibrous(Clan)",
+    "structureType": "Clan Endo Steel",
+    "armorPoints": "247",
+    "armorTonnage": "12.86",
     "warnings": ""
   },
   "mtf": {
-    "fileName": "Peacekeeper PKP-2K.mtf",
-    "relativePath": "meks/3145/NTNU RS/Peacekeeper PKP-2K.mtf",
-    "sourcePath": "src/data/units/meks/3145/NTNU RS/Peacekeeper PKP-2K.mtf",
+    "fileName": "Star Crusader Prime.mtf",
+    "relativePath": "meks/Rec Guides ilClan/Vol 23/Star Crusader Prime.mtf",
+    "sourcePath": "server/data/units/meks/Rec Guides ilClan/Vol 23/Star Crusader Prime.mtf",
     "rawFields": {
-      "chassis": "Peacekeeper",
-      "model": "PKP-2K",
-      "mul id": "6836",
-      "TechBase": "Inner Sphere",
-      "Era": "3116",
-      "Source": "RS:3145-NTNU",
-      "Rules Level": "3",
+      "chassis": "Star Crusader",
+      "model": "Prime",
+      "mul id": "8425",
+      "techbase": "Clan",
+      "era": "3146",
+      "source": "RG23",
+      "rules level": "2",
       "role": "Sniper",
-      "quirk": "rugged_1",
-      "Mass": "95",
-      "Structure": "IS Endo Steel",
-      "Heat Sinks": "15 Double",
-      "Walk MP": "4",
-      "Jump MP": "3",
-      "Armor": "Anti-Penetrative Ablation(Inner Sphere)",
-      "LA Armor": "27",
-      "RA Armor": "27",
-      "LT Armor": "30",
-      "RT Armor": "30",
-      "CT Armor": "44",
-      "HD Armor": "9",
-      "LL Armor": "35",
-      "RL Armor": "35",
-      "RTL Armor": "10",
-      "RTR Armor": "10",
-      "RTC Armor": "13",
-      "Weapons": "4",
+      "quirk": "stable",
+      "mass": "80",
+      "structure": "Clan Endo Steel",
+      "heat sinks": "13 Clan Double",
+      "base chassis heat sinks": "12",
+      "walk mp": "4",
+      "jump mp": "3",
+      "armor": "Ferro-Fibrous(Clan)",
+      "LA armor": "26",
+      "RA armor": "26",
+      "LT armor": "24",
+      "RT armor": "24",
+      "CT armor": "35",
+      "HD armor": "9",
+      "LL armor": "34",
+      "RL armor": "34",
+      "RTL armor": "10",
+      "RTR armor": "10",
+      "RTC armor": "15",
+      "Weapons": "7",
       "Left Arm": "",
       "Right Arm": "",
       "Left Torso": "",
@@ -79,225 +80,414 @@
       "Right Leg": ""
     }
   },
-  "fluff": {},
+  "fluff": {
+    "manufacturer": "Imperial BattleMechs",
+    "primaryFactory": "Antwerp",
+    "systemManufacturer": {
+      "chassis": "Imperial 4a Endo",
+      "engine": "Antwerp 320 XL",
+      "armor": "Forging SE09B Ferro-Fibrous with CASE II",
+      "communications": "CGS-Comm-4",
+      "targeting": "CGS-TTS-VIIa"
+    }
+  },
   "weapons": [
     {
       "ref": "weapon-1",
       "index": 1,
-      "name": "ER PPC",
+      "name": "ER Large Laser",
       "location": "Left Arm",
       "quantityIndex": 1,
-      "referenceId": "is_er_ppc",
-      "referenceName": "ER PPC",
+      "referenceId": "clan_er_large_laser",
+      "referenceName": "ER Large Laser",
       "referenceSource": "weapon",
-      "displayName": "ER PPC",
+      "displayName": "ER Large Laser",
       "definition": {
-        "id": "is_er_ppc",
-        "name": "ER PPC",
+        "id": "clan_er_large_laser",
+        "name": "ER Large Laser",
         "altNames": [
-          "IS ER PPC",
-          "ISERPPC",
-          "ERPPC",
-          "ISEHERPPC",
-          "ER Particle Projector Cannon"
+          "Clan ER Large Laser",
+          "CL ER Large Laser",
+          "CLERLargeLaser",
+          "ERLargeLaser"
         ],
         "category": "Energy",
-        "techBase": "Inner Sphere",
+        "techBase": "Clan",
         "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "ppc",
+        "variant": "Clan",
+        "family": "laser",
         "damage": 10,
-        "heat": 15,
-        "tons": 7,
-        "critSlots": 3,
-        "spaceSlots": 3,
+        "heat": 12,
+        "tons": 4,
+        "critSlots": 1,
+        "spaceSlots": 1,
         "range": {
           "min": 0,
-          "short": 7,
-          "medium": 14,
-          "long": 23
+          "short": 8,
+          "medium": 15,
+          "long": 25
         },
-        "techRating": "E",
+        "techRating": "F",
         "flags": [
           "directFire"
         ],
         "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317,
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
           "costAvailabilityPage": 0
         },
         "typeCodes": [
           "DE"
         ],
-        "bv": 229,
-        "cost": 300000
+        "bv": 248,
+        "cost": 200000
       }
     },
     {
       "ref": "weapon-2",
       "index": 2,
-      "name": "Heavy PPC",
-      "location": "Right Arm",
+      "name": "ER Medium Laser",
+      "location": "Left Arm",
       "quantityIndex": 1,
-      "referenceId": "is_heavy_ppc",
-      "referenceName": "Heavy PPC",
+      "referenceId": "clan_er_medium_laser",
+      "referenceName": "ER Medium Laser",
       "referenceSource": "weapon",
-      "displayName": "Heavy PPC",
+      "displayName": "ER Medium Laser",
       "definition": {
-        "id": "is_heavy_ppc",
-        "name": "Heavy PPC",
+        "id": "clan_er_medium_laser",
+        "name": "ER Medium Laser",
         "altNames": [
-          "IS Heavy PPC",
-          "ISHeavyPPC",
-          "HeavyPPC"
+          "Clan ER Medium Laser",
+          "CL ER Medium Laser",
+          "CLERMediumLaser",
+          "ERMediumLaser"
         ],
         "category": "Energy",
-        "techBase": "Inner Sphere",
+        "techBase": "Clan",
         "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "ppc",
-        "damage": 15,
-        "heat": 15,
-        "tons": 10,
-        "critSlots": 4,
-        "spaceSlots": 4,
-        "range": {
-          "min": 3,
-          "short": 6,
-          "medium": 12,
-          "long": 18
-        },
-        "techRating": "E",
-        "flags": [
-          "directFire"
-        ],
-        "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317
-        },
-        "typeCodes": [
-          "DE"
-        ],
-        "bv": 317,
-        "cost": 250000
-      }
-    },
-    {
-      "ref": "weapon-3",
-      "index": 3,
-      "name": "Medium X-Pulse Laser",
-      "location": "Left Torso",
-      "quantityIndex": 1,
-      "referenceId": "is_medium_xpulse_laser",
-      "referenceName": "Medium X-Pulse Laser",
-      "referenceSource": "weapon",
-      "displayName": "Medium X-Pulse Laser",
-      "definition": {
-        "id": "is_medium_xpulse_laser",
-        "name": "Medium X-Pulse Laser",
-        "altNames": [
-          "IS Medium X-Pulse Laser",
-          "ISMediumXPulseLaser",
-          "MediumXPulseLaser"
-        ],
-        "category": "Energy",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "pulseLaser",
-        "damage": 6,
-        "heat": 6,
-        "tons": 2,
+        "variant": "Clan",
+        "family": "laser",
+        "damage": 7,
+        "heat": 5,
+        "tons": 1,
         "critSlots": 1,
         "spaceSlots": 1,
-        "range": {
-          "min": 0,
-          "short": 2,
-          "medium": 4,
-          "long": 6
-        },
-        "techRating": "E",
-        "availability": {
-          "starLeague": "X",
-          "successionWars": "X",
-          "clanInvasion": "E"
-        },
-        "flags": [
-          "directFire",
-          "pulse"
-        ],
-        "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317,
-          "costAvailabilityPage": 0
-        },
-        "typeCodes": [
-          "P"
-        ],
-        "bv": 71,
-        "cost": 110000
-      }
-    },
-    {
-      "ref": "weapon-4",
-      "index": 4,
-      "name": "Plasma Rifle",
-      "location": "Right Torso",
-      "quantityIndex": 1,
-      "referenceId": "is_plasma_rifle",
-      "referenceName": "Plasma Rifle",
-      "referenceSource": "weapon",
-      "displayName": "Plasma Rifle",
-      "definition": {
-        "id": "is_plasma_rifle",
-        "name": "Plasma Rifle",
-        "altNames": [
-          "IS Plasma Rifle",
-          "ISPlasmaRifle",
-          "PlasmaRifle"
-        ],
-        "category": "Energy",
-        "techBase": "Inner Sphere",
-        "rulesLevel": "Standard",
-        "variant": "IS",
-        "family": "plasma",
-        "damage": 10,
-        "heat": 10,
-        "tons": 6,
-        "critSlots": 2,
-        "spaceSlots": 2,
         "range": {
           "min": 0,
           "short": 5,
           "medium": 10,
           "long": 15
         },
-        "techRating": "E",
+        "techRating": "F",
         "flags": [
-          "directFire",
-          "requiresAmmo"
+          "directFire"
         ],
         "source": {
-          "weightSpacePage": 341,
-          "battleValuePage": 317,
-          "costAvailabilityPage": 295
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
         },
         "typeCodes": [
-          "DE",
-          "H"
+          "DE"
+        ],
+        "bv": 108,
+        "cost": 80000
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "ER Large Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_er_large_laser",
+      "referenceName": "ER Large Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Large Laser",
+      "definition": {
+        "id": "clan_er_large_laser",
+        "name": "ER Large Laser",
+        "altNames": [
+          "Clan ER Large Laser",
+          "CL ER Large Laser",
+          "CLERLargeLaser",
+          "ERLargeLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "laser",
+        "damage": 10,
+        "heat": 12,
+        "tons": 4,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 8,
+          "medium": 15,
+          "long": 25
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 248,
+        "cost": 200000
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "ER Medium Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_er_medium_laser",
+      "referenceName": "ER Medium Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Medium Laser",
+      "definition": {
+        "id": "clan_er_medium_laser",
+        "name": "ER Medium Laser",
+        "altNames": [
+          "Clan ER Medium Laser",
+          "CL ER Medium Laser",
+          "CLERMediumLaser",
+          "ERMediumLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "laser",
+        "damage": 7,
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 5,
+          "medium": 10,
+          "long": 15
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 108,
+        "cost": 80000
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "Streak LRM 20",
+      "location": "Left Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_streak_lrm_20",
+      "referenceName": "Streak LRM 20",
+      "referenceSource": "weapon",
+      "displayName": "Streak LRM 20",
+      "definition": {
+        "id": "clan_streak_lrm_20",
+        "name": "Streak LRM 20",
+        "altNames": [
+          "Clan Streak LRM 20",
+          "CLANStreakLRM20",
+          "StreakLRM20",
+          "Streak-LRM-20",
+          "CL Streak LRM 20",
+          "CLStreakLRM20",
+          "Streak LRM-20",
+          "CLSRTLRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Experimental",
+        "variant": "Clan",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 20,
+        "heat": 6,
+        "tons": 10,
+        "critSlots": 5,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21,
+          "extreme": 28
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "minimumRange",
+          "streak"
+        ],
+        "source": {
+          "battleValuePage": 0,
+          "weightSpacePage": 0
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
         ],
         "ammo": {
-          "ammoId": "is_plasma_rifle_ammo"
+          "ammoId": "clan_streak_lrm_20_ammo"
         },
-        "bv": 210,
-        "cost": 260000,
-        "notes": [
-          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
-        ],
+        "cost": 600000,
+        "bv": 345,
         "availability": {
           "starLeague": "X",
           "successionWars": "X",
           "clanInvasion": "E"
+        },
+        "notes": [
+          "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-6",
+      "index": 6,
+      "name": "Streak LRM 20",
+      "location": "Right Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_streak_lrm_20",
+      "referenceName": "Streak LRM 20",
+      "referenceSource": "weapon",
+      "displayName": "Streak LRM 20",
+      "definition": {
+        "id": "clan_streak_lrm_20",
+        "name": "Streak LRM 20",
+        "altNames": [
+          "Clan Streak LRM 20",
+          "CLANStreakLRM20",
+          "StreakLRM20",
+          "Streak-LRM-20",
+          "CL Streak LRM 20",
+          "CLStreakLRM20",
+          "Streak LRM-20",
+          "CLSRTLRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Experimental",
+        "variant": "Clan",
+        "family": "streakLrm",
+        "damage": "1/Msl",
+        "rackSize": 20,
+        "heat": 6,
+        "tons": 10,
+        "critSlots": 5,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21,
+          "extreme": 28
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "minimumRange",
+          "streak"
+        ],
+        "source": {
+          "battleValuePage": 0,
+          "weightSpacePage": 0
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_streak_lrm_20_ammo"
+        },
+        "cost": 600000,
+        "bv": 345,
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        },
+        "notes": [
+          "Clan experimental Streak LRM launcher. Included to resolve existing MTF weapon names, even though experimental Meks can be excluded from audits."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-7",
+      "index": 7,
+      "name": "Anti-Missile System",
+      "location": "Head",
+      "quantityIndex": 1,
+      "referenceId": "clan_anti_missile_system",
+      "referenceName": "Anti-Missile System",
+      "referenceSource": "weapon",
+      "displayName": "Anti-Missile System",
+      "definition": {
+        "id": "clan_anti_missile_system",
+        "name": "Anti-Missile System",
+        "altNames": [
+          "Clan Anti-Missile System",
+          "CL Anti-Missile System",
+          "CLAntiMissileSystem",
+          "AntiMissileSystem"
+        ],
+        "category": "Equipment",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "anti_missile_system",
+        "damage": "special",
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "F",
+        "flags": [
+          "pointDefense",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "ammo": {
+          "ammoId": "clan_anti_missile_system_ammo"
+        },
+        "bv": 32,
+        "cost": 100000,
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "D",
+          "clanInvasion": "C"
         }
       }
     }
@@ -307,6 +497,7 @@
       "key": "head",
       "name": "Head",
       "armor": 9,
+      "structure": 3,
       "slotCapacity": 6,
       "slots": [
         {
@@ -374,24 +565,15 @@
         },
         {
           "slotIndex": 4,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
-          "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
-          "referenceSource": "component",
-          "techRating": "F",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
-          },
-          "cost": {
-            "type": "armorTonnage",
-            "multiplier": 120000
-          }
+          "raw": "CLAntiMissileSystem (OMNIPOD)",
+          "normalized": "clan_anti_missile_system",
+          "normalizedId": "clan_anti_missile_system",
+          "type": "equipment",
+          "displayName": "Anti-Missile System",
+          "referenceId": "clan_anti_missile_system",
+          "referenceName": "Anti-Missile System",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-7"
         },
         {
           "slotIndex": 5,
@@ -440,7 +622,8 @@
     "centerTorso": {
       "key": "centerTorso",
       "name": "Center Torso",
-      "armor": 44,
+      "armor": 35,
+      "structure": 25,
       "slotCapacity": 12,
       "slots": [
         {
@@ -655,7 +838,7 @@
         },
         {
           "slotIndex": 11,
-          "raw": "Jump Jet",
+          "raw": "Jump Jet (OMNIPOD)",
           "normalized": "standardJumpJet",
           "normalizedId": "standardJumpJet",
           "type": "system",
@@ -676,32 +859,28 @@
         },
         {
           "slotIndex": 12,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
-          "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
-          "referenceSource": "component",
-          "techRating": "F",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
-          },
-          "cost": {
-            "type": "armorTonnage",
-            "multiplier": 120000
-          }
+          "raw": "CLAMS Ammo (OMNIPOD)",
+          "normalized": "clan_ams_ammo",
+          "normalizedId": "clan_ams_ammo",
+          "type": "ammo",
+          "displayName": "Anti-Missile System Ammo",
+          "referenceId": "clan_ams_ammo",
+          "referenceName": "Anti-Missile System Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_ams_ammo",
+          "weaponRef": "weapon-7",
+          "bv": 11,
+          "costPerTon": 20000,
+          "shotsPerTon": 24
         }
       ],
-      "rearArmor": 13
+      "rearArmor": 15
     },
     "leftTorso": {
       "key": "leftTorso",
       "name": "Left Torso",
-      "armor": 30,
+      "armor": 24,
+      "structure": 17,
       "slotCapacity": 12,
       "slots": [
         {
@@ -748,204 +927,140 @@
         },
         {
           "slotIndex": 3,
-          "raw": "Fusion Engine",
-          "normalized": "standardFusionEngine",
-          "normalizedId": "standardFusionEngine",
+          "raw": "Jump Jet (OMNIPOD)",
+          "normalized": "standardJumpJet",
+          "normalizedId": "standardJumpJet",
           "type": "system",
-          "displayName": "Standard Fusion Engine",
-          "referenceId": "standardFusionEngine",
-          "referenceName": "Standard Fusion Engine",
+          "displayName": "Standard Jump Jets",
+          "referenceId": "standardJumpJet",
+          "referenceName": "Standard Jump Jets",
           "referenceSource": "component",
           "techRating": "D",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "engineRatingUnitTonnageDiv75",
-            "multiplier": 5000
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 200
           }
         },
         {
           "slotIndex": 4,
-          "raw": "ISMediumXPulseLaser",
-          "normalized": "is_medium_xpulse_laser",
-          "normalizedId": "is_medium_xpulse_laser",
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
           "type": "weapon",
-          "displayName": "Medium X-Pulse Laser",
-          "referenceId": "is_medium_xpulse_laser",
-          "referenceName": "Medium X-Pulse Laser",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
           "referenceSource": "weapon",
-          "weaponRef": "weapon-3"
+          "weaponRef": "weapon-5"
         },
         {
           "slotIndex": 5,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
         },
         {
           "slotIndex": 6,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
         },
         {
           "slotIndex": 7,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
         },
         {
           "slotIndex": 8,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
         },
         {
           "slotIndex": 9,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "Clan Streak LRM 20 Ammo (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20_ammo",
+          "normalizedId": "clan_streak_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "Streak LRM 20 Ammo",
+          "referenceId": "clan_streak_lrm_20_ammo",
+          "referenceName": "Streak LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_streak_lrm_20_ammo",
+          "bv": 43,
+          "costPerTon": 60000,
+          "shotsPerTon": 6
         },
         {
           "slotIndex": 10,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "Clan Streak LRM 20 Ammo (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20_ammo",
+          "normalizedId": "clan_streak_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "Streak LRM 20 Ammo",
+          "referenceId": "clan_streak_lrm_20_ammo",
+          "referenceName": "Streak LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_streak_lrm_20_ammo",
+          "bv": 43,
+          "costPerTon": 60000,
+          "shotsPerTon": 6
         },
         {
           "slotIndex": 11,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
-          "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
-          "referenceSource": "component",
-          "techRating": "F",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
-          },
-          "cost": {
-            "type": "armorTonnage",
-            "multiplier": 120000
-          }
+          "raw": "Clan Streak LRM 20 Ammo (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20_ammo",
+          "normalizedId": "clan_streak_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "Streak LRM 20 Ammo",
+          "referenceId": "clan_streak_lrm_20_ammo",
+          "referenceName": "Streak LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_streak_lrm_20_ammo",
+          "bv": 43,
+          "costPerTon": 60000,
+          "shotsPerTon": 6
         },
         {
           "slotIndex": 12,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
-          "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
-          "referenceSource": "component",
-          "techRating": "F",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
-          },
-          "cost": {
-            "type": "armorTonnage",
-            "multiplier": 120000
-          }
+          "raw": "CLCASEII (OMNIPOD)",
+          "normalized": "clan_case_ii",
+          "normalizedId": "clan_case_ii",
+          "type": "equipment",
+          "displayName": "CASE II",
+          "referenceId": "clan_case_ii",
+          "referenceName": "CASE II",
+          "referenceSource": "weapon"
         }
       ],
       "rearArmor": 10
@@ -953,7 +1068,8 @@
     "rightTorso": {
       "key": "rightTorso",
       "name": "Right Torso",
-      "armor": 30,
+      "armor": 24,
+      "structure": 17,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1000,164 +1116,151 @@
         },
         {
           "slotIndex": 3,
-          "raw": "Fusion Engine",
-          "normalized": "standardFusionEngine",
-          "normalizedId": "standardFusionEngine",
+          "raw": "Jump Jet (OMNIPOD)",
+          "normalized": "standardJumpJet",
+          "normalizedId": "standardJumpJet",
           "type": "system",
-          "displayName": "Standard Fusion Engine",
-          "referenceId": "standardFusionEngine",
-          "referenceName": "Standard Fusion Engine",
+          "displayName": "Standard Jump Jets",
+          "referenceId": "standardJumpJet",
+          "referenceName": "Standard Jump Jets",
           "referenceSource": "component",
           "techRating": "D",
           "availability": {
             "starLeague": "C",
-            "successionWars": "E",
-            "clanInvasion": "D"
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
-            "type": "engineRatingUnitTonnageDiv75",
-            "multiplier": 5000
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 200
           }
         },
         {
           "slotIndex": 4,
-          "raw": "ISPlasmaRifle",
-          "normalized": "is_plasma_rifle",
-          "normalizedId": "is_plasma_rifle",
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
           "type": "weapon",
-          "displayName": "Plasma Rifle",
-          "referenceId": "is_plasma_rifle",
-          "referenceName": "Plasma Rifle",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
           "referenceSource": "weapon",
-          "weaponRef": "weapon-4"
+          "weaponRef": "weapon-6"
         },
         {
           "slotIndex": 5,
-          "raw": "ISPlasmaRifle",
-          "normalized": "is_plasma_rifle",
-          "normalizedId": "is_plasma_rifle",
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
           "type": "weapon",
-          "displayName": "Plasma Rifle",
-          "referenceId": "is_plasma_rifle",
-          "referenceName": "Plasma Rifle",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
           "referenceSource": "weapon",
-          "weaponRef": "weapon-4"
+          "weaponRef": "weapon-6"
         },
         {
           "slotIndex": 6,
-          "raw": "ISPlasmaRifleAmmo",
-          "normalized": "is_plasma_rifle_ammo",
-          "normalizedId": "is_plasma_rifle_ammo",
-          "type": "ammo",
-          "displayName": "Plasma Rifle Ammo",
-          "referenceId": "is_plasma_rifle_ammo",
-          "referenceName": "Plasma Rifle Ammo",
-          "referenceSource": "ammo",
-          "ammoRef": "is_plasma_rifle_ammo",
-          "weaponRef": "weapon-4",
-          "bv": 26,
-          "costPerTon": 10000,
-          "shotsPerTon": 10
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
         },
         {
           "slotIndex": 7,
-          "raw": "ISPlasmaRifleAmmo",
-          "normalized": "is_plasma_rifle_ammo",
-          "normalizedId": "is_plasma_rifle_ammo",
-          "type": "ammo",
-          "displayName": "Plasma Rifle Ammo",
-          "referenceId": "is_plasma_rifle_ammo",
-          "referenceName": "Plasma Rifle Ammo",
-          "referenceSource": "ammo",
-          "ammoRef": "is_plasma_rifle_ammo",
-          "weaponRef": "weapon-4",
-          "bv": 26,
-          "costPerTon": 10000,
-          "shotsPerTon": 10
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
         },
         {
           "slotIndex": 8,
-          "raw": "Emergency C3 Master",
-          "normalized": "is_c3_computer_master",
-          "normalizedId": "is_c3_computer_master",
-          "type": "equipment",
-          "displayName": "C3 Computer (Master)",
-          "referenceId": "is_c3_computer_master",
-          "referenceName": "C3 Computer (Master)",
-          "referenceSource": "weapon"
+          "raw": "CLStreakLRM20 (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20",
+          "normalizedId": "clan_streak_lrm_20",
+          "type": "weapon",
+          "displayName": "Streak LRM 20",
+          "referenceId": "clan_streak_lrm_20",
+          "referenceName": "Streak LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
         },
         {
           "slotIndex": 9,
-          "raw": "Emergency C3 Master",
-          "normalized": "is_c3_computer_master",
-          "normalizedId": "is_c3_computer_master",
-          "type": "equipment",
-          "displayName": "C3 Computer (Master)",
-          "referenceId": "is_c3_computer_master",
-          "referenceName": "C3 Computer (Master)",
-          "referenceSource": "weapon"
+          "raw": "Clan Streak LRM 20 Ammo (OMNIPOD)",
+          "normalized": "clan_streak_lrm_20_ammo",
+          "normalizedId": "clan_streak_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "Streak LRM 20 Ammo",
+          "referenceId": "clan_streak_lrm_20_ammo",
+          "referenceName": "Streak LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_streak_lrm_20_ammo",
+          "bv": 43,
+          "costPerTon": 60000,
+          "shotsPerTon": 6
         },
         {
           "slotIndex": 10,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "CLCASEII (OMNIPOD)",
+          "normalized": "clan_case_ii",
+          "normalizedId": "clan_case_ii",
+          "type": "equipment",
+          "displayName": "CASE II",
+          "referenceId": "clan_case_ii",
+          "referenceName": "CASE II",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
             "starLeague": "D",
             "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
-        },
-        {
-          "slotIndex": 11,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
-          "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
-          "referenceSource": "component",
-          "techRating": "F",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
+            "clanInvasion": "D"
           },
           "cost": {
             "type": "armorTonnage",
-            "multiplier": 120000
+            "multiplier": 20000
           }
         },
         {
           "slotIndex": 12,
-          "raw": "IS Anti-Penetrative Ablation",
-          "normalized": "antiPenetrativeAblationArmor",
-          "normalizedId": "antiPenetrativeAblationArmor",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Anti-Penetrative Ablation Armor",
-          "referenceId": "antiPenetrativeAblationArmor",
-          "referenceName": "Anti-Penetrative Ablation Armor",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
-          "techRating": "F",
+          "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "F"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
           },
           "cost": {
             "type": "armorTonnage",
-            "multiplier": 120000
+            "multiplier": 20000
           }
         }
       ],
@@ -1166,7 +1269,8 @@
     "leftArm": {
       "key": "leftArm",
       "name": "Left Arm",
-      "armor": 27,
+      "armor": 26,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1202,165 +1306,163 @@
         },
         {
           "slotIndex": 3,
-          "raw": "ISERPPC",
-          "normalized": "is_er_ppc",
-          "normalizedId": "is_er_ppc",
-          "type": "weapon",
-          "displayName": "ER PPC",
-          "referenceId": "is_er_ppc",
-          "referenceName": "ER PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-1"
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
         },
         {
           "slotIndex": 4,
-          "raw": "ISERPPC",
-          "normalized": "is_er_ppc",
-          "normalizedId": "is_er_ppc",
-          "type": "weapon",
-          "displayName": "ER PPC",
-          "referenceId": "is_er_ppc",
-          "referenceName": "ER PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-1"
+          "raw": "CLDoubleHeatSink (OMNIPOD)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
         },
         {
           "slotIndex": 5,
-          "raw": "ISERPPC",
-          "normalized": "is_er_ppc",
-          "normalizedId": "is_er_ppc",
+          "raw": "CLDoubleHeatSink (OMNIPOD)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLERLargeLaser (OMNIPOD)",
+          "normalized": "clan_er_large_laser",
+          "normalizedId": "clan_er_large_laser",
           "type": "weapon",
-          "displayName": "ER PPC",
-          "referenceId": "is_er_ppc",
-          "referenceName": "ER PPC",
+          "displayName": "ER Large Laser",
+          "referenceId": "clan_er_large_laser",
+          "referenceName": "ER Large Laser",
           "referenceSource": "weapon",
           "weaponRef": "weapon-1"
         },
         {
-          "slotIndex": 6,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
-        },
-        {
           "slotIndex": 7,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
-          "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
-          }
+          "raw": "CLERMediumLaser (OMNIPOD)",
+          "normalized": "clan_er_medium_laser",
+          "normalizedId": "clan_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "clan_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
         },
         {
           "slotIndex": 8,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
             "starLeague": "D",
             "successionWars": "F",
-            "clanInvasion": "E"
+            "clanInvasion": "D"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 20000
           }
         },
         {
           "slotIndex": 9,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
             "starLeague": "D",
             "successionWars": "F",
-            "clanInvasion": "E"
+            "clanInvasion": "D"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 1600
+            "type": "armorTonnage",
+            "multiplier": 20000
           }
         },
         {
           "slotIndex": 10,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
+            "starLeague": "D",
+            "successionWars": "F",
             "clanInvasion": "D"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 16000
+            "type": "armorTonnage",
+            "multiplier": 20000
           }
         },
         {
           "slotIndex": 11,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
-          "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
-          "referenceSource": "component",
-          "techRating": "E",
-          "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "D"
-          },
-          "cost": {
-            "type": "unitTonnage",
-            "multiplier": 16000
-          }
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
         },
         {
           "slotIndex": 12,
@@ -1377,7 +1479,8 @@
     "rightArm": {
       "key": "rightArm",
       "name": "Right Arm",
-      "armor": 27,
+      "armor": 26,
+      "structure": 13,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1413,76 +1516,74 @@
         },
         {
           "slotIndex": 3,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
-        },
-        {
-          "slotIndex": 4,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
-        },
-        {
-          "slotIndex": 5,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
-        },
-        {
-          "slotIndex": 6,
-          "raw": "Heavy PPC",
-          "normalized": "is_heavy_ppc",
-          "normalizedId": "is_heavy_ppc",
-          "type": "weapon",
-          "displayName": "Heavy PPC",
-          "referenceId": "is_heavy_ppc",
-          "referenceName": "Heavy PPC",
-          "referenceSource": "weapon",
-          "weaponRef": "weapon-2"
-        },
-        {
-          "slotIndex": 7,
-          "raw": "IS Endo Steel",
-          "normalized": "endoSteelInternalStructure",
-          "normalizedId": "endoSteelInternalStructure",
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
           "type": "system",
-          "displayName": "Endo-Steel Internal Structure",
-          "referenceId": "endoSteelInternalStructure",
-          "referenceName": "Endo-Steel Internal Structure",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
           "referenceSource": "component",
-          "techRating": "E",
+          "techRating": "C",
           "availability": {
-            "starLeague": "D",
-            "successionWars": "F",
-            "clanInvasion": "E"
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
           },
           "cost": {
             "type": "unitTonnage",
-            "multiplier": 1600
+            "multiplier": 50
           }
         },
         {
+          "slotIndex": 4,
+          "raw": "CLERLargeLaser (OMNIPOD)",
+          "normalized": "clan_er_large_laser",
+          "normalizedId": "clan_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "clan_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLERMediumLaser (OMNIPOD)",
+          "normalized": "clan_er_medium_laser",
+          "normalizedId": "clan_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "clan_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLTargeting Computer (OMNIPOD)",
+          "normalized": "clan_targeting_computer",
+          "normalizedId": "clan_targeting_computer",
+          "type": "equipment",
+          "displayName": "Targeting Computer",
+          "referenceId": "clan_targeting_computer",
+          "referenceName": "Targeting Computer",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLTargeting Computer (OMNIPOD)",
+          "normalized": "clan_targeting_computer",
+          "normalizedId": "clan_targeting_computer",
+          "type": "equipment",
+          "displayName": "Targeting Computer",
+          "referenceId": "clan_targeting_computer",
+          "referenceName": "Targeting Computer",
+          "referenceSource": "weapon"
+        },
+        {
           "slotIndex": 8,
-          "raw": "IS Endo Steel",
+          "raw": "Clan Endo Steel",
           "normalized": "endoSteelInternalStructure",
           "normalizedId": "endoSteelInternalStructure",
           "type": "system",
@@ -1503,7 +1604,7 @@
         },
         {
           "slotIndex": 9,
-          "raw": "IS Endo Steel",
+          "raw": "Clan Endo Steel",
           "normalized": "endoSteelInternalStructure",
           "normalizedId": "endoSteelInternalStructure",
           "type": "system",
@@ -1524,62 +1625,74 @@
         },
         {
           "slotIndex": 10,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
           "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "D"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
           },
           "cost": {
             "type": "unitTonnage",
-            "multiplier": 16000
+            "multiplier": 1600
           }
         },
         {
           "slotIndex": 11,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
           "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "D"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
           },
           "cost": {
             "type": "unitTonnage",
-            "multiplier": 16000
+            "multiplier": 1600
           }
         },
         {
           "slotIndex": 12,
-          "raw": "-Empty-",
-          "normalized": "empty",
-          "type": "empty",
-          "displayName": "Empty",
-          "referenceId": "",
-          "referenceName": "",
-          "referenceSource": ""
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
         }
       ]
     },
     "leftLeg": {
       "key": "leftLeg",
       "name": "Left Leg",
-      "armor": 35,
+      "armor": 34,
+      "structure": 17,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1668,44 +1781,44 @@
         },
         {
           "slotIndex": 5,
-          "raw": "Jump Jet",
-          "normalized": "standardJumpJet",
-          "normalizedId": "standardJumpJet",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Standard Jump Jets",
-          "referenceId": "standardJumpJet",
-          "referenceName": "Standard Jump Jets",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
-          "techRating": "D",
+          "techRating": "E",
           "availability": {
-            "starLeague": "C",
-            "successionWars": "C",
-            "clanInvasion": "C"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
           },
           "cost": {
-            "type": "jumpJetsSquaredUnitTonnage",
-            "multiplier": 200
+            "type": "armorTonnage",
+            "multiplier": 20000
           }
         },
         {
           "slotIndex": 6,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
           "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
+            "starLeague": "D",
+            "successionWars": "F",
             "clanInvasion": "D"
           },
           "cost": {
-            "type": "unitTonnage",
-            "multiplier": 16000
+            "type": "armorTonnage",
+            "multiplier": 20000
           }
         },
         {
@@ -1773,7 +1886,8 @@
     "rightLeg": {
       "key": "rightLeg",
       "name": "Right Leg",
-      "armor": 35,
+      "armor": 34,
+      "structure": 17,
       "slotCapacity": 12,
       "slots": [
         {
@@ -1862,44 +1976,44 @@
         },
         {
           "slotIndex": 5,
-          "raw": "Jump Jet",
-          "normalized": "standardJumpJet",
-          "normalizedId": "standardJumpJet",
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
           "type": "system",
-          "displayName": "Standard Jump Jets",
-          "referenceId": "standardJumpJet",
-          "referenceName": "Standard Jump Jets",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
           "referenceSource": "component",
-          "techRating": "D",
+          "techRating": "E",
           "availability": {
-            "starLeague": "C",
-            "successionWars": "C",
-            "clanInvasion": "C"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
           },
           "cost": {
-            "type": "jumpJetsSquaredUnitTonnage",
-            "multiplier": 200
+            "type": "unitTonnage",
+            "multiplier": 1600
           }
         },
         {
           "slotIndex": 6,
-          "raw": "TSM",
-          "normalized": "tripleStrengthMyomer",
-          "normalizedId": "tripleStrengthMyomer",
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
           "type": "system",
-          "displayName": "Triple-Strength Myomer",
-          "referenceId": "tripleStrengthMyomer",
-          "referenceName": "Triple-Strength Myomer",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
           "referenceSource": "component",
           "techRating": "E",
           "availability": {
-            "starLeague": "X",
-            "successionWars": "X",
-            "clanInvasion": "D"
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
           },
           "cost": {
             "type": "unitTonnage",
-            "multiplier": 16000
+            "multiplier": 1600
           }
         },
         {

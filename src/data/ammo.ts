@@ -2592,6 +2592,84 @@ export const AMMO: Record<string, AmmoDefinition> = {
                     "costAvailabilityPage": 0
                 }
     },
+        "is_narc_pod_ammo": {
+        "id": "is_narc_pod_ammo",
+        "name": "Narc Pod Ammo",
+        "altNames": [
+            "Narc Pod Ammo",
+            "Narc Pods",
+            "Narc Pod",
+            "Narc Ammo",
+            "IS Narc Pod Ammo",
+            "IS Narc Pods",
+            "IS Narc Pod",
+            "ISNarcPodAmmo",
+            "ISNarcPods",
+            "ISNarcPod",
+            "ISNarc Ammo",
+            "ISNarcAmmo",
+            "ISNarc Pods"
+        ],
+        "ammoType": "is_narc_pod",
+        "weaponIds": ["is_narc_missile_beacon"],
+        "compatibleWeaponNames": ["Narc Missile Beacon", "Narc Beacon", "Narc"],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "shotsPerTon": 6,
+        "costPerTon": 6000,
+        "bv": 5,
+        "availability": {
+            "starLeague": "E",
+            "successionWars": "F",
+            "clanInvasion": "D"
+        },
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+    "is_inarc_pod_ammo": {
+        "id": "is_inarc_pod_ammo",
+        "name": "iNarc Pod Ammo",
+        "altNames": [
+            "iNarc Pod Ammo",
+            "iNarc Pods",
+            "iNarc Pod",
+            "Improved Narc Pod Ammo",
+            "Improved Narc Pods",
+            "Improved Narc Pod",
+            "IS iNarc Pod Ammo",
+            "IS iNarc Pods",
+            "ISiNarcPodAmmo",
+            "ISiNarcPods",
+            "ISImprovedNarcPodAmmo",
+            "IS Improved Narc Pod Ammo",
+            "IS Improved Narc Pods"
+        ],
+        "ammoType": "is_inarc_pod",
+        "weaponIds": ["is_improved_narc_launcher"],
+        "compatibleWeaponNames": [
+            "Improved Narc Missile Beacon",
+            "iNarc Missile Beacon",
+            "iNarc"
+        ],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "shotsPerTon": 4,
+        "costPerTon": 30000,
+        "bv": 6,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+        },
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
 
     // Clan ammo
 "clan_a_pod_ammo": {
@@ -2615,6 +2693,85 @@ export const AMMO: Record<string, AmmoDefinition> = {
                     "weightSpacePage": 343,
                     "battleValuePage": 318
                 }
+    },
+    
+    "clan_narc_pod_ammo": {
+        "id": "clan_narc_pod_ammo",
+        "name": "Narc Pod Ammo",
+        "altNames": [
+            "Narc Pod Ammo",
+            "Narc Pods",
+            "Narc Pod",
+            "Narc Ammo",
+            "Clan Narc Pod Ammo",
+            "Clan Narc Pods",
+            "Clan Narc Pod",
+            "CLNarcPodAmmo",
+            "CLNarcPods",
+            "CLNarcPod",
+            "CLNarc Ammo",
+            "CLNarcAmmo"
+        ],
+        "ammoType": "clan_narc_pod",
+        "weaponIds": ["clan_narc_missile_beacon"],
+        "compatibleWeaponNames": ["Narc Missile Beacon", "Narc Beacon", "Narc", "Clan Narc Missile Beacon"],
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "shotsPerTon": 6,
+        "costPerTon": 6000,
+        "bv": 5,
+        "availability": {
+            "starLeague": "E",
+            "successionWars": "F",
+            "clanInvasion": "D"
+        },
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+    "clan_inarc_pod_ammo": {
+        "id": "clan_inarc_pod_ammo",
+        "name": "iNarc Pod Ammo",
+        "altNames": [
+            "iNarc Pod Ammo",
+            "iNarc Pods",
+            "iNarc Pod",
+            "Improved Narc Pod Ammo",
+            "Improved Narc Pods",
+            "Improved Narc Pod",
+            "Clan iNarc Pod Ammo",
+            "Clan iNarc Pods",
+            "CLiNarcPodAmmo",
+            "CLiNarcPods",
+            "CLImprovedNarcPodAmmo",
+            "Clan Improved Narc Pod Ammo",
+            "Clan Improved Narc Pods"
+        ],
+        "ammoType": "clan_inarc_pod",
+        "weaponIds": ["clan_improved_narc_missile_beacon"],
+        "compatibleWeaponNames": [
+            "Improved Narc Missile Beacon",
+            "iNarc Missile Beacon",
+            "iNarc",
+            "Clan Improved Narc Missile Beacon"
+        ],
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "shotsPerTon": 4,
+        "costPerTon": 30000,
+        "bv": 6,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+        },
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
     },
     "clan_anti_missile_system_ammo": {
         "id": "clan_anti_missile_system_ammo",

@@ -132,7 +132,7 @@ export default function UnitsPage({
         <PageTitle
           eyebrow="Unit database"
           title="Units"
-          description="API-backed unit catalog loaded from generated MegaMek CSV indexes. Select a unit to parse the full MTF and load the MechLab view."
+          description="API-backed unit catalog loaded from generated JSON. Select a unit to load the JSON MechLab view."
           actions={
             selectedForceForUnitAdd ? (
               <button
@@ -571,7 +571,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Complete record</div>
           <h3 className="mt-1 text-2xl font-black text-zinc-50">{unit.model} Full Information</h3>
         </div>
-        <Badge>{unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : "MTF fallback") : unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
+        <Badge>{unit.detailSource ? "Generated JSON" : unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -597,7 +597,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
         <InfoSection
           title="Rules / Source"
           items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Source Book", "Detail Source", "MUL ID"]}
-          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : "MTF fallback") : "—", unit.mulId ? String(unit.mulId) : "—"]}
+          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.detailSource ? "Generated JSON" : "—", unit.mulId ? String(unit.mulId) : "—"]}
         />
       </div>
     </section>
@@ -669,7 +669,7 @@ function LocationGrid({ unit }: { unit: Unit }) {
         <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="slots" compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="slots" compact />}{byId.ll && <LocationCard location={byId.ll} mode="slots" compact />}</div>
-          <div className="space-y-3 -mt-8">
+          <div className="space-y-3 pt-10 2xl:pt-8">
             {byId.head && (
               <div className="relative -top-4 2xl:-top-3">
                 <LocationCard location={byId.head} mode="slots" compact head />
@@ -708,7 +708,7 @@ function WeaponPlacementGrid({ unit }: { unit: Unit }) {
         <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact />}{byId.ll && <LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact />}</div>
-          <div className="space-y-3 -mt-8">
+          <div className="space-y-3 pt-10 2xl:pt-8">
             {byId.head && (
               <div className="relative -top-4 2xl:-top-3">
                 <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />
