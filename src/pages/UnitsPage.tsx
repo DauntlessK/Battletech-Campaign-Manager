@@ -10,6 +10,8 @@ import {
   BookOpen,
   Flag,
   Cpu,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import type {
   CriticalSlot,
@@ -27,6 +29,7 @@ import { normalizeEra } from "../utils/unitNormalization";
 export default function UnitsPage({
   units,
   selectedUnit,
+  forces,
   selectedForceForUnitAdd,
   onSelectUnit,
   onClearSelectedUnit,
@@ -37,11 +40,12 @@ export default function UnitsPage({
 }: {
   units: Unit[];
   selectedUnit: Unit | null;
+  forces: Force[];
   selectedForceForUnitAdd: Force | null;
   onSelectUnit: (id: string) => void;
   onClearSelectedUnit: () => void;
   onSelectForceForUnitAdd: (force: Force | null) => void;
-  onAddUnitToForce: (unitId: string) => void;
+  onAddUnitToForce: (unitId: string, forceId?: string) => void;
   addUnitLoading: boolean;
   addUnitError: string | null;
 }) {
@@ -62,6 +66,7 @@ export default function UnitsPage({
   const [panelMode, setPanelMode] = useState<UnitPanelMode>("slots");
   const [topMode, setTopMode] = useState<"filters" | "browse">("filters");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [addUnitModalOpen, setAddUnitModalOpen] = useState(false);
 
   const filterOptions = useMemo(
     () => ({
@@ -190,8 +195,7 @@ export default function UnitsPage({
               panelMode={panelMode}
               setPanelMode={setPanelMode}
               onClose={onClearSelectedUnit}
-              selectedForceForUnitAdd={selectedForceForUnitAdd}
-              onAddUnitToForce={onAddUnitToForce}
+              onOpenAddUnitModal={() => setAddUnitModalOpen(true)}
               addUnitLoading={addUnitLoading}
               addUnitError={addUnitError}
               embedded
@@ -202,32 +206,6 @@ export default function UnitsPage({
             eyebrow="Unit database"
             title="Units"
             description="API-backed unit catalog loaded from generated JSON data. Select a unit to load its JSON-powered MechLab view."
-            actions={
-              selectedForceForUnitAdd ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    selectedUnit && onAddUnitToForce(selectedUnit.id)
-                  }
-                  disabled={!selectedUnit || addUnitLoading}
-                  className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
-                >
-                  {addUnitLoading
-                    ? "Adding…"
-                    : selectedUnit
-                      ? `Add ${selectedUnit.model} to ${selectedForceForUnitAdd.name}`
-                      : "Select a unit to add"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="mt-4 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-400"
-                >
-                  Select a force from Forces to add units
-                </button>
-              )
-            }
           />
         )}
 
@@ -355,8 +333,240 @@ export default function UnitsPage({
           setSortBy={setSortBy}
         />
       )}
+
+      {selectedUnit && addUnitModalOpen && (
+        <AddUnitToForceModal
+          unit={selectedUnit}
+          units={units}
+          forces={forces}
+          onClose={() => setAddUnitModalOpen(false)}
+          onAddUnitToForce={onAddUnitToForce}
+          addUnitLoading={addUnitLoading}
+          addUnitError={addUnitError}
+        />
+      )}
     </section>
   );
+}
+
+function AddUnitToForceModal({
+  unit,
+  units,
+  forces,
+  onClose,
+  onAddUnitToForce,
+  addUnitLoading,
+  addUnitError,
+}: {
+  unit: Unit;
+  units: Unit[];
+  forces: Force[];
+  onClose: () => void;
+  onAddUnitToForce: (unitId: string, forceId?: string) => void;
+  addUnitLoading: boolean;
+  addUnitError: string | null;
+}) {
+  const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
+  const forceRows = forces.map((force) => {
+    const currentBV = getForceCurrentBV(force, units);
+    const remainingBV = Math.max(0, Number(force.totalBV ?? 0) - currentBV);
+    const validation = getForceEligibility(force, unit, units);
+    return { force, currentBV, remainingBV, validation };
+  });
+  const eligibleCount = forceRows.filter(
+    (row) => row.validation.eligible,
+  ).length;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <section className="flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/60">
+        <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-5">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Add Unit to Force
+            </div>
+            <h2 className="mt-1 text-2xl font-black text-zinc-50">
+              {unit.model} {unit.name}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              {unit.tonnage}t · {unit.rulesLevel || "Unknown rules"} ·{" "}
+              {unit.era || normalizeEra(unit.era, unit.year) || "Unknown era"} ·{" "}
+              {unitBV.toLocaleString("en-US")} BV
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-zinc-700 bg-zinc-900 text-zinc-400 transition hover:border-lime-400 hover:text-lime-300"
+            aria-label="Close add unit modal"
+            title="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {addUnitError && (
+          <div className="mx-5 mt-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+            {addUnitError}
+          </div>
+        )}
+
+        <div className="btcm-scrollbar min-h-0 flex-1 overflow-y-scroll p-5 [scrollbar-gutter:stable]">
+          {forces.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/70 p-6 text-sm text-zinc-400">
+              No forces are available yet. Create a force first, then return
+              here to add this unit directly from the Units page.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div className="text-sm text-zinc-400">
+                  Showing {eligibleCount} eligible force
+                  {eligibleCount === 1 ? "" : "s"} of {forces.length}.
+                </div>
+                <div className="text-xs uppercase tracking-[0.16em] text-zinc-500">
+                  Era · Rules · BV limit checked
+                </div>
+              </div>
+
+              {forceRows.map(
+                ({ force, currentBV, remainingBV, validation }) => (
+                  <div
+                    key={force.id}
+                    className={`rounded-3xl border p-4 ${validation.eligible ? "border-lime-400/30 bg-lime-400/10" : "border-zinc-800 bg-zinc-900/70"}`}
+                  >
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {validation.eligible ? (
+                            <CheckCircle2 className="text-lime-300" size={17} />
+                          ) : (
+                            <AlertTriangle
+                              className="text-amber-300"
+                              size={17}
+                            />
+                          )}
+                          <h3 className="truncate text-lg font-black text-zinc-50">
+                            {force.name}
+                          </h3>
+                          <span className="rounded-full border border-zinc-700 bg-zinc-950 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-400">
+                            {force.origin === "CampaignCopy" || force.campaignId
+                              ? "Campaign"
+                              : "Original"}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-400">
+                          <span>Era: {force.era || "Any"}</span>
+                          <span>Rules: {force.rulesLevel || "Any"}</span>
+                          <span>
+                            BV: {currentBV.toLocaleString("en-US")} /{" "}
+                            {Number(force.totalBV ?? 0).toLocaleString("en-US")}
+                          </span>
+                          <span>
+                            Remaining: {remainingBV.toLocaleString("en-US")}
+                          </span>
+                        </div>
+                        {!validation.eligible && (
+                          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-amber-200/90">
+                            {validation.reasons.map((reason) => (
+                              <li key={reason}>{reason}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onAddUnitToForce(unit.id, force.id)}
+                        disabled={!validation.eligible || addUnitLoading}
+                        className="shrink-0 rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none"
+                      >
+                        {addUnitLoading ? "Adding…" : "Add to this force"}
+                      </button>
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function getForceCurrentBV(force: Force, units: Unit[]) {
+  const unitMap = new Map(units.map((candidate) => [candidate.id, candidate]));
+  return (force.unitIds ?? []).reduce((total, unitId) => {
+    const existingUnit = unitMap.get(unitId);
+    return total + Number(existingUnit?.totalBV ?? existingUnit?.bv ?? 0);
+  }, 0);
+}
+
+function getForceEligibility(force: Force, unit: Unit, units: Unit[]) {
+  const reasons: string[] = [];
+  const currentBV = getForceCurrentBV(force, units);
+  const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
+  const forceBVLimit = Number(force.totalBV ?? 0);
+
+  if (forceBVLimit > 0 && currentBV + unitBV > forceBVLimit) {
+    reasons.push(
+      `Adding this unit would exceed the force BV limit by ${(currentBV + unitBV - forceBVLimit).toLocaleString("en-US")} BV.`,
+    );
+  }
+
+  const forceRulesRank = getRulesRank(force.rulesLevel);
+  const unitRulesRank = getRulesRank(unit.rulesLevel);
+  if (
+    forceRulesRank !== null &&
+    unitRulesRank !== null &&
+    unitRulesRank > forceRulesRank
+  ) {
+    reasons.push(
+      `${unit.rulesLevel} units are above this force's ${force.rulesLevel} rules level.`,
+    );
+  }
+
+  const forceEraRank = getEraRank(force.era);
+  const unitEraRank = getEraRank(unit.era || normalizeEra(unit.era, unit.year));
+  if (
+    forceEraRank !== null &&
+    unitEraRank !== null &&
+    unitEraRank > forceEraRank
+  ) {
+    reasons.push(
+      `${unit.era || "This unit's era"} is later than this force's ${force.era} era.`,
+    );
+  }
+
+  return { eligible: reasons.length === 0, reasons };
+}
+
+function getRulesRank(value?: string) {
+  if (!value || value === "All" || value === "Any" || value === "Unknown")
+    return null;
+  const normalized = value.toLowerCase();
+  const order = ["introductory", "standard", "advanced", "experimental"];
+  const index = order.findIndex((entry) => normalized.includes(entry));
+  return index >= 0 ? index : null;
+}
+
+function getEraRank(value?: string) {
+  if (!value || value === "All" || value === "Any" || value === "Unknown")
+    return null;
+  const normalized = value.toLowerCase();
+  const eraOrder = [
+    "age of war",
+    "star league",
+    "early succession war",
+    "late succession war",
+    "clan invasion",
+    "civil war",
+    "jihad",
+    "dark age",
+    "ilclan",
+  ];
+  const index = eraOrder.findIndex((era) => normalized.includes(era));
+  return index >= 0 ? index : null;
 }
 
 function UnitToolbar({
@@ -733,8 +943,7 @@ function MechSummary({
   panelMode,
   setPanelMode,
   onClose,
-  selectedForceForUnitAdd,
-  onAddUnitToForce,
+  onOpenAddUnitModal,
   addUnitLoading = false,
   addUnitError,
   embedded = false,
@@ -743,8 +952,7 @@ function MechSummary({
   panelMode: UnitPanelMode;
   setPanelMode: (mode: UnitPanelMode) => void;
   onClose?: () => void;
-  selectedForceForUnitAdd?: Force | null;
-  onAddUnitToForce?: (unitId: string) => void;
+  onOpenAddUnitModal?: () => void;
   addUnitLoading?: boolean;
   addUnitError?: string | null;
   embedded?: boolean;
@@ -767,26 +975,14 @@ function MechSummary({
         </div>
 
         <div className="flex min-w-0 flex-1 justify-center px-3 pt-2">
-          {selectedForceForUnitAdd && onAddUnitToForce ? (
-            <button
-              type="button"
-              onClick={() => onAddUnitToForce(unit.id)}
-              disabled={addUnitLoading}
-              className="w-full max-w-md rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
-            >
-              {addUnitLoading
-                ? "Adding…"
-                : `Add ${unit.model} to ${selectedForceForUnitAdd.name}`}
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-950 px-5 py-3 text-sm font-black text-zinc-400"
-            >
-              Select a force from Forces to add units
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onOpenAddUnitModal}
+            disabled={addUnitLoading || !onOpenAddUnitModal}
+            className="w-full max-w-md rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
+          >
+            {addUnitLoading ? "Adding…" : "Add Unit to Force"}
+          </button>
         </div>
 
         <div className="flex shrink-0 items-start gap-2">
@@ -1427,7 +1623,9 @@ function LocationCard({
   return (
     <article className={cardClassName}>
       <div className="mb-3 text-center">
-        <h3 className="text-base font-black uppercase tracking-[0.14em] text-zinc-50">{location.name}</h3>
+        <h3 className="text-base font-black uppercase tracking-[0.14em] text-zinc-50">
+          {location.name}
+        </h3>
         <p className="mt-1 text-[11px] text-zinc-500">
           {occupiedSlots}/{visibleSlots.length} slots occupied
         </p>

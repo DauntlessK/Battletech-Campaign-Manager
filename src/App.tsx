@@ -247,9 +247,10 @@ export default function App() {
     }
   };
 
-  const assignUnitToForce = async (unitId: string) => {
-    if (!forceAssignmentTarget) {
-      setForceAssignmentError("Add Unit to Force");
+  const assignUnitToForce = async (unitId: string, forceId?: string) => {
+    const targetForceId = forceId ?? forceAssignmentTarget?.id;
+    if (!targetForceId) {
+      setForceAssignmentError("Select a force before adding units.");
       return;
     }
 
@@ -257,7 +258,7 @@ export default function App() {
     setForceAssignmentError(null);
 
     try {
-      const response = await fetch(`/api/forces/${forceAssignmentTarget.id}/units`, {
+      const response = await fetch(`/api/forces/${targetForceId}/units`, {
         method: "POST",
         headers: {
           ...authHeaders(),
@@ -509,6 +510,7 @@ export default function App() {
                 <UnitsPage
                   units={units}
                   selectedUnit={selectedUnit}
+                  forces={forces}
                   selectedForceForUnitAdd={forceAssignmentTarget}
                   onSelectUnit={setSelectedUnitId}
                   onClearSelectedUnit={() => setSelectedUnitId(null)}
