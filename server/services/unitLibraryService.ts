@@ -1,27 +1,32 @@
 import fs from "fs/promises";
 import path from "path";
-import { Mek } from "../../src/files/Mek";
-import { unitType } from "../../src/constants/enums";
-import { installServerUnitFetch, setForcedMtfPath } from "./serverUnitFetch";
 import { findCatalogItemById, getUnitCatalog, type UnitCatalogItem } from "./unitCatalogService";
-import { mekToUnitDto } from "./mekToUnitDto";
-import type { Unit } from "../types/unit";
+import type { CriticalSlot, Unit } from "../types/unit";
+
+const UNIT_DETAIL_DIR = path.resolve(
+  process.cwd(),
+  "server",
+  "data",
+  "generated",
+  "unitDetails",
+  "meks"
+);
 
 export async function getTestMekUnit(): Promise<Unit> {
-  installServerUnitFetch();
+  const units = await getUnitCatalog("meks");
+  const catalogItem = units.find((unit) => unit.detailPath) ?? units[0];
 
-  const mek = await new Mek(
-    unitType.Mek,
-    null,
-    null,
-    "Atlas",
-    "AS7-D"
-  ).ready();
+  if (!catalogItem) {
+    throw new Error("No unit catalog rows are available.");
+  }
 
-  return {
-    ...mekToUnitDto(mek, "Atlas AS7-D.mtf"),
-    detailSource: "mtf",
-  };
+  const unit = await getUnitDefinitionById(catalogItem.id);
+
+  if (!unit) {
+    throw new Error(`No generated JSON detail found for test unit ${catalogItem.id}.`);
+  }
+
+  return unit;
 }
 
 export async function getAllUnitDefinitions() {
@@ -35,53 +40,84 @@ export async function getUnitDefinitionById(id: string): Promise<Unit | null> {
     return null;
   }
 
-  if (catalogItem.detailPath) {
-    try {
-      const jsonText = await fs.readFile(path.resolve(process.cwd(), catalogItem.detailPath), "utf-8");
-      const detail = JSON.parse(jsonText) as UnitDetailJson;
-      return mapDetailJsonToUnit(detail, catalogItem);
-    } catch (error) {
-      console.warn(`[unitLibraryService] Failed to load unit detail JSON for ${id}:`, error);
-    }
-  }
+  const detail = await loadUnitDetailJson(catalogItem);
 
-  installServerUnitFetch();
-
-  if (!catalogItem.relativePath) {
+  if (!detail) {
+    console.warn(
+      `[unitLibraryService] No generated unit detail JSON found for ${id}; MTF fallback is disabled.`
+    );
     return null;
   }
 
-  try {
-    setForcedMtfPath(catalogItem.relativePath);
-
-    const mek = await new Mek(
-      unitType.Mek,
-      null,
-      null,
-      catalogItem.chassis,
-      catalogItem.model
-    ).ready();
-
-      return {
-        ...mekToUnitDto(mek, catalogItem.relativePath),
-        detailSource: "mtf",
-      };
-  } finally {
-    setForcedMtfPath(null);
-  }
+  return mapDetailJsonToUnit(detail, catalogItem);
 }
+
+async function loadUnitDetailJson(catalogItem: UnitCatalogItem): Promise<UnitDetailJson | null> {
+  const candidatePaths = buildUnitDetailPathCandidates(catalogItem);
+
+  for (const candidatePath of candidatePaths) {
+    try {
+      const jsonText = await fs.readFile(candidatePath, "utf-8");
+      return JSON.parse(jsonText) as UnitDetailJson;
+    } catch (error: any) {
+      if (error?.code !== "ENOENT") {
+        console.warn(
+          `[unitLibraryService] Failed to load unit detail JSON for ${catalogItem.id} from ${candidatePath}:`,
+          error
+        );
+      }
+    }
+  }
+
+  return null;
+}
+
+function buildUnitDetailPathCandidates(catalogItem: UnitCatalogItem): string[] {
+  const candidates = new Set<string>();
+
+  if (catalogItem.detailPath) {
+    candidates.add(path.resolve(process.cwd(), catalogItem.detailPath));
+  }
+
+  const baseNames = [
+    catalogItem.id,
+    catalogItem.name,
+    `${catalogItem.chassis} ${catalogItem.model}`,
+    catalogItem.fileName?.replace(/\.mtf$/i, ""),
+  ];
+
+  for (const baseName of baseNames) {
+    const slug = slugForFileName(baseName);
+    if (slug) {
+      candidates.add(path.join(UNIT_DETAIL_DIR, `${slug}.json`));
+    }
+  }
+
+  return Array.from(candidates);
+}
+
+function slugForFileName(value: string | undefined): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\.mtf$/i, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 interface UnitDetailJson {
   catalog?: Record<string, any>;
   mtf?: {
     sourcePath?: string;
   };
+  fluff?: Record<string, any>;
   weapons?: Array<any>;
   locations?: Record<string, any>;
 }
 
 function mapDetailJsonToUnit(detail: UnitDetailJson, catalogItem: UnitCatalogItem): Unit {
   const catalog = detail.catalog ?? {};
-  const mtf = detail.mtf ?? {};
+  const fluff = detail.fluff ?? {};
   const weapons = Array.isArray(detail.weapons) ? detail.weapons : [];
   const locations = detail.locations ?? {};
 
@@ -98,10 +134,10 @@ function mapDetailJsonToUnit(detail: UnitDetailJson, catalogItem: UnitCatalogIte
     weightClass: (catalog.weightClass ?? catalogItem.weightClass ?? "Unknown") as Unit["weightClass"],
     costCBills: Number(catalog.costCBills ?? catalogItem.costCBills ?? 0),
     rulesLevel: (catalog.rulesLevel ?? catalogItem.rulesLevel ?? "Unknown") as Unit["rulesLevel"],
-    walk: Number(catalog.walkMP ?? catalogItem.walk ?? 0),
-    run: Number(catalog.runMP ?? catalogItem.run ?? 0),
-    jump: Number(catalog.jumpMP ?? catalogItem.jump ?? 0),
-    heatSinks: Number(catalog.heatSinkCount ?? catalogItem.heatSinks ?? 0),
+    walk: Number(catalog.walkMP ?? catalog.walk ?? catalogItem.walk ?? 0),
+    run: Number(catalog.runMP ?? catalog.run ?? catalogItem.run ?? 0),
+    jump: Number(catalog.jumpMP ?? catalog.jump ?? catalogItem.jump ?? 0),
+    heatSinks: Number(catalog.heatSinkCount ?? catalog.heatSinks ?? catalogItem.heatSinks ?? 0),
     heatSinkType: catalog.heatSinkType ?? catalogItem.heatSinkType,
     armor: getTotalArmor(locations),
     structure: getTotalStructure(locations),
@@ -111,22 +147,22 @@ function mapDetailJsonToUnit(detail: UnitDetailJson, catalogItem: UnitCatalogIte
     role: catalog.role ?? catalogItem.role ?? "Unknown",
     engine: catalog.engineType ?? catalog.engine ?? catalogItem.engine ?? "Unknown",
     gyro: catalog.gyroType ?? catalog.gyro ?? catalogItem.gyro ?? "Unknown",
-    cockpit: catalog.cockpitType ?? "Standard",
-    sourceFile: mtf.sourcePath ?? catalogItem.relativePath,
+    cockpit: catalog.cockpitType ?? catalog.cockpit ?? "Standard",
+    sourceFile: catalog.fileName ?? catalogItem.fileName,
     fileName: catalog.fileName ?? catalogItem.fileName,
     relativePath: catalog.relativePath ?? catalogItem.relativePath,
     detailSource: "json",
     clanName: undefined,
     mulId: catalog.mulId ?? catalogItem.mulId,
     sourceBook: catalog.source ?? undefined,
-    overview: undefined,
-    capabilities: undefined,
-    deployment: undefined,
-    history: undefined,
-    quirks: undefined,
-    manufacturer: undefined,
-    factory: undefined,
-    myomer: undefined,
+    overview: fluff.overview,
+    capabilities: fluff.capabilities,
+    deployment: fluff.deployment,
+    history: fluff.history,
+    quirks: fluff.quirks,
+    manufacturer: fluff.manufacturer,
+    factory: fluff.factory,
+    myomer: fluff.myomer,
     armorType: catalog.armorType ?? catalogItem.armorType,
     structureType: catalog.structureType ?? catalogItem.structureType,
     weapons: mapDetailWeapons(weapons),
@@ -172,7 +208,7 @@ function formatWeaponRange(range: any): string {
     }
   }
 
-  return "�";
+  return "—";
 }
 
 function normalizeDisplayLocation(location: string): string {
@@ -248,7 +284,6 @@ function normalizeLocationId(value: string): string {
   const map: Record<string, string> = {
     head: "head",
     centertorso: "ct",
-    centertorso: "ct",
     lefttorso: "lt",
     righttorso: "rt",
     leftarm: "la",
@@ -282,7 +317,7 @@ function mapDetailSlotType(slot: any): CriticalSlot["type"] {
 
 function getTotalArmor(locations: Record<string, any>): number {
   return Object.values(locations).reduce((sum: number, location: any) => {
-    return sum + Number(location.armor ?? 0);
+    return sum + Number(location.armor ?? 0) + Number(location.rearArmor ?? 0);
   }, 0);
 }
 

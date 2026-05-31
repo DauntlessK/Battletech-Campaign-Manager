@@ -10,6 +10,7 @@ export type UnitCatalogItem = {
   fileName: string;
   relativePath: string;
   detailPath?: string;
+  mulId?: string;
   tonnage: number;
   weightClass: string;
   bv: number;
@@ -94,13 +95,80 @@ async function loadUnitDetailManifest(unitType: string): Promise<Map<string, str
     return undefined;
   }
 
+  const detailPathMap = new Map<string, string>();
+
   try {
     const manifestContent = await fs.readFile(manifestPath, "utf-8");
     const manifestEntries = JSON.parse(manifestContent) as Array<{ id: string; detailPath: string }>;
-    return new Map(manifestEntries.map((entry) => [entry.id, path.resolve(process.cwd(), entry.detailPath)]));
+
+    for (const entry of manifestEntries) {
+      if (entry.id && entry.detailPath) {
+        detailPathMap.set(entry.id, path.resolve(process.cwd(), entry.detailPath));
+      }
+    }
   } catch {
-    return undefined;
+    // The manifest is optional. If it is missing or incomplete, scan the generated JSON folder below.
   }
+
+  await addGeneratedDetailFilesToMap(detailPathMap, path.dirname(manifestPath));
+
+  return detailPathMap;
+}
+
+async function addGeneratedDetailFilesToMap(detailPathMap: Map<string, string>, detailDir: string) {
+  let entries: string[];
+
+  try {
+    entries = await fs.readdir(detailDir);
+  } catch {
+    return;
+  }
+
+  await Promise.all(
+    entries
+      .filter((entry) => entry.toLowerCase().endsWith(".json") && entry !== "manifest.json")
+      .map(async (entry) => {
+        const detailPath = path.join(detailDir, entry);
+
+        try {
+          const detailContent = await fs.readFile(detailPath, "utf-8");
+          const detail = JSON.parse(detailContent) as {
+            catalog?: {
+              id?: string;
+              name?: string;
+              chassis?: string;
+              model?: string;
+              fileName?: string;
+            };
+          };
+
+          const catalog = detail.catalog ?? {};
+          const ids = [
+            catalog.id,
+            slugForDetailMatch(catalog.name),
+            slugForDetailMatch(`${catalog.chassis ?? ""} ${catalog.model ?? ""}`),
+            slugForDetailMatch(catalog.fileName?.replace(/\.mtf$/i, "")),
+          ].filter(Boolean) as string[];
+
+          for (const id of ids) {
+            if (!detailPathMap.has(id)) {
+              detailPathMap.set(id, detailPath);
+            }
+          }
+        } catch {
+          // Ignore malformed/generated files here; the selected-unit route will report detail-load errors.
+        }
+      })
+  );
+}
+
+function slugForDetailMatch(value: string | undefined): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\.mtf$/i, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export async function findCatalogItemById(id: string): Promise<UnitCatalogItem | null> {
@@ -137,6 +205,7 @@ function parseCatalogCsv(csv: string, detailPathMap?: Map<string, string>): Unit
         fileName: record.fileName,
         relativePath: record.relativePath,
         detailPath: detailPathMap?.get(record.id),
+        mulId: record.mulId,
         tonnage: toNumber(record.tonnage),
         weightClass: record.weightClass,
         bv: toNumber(record.bv || record.totalBV),

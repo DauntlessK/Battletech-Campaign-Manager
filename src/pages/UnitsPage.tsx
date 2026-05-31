@@ -126,37 +126,43 @@ export default function UnitsPage({
     if (match) selectUnit(match.id);
   };
 
+  const selectedPanelTitle = selectedUnit ? `${selectedUnit.model} selected` : "Find / filter a chassis";
+
   return (
     <section className="space-y-4 overflow-hidden">
       <div className="grid gap-4 xl:grid-cols-[minmax(330px,0.72fr)_minmax(0,2.28fr)] 2xl:grid-cols-[minmax(400px,0.68fr)_minmax(0,2.32fr)]">
-        <PageTitle
-          eyebrow="Unit database"
-          title="Units"
-          description="API-backed unit catalog loaded from generated JSON. Select a unit to load the JSON MechLab view."
-          actions={
-            selectedForceForUnitAdd ? (
-              <button
-                type="button"
-                onClick={() => selectedUnit && onAddUnitToForce(selectedUnit.id)}
-                disabled={!selectedUnit || addUnitLoading}
-                className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
-              >
-                {addUnitLoading ? "Adding…" : selectedUnit ? `Add ${selectedUnit.model} to ${selectedForceForUnitAdd.name}` : "Select a unit to add"}
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="mt-4 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-400"
-              >
-                Select a force from Forces to add units
-              </button>
-            )
-          }
-        />
+        {selectedUnit ? (
+          <WeaponSummary unit={selectedUnit} />
+        ) : (
+          <PageTitle
+            eyebrow="Unit database"
+            title="Units"
+            description="API-backed unit catalog loaded from generated JSON data. Select a unit to load its JSON-powered MechLab view."
+            actions={
+              selectedForceForUnitAdd ? (
+                <button
+                  type="button"
+                  onClick={() => selectedUnit && onAddUnitToForce(selectedUnit.id)}
+                  disabled={!selectedUnit || addUnitLoading}
+                  className="mt-4 w-full rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:opacity-50"
+                >
+                  {addUnitLoading ? "Adding…" : selectedUnit ? `Add ${selectedUnit.model} to ${selectedForceForUnitAdd.name}` : "Select a unit to add"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="mt-4 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-400"
+                >
+                  Select a force from Forces to add units
+                </button>
+              )
+            }
+          />
+        )}
 
         <div className="min-w-0 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-3 sm:p-4">
-          {selectedForceForUnitAdd && (
+          {!selectedUnit && selectedForceForUnitAdd && (
             <div className="mb-4 rounded-3xl border border-lime-500/20 bg-lime-500/10 p-4 text-sm text-lime-200">
               Adding units to <strong className="text-lime-100">{selectedForceForUnitAdd.name}</strong>.
               <button
@@ -168,80 +174,78 @@ export default function UnitsPage({
               </button>
             </div>
           )}
-          {addUnitError && (
+          {!selectedUnit && addUnitError && (
             <div className="mb-4 rounded-3xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{addUnitError}</div>
           )}
-          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Find / filter a chassis</div>
-              <p className="text-xs text-zinc-500">{filteredUnits.length.toLocaleString("en-US")} matching unit{filteredUnits.length === 1 ? "" : "s"}</p>
-            </div>
-            <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="shrink-0 rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:border-lime-400 hover:text-lime-300 sm:px-4 sm:text-sm"
-              >
-                Clear Filters
-              </button>
-              <div className="grid min-w-[190px] grid-cols-2 rounded-2xl border border-zinc-800 bg-zinc-950 p-1 sm:min-w-[220px]">
-                <button onClick={() => setTopMode("filters")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "filters" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Filters</button>
-                <button onClick={() => setTopMode("browse")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "browse" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Browse</button>
-              </div>
-            </div>
-          </div>
 
-          {topMode === "filters" ? (
-            <UnitToolbar
-              units={filteredUnits}
-              query={query}
-              setQuery={setQuery}
-              onSelectByModel={selectByModel}
-              typeFilter={typeFilter}
-              setTypeFilter={setTypeFilter}
-              weightFilter={weightFilter}
-              setWeightFilter={setWeightFilter}
-              eraFilter={eraFilter}
-              setEraFilter={setEraFilter}
-              rulesFilter={rulesFilter}
-              setRulesFilter={setRulesFilter}
-              roleFilter={roleFilter}
-              setRoleFilter={setRoleFilter}
-              techBaseFilter={techBaseFilter}
-              setTechBaseFilter={setTechBaseFilter}
-              filterOptions={filterOptions}
-              minTonnage={minTonnage}
-              setMinTonnage={setMinTonnage}
-              maxTonnage={maxTonnage}
-              setMaxTonnage={setMaxTonnage}
-              minBV={minBV}
-              setMinBV={setMinBV}
-              maxBV={maxBV}
-              setMaxBV={setMaxBV}
-              minCost={minCost}
-              setMinCost={setMinCost}
-              maxCost={maxCost}
-              setMaxCost={setMaxCost}
-              mobileFiltersOpen={mobileFiltersOpen}
-              setMobileFiltersOpen={setMobileFiltersOpen}
-            />
+          {selectedUnit ? (
+            <MechSummary unit={selectedUnit} panelMode={panelMode} setPanelMode={setPanelMode} onClose={onClearSelectedUnit} embedded />
           ) : (
-            <BrowseUnitList units={filteredUnits} onSelectUnit={selectUnit} compact sortBy={sortBy} setSortBy={setSortBy} />
+            <>
+              <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">{selectedPanelTitle}</div>
+                  <p className="text-xs text-zinc-500">{filteredUnits.length.toLocaleString("en-US")} matching unit{filteredUnits.length === 1 ? "" : "s"}</p>
+                </div>
+                <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="shrink-0 rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:border-lime-400 hover:text-lime-300 sm:px-4 sm:text-sm"
+                  >
+                    Clear Filters
+                  </button>
+                  <div className="grid min-w-[190px] grid-cols-2 rounded-2xl border border-zinc-800 bg-zinc-950 p-1 sm:min-w-[220px]">
+                    <button onClick={() => setTopMode("filters")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "filters" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Filters</button>
+                    <button onClick={() => setTopMode("browse")} className={`rounded-xl px-4 py-2 text-sm font-bold transition ${topMode === "browse" ? "bg-lime-400 text-zinc-950" : "text-zinc-400 hover:text-zinc-100"}`}>Browse</button>
+                  </div>
+                </div>
+              </div>
+
+              {topMode === "filters" ? (
+                <UnitToolbar
+                  units={filteredUnits}
+                  query={query}
+                  setQuery={setQuery}
+                  onSelectByModel={selectByModel}
+                  typeFilter={typeFilter}
+                  setTypeFilter={setTypeFilter}
+                  weightFilter={weightFilter}
+                  setWeightFilter={setWeightFilter}
+                  eraFilter={eraFilter}
+                  setEraFilter={setEraFilter}
+                  rulesFilter={rulesFilter}
+                  setRulesFilter={setRulesFilter}
+                  roleFilter={roleFilter}
+                  setRoleFilter={setRoleFilter}
+                  techBaseFilter={techBaseFilter}
+                  setTechBaseFilter={setTechBaseFilter}
+                  filterOptions={filterOptions}
+                  minTonnage={minTonnage}
+                  setMinTonnage={setMinTonnage}
+                  maxTonnage={maxTonnage}
+                  setMaxTonnage={setMaxTonnage}
+                  minBV={minBV}
+                  setMinBV={setMinBV}
+                  maxBV={maxBV}
+                  setMaxBV={setMaxBV}
+                  minCost={minCost}
+                  setMinCost={setMinCost}
+                  maxCost={maxCost}
+                  setMaxCost={setMaxCost}
+                  mobileFiltersOpen={mobileFiltersOpen}
+                  setMobileFiltersOpen={setMobileFiltersOpen}
+                />
+              ) : (
+                <BrowseUnitList units={filteredUnits} onSelectUnit={selectUnit} compact sortBy={sortBy} setSortBy={setSortBy} />
+              )}
+            </>
           )}
         </div>
       </div>
 
       {selectedUnit ? (
-        <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(330px,0.72fr)_minmax(0,2.28fr)] 2xl:grid-cols-[minmax(400px,0.68fr)_minmax(0,2.32fr)]">
-          <div className="min-w-0 space-y-4">
-            <MechSummary unit={selectedUnit} panelMode={panelMode} setPanelMode={setPanelMode} />
-            <WeaponSummary unit={selectedUnit} />
-          </div>
-
-          <div className="min-w-0 overflow-hidden">
-            <MechLabPanel unit={selectedUnit} panelMode={panelMode} setPanelMode={setPanelMode} onClose={onClearSelectedUnit} />
-          </div>
-        </div>
+        <MechLabPanel unit={selectedUnit} panelMode={panelMode} setPanelMode={setPanelMode} onClose={onClearSelectedUnit} />
       ) : (
         <BrowseUnitList units={filteredUnits} onSelectUnit={selectUnit} sortBy={sortBy} setSortBy={setSortBy} />
       )}
@@ -466,30 +470,55 @@ function RangePair({ label, min, max, setMin, setMax, step }: { label: string; m
   );
 }
 
-function MechSummary({ unit, panelMode, setPanelMode }: { unit: Unit; panelMode: UnitPanelMode; setPanelMode: (mode: UnitPanelMode) => void }) {
+function MechSummary({
+  unit,
+  panelMode,
+  setPanelMode,
+  onClose,
+  embedded = false,
+}: {
+  unit: Unit;
+  panelMode: UnitPanelMode;
+  setPanelMode: (mode: UnitPanelMode) => void;
+  onClose?: () => void;
+  embedded?: boolean;
+}) {
+  const engineDisplay = getEngineDisplay(unit);
+  const wrapperClassName = embedded ? "" : "rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5";
+
   return (
-    <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={wrapperClassName}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">Selected BattleMech</div>
-          <h2 className="mt-2 truncate text-4xl font-black text-zinc-50">{unit.model}</h2>
+          <h2 className="mt-2 truncate text-3xl font-black text-zinc-50 sm:text-4xl">{unit.model}</h2>
           <p className="truncate text-zinc-400">{unit.name}</p>
         </div>
-        <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 px-4 py-3 text-center">
-          <div className="text-2xl font-black text-lime-200">{Number(unit.totalBV ?? unit.bv ?? 0).toLocaleString("en-US")}</div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300/70">BV</div>
+        <div className="flex shrink-0 items-start gap-2">
+          <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 px-4 py-3 text-center">
+            <div className="text-2xl font-black text-lime-200">{Number(unit.totalBV ?? unit.bv ?? 0).toLocaleString("en-US")}</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300/70">BV</div>
+          </div>
+          {onClose && (
+            <button onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-zinc-700 bg-zinc-950 text-zinc-400 transition hover:border-lime-400 hover:text-lime-300" aria-label="Close selected BattleMech" title="Close selected BattleMech">
+              <X size={18} />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <DetailStat label="Tons" value={unit.tonnage} icon={<Weight size={15} />} />
+      <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-3">
+        <DetailStat label="Tons" value={`${unit.tonnage}t`} icon={<Weight size={15} />} />
         <DetailStat label="Movement" value={`${unit.walk}/${unit.run}/${unit.jump}`} icon={<Gauge size={15} />} />
-        <DetailStat label="Role" value={unit.role} icon={<Crosshair size={15} />} />
-        <DetailStat label="Heat" value={`${unit.heatSinks} (${unit.heatSinkType || "Single"})`} icon={<Flame size={15} />} />
-        <DetailStat label="Engine" value={unit.engine} icon={<Zap size={15} />} />
-        <DetailStat label="Rules" value={unit.rulesLevel} icon={<BookOpen size={15} />} />
+        <DetailStat label="Role" value={unit.role || "—"} icon={<Crosshair size={15} />} />
+        <DetailStat label="Heat" value={`${unit.heatSinks ?? "—"} (${unit.heatSinkType || "Single"})`} icon={<Flame size={15} />} />
+        <DetailStat label="Engine" value={engineDisplay} icon={<Zap size={15} />} />
+        <DetailStat label="Gyro Type" value={unit.gyro || "Standard"} icon={<Cpu size={15} />} />
+        <DetailStat label="Armor Type" value={unit.armorType || "Standard"} icon={<Boxes size={15} />} />
+        <DetailStat label="Structure Type" value={unit.structureType || "Standard"} icon={<Boxes size={15} />} />
+        <DetailStat label="Rules" value={unit.rulesLevel || "—"} icon={<BookOpen size={15} />} />
         <DetailStat label="Year" value={unit.year || "—"} icon={<Flag size={15} />} />
-        <DetailStat label="Tech Base" value={unit.techBase} icon={<Cpu size={15} />} />
+        <DetailStat label="Tech Base" value={unit.techBase || "—"} icon={<Cpu size={15} />} />
       </div>
 
       <button
@@ -500,6 +529,27 @@ function MechSummary({ unit, panelMode, setPanelMode }: { unit: Unit; panelMode:
       </button>
     </section>
   );
+}
+
+function getEngineDisplay(unit: Unit) {
+  const extendedUnit = unit as Unit & { engineRating?: string | number; engineType?: string };
+  const engineRating = extendedUnit.engineRating == null ? "" : String(extendedUnit.engineRating).trim();
+  const engineType = (extendedUnit.engineType ?? "").trim();
+  const engine = (unit.engine ?? "").trim();
+
+  if (engineRating && engineType) {
+    return `${engineRating} ${engineType}`;
+  }
+
+  if (engineRating && engine) {
+    return engine.includes(engineRating) ? engine : `${engineRating} ${engine}`;
+  }
+
+  if (engine && engineType) {
+    return engine.toLowerCase().includes(engineType.toLowerCase()) ? engine : `${engine} ${engineType}`;
+  }
+
+  return engineRating || engineType || engine || "—";
 }
 
 function WeaponSummary({ unit }: { unit: Unit }) {
@@ -519,11 +569,11 @@ function WeaponSummary({ unit }: { unit: Unit }) {
         {weapons.length === 0 && <div className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/50 p-4 text-sm text-zinc-500">No weapon data loaded.</div>}
         {weapons.map((weapon) => (
           <div key={weapon.id} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="font-bold text-zinc-100">{weapon.name}</div>
-              <div className="text-xs text-zinc-500">{weapon.location}</div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 font-bold text-zinc-100">{weapon.name}</div>
+              <div className="shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">{weapon.location}</div>
             </div>
-            <div className="mt-2 grid grid-cols-4 gap-2 text-xs text-zinc-400">
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-zinc-400 sm:grid-cols-4">
               <span>Dmg {weapon.damage}</span>
               <span>Heat {weapon.heat}</span>
               <span>Slots {weapon.slots}</span>
@@ -571,7 +621,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Complete record</div>
           <h3 className="mt-1 text-2xl font-black text-zinc-50">{unit.model} Full Information</h3>
         </div>
-        <Badge>{unit.detailSource ? "Generated JSON" : unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
+        <Badge>{unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : unit.detailSource) : unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "No source"}</Badge>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -597,7 +647,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
         <InfoSection
           title="Rules / Source"
           items={["Rules Level", "Tech Base", "Year", "Era", "Source File", "Source Book", "Detail Source", "MUL ID"]}
-          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.detailSource ? "Generated JSON" : "—", unit.mulId ? String(unit.mulId) : "—"]}
+          values={[unit.rulesLevel, unit.techBase, `${unit.year || "—"}`, unit.era || "", unit.relativePath ?? unit.sourceFile ?? unit.fileName ?? "—", unit.sourceBook ?? "—", unit.detailSource ? (unit.detailSource === "json" ? "Generated JSON" : unit.detailSource) : "—", unit.mulId ? String(unit.mulId) : "—"]}
         />
       </div>
     </section>
@@ -669,7 +719,7 @@ function LocationGrid({ unit }: { unit: Unit }) {
         <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="slots" compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="slots" compact />}{byId.ll && <LocationCard location={byId.ll} mode="slots" compact />}</div>
-          <div className="space-y-3 pt-10 2xl:pt-8">
+          <div className="space-y-3 -mt-4">
             {byId.head && (
               <div className="relative -top-4 2xl:-top-3">
                 <LocationCard location={byId.head} mode="slots" compact head />
@@ -708,7 +758,7 @@ function WeaponPlacementGrid({ unit }: { unit: Unit }) {
         <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
           <div className="space-y-3 pt-20 2xl:pt-10">{byId.la && <LocationCard location={byId.la} mode="weapons" weapons={weaponsFor(byId.la)} compact />}</div>
           <div className="space-y-3">{byId.lt && <LocationCard location={byId.lt} mode="weapons" weapons={weaponsFor(byId.lt)} compact />}{byId.ll && <LocationCard location={byId.ll} mode="weapons" weapons={weaponsFor(byId.ll)} compact />}</div>
-          <div className="space-y-3 pt-10 2xl:pt-8">
+          <div className="space-y-3 -mt-4">
             {byId.head && (
               <div className="relative -top-4 2xl:-top-3">
                 <LocationCard location={byId.head} mode="weapons" weapons={weaponsFor(byId.head)} compact head />

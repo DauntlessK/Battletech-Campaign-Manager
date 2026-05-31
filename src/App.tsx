@@ -421,33 +421,35 @@ export default function App() {
     if (!selectedUnitId) {
       setSelectedUnit(null);
       setSelectedUnitError(null);
-      setSelectedUnitLoading(false);
       return;
     }
 
-    // Unit details are now JSON-only.
-    // Do not call /api/units/:id here, because the old detail endpoint may fall back
-    // to scanning/parsing moved MTF files. The selected unit is taken directly from
-    // the JSON-backed catalog returned by /api/units.
-    if (unitsLoading) {
-      setSelectedUnitLoading(true);
-      setSelectedUnitError(null);
-      return;
-    }
+    const loadSelectedUnit = async () => {
+      try {
+        setSelectedUnitLoading(true);
+        setSelectedUnitError(null);
 
-    const matchingUnit = units.find((unit) => String(unit.id) === String(selectedUnitId));
+        const response = await fetch(`/api/units/${selectedUnitId}`);
 
-    if (!matchingUnit) {
-      setSelectedUnit(null);
-      setSelectedUnitLoading(false);
-      setSelectedUnitError("Selected unit was not found in the JSON unit catalog.");
-      return;
-    }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => null);
+          throw new Error(errorBody?.message ?? errorBody?.error ?? `Failed to load unit: ${response.status}`);
+        }
 
-    setSelectedUnit(normalizeCatalogUnit(matchingUnit));
-    setSelectedUnitError(null);
-    setSelectedUnitLoading(false);
-  }, [selectedUnitId, units, unitsLoading]);
+        const data = (await response.json()) as Unit;
+        setSelectedUnit(normalizeCatalogUnit(data));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to load selected unit";
+        console.error(error);
+        setSelectedUnit(null);
+        setSelectedUnitError(message);
+      } finally {
+        setSelectedUnitLoading(false);
+      }
+    };
+
+    loadSelectedUnit();
+  }, [selectedUnitId]);
 
   const navigate = (page: PageKey) => {
     setActivePage(page);
