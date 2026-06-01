@@ -45,7 +45,7 @@ export default function UnitsPage({
   onSelectUnit: (id: string) => void;
   onClearSelectedUnit: () => void;
   onSelectForceForUnitAdd: (force: Force | null) => void;
-  onAddUnitToForce: (unitId: string, forceId?: string) => void;
+  onAddUnitToForce: (unitId: string, forceId?: string, teamNumber?: number) => void;
   addUnitLoading: boolean;
   addUnitError: string | null;
 }) {
@@ -362,10 +362,11 @@ function AddUnitToForceModal({
   units: Unit[];
   forces: Force[];
   onClose: () => void;
-  onAddUnitToForce: (unitId: string, forceId?: string) => void;
+  onAddUnitToForce: (unitId: string, forceId?: string, teamNumber?: number) => void;
   addUnitLoading: boolean;
   addUnitError: string | null;
 }) {
+  const [selectedTeams, setSelectedTeams] = useState<Record<string, number>>({});
   const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
   const forceRows = forces.map((force) => {
     const currentBV = getForceCurrentBV(force, units);
@@ -474,14 +475,31 @@ function AddUnitToForceModal({
                           </ul>
                         )}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => onAddUnitToForce(unit.id, force.id)}
-                        disabled={!validation.eligible || addUnitLoading}
-                        className="shrink-0 rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none"
-                      >
-                        {addUnitLoading ? "Adding…" : "Add to this force"}
-                      </button>
+                      <div className="flex shrink-0 flex-col gap-2">
+                        {force.forConquest && (
+                          <label className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                            Team
+                            <select
+                              value={selectedTeams[force.id] ?? ""}
+                              onChange={(event) => setSelectedTeams((current) => ({ ...current, [force.id]: Number(event.target.value) }))}
+                              className="mt-1 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm normal-case tracking-normal text-zinc-100 outline-none focus:border-lime-400"
+                            >
+                              <option value="">Choose team</option>
+                              {Array.from({ length: force.combatTeamCount ?? 0 }, (_, index) => (
+                                <option key={index} value={index + 1}>{`Team ${index + 1}`}</option>
+                              ))}
+                            </select>
+                          </label>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => onAddUnitToForce(unit.id, force.id, force.forConquest ? selectedTeams[force.id] : undefined)}
+                          disabled={!validation.eligible || addUnitLoading || (force.forConquest && !selectedTeams[force.id])}
+                          className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none"
+                        >
+                          {addUnitLoading ? "Adding…" : "Add to this force"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ),
@@ -554,11 +572,11 @@ function getEraRank(value?: string) {
   if (!value || value === "All" || value === "Any" || value === "Unknown")
     return null;
   const normalized = value.toLowerCase();
+  if (normalized.includes("succession war")) return 2;
+  if (normalized.includes("republic")) return 6;
   const eraOrder = [
     "age of war",
     "star league",
-    "early succession war",
-    "late succession war",
     "clan invasion",
     "civil war",
     "jihad",
@@ -566,7 +584,8 @@ function getEraRank(value?: string) {
     "ilclan",
   ];
   const index = eraOrder.findIndex((era) => normalized.includes(era));
-  return index >= 0 ? index : null;
+  if (index < 0) return null;
+  return index >= 2 ? index + 1 : index;
 }
 
 function UnitToolbar({

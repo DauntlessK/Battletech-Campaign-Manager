@@ -24,6 +24,7 @@ import type {
   User,
   Campaign,
   Force,
+  ForceUnit,
   PendingInvite,
   NotificationItem,
   AuthMode,
@@ -247,10 +248,21 @@ export default function App() {
     }
   };
 
-  const assignUnitToForce = async (unitId: string, forceId?: string) => {
+  const replaceForceInState = (updatedForce: Force) => {
+    setForces((current) => current.map((force) => (force.id === updatedForce.id ? updatedForce : force)));
+    setForceAssignmentTarget((current) => (current?.id === updatedForce.id ? updatedForce : current));
+  };
+
+  const assignUnitToForce = async (unitId: string, forceId?: string, teamNumber?: number) => {
     const targetForceId = forceId ?? forceAssignmentTarget?.id;
     if (!targetForceId) {
       setForceAssignmentError("Select a force before adding units.");
+      return;
+    }
+
+    const targetForce = forces.find((force) => force.id === targetForceId) ?? forceAssignmentTarget;
+    if (targetForce?.forConquest && !teamNumber) {
+      setForceAssignmentError("Choose which team this unit should be added to.");
       return;
     }
 
@@ -264,7 +276,7 @@ export default function App() {
           ...authHeaders(),
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ baseUnitId: unitId }),
+        body: JSON.stringify({ baseUnitId: unitId, teamNumber }),
       });
 
       const result = await response.json();
@@ -272,12 +284,53 @@ export default function App() {
         throw new Error(result?.error || "Unable to add unit to force.");
       }
 
-      await fetchForces();
+      replaceForceInState(result as Force);
     } catch (error) {
       setForceAssignmentError(error instanceof Error ? error.message : "Unable to add unit to force.");
     } finally {
       setForceAssignmentLoading(false);
     }
+  };
+
+  const updateForceDetails = async (forceId: string, updates: { name?: string; description?: string; forceUnits?: ForceUnit[] }) => {
+    const response = await fetch(`/api/forces/${forceId}`, {
+      method: "PATCH",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(result?.error || "Unable to update force.");
+    replaceForceInState(result as Force);
+  };
+
+  const deleteForceById = async (forceId: string) => {
+    const response = await fetch(`/api/forces/${forceId}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.error || "Unable to delete force.");
+    }
+    setForces((current) => current.filter((force) => force.id !== forceId));
+    setForceAssignmentTarget((current) => (current?.id === forceId ? null : current));
+  };
+
+  const updateForceUnit = async (forceId: string, forceUnitId: string, updates: { teamNumber?: number; sortOrder?: number; pilotName?: string; gunnery?: number; piloting?: number }) => {
+    const response = await fetch(`/api/forces/${forceId}/units/${forceUnitId}`, {
+      method: "PATCH",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(result?.error || "Unable to update force unit.");
+    replaceForceInState(result as Force);
   };
 
   const fetchBattlesForCampaign = async (campaignId: string) => {
@@ -560,6 +613,8 @@ export default function App() {
               setForceAssignmentTarget(force);
               navigate("units");
             }}
+            onUpdateForce={updateForceDetails}
+            onDeleteForce={deleteForceById}
             onCreateForce={async () => {
               if (!forceName.trim()) {
                 setForceFormError("Force name is required.");

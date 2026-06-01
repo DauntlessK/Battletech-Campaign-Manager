@@ -85,6 +85,7 @@ export type Force = {
   originalForceId?: string;
   origin: ForceOrigin;
   status: ForceStatus;
+  forceUnits?: ForceUnit[];
 };
 
 export type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace";
@@ -136,6 +137,13 @@ export type ForceUnit = {
   damageDescription?: string;
   isDestroyed: boolean;
   assignedPilotId?: string;
+  teamNumber?: number;
+  sortOrder?: number;
+  pilot?: {
+    name?: string;
+    gunnery: number;
+    piloting: number;
+  };
 };
 
 export type BattleStatus = "Proposed" | "Confirmed" | "Disputed" | "Finalized";

@@ -6,6 +6,9 @@ import {
   assignForceToCampaign,
   getForceById,
   addUnitToForce,
+  updateForce,
+  deleteForce,
+  updateForceUnit,
 } from "../services/forceService";
 
 const router = express.Router();
@@ -80,6 +83,35 @@ router.get("/:id", requireAuth, async (req: RequestWithUser, res) => {
   }
 });
 
+router.patch("/:id", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const force = await updateForce(req.params.id, user.id, {
+      name: typeof req.body.name === "string" ? req.body.name : undefined,
+      description: typeof req.body.description === "string" ? req.body.description : undefined,
+      forceUnits: Array.isArray(req.body.forceUnits) ? req.body.forceUnits : undefined,
+    });
+    res.json(force);
+  } catch (error) {
+    console.error("[routes/forces] Update force failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.delete("/:id", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+    await deleteForce(req.params.id, user.id);
+    res.status(204).send();
+  } catch (error) {
+    console.error("[routes/forces] Delete force failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 router.post("/:id/units", requireAuth, async (req: RequestWithUser, res) => {
   try {
     const user = req.user;
@@ -88,10 +120,29 @@ router.post("/:id/units", requireAuth, async (req: RequestWithUser, res) => {
     const baseUnitId = req.body.baseUnitId;
     if (!baseUnitId) return res.status(400).json({ error: "baseUnitId is required." });
 
-    const forceUnit = await addUnitToForce(req.params.id, baseUnitId, user.id);
-    res.status(201).json(forceUnit);
+    const force = await addUnitToForce(req.params.id, baseUnitId, user.id, typeof req.body.teamNumber === "number" ? req.body.teamNumber : undefined);
+    res.status(201).json(force);
   } catch (error) {
     console.error("[routes/forces] Add unit failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.patch("/:id/units/:forceUnitId", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const force = await updateForceUnit(req.params.id, req.params.forceUnitId, user.id, {
+      teamNumber: typeof req.body.teamNumber === "number" ? req.body.teamNumber : undefined,
+      sortOrder: typeof req.body.sortOrder === "number" ? req.body.sortOrder : undefined,
+      pilotName: typeof req.body.pilotName === "string" ? req.body.pilotName : undefined,
+      gunnery: typeof req.body.gunnery === "number" ? req.body.gunnery : undefined,
+      piloting: typeof req.body.piloting === "number" ? req.body.piloting : undefined,
+    });
+    res.json(force);
+  } catch (error) {
+    console.error("[routes/forces] Update force unit failed:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });

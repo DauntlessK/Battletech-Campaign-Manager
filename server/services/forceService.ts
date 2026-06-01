@@ -4,6 +4,28 @@ import { getUnitDefinitionById } from "./unitLibraryService";
 import type { CampaignUnitSnapshot, Force, ForceUnit } from "../types/models";
 import type { Unit } from "../types/unit";
 
+function withForceUnits(force: Force, forceUnits: ForceUnit[]): Force {
+  return {
+    ...force,
+    forceUnits: forceUnits
+      .filter((unit) => unit.forceId === force.id)
+      .map((unit, index) => ({
+        ...unit,
+        teamNumber: unit.teamNumber ?? 1,
+        sortOrder: unit.sortOrder ?? index,
+        pilot: unit.pilot ?? { gunnery: 4, piloting: 5 },
+      }))
+      .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+  };
+}
+
+function refreshForceUnitIds(force: Force, forceUnits: ForceUnit[]) {
+  force.unitIds = forceUnits
+    .filter((unit) => unit.forceId === force.id)
+    .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+    .map((unit) => unit.baseUnitId);
+}
+
 export async function createForce(
   ownerId: string,
   name: string,
@@ -42,12 +64,14 @@ export async function createForce(
   store.forces.push(force);
   await saveStore(store);
 
-  return force;
+  return withForceUnits(force, store.forceUnits);
 }
 
 export async function listForcesForUser(ownerId: string): Promise<Force[]> {
   const store = await loadStore();
-  return store.forces.filter((f) => f.ownerId === ownerId && f.status !== "Deleted");
+  return store.forces
+    .filter((f) => f.ownerId === ownerId && f.status !== "Deleted")
+    .map((force) => withForceUnits(force, store.forceUnits));
 }
 
 export async function assignForceToCampaign(originalForceId: string, campaignId: string, assignedOwnerId: string): Promise<Force> {
@@ -68,32 +92,28 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
     updatedAt: new Date().toISOString(),
   } as Force;
 
-  // Deep-copy unit entries for campaign (if any exist)
   const originalUnits = store.forceUnits.filter((u) => u.forceId === original.id);
-  const newUnitIds: string[] = [];
-
   for (const u of originalUnits) {
     const newUnit: ForceUnit = {
       ...u,
       id: crypto.randomUUID(),
       forceId: copy.id,
+      pilot: u.pilot ?? { gunnery: 4, piloting: 5 },
     };
     store.forceUnits.push(newUnit);
-    newUnitIds.push(newUnit.id);
   }
 
-  // If original had unitIds referencing base units, keep them
-  copy.unitIds = original.unitIds ? [...original.unitIds] : [];
-
+  refreshForceUnitIds(copy, store.forceUnits);
   store.forces.push(copy);
   await saveStore(store);
 
-  return copy;
+  return withForceUnits(copy, store.forceUnits);
 }
 
 export async function getForceById(forceId: string): Promise<Force | undefined> {
   const store = await loadStore();
-  return store.forces.find((force) => force.id === forceId);
+  const force = store.forces.find((candidate) => candidate.id === forceId);
+  return force ? withForceUnits(force, store.forceUnits) : undefined;
 }
 
 function buildUnitSnapshot(unit: Unit): CampaignUnitSnapshot {
@@ -133,21 +153,23 @@ function buildUnitSnapshot(unit: Unit): CampaignUnitSnapshot {
   };
 }
 
-export async function addUnitToForce(forceId: string, baseUnitId: string, ownerId: string): Promise<ForceUnit> {
+export async function addUnitToForce(forceId: string, baseUnitId: string, ownerId: string, teamNumber?: number): Promise<Force> {
   const store = await loadStore();
   const force = store.forces.find((f) => f.id === forceId);
   if (!force) throw new Error("Force not found.");
   if (force.ownerId !== ownerId) throw new Error("You do not have permission to edit this force.");
   if (force.origin !== "UserCreated") throw new Error("Units can only be added to original user forces.");
-  if (force.unitIds.includes(baseUnitId)) throw new Error("This unit is already part of the force.");
+
+  const normalizedTeam = force.forConquest ? Math.max(1, Math.min(Number(force.combatTeamCount ?? 1), Number(teamNumber ?? 0))) : undefined;
+  if (force.forConquest && !normalizedTeam) throw new Error("Choose which team this unit should be added to.");
 
   const unit = await getUnitDefinitionById(baseUnitId);
   if (!unit) throw new Error("Unit definition not found.");
 
-  force.unitIds = [...force.unitIds, baseUnitId];
-  force.updatedAt = new Date().toISOString();
-
   const unitSnapshot = buildUnitSnapshot(unit);
+  const sameTeamUnits = store.forceUnits.filter((entry) => entry.forceId === force.id && (entry.teamNumber ?? 1) === (normalizedTeam ?? 1));
+  const nextSortOrder = sameTeamUnits.length ? Math.max(...sameTeamUnits.map((entry) => entry.sortOrder ?? 0)) + 1 : 0;
+
   const newForceUnit: ForceUnit = {
     id: crypto.randomUUID(),
     forceId: force.id,
@@ -157,10 +179,137 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
     status: "Available",
     kills: 0,
     isDestroyed: false,
+    teamNumber: normalizedTeam,
+    sortOrder: nextSortOrder,
+    pilot: { gunnery: 4, piloting: 5 },
   };
 
   store.forceUnits.push(newForceUnit);
+  refreshForceUnitIds(force, store.forceUnits);
+  force.updatedAt = new Date().toISOString();
   await saveStore(store);
 
-  return newForceUnit;
+  return withForceUnits(force, store.forceUnits);
+}
+
+export async function updateForce(
+  forceId: string,
+  ownerId: string,
+  updates: { name?: string; description?: string; forceUnits?: Partial<ForceUnit>[] }
+): Promise<Force> {
+  const store = await loadStore();
+  const force = store.forces.find((candidate) => candidate.id === forceId);
+  if (!force) throw new Error("Force not found.");
+  if (force.ownerId !== ownerId) throw new Error("You do not have permission to edit this force.");
+  if (force.origin !== "UserCreated") throw new Error("Only original user forces can be edited here.");
+
+  if (updates.name !== undefined) {
+    const name = updates.name.trim();
+    if (!name) throw new Error("Force name is required.");
+    force.name = name;
+  }
+  if (updates.description !== undefined) force.description = updates.description;
+
+  if (updates.forceUnits) {
+    const maxTeamNumber = Math.max(1, Number(force.combatTeamCount ?? 1));
+    const sanitizedForceUnits: ForceUnit[] = [];
+
+    for (const [index, incoming] of updates.forceUnits.entries()) {
+      const baseUnitId = typeof incoming.baseUnitId === "string" ? incoming.baseUnitId : incoming.snapshot?.id;
+      if (!baseUnitId) continue;
+
+      const existing = store.forceUnits.find((candidate) => candidate.id === incoming.id && candidate.forceId === forceId);
+      const sourceUnit = existing?.snapshot ? null : await getUnitDefinitionById(baseUnitId).catch(() => null);
+      const snapshot = existing?.snapshot ?? (sourceUnit
+        ? {
+            id: sourceUnit.id,
+            name: sourceUnit.name,
+            model: sourceUnit.model,
+            chassis: sourceUnit.chassis,
+            type: sourceUnit.type as CampaignUnitSnapshot["type"],
+            techBase: sourceUnit.techBase,
+            era: sourceUnit.era,
+            year: sourceUnit.year,
+            tonnage: sourceUnit.tonnage,
+            weightClass: sourceUnit.weightClass,
+            totalBV: Number(sourceUnit.totalBV ?? sourceUnit.bv ?? 0),
+            role: sourceUnit.role,
+            weapons: sourceUnit.weapons ?? [],
+            locations: sourceUnit.locations ?? [],
+          }
+        : incoming.snapshot);
+
+      if (!snapshot) continue;
+
+      const incomingTeamNumber = Number(incoming.teamNumber ?? existing?.teamNumber ?? 1);
+      const normalizedTeamNumber = force.forConquest ? Math.max(1, Math.min(maxTeamNumber, incomingTeamNumber)) : 1;
+      const incomingPilot = incoming.pilot ?? existing?.pilot ?? { gunnery: 4, piloting: 5 };
+
+      sanitizedForceUnits.push({
+        id: typeof incoming.id === "string" && !incoming.id.startsWith("draft-") ? incoming.id : crypto.randomUUID(),
+        forceId,
+        baseUnitId,
+        snapshot,
+        currentBV: Number(incoming.currentBV ?? existing?.currentBV ?? snapshot.totalBV ?? 0),
+        status: incoming.status ?? existing?.status ?? "Available",
+        kills: Number(incoming.kills ?? existing?.kills ?? 0),
+        damageDescription: incoming.damageDescription ?? existing?.damageDescription,
+        isDestroyed: Boolean(incoming.isDestroyed ?? existing?.isDestroyed ?? false),
+        assignedPilotId: incoming.assignedPilotId ?? existing?.assignedPilotId,
+        teamNumber: normalizedTeamNumber,
+        sortOrder: Number(incoming.sortOrder ?? index),
+        pilot: {
+          name: incomingPilot.name,
+          gunnery: Number(incomingPilot.gunnery ?? 4),
+          piloting: Number(incomingPilot.piloting ?? 5),
+        },
+      });
+    }
+
+    store.forceUnits = store.forceUnits.filter((forceUnit) => forceUnit.forceId !== forceId).concat(sanitizedForceUnits);
+    refreshForceUnitIds(force, store.forceUnits);
+  }
+
+  force.updatedAt = new Date().toISOString();
+  await saveStore(store);
+  return withForceUnits(force, store.forceUnits);
+}
+
+export async function deleteForce(forceId: string, ownerId: string): Promise<void> {
+  const store = await loadStore();
+  const force = store.forces.find((candidate) => candidate.id === forceId);
+  if (!force) throw new Error("Force not found.");
+  if (force.ownerId !== ownerId) throw new Error("You do not have permission to delete this force.");
+  if (force.origin !== "UserCreated") throw new Error("Only original user forces can be deleted here.");
+  force.status = "Deleted";
+  force.updatedAt = new Date().toISOString();
+  await saveStore(store);
+}
+
+export async function updateForceUnit(forceId: string, forceUnitId: string, ownerId: string, updates: { teamNumber?: number; sortOrder?: number; pilotName?: string; gunnery?: number; piloting?: number }): Promise<Force> {
+  const store = await loadStore();
+  const force = store.forces.find((candidate) => candidate.id === forceId);
+  if (!force) throw new Error("Force not found.");
+  if (force.ownerId !== ownerId) throw new Error("You do not have permission to edit this force.");
+  if (force.origin !== "UserCreated") throw new Error("Only original user forces can be edited here.");
+
+  const forceUnit = store.forceUnits.find((candidate) => candidate.id === forceUnitId && candidate.forceId === forceId);
+  if (!forceUnit) throw new Error("Force unit not found.");
+
+  if (updates.teamNumber !== undefined) {
+    forceUnit.teamNumber = Math.max(1, Math.min(Number(force.combatTeamCount ?? 1), Number(updates.teamNumber)));
+  }
+  if (updates.sortOrder !== undefined) forceUnit.sortOrder = Number(updates.sortOrder);
+  if (updates.pilotName !== undefined || updates.gunnery !== undefined || updates.piloting !== undefined) {
+    forceUnit.pilot = {
+      name: updates.pilotName ?? forceUnit.pilot?.name,
+      gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : forceUnit.pilot?.gunnery ?? 4,
+      piloting: updates.piloting !== undefined ? Number(updates.piloting) : forceUnit.pilot?.piloting ?? 5,
+    };
+  }
+
+  refreshForceUnitIds(force, store.forceUnits);
+  force.updatedAt = new Date().toISOString();
+  await saveStore(store);
+  return withForceUnits(force, store.forceUnits);
 }

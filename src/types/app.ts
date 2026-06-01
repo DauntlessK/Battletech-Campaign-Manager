@@ -128,6 +128,37 @@ export type Campaign = {
   updatedAt?: string;
 };
 
+export type ForceUnit = {
+  id: string;
+  forceId: string;
+  baseUnitId: string;
+  snapshot?: {
+    id: string;
+    name: string;
+    model: string;
+    chassis: string;
+    type?: string;
+    techBase?: string;
+    era?: string;
+    year?: number;
+    tonnage?: number;
+    weightClass?: string;
+    totalBV?: number;
+    role?: string;
+  };
+  currentBV: number;
+  status?: string;
+  kills?: number;
+  isDestroyed?: boolean;
+  teamNumber?: number;
+  sortOrder?: number;
+  pilot?: {
+    name?: string;
+    gunnery: number;
+    piloting: number;
+  };
+};
+
 export type Force = {
   id: string;
   name: string;
@@ -142,6 +173,7 @@ export type Force = {
   combatTeamCount?: number;
   combatTeamBV?: number;
   unitIds?: string[];
+  forceUnits?: ForceUnit[];
   createdAt?: string;
   updatedAt?: string;
   campaignId?: string;
