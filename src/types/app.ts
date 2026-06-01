@@ -117,15 +117,41 @@ export type User = {
   updatedAt: string;
 };
 
+export type CampaignType = "Chaos" | "Advanced" | "Conquest" | string;
+export type CampaignStatus = "Setup" | "Active" | "Paused" | "Completed" | "Archived" | string;
+export type ObjectiveControlType = "Binary" | "Percentage" | string;
+export type ResourceBalance = Partial<Record<"CBills" | "RepairPoints" | "Warchest" | "Time" | "Salvage" | string, number>>;
+
+export type CampaignSettings = {
+  type: CampaignType;
+  scoringMethod?: string;
+  era: string;
+  rulesLevel: string;
+  forceBVLimit: number;
+  factionRestriction?: string;
+  maxPlayers?: number;
+  maxTurnsAhead?: number;
+  maxTurns?: number;
+  combatTeamRules?: boolean;
+  combatTeamBVLimit?: number;
+  combatTeamSize?: number;
+  objectiveControlType?: ObjectiveControlType;
+  salariesEnabled?: boolean;
+  startingResources?: ResourceBalance;
+  victoryConditions?: string[];
+};
+
 export type Campaign = {
   id: string;
   name: string;
   description?: string;
   ownerId: string;
-  status?: string;
-  settings?: Record<string, unknown>;
+  status?: CampaignStatus;
+  settings?: CampaignSettings;
   createdAt?: string;
   updatedAt?: string;
+  startDate?: string;
+  finishDate?: string;
 };
 
 export type ForceUnit = {

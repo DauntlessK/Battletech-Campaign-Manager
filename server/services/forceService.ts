@@ -26,6 +26,98 @@ function refreshForceUnitIds(force: Force, forceUnits: ForceUnit[]) {
     .map((unit) => unit.baseUnitId);
 }
 
+function getRulesRank(value?: string) {
+  if (!value || value === "All" || value === "Any" || value === "Unknown") return null;
+  const normalized = value.toLowerCase();
+  const order = ["introductory", "standard", "advanced", "experimental", "unofficial"];
+  const index = order.findIndex((entry) => normalized.includes(entry));
+  return index >= 0 ? index : null;
+}
+
+function getEraRank(value?: string) {
+  if (!value || value === "All" || value === "Any" || value === "Unknown") return null;
+  const normalized = value.toLowerCase();
+  if (normalized.includes("succession war")) return 2;
+  if (normalized.includes("republic")) return 6;
+  const eraOrder = ["age of war", "star league", "clan invasion", "civil war", "jihad", "dark age", "ilclan"];
+  const index = eraOrder.findIndex((era) => normalized.includes(era));
+  if (index < 0) return null;
+  return index >= 2 ? index + 1 : index;
+}
+
+function getUnitBV(unit: Unit) {
+  return Number(unit.totalBV ?? 0);
+}
+
+function getForceUnitBV(forceUnit: ForceUnit) {
+  return Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0);
+}
+
+function teamBVTotal(forceUnits: ForceUnit[], teamNumber: number) {
+  return forceUnits
+    .filter((forceUnit) => (forceUnit.teamNumber ?? 1) === teamNumber)
+    .reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+}
+
+function validateUnitAgainstForce(force: Force, unit: Unit, existingForceUnits: ForceUnit[], targetTeamNumber?: number) {
+  const reasons: string[] = [];
+  const unitBV = getUnitBV(unit);
+  const forceBVLimit = Number(force.totalBV ?? 0);
+  const currentBV = existingForceUnits.reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+
+  if (forceBVLimit > 0 && currentBV + unitBV > forceBVLimit) {
+    reasons.push(`Adding this unit would exceed the force BV limit by ${(currentBV + unitBV - forceBVLimit).toLocaleString("en-US")} BV.`);
+  }
+
+  if (force.forConquest) {
+    const teamBVLimit = Number(force.combatTeamBV ?? 0);
+    const teamNumber = targetTeamNumber ?? 1;
+    const currentTeamBV = teamBVTotal(existingForceUnits, teamNumber);
+    if (teamBVLimit > 0 && currentTeamBV + unitBV > teamBVLimit) {
+      reasons.push(`Adding this unit would exceed Team ${teamNumber}'s BV limit by ${(currentTeamBV + unitBV - teamBVLimit).toLocaleString("en-US")} BV.`);
+    }
+  }
+
+  const forceRulesRank = getRulesRank(force.rulesLevel);
+  const unitRulesRank = getRulesRank(unit.rulesLevel);
+  if (forceRulesRank !== null && unitRulesRank !== null && unitRulesRank > forceRulesRank) {
+    reasons.push(`${unit.rulesLevel} units are above this force's ${force.rulesLevel} rules level.`);
+  }
+
+  const forceEraRank = getEraRank(force.era);
+  const unitEraRank = getEraRank(unit.era);
+  if (forceEraRank !== null && unitEraRank !== null && unitEraRank > forceEraRank) {
+    reasons.push(`${unit.era || "This unit's era"} is later than this force's ${force.era} era.`);
+  }
+
+  if (reasons.length) throw new Error(reasons.join(" "));
+}
+
+function validateForceUnitRoster(force: Force, forceUnits: ForceUnit[]) {
+  const reasons: string[] = [];
+  const forceBVLimit = Number(force.totalBV ?? 0);
+  const totalBV = forceUnits.reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+
+  if (forceBVLimit > 0 && totalBV > forceBVLimit) {
+    reasons.push(`This force exceeds its total BV limit by ${(totalBV - forceBVLimit).toLocaleString("en-US")} BV.`);
+  }
+
+  if (force.forConquest) {
+    const teamBVLimit = Number(force.combatTeamBV ?? 0);
+    const teamCount = Math.max(1, Number(force.combatTeamCount ?? 1));
+    if (teamBVLimit > 0) {
+      for (let teamNumber = 1; teamNumber <= teamCount; teamNumber += 1) {
+        const total = teamBVTotal(forceUnits, teamNumber);
+        if (total > teamBVLimit) {
+          reasons.push(`Team ${teamNumber} exceeds its BV limit by ${(total - teamBVLimit).toLocaleString("en-US")} BV.`);
+        }
+      }
+    }
+  }
+
+  if (reasons.length) throw new Error(reasons.join(" "));
+}
+
 export async function createForce(
   ownerId: string,
   name: string,
@@ -166,6 +258,8 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
   const unit = await getUnitDefinitionById(baseUnitId);
   if (!unit) throw new Error("Unit definition not found.");
 
+  validateUnitAgainstForce(force, unit, store.forceUnits.filter((entry) => entry.forceId === force.id), normalizedTeam ?? 1);
+
   const unitSnapshot = buildUnitSnapshot(unit);
   const sameTeamUnits = store.forceUnits.filter((entry) => entry.forceId === force.id && (entry.teamNumber ?? 1) === (normalizedTeam ?? 1));
   const nextSortOrder = sameTeamUnits.length ? Math.max(...sameTeamUnits.map((entry) => entry.sortOrder ?? 0)) + 1 : 0;
@@ -266,6 +360,8 @@ export async function updateForce(
       });
     }
 
+    validateForceUnitRoster(force, sanitizedForceUnits);
+
     store.forceUnits = store.forceUnits.filter((forceUnit) => forceUnit.forceId !== forceId).concat(sanitizedForceUnits);
     refreshForceUnitIds(force, store.forceUnits);
   }
@@ -308,6 +404,7 @@ export async function updateForceUnit(forceId: string, forceUnitId: string, owne
     };
   }
 
+  validateForceUnitRoster(force, store.forceUnits.filter((entry) => entry.forceId === force.id));
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);

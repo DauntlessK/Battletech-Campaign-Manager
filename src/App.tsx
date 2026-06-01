@@ -23,6 +23,7 @@ import type {
   Unit,
   User,
   Campaign,
+  CampaignSettings,
   Force,
   ForceUnit,
   PendingInvite,
@@ -52,6 +53,8 @@ export default function App() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [campaignsLoading, setCampaignsLoading] = useState(false);
   const [campaignsError, setCampaignsError] = useState<string | null>(null);
+  const [campaignFormLoading, setCampaignFormLoading] = useState(false);
+  const [campaignFormError, setCampaignFormError] = useState<string | null>(null);
   const [forces, setForces] = useState<Force[]>([]);
   const [forcesLoading, setForcesLoading] = useState(false);
   const [forcesError, setForcesError] = useState<string | null>(null);
@@ -222,6 +225,35 @@ export default function App() {
       setCampaignsError(error instanceof Error ? error.message : "Unable to load campaigns.");
     } finally {
       setCampaignsLoading(false);
+    }
+  };
+
+  const createCampaignForUser = async (payload: { name: string; description?: string; settings: CampaignSettings }): Promise<Campaign | null> => {
+    setCampaignFormLoading(true);
+    setCampaignFormError(null);
+
+    try {
+      const response = await fetch("/api/campaigns", {
+        method: "POST",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to create campaign.");
+      }
+
+      const createdCampaign = result as Campaign;
+      setCampaigns((current) => [createdCampaign, ...current]);
+      return createdCampaign;
+    } catch (error) {
+      setCampaignFormError(error instanceof Error ? error.message : "Unable to create campaign.");
+      return null;
+    } finally {
+      setCampaignFormLoading(false);
     }
   };
 
@@ -673,8 +705,12 @@ export default function App() {
           <CampaignsPage
             authUser={authUser}
             campaigns={campaigns}
+            forces={forces}
             loading={campaignsLoading}
             error={campaignsError}
+            createLoading={campaignFormLoading}
+            createError={campaignFormError}
+            onCreateCampaign={createCampaignForUser}
           />
         )}
         {activePage === "battles" && (

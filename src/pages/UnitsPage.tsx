@@ -21,6 +21,7 @@ import type {
   UnitPanelMode,
   UnitWeapon,
   Force,
+  ForceUnit,
 } from "../types/app";
 import PageTitle from "../components/PageTitle";
 import { ERA_OPTIONS, RULE_OPTIONS } from "../constants/appOptions";
@@ -371,7 +372,7 @@ function AddUnitToForceModal({
   const forceRows = forces.map((force) => {
     const currentBV = getForceCurrentBV(force, units);
     const remainingBV = Math.max(0, Number(force.totalBV ?? 0) - currentBV);
-    const validation = getForceEligibility(force, unit, units);
+    const validation = getForceEligibility(force, unit, units, selectedTeams[force.id]);
     return { force, currentBV, remainingBV, validation };
   });
   const eligibleCount = forceRows.filter(
@@ -485,9 +486,10 @@ function AddUnitToForceModal({
                               className="mt-1 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm normal-case tracking-normal text-zinc-100 outline-none focus:border-lime-400"
                             >
                               <option value="">Choose team</option>
-                              {Array.from({ length: force.combatTeamCount ?? 0 }, (_, index) => (
-                                <option key={index} value={index + 1}>{`Team ${index + 1}`}</option>
-                              ))}
+                              {Array.from({ length: force.combatTeamCount ?? 0 }, (_, index) => {
+                                const teamNumber = index + 1;
+                                return <option key={index} value={teamNumber}>{`Team ${teamNumber} — ${getForceTeamBV(force, teamNumber).toLocaleString("en-US")} / ${Number(force.combatTeamBV ?? 0).toLocaleString("en-US")} BV`}</option>;
+                              })}
                             </select>
                           </label>
                         )}
@@ -512,7 +514,15 @@ function AddUnitToForceModal({
   );
 }
 
+function getForceUnitBV(forceUnit: ForceUnit) {
+  return Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0);
+}
+
 function getForceCurrentBV(force: Force, units: Unit[]) {
+  if (force.forceUnits?.length) {
+    return force.forceUnits.reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+  }
+
   const unitMap = new Map(units.map((candidate) => [candidate.id, candidate]));
   return (force.unitIds ?? []).reduce((total, unitId) => {
     const existingUnit = unitMap.get(unitId);
@@ -520,7 +530,13 @@ function getForceCurrentBV(force: Force, units: Unit[]) {
   }, 0);
 }
 
-function getForceEligibility(force: Force, unit: Unit, units: Unit[]) {
+function getForceTeamBV(force: Force, teamNumber: number) {
+  return (force.forceUnits ?? [])
+    .filter((forceUnit) => (forceUnit.teamNumber ?? 1) === teamNumber)
+    .reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+}
+
+function getForceEligibility(force: Force, unit: Unit, units: Unit[], targetTeamNumber?: number) {
   const reasons: string[] = [];
   const currentBV = getForceCurrentBV(force, units);
   const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
@@ -530,6 +546,16 @@ function getForceEligibility(force: Force, unit: Unit, units: Unit[]) {
     reasons.push(
       `Adding this unit would exceed the force BV limit by ${(currentBV + unitBV - forceBVLimit).toLocaleString("en-US")} BV.`,
     );
+  }
+
+  if (force.forConquest && targetTeamNumber) {
+    const teamBVLimit = Number(force.combatTeamBV ?? 0);
+    const currentTeamBV = getForceTeamBV(force, targetTeamNumber);
+    if (teamBVLimit > 0 && currentTeamBV + unitBV > teamBVLimit) {
+      reasons.push(
+        `Adding this unit would exceed Team ${targetTeamNumber}'s BV limit by ${(currentTeamBV + unitBV - teamBVLimit).toLocaleString("en-US")} BV.`,
+      );
+    }
   }
 
   const forceRulesRank = getRulesRank(force.rulesLevel);

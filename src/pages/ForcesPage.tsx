@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import type { Force, ForceUnit, Unit, User } from "../types/app";
 import PageTitle from "../components/PageTitle";
+import { X } from "lucide-react";
 import { ERA_OPTIONS, RULE_OPTIONS, FACTION_OPTIONS, getTeamLabel } from "../constants/appOptions";
 import { normalizeEra } from "../utils/unitNormalization";
 
@@ -31,12 +32,21 @@ function getEraRank(value?: string) {
   return index >= 2 ? index + 1 : index;
 }
 
-function getForceEligibility(force: Force, unit: Unit, currentBV: number) {
+function getForceEligibility(force: Force, unit: Unit, currentBV: number, currentForceUnits: ForceUnit[] = [], targetTeamNumber?: number) {
   const reasons: string[] = [];
   const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
   const forceBVLimit = Number(force.totalBV ?? 0);
   if (forceBVLimit > 0 && currentBV + unitBV > forceBVLimit) {
     reasons.push(`Adding this unit would exceed the force BV limit by ${(currentBV + unitBV - forceBVLimit).toLocaleString("en-US")} BV.`);
+  }
+
+  if (force.forConquest) {
+    const teamLimit = Number(force.combatTeamBV ?? 0);
+    const teamNumber = targetTeamNumber ?? 1;
+    const teamCurrentBV = teamBVTotal(currentForceUnits, teamNumber);
+    if (teamLimit > 0 && teamCurrentBV + unitBV > teamLimit) {
+      reasons.push(`Adding this unit would exceed ${getTeamLabel(force.faction ?? "")} ${teamNumber}'s BV limit by ${(teamCurrentBV + unitBV - teamLimit).toLocaleString("en-US")} BV.`);
+    }
   }
 
   const forceRulesRank = getRulesRank(force.rulesLevel);
@@ -54,11 +64,50 @@ function getForceEligibility(force: Force, unit: Unit, currentBV: number) {
   return { eligible: reasons.length === 0, reasons };
 }
 
+function getForceUnitBV(forceUnit: ForceUnit) {
+  return Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0);
+}
+
 function forceUnitBVTotal(force: Force) {
   if (force.forceUnits?.length) {
-    return force.forceUnits.reduce((total, forceUnit) => total + Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0), 0);
+    return force.forceUnits.reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
   }
   return 0;
+}
+
+function forceUnitsBVTotal(forceUnits: ForceUnit[] = []) {
+  return forceUnits.reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+}
+
+function teamBVTotal(forceUnits: ForceUnit[] = [], teamNumber: number) {
+  return forceUnits
+    .filter((forceUnit) => (forceUnit.teamNumber ?? 1) === teamNumber)
+    .reduce((total, forceUnit) => total + getForceUnitBV(forceUnit), 0);
+}
+
+function validateForceRoster(force: Force, forceUnits: ForceUnit[]) {
+  const reasons: string[] = [];
+  const forceBVLimit = Number(force.totalBV ?? 0);
+  const totalBV = forceUnitsBVTotal(forceUnits);
+
+  if (forceBVLimit > 0 && totalBV > forceBVLimit) {
+    reasons.push(`This force exceeds its total BV limit by ${(totalBV - forceBVLimit).toLocaleString("en-US")} BV.`);
+  }
+
+  if (force.forConquest) {
+    const teamLimit = Number(force.combatTeamBV ?? 0);
+    const teamCount = Math.max(1, Number(force.combatTeamCount ?? 1));
+    if (teamLimit > 0) {
+      for (let teamNumber = 1; teamNumber <= teamCount; teamNumber += 1) {
+        const total = teamBVTotal(forceUnits, teamNumber);
+        if (total > teamLimit) {
+          reasons.push(`${getTeamLabel(force.faction ?? "")} ${teamNumber} exceeds its BV limit by ${(total - teamLimit).toLocaleString("en-US")} BV.`);
+        }
+      }
+    }
+  }
+
+  return { valid: reasons.length === 0, reasons };
 }
 
 function getDisplayForceUnits(force: Force, units?: Unit[]): ForceUnit[] {
@@ -311,7 +360,9 @@ export default function ForcesPage({
   const selectedForceUnits = selectedForce ? sortForceUnitsForDisplay(selectedForce.forceUnits ?? getDisplayForceUnits(selectedForce, units)) : [];
   const selectedForceBV = selectedForce ? selectedForceUnits.reduce((total, forceUnit) => total + Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0), 0) : 0;
   const selectedAddUnit = selectedAddUnitId ? units?.find((unit) => unit.id === selectedAddUnitId) ?? null : null;
-  const selectedAddValidation = selectedForce && selectedAddUnit ? getForceEligibility(selectedForce, selectedAddUnit, selectedForceBV) : { eligible: true, reasons: [] };
+  const selectedAddValidation = selectedForce && selectedAddUnit ? getForceEligibility(selectedForce, selectedAddUnit, selectedForceBV, selectedForceUnits, selectedForce.forConquest ? selectedAddTeam : 1) : { eligible: true, reasons: [] };
+  const draftForceValidation = selectedForce ? validateForceRoster(selectedForce, selectedForceUnits) : { valid: true, reasons: [] };
+  const hasAddUnitSearch = addUnitSearch.trim().length > 0;
 
   useEffect(() => {
     if (!selectedSavedForce) {
@@ -328,10 +379,11 @@ export default function ForcesPage({
   const filteredAddUnitOptions = useMemo(() => {
     if (!units) return [];
     const query = addUnitSearch.trim().toLowerCase();
+    if (!query) return [];
     return units
       .filter((unit) => {
         const searchable = `${unit.name} ${unit.model} ${unit.chassis}`.toLowerCase();
-        return !query || searchable.includes(query);
+        return searchable.includes(query);
       })
       .slice(0, 50);
   }, [addUnitSearch, units]);
@@ -416,6 +468,11 @@ export default function ForcesPage({
 
   const handleSaveForce = async () => {
     if (!draftForce) return;
+    const rosterValidation = validateForceRoster(draftForce, sortForceUnitsForDisplay(draftForce.forceUnits ?? []));
+    if (!rosterValidation.valid) {
+      setActionError(rosterValidation.reasons.join(" "));
+      return;
+    }
     setActionError(null);
     setSaveLoading(true);
     try {
@@ -451,7 +508,7 @@ export default function ForcesPage({
         <button type="button" onClick={() => setShowCreateModal(true)} className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300">New Force</button>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -475,8 +532,13 @@ export default function ForcesPage({
                   <div key={force.id} onClick={() => setSelectedForceId(force.id)} className={`cursor-pointer rounded-3xl border p-5 transition ${selectedForceId === force.id ? "border-lime-400/60 bg-lime-400/10" : "border-zinc-800 bg-zinc-950/70 hover:border-zinc-700 hover:bg-zinc-900/80"}`}>
                     <div className="flex flex-col gap-3">
                       <div>
-                        <div className="text-xs font-semibold uppercase tracking-[0.16em] text-lime-300">{isCampaignForce(force) ? "Campaign Force" : "Original Force"}</div>
-                        <div className="mt-1 text-lg font-black text-zinc-50">{force.name}</div>
+                        <div className="text-lg font-black text-zinc-50">{force.name}</div>
+                        <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
+                          <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-zinc-300">{force.era ?? "Any era"}</span>
+                          <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-zinc-300">{force.rulesLevel ?? "Standard"}</span>
+                          {force.forConquest && <span className="rounded-full border border-lime-400/40 bg-lime-400/10 px-2.5 py-1 text-lime-200">Conquest</span>}
+                          {isCampaignForce(force) && <span className="rounded-full border border-sky-400/40 bg-sky-400/10 px-2.5 py-1 text-sky-200">Campaign</span>}
+                        </div>
                       </div>
                       <div className="flex items-center justify-between gap-2 text-xs text-zinc-400">
                         <span>{force.forceUnits?.length ?? force.unitIds?.length ?? 0} units</span>
@@ -505,14 +567,27 @@ export default function ForcesPage({
                   <textarea value={selectedForce.description ?? ""} onChange={(event) => updateDraftForce((force) => ({ ...force, description: event.target.value }))} rows={2} placeholder="No description provided." className="mt-3 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-300 outline-none focus:border-lime-400" />
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
-                  <button type="button" onClick={handleSaveForce} disabled={!hasUnsavedChanges || saveLoading} className="rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50">{saveLoading ? "Saving…" : "Save Changes"}</button>
+                  <button type="button" onClick={handleSaveForce} disabled={!hasUnsavedChanges || saveLoading || !draftForceValidation.valid} className="rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50">{saveLoading ? "Saving…" : "Save Changes"}</button>
                   <button type="button" onClick={handleDiscardChanges} disabled={!hasUnsavedChanges || saveLoading} className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-semibold text-zinc-100 transition hover:border-lime-400 hover:text-lime-50 disabled:cursor-not-allowed disabled:opacity-50">Discard</button>
                   <button type="button" onClick={async () => { if (!confirm(`Delete ${selectedForce.name}?`)) return; setActionError(null); try { await onDeleteForce(selectedForce.id); setSelectedForceId(null); } catch (error) { setActionError(error instanceof Error ? error.message : "Unable to delete force."); } }} className="rounded-2xl border border-red-500/40 bg-red-950/30 px-4 py-2 text-sm font-semibold text-red-200 transition hover:border-red-400">Delete</button>
-                  <button type="button" onClick={() => setSelectedForceId(null)} className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-semibold text-zinc-100 transition hover:border-lime-400 hover:text-lime-50">Deselect</button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedForceId(null)}
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-zinc-700 bg-zinc-950 text-zinc-400 transition hover:border-lime-400 hover:text-lime-300"
+                    aria-label="Close selected force"
+                    title="Close selected force"
+                  >
+                    <X size={18} />
+                  </button>
                 </div>
               </div>
 
               {hasUnsavedChanges && <div className="rounded-3xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">You have unsaved force changes. Drag/drop, pilot edits, team changes, and added units are local until you click Save Changes.</div>}
+              {!draftForceValidation.valid && (
+                <ul className="rounded-3xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">
+                  {draftForceValidation.reasons.map((reason) => <li key={reason}>• {reason}</li>)}
+                </ul>
+              )}
               {actionError && <div className="rounded-3xl border border-red-500/40 bg-red-950/30 p-4 text-sm text-red-200">{actionError}</div>}
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -544,7 +619,7 @@ export default function ForcesPage({
                         <div key={teamNumber} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); handleDropInTeam(teamNumber); }} className="rounded-3xl border border-zinc-800 bg-zinc-900/80 p-4">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">{getTeamLabel(selectedForce.faction ?? forceFaction)} {teamNumber}</div>
-                            <div className="text-xs text-zinc-500">Drop units here</div>
+                            <div className="text-xs text-zinc-500">{formatNumber(teamBVTotal(teamUnits, teamNumber))} / {formatNumber(selectedForce.combatTeamBV)} BV · Drop units here</div>
                           </div>
                           <div className="mt-4 space-y-3">
                             {teamUnits.length === 0 ? (
@@ -614,10 +689,10 @@ export default function ForcesPage({
 
             <div className="space-y-5">
               <label className="block text-sm font-semibold text-zinc-200">Search chassis, model, or name<input value={addUnitSearch} onChange={(event) => setAddUnitSearch(event.target.value)} placeholder="Search for a unit..." className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4" /></label>
-              <label className="block text-sm font-semibold text-zinc-200">Choose unit<select value={selectedAddUnitId ?? ""} onChange={(event) => setSelectedAddUnitId(event.target.value || null)} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4"><option value="">Select a unit</option>{filteredAddUnitOptions.map((unit) => <option key={unit.id} value={unit.id}>{unit.chassis} {unit.model} — {unit.name}</option>)}</select></label>
+              <label className="block text-sm font-semibold text-zinc-200">Choose unit<select value={selectedAddUnitId ?? ""} disabled={!hasAddUnitSearch} onChange={(event) => setSelectedAddUnitId(event.target.value || null)} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50"><option value="">{hasAddUnitSearch ? "Select a unit" : "Search first to choose a unit"}</option>{filteredAddUnitOptions.map((unit) => <option key={unit.id} value={unit.id}>{unit.chassis} {unit.model} — {unit.name}</option>)}</select></label>
               {selectedForce.forConquest && <label className="block text-sm font-semibold text-zinc-200">Assign to {addUnitLabel.toLowerCase()}<select value={selectedAddTeam} onChange={(event) => setSelectedAddTeam(Number(event.target.value))} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4">{Array.from({ length: selectedForce.combatTeamCount ?? 0 }, (_, index) => <option key={index} value={index + 1}>{`${addUnitLabel} ${index + 1}`}</option>)}</select></label>}
               {!selectedAddValidation.eligible && <ul className="rounded-3xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">{selectedAddValidation.reasons.map((reason) => <li key={reason}>• {reason}</li>)}</ul>}
-              <div className="flex gap-3 pt-4"><button type="button" onClick={() => setShowAddUnitModal(false)} className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-zinc-600 hover:text-zinc-100">Cancel</button><button type="button" onClick={handleAddUnitToDraft} disabled={!selectedAddUnitId || !selectedAddValidation.eligible} className="flex-1 rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:opacity-50">Add unit to draft</button></div>
+              <div className="flex gap-3 pt-4"><button type="button" onClick={() => setShowAddUnitModal(false)} className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-zinc-600 hover:text-zinc-100">Cancel</button><button type="button" onClick={handleAddUnitToDraft} disabled={!hasAddUnitSearch || !selectedAddUnitId || !selectedAddValidation.eligible} className="flex-1 rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:opacity-50">Add unit to draft</button></div>
             </div>
           </div>
         </div>

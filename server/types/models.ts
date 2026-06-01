@@ -21,16 +21,21 @@ export type ObjectiveControlType = "Binary" | "Percentage";
 
 export type CampaignSettings = {
   type: CampaignType;
+  scoringMethod?: string;
   era: "Star League" | "Early Succession Wars" | "Late Succession Wars" | "Clan Invasion" | string;
-  rulesLevel: "Introductory" | "Standard" | "Advanced" | "Experimental" | "Unofficial";
+  rulesLevel: "Introductory" | "Standard" | "Advanced" | "Experimental" | "Unofficial" | string;
   forceBVLimit: number;
-  maxPlayers: number;
+  factionRestriction?: string;
+  maxPlayers?: number;
   maxTurns?: number;
+  maxTurnsAhead?: number;
+  combatTeamRules?: boolean;
+  combatTeamBVLimit?: number;
   combatTeamSize?: number;
-  objectiveControlType: ObjectiveControlType;
-  salariesEnabled: boolean;
-  startingResources: ResourceBalance;
-  victoryConditions: string[];
+  objectiveControlType?: ObjectiveControlType;
+  salariesEnabled?: boolean;
+  startingResources?: ResourceBalance;
+  victoryConditions?: string[];
 };
 
 export type Campaign = {
