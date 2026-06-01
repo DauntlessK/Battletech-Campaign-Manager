@@ -1,0 +1,2025 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-01T02:33:00.228Z",
+  "catalog": {
+    "id": "meks-meks-3085u-phoenix-marauder-mad-9w2",
+    "unitType": "meks",
+    "chassis": "Marauder",
+    "model": "MAD-9W2",
+    "name": "Marauder MAD-9W2",
+    "fileName": "Marauder MAD-9W2.mtf",
+    "relativePath": "meks/3085u/Phoenix/Marauder MAD-9W2.mtf",
+    "mulId": "2051",
+    "tonnage": "75",
+    "weightClass": "Heavy",
+    "bv": "1868",
+    "bvSource": "calculated",
+    "costCBills": "16552375",
+    "costSource": "calculated",
+    "techBase": "Inner Sphere",
+    "rulesLevel": "Standard",
+    "year": "3080",
+    "era": "Jihad",
+    "role": "Skirmisher",
+    "source": "TR:3085",
+    "walkMP": "3",
+    "runMP": "5",
+    "jumpMP": "5",
+    "engineRating": "225",
+    "engineType": "Light Fusion",
+    "gyroType": "Heavy Duty Gyro",
+    "cockpitType": "Standard Cockpit",
+    "heatSinkCount": "16",
+    "heatSinkType": "Double",
+    "armorType": "Standard(Inner Sphere)",
+    "structureType": "Standard",
+    "armorPoints": "200",
+    "armorTonnage": "12.5",
+    "warnings": ""
+  },
+  "mtf": {
+    "fileName": "Marauder MAD-9W2.mtf",
+    "relativePath": "meks/3085u/Phoenix/Marauder MAD-9W2.mtf",
+    "sourcePath": "server/data/units/meks/3085u/Phoenix/Marauder MAD-9W2.mtf",
+    "rawFields": {
+      "chassis": "Marauder",
+      "model": "MAD-9W2",
+      "mul id": "2051",
+      "TechBase": "Inner Sphere",
+      "Era": "3080",
+      "source": "TR:3085",
+      "Rules Level": "2",
+      "role": "Skirmisher",
+      "quirk": "low_profile",
+      "weaponquirk": "exposed_linkage:RT:7:ISSNPPC",
+      "Mass": "75",
+      "Structure": "Standard",
+      "Cockpit": "Standard Cockpit",
+      "Gyro": "Heavy Duty Gyro",
+      "Heat Sinks": "16 Double",
+      "Walk MP": "3",
+      "Jump MP": "5",
+      "Armor": "Standard(Inner Sphere)",
+      "LA Armor": "21",
+      "RA Armor": "21",
+      "LT Armor": "24",
+      "RT Armor": "24",
+      "CT Armor": "30",
+      "HD Armor": "9",
+      "LL Armor": "24",
+      "RL Armor": "24",
+      "RTL Armor": "6",
+      "RTR Armor": "6",
+      "RTC Armor": "11",
+      "Weapons": "5",
+      "Left Arm": "",
+      "Right Arm": "",
+      "Left Torso": "",
+      "Right Torso": "",
+      "Center Torso": "",
+      "Head": "",
+      "Left Leg": "",
+      "Right Leg": "",
+      "imagefile": ".\\data\\images\\fluff\\Mech\\3085 Marauder .jpg"
+    }
+  },
+  "fluff": {},
+  "weapons": [
+    {
+      "ref": "weapon-1",
+      "index": 1,
+      "name": "ER Large Laser",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_er_large_laser",
+      "referenceName": "ER Large Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Large Laser",
+      "definition": {
+        "id": "is_er_large_laser",
+        "name": "ER Large Laser",
+        "altNames": [
+          "IS ER Large Laser",
+          "ISERLargeLaser",
+          "ERLargeLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 8,
+        "heat": 12,
+        "tons": 5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 19
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 163,
+        "cost": 200000
+      }
+    },
+    {
+      "ref": "weapon-2",
+      "index": 2,
+      "name": "Medium Pulse Laser",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_medium_pulse_laser",
+      "referenceName": "Medium Pulse Laser",
+      "referenceSource": "weapon",
+      "displayName": "Medium Pulse Laser",
+      "definition": {
+        "id": "is_medium_pulse_laser",
+        "name": "Medium Pulse Laser",
+        "altNames": [
+          "IS Medium Pulse Laser",
+          "ISMediumPulseLaser",
+          "MediumPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 6,
+        "heat": 4,
+        "tons": 2,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 2,
+          "medium": 4,
+          "long": 6
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire",
+          "pulse"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "P"
+        ],
+        "bv": 48,
+        "cost": 60000
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "ER Large Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_er_large_laser",
+      "referenceName": "ER Large Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Large Laser",
+      "definition": {
+        "id": "is_er_large_laser",
+        "name": "ER Large Laser",
+        "altNames": [
+          "IS ER Large Laser",
+          "ISERLargeLaser",
+          "ERLargeLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 8,
+        "heat": 12,
+        "tons": 5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 19
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 163,
+        "cost": 200000
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "Medium Pulse Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_medium_pulse_laser",
+      "referenceName": "Medium Pulse Laser",
+      "referenceSource": "weapon",
+      "displayName": "Medium Pulse Laser",
+      "definition": {
+        "id": "is_medium_pulse_laser",
+        "name": "Medium Pulse Laser",
+        "altNames": [
+          "IS Medium Pulse Laser",
+          "ISMediumPulseLaser",
+          "MediumPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "pulseLaser",
+        "damage": 6,
+        "heat": 4,
+        "tons": 2,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 2,
+          "medium": 4,
+          "long": 6
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire",
+          "pulse"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "P"
+        ],
+        "bv": 48,
+        "cost": 60000
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "Snub-Nose PPC",
+      "location": "Right Torso",
+      "quantityIndex": 1,
+      "referenceId": "is_snub_nose_ppc",
+      "referenceName": "Snub-Nose PPC",
+      "referenceSource": "weapon",
+      "displayName": "Snub-Nose PPC",
+      "definition": {
+        "id": "is_snub_nose_ppc",
+        "name": "Snub-Nose PPC",
+        "altNames": [
+          "IS Snub-Nose PPC",
+          "ISSnubNosePPC",
+          "SnubNosePPC",
+          "ISSNPPC",
+          "SNPPC",
+          "Snub Nose PPC",
+          "Snub PPC"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "ppc",
+        "damage": "10/8/5",
+        "heat": 10,
+        "tons": 6,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 9,
+          "medium": 13,
+          "long": 15
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE",
+          "V"
+        ],
+        "bv": 165,
+        "cost": 300000
+      }
+    }
+  ],
+  "locations": {
+    "head": {
+      "key": "head",
+      "name": "Head",
+      "armor": 9,
+      "structure": 3,
+      "slotCapacity": 6,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Cockpit",
+          "normalized": "standardCockpit",
+          "normalizedId": "standardCockpit",
+          "type": "system",
+          "displayName": "Standard Cockpit",
+          "referenceId": "standardCockpit",
+          "referenceName": "Standard Cockpit",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 200000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        }
+      ]
+    },
+    "centerTorso": {
+      "key": "centerTorso",
+      "name": "Center Torso",
+      "armor": 30,
+      "structure": 23,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        }
+      ],
+      "rearArmor": 11
+    },
+    "leftTorso": {
+      "key": "leftTorso",
+      "name": "Left Torso",
+      "armor": 24,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 6
+    },
+    "rightTorso": {
+      "key": "rightTorso",
+      "name": "Right Torso",
+      "armor": 24,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISSNPPC",
+          "normalized": "is_snub_nose_ppc",
+          "normalizedId": "is_snub_nose_ppc",
+          "type": "weapon",
+          "displayName": "Snub-Nose PPC",
+          "referenceId": "is_snub_nose_ppc",
+          "referenceName": "Snub-Nose PPC",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "ISSNPPC",
+          "normalized": "is_snub_nose_ppc",
+          "normalizedId": "is_snub_nose_ppc",
+          "type": "weapon",
+          "displayName": "Snub-Nose PPC",
+          "referenceId": "is_snub_nose_ppc",
+          "referenceName": "Snub-Nose PPC",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "ISGuardianECMSuite",
+          "normalized": "is_guardian_ecm_suite",
+          "normalizedId": "is_guardian_ecm_suite",
+          "type": "equipment",
+          "displayName": "Guardian ECM Suite",
+          "referenceId": "is_guardian_ecm_suite",
+          "referenceName": "Guardian ECM Suite",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISGuardianECMSuite",
+          "normalized": "is_guardian_ecm_suite",
+          "normalizedId": "is_guardian_ecm_suite",
+          "type": "equipment",
+          "displayName": "Guardian ECM Suite",
+          "referenceId": "is_guardian_ecm_suite",
+          "referenceName": "Guardian ECM Suite",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISC3SlaveUnit",
+          "normalized": "is_c3_computer_slave",
+          "normalizedId": "is_c3_computer_slave",
+          "type": "equipment",
+          "displayName": "C3 Computer (Slave)",
+          "referenceId": "is_c3_computer_slave",
+          "referenceName": "C3 Computer (Slave)",
+          "referenceSource": "weapon"
+        }
+      ],
+      "rearArmor": 6
+    },
+    "leftArm": {
+      "key": "leftArm",
+      "name": "Left Arm",
+      "armor": 21,
+      "structure": 12,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISMediumPulseLaser",
+          "normalized": "is_medium_pulse_laser",
+          "normalizedId": "is_medium_pulse_laser",
+          "type": "weapon",
+          "displayName": "Medium Pulse Laser",
+          "referenceId": "is_medium_pulse_laser",
+          "referenceName": "Medium Pulse Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        }
+      ]
+    },
+    "rightArm": {
+      "key": "rightArm",
+      "name": "Right Arm",
+      "armor": 21,
+      "structure": 12,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "ISDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISERLargeLaser",
+          "normalized": "is_er_large_laser",
+          "normalizedId": "is_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "is_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISMediumPulseLaser",
+          "normalized": "is_medium_pulse_laser",
+          "normalizedId": "is_medium_pulse_laser",
+          "type": "weapon",
+          "displayName": "Medium Pulse Laser",
+          "referenceId": "is_medium_pulse_laser",
+          "referenceName": "Medium Pulse Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        }
+      ]
+    },
+    "leftLeg": {
+      "key": "leftLeg",
+      "name": "Left Leg",
+      "armor": 24,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightLeg": {
+      "key": "rightLeg",
+      "name": "Right Leg",
+      "armor": 24,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Improved Jump Jet",
+          "normalized": "improvedJumpJet",
+          "normalizedId": "improvedJumpJet",
+          "type": "system",
+          "displayName": "Improved Jump Jets",
+          "referenceId": "improvedJumpJet",
+          "referenceName": "Improved Jump Jets",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "jumpJetsSquaredUnitTonnage",
+            "multiplier": 500
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    }
+  },
+  "warnings": []
+}

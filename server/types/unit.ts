@@ -15,6 +15,15 @@ export type UnitLocation = {
   slots: CriticalSlot[];
 };
 
+export type UnitJsonWarning =
+  | string
+  | {
+      severity?: string;
+      code?: string;
+      field?: string;
+      message?: string;
+    };
+
 export type UnitWeapon = {
   id: string;
   name: string;
@@ -74,12 +83,15 @@ export type Unit = {
 
   manufacturer?: string;
   factory?: string;
+  primaryFactory?: string;
+  systemManufacturers?: Record<string, string>;
   myomer?: string;
   armorType?: string;
   structureType?: string;
 
   weapons: UnitWeapon[];
   locations: UnitLocation[];
+  warnings?: UnitJsonWarning[];
 };
 
 export type UnitListItem = Pick<

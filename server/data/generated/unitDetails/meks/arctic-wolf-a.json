@@ -1,0 +1,2006 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-01T02:21:39.971Z",
+  "catalog": {
+    "id": "meks-meks-3060u-arctic-wolf-a",
+    "unitType": "meks",
+    "chassis": "Arctic Wolf",
+    "model": "A",
+    "name": "Arctic Wolf A",
+    "fileName": "Arctic Wolf A.mtf",
+    "relativePath": "meks/3060u/Arctic Wolf A.mtf",
+    "mulId": "101",
+    "tonnage": "40",
+    "weightClass": "Medium",
+    "bv": "1587",
+    "bvSource": "calculated",
+    "costCBills": "8953000",
+    "costSource": "calculated",
+    "techBase": "Clan",
+    "rulesLevel": "Standard",
+    "year": "3067",
+    "era": "Civil War",
+    "role": "Missile Boat",
+    "source": "TR:3060",
+    "walkMP": "6",
+    "runMP": "9",
+    "jumpMP": "",
+    "engineRating": "240",
+    "engineType": "XL Fusion",
+    "gyroType": "Standard",
+    "cockpitType": "Standard",
+    "heatSinkCount": "10",
+    "heatSinkType": "Double",
+    "armorType": "Ferro-Fibrous(Clan)",
+    "structureType": "Clan Endo Steel",
+    "armorPoints": "134",
+    "armorTonnage": "6.98",
+    "warnings": ""
+  },
+  "mtf": {
+    "fileName": "Arctic Wolf A.mtf",
+    "relativePath": "meks/3060u/Arctic Wolf A.mtf",
+    "sourcePath": "server/data/units/meks/3060u/Arctic Wolf A.mtf",
+    "rawFields": {
+      "chassis": "Arctic Wolf",
+      "model": "A",
+      "mul id": "101",
+      "TechBase": "Clan",
+      "Era": "3067",
+      "Source": "TR:3060",
+      "Rules Level": "2",
+      "role": "Missile Boat",
+      "quirk": "imp_target_short",
+      "Mass": "40",
+      "Structure": "Clan Endo Steel",
+      "Heat Sinks": "10 Double",
+      "Base Chassis Heat Sinks": "9",
+      "Walk MP": "6",
+      "Jump MP": "0",
+      "Armor": "Ferro-Fibrous(Clan)",
+      "LA Armor": "12",
+      "RA Armor": "12",
+      "LT Armor": "15",
+      "RT Armor": "15",
+      "CT Armor": "16",
+      "HD Armor": "9",
+      "LL Armor": "20",
+      "RL Armor": "20",
+      "RTL Armor": "5",
+      "RTR Armor": "5",
+      "RTC Armor": "5",
+      "Weapons": "6",
+      "Left Arm": "",
+      "Right Arm": "",
+      "Left Torso": "",
+      "Right Torso": "",
+      "Center Torso": "",
+      "Head": "",
+      "Left Leg": "",
+      "Right Leg": ""
+    }
+  },
+  "fluff": {},
+  "weapons": [
+    {
+      "ref": "weapon-1",
+      "index": 1,
+      "name": "SRM 6",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_srm_6",
+      "referenceName": "SRM 6",
+      "referenceSource": "weapon",
+      "displayName": "SRM 6",
+      "definition": {
+        "id": "clan_srm_6",
+        "name": "SRM 6",
+        "altNames": [
+          "Clan SRM 6",
+          "CL SRM 6",
+          "CLSRM6",
+          "SRM-6",
+          "SRM6"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "srm",
+        "damage": "2/Msl",
+        "heat": 4,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_srm_6_ammo"
+        },
+        "bv": 59,
+        "oneShotBV": 12,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 80000,
+        "availability": {
+          "starLeague": "B",
+          "successionWars": "B",
+          "clanInvasion": "B"
+        }
+      }
+    },
+    {
+      "ref": "weapon-2",
+      "index": 2,
+      "name": "Small Pulse Laser",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_small_pulse_laser",
+      "referenceName": "Small Pulse Laser",
+      "referenceSource": "weapon",
+      "displayName": "Small Pulse Laser",
+      "definition": {
+        "id": "clan_small_pulse_laser",
+        "name": "Small Pulse Laser",
+        "altNames": [
+          "Clan Small Pulse Laser",
+          "CL Small Pulse Laser",
+          "CLSmallPulseLaser",
+          "SmallPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "pulseLaser",
+        "damage": 3,
+        "heat": 2,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 2,
+          "medium": 4,
+          "long": 6
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "pulse"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "P",
+          "AI"
+        ],
+        "bv": 24,
+        "cost": 16000
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "SRM 6",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_srm_6",
+      "referenceName": "SRM 6",
+      "referenceSource": "weapon",
+      "displayName": "SRM 6",
+      "definition": {
+        "id": "clan_srm_6",
+        "name": "SRM 6",
+        "altNames": [
+          "Clan SRM 6",
+          "CL SRM 6",
+          "CLSRM6",
+          "SRM-6",
+          "SRM6"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "srm",
+        "damage": "2/Msl",
+        "heat": 4,
+        "tons": 1.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_srm_6_ammo"
+        },
+        "bv": 59,
+        "oneShotBV": 12,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 80000,
+        "availability": {
+          "starLeague": "B",
+          "successionWars": "B",
+          "clanInvasion": "B"
+        }
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "Small Pulse Laser",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_small_pulse_laser",
+      "referenceName": "Small Pulse Laser",
+      "referenceSource": "weapon",
+      "displayName": "Small Pulse Laser",
+      "definition": {
+        "id": "clan_small_pulse_laser",
+        "name": "Small Pulse Laser",
+        "altNames": [
+          "Clan Small Pulse Laser",
+          "CL Small Pulse Laser",
+          "CLSmallPulseLaser",
+          "SmallPulseLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "pulseLaser",
+        "damage": 3,
+        "heat": 2,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 2,
+          "medium": 4,
+          "long": 6
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "pulse"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "P",
+          "AI"
+        ],
+        "bv": 24,
+        "cost": 16000
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "LRM 15",
+      "location": "Left Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_lrm_15",
+      "referenceName": "LRM 15",
+      "referenceSource": "weapon",
+      "displayName": "LRM 15",
+      "definition": {
+        "id": "clan_lrm_15",
+        "name": "LRM 15",
+        "altNames": [
+          "Clan LRM 15",
+          "CL LRM 15",
+          "CLLRM15",
+          "LRM-15",
+          "LRM15"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 5,
+        "tons": 3.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_lrm_15_ammo"
+        },
+        "bv": 164,
+        "oneShotBV": 33,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 175000,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "C"
+        }
+      }
+    },
+    {
+      "ref": "weapon-6",
+      "index": 6,
+      "name": "LRM 15",
+      "location": "Right Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_lrm_15",
+      "referenceName": "LRM 15",
+      "referenceSource": "weapon",
+      "displayName": "LRM 15",
+      "definition": {
+        "id": "clan_lrm_15",
+        "name": "LRM 15",
+        "altNames": [
+          "Clan LRM 15",
+          "CL LRM 15",
+          "CLLRM15",
+          "LRM-15",
+          "LRM15"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 5,
+        "tons": 3.5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_lrm_15_ammo"
+        },
+        "bv": 164,
+        "oneShotBV": 33,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 175000,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "C"
+        }
+      }
+    }
+  ],
+  "locations": {
+    "head": {
+      "key": "head",
+      "name": "Head",
+      "armor": 9,
+      "structure": 3,
+      "slotCapacity": 6,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Cockpit",
+          "normalized": "standardCockpit",
+          "normalizedId": "standardCockpit",
+          "type": "system",
+          "displayName": "Standard Cockpit",
+          "referenceId": "standardCockpit",
+          "referenceName": "Standard Cockpit",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 200000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        }
+      ]
+    },
+    "centerTorso": {
+      "key": "centerTorso",
+      "name": "Center Torso",
+      "armor": 16,
+      "structure": 12,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "CLDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 12,
+          "raw": "CLDoubleHeatSink",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        }
+      ],
+      "rearArmor": 5
+    },
+    "leftTorso": {
+      "key": "leftTorso",
+      "name": "Left Torso",
+      "armor": 15,
+      "structure": 10,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLLRM15 (omnipod)",
+          "normalized": "clan_lrm_15",
+          "normalizedId": "clan_lrm_15",
+          "type": "weapon",
+          "displayName": "LRM 15",
+          "referenceId": "clan_lrm_15",
+          "referenceName": "LRM 15",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLLRM15 (omnipod)",
+          "normalized": "clan_lrm_15",
+          "normalizedId": "clan_lrm_15",
+          "type": "weapon",
+          "displayName": "LRM 15",
+          "referenceId": "clan_lrm_15",
+          "referenceName": "LRM 15",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Ammo LRM-15 (omnipod)",
+          "normalized": "clan_lrm_15_ammo",
+          "normalizedId": "clan_lrm_15_ammo",
+          "type": "ammo",
+          "displayName": "LRM 15 Ammo",
+          "referenceId": "clan_lrm_15_ammo",
+          "referenceName": "LRM 15 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_15_ammo",
+          "bv": 21,
+          "costPerTon": 30000,
+          "shotsPerTon": 8
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ammo LRM-15 (omnipod)",
+          "normalized": "clan_lrm_15_ammo",
+          "normalizedId": "clan_lrm_15_ammo",
+          "type": "ammo",
+          "displayName": "LRM 15 Ammo",
+          "referenceId": "clan_lrm_15_ammo",
+          "referenceName": "LRM 15 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_15_ammo",
+          "bv": 21,
+          "costPerTon": 30000,
+          "shotsPerTon": 8
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 5
+    },
+    "rightTorso": {
+      "key": "rightTorso",
+      "name": "Right Torso",
+      "armor": 15,
+      "structure": 10,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLLRM15 (omnipod)",
+          "normalized": "clan_lrm_15",
+          "normalizedId": "clan_lrm_15",
+          "type": "weapon",
+          "displayName": "LRM 15",
+          "referenceId": "clan_lrm_15",
+          "referenceName": "LRM 15",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLLRM15 (omnipod)",
+          "normalized": "clan_lrm_15",
+          "normalizedId": "clan_lrm_15",
+          "type": "weapon",
+          "displayName": "LRM 15",
+          "referenceId": "clan_lrm_15",
+          "referenceName": "LRM 15",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Ammo LRM-15 (omnipod)",
+          "normalized": "clan_lrm_15_ammo",
+          "normalizedId": "clan_lrm_15_ammo",
+          "type": "ammo",
+          "displayName": "LRM 15 Ammo",
+          "referenceId": "clan_lrm_15_ammo",
+          "referenceName": "LRM 15 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_15_ammo",
+          "bv": 21,
+          "costPerTon": 30000,
+          "shotsPerTon": 8
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ammo LRM-15 (omnipod)",
+          "normalized": "clan_lrm_15_ammo",
+          "normalizedId": "clan_lrm_15_ammo",
+          "type": "ammo",
+          "displayName": "LRM 15 Ammo",
+          "referenceId": "clan_lrm_15_ammo",
+          "referenceName": "LRM 15 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_15_ammo",
+          "bv": 21,
+          "costPerTon": 30000,
+          "shotsPerTon": 8
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLECMSuite (omnipod)",
+          "normalized": "clan_ecm_suite",
+          "normalizedId": "clan_ecm_suite",
+          "type": "equipment",
+          "displayName": "ECM Suite",
+          "referenceId": "clan_ecm_suite",
+          "referenceName": "ECM Suite",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 5
+    },
+    "leftArm": {
+      "key": "leftArm",
+      "name": "Left Arm",
+      "armor": 12,
+      "structure": 6,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLSRM6 (omnipod)",
+          "normalized": "clan_srm_6",
+          "normalizedId": "clan_srm_6",
+          "type": "weapon",
+          "displayName": "SRM 6",
+          "referenceId": "clan_srm_6",
+          "referenceName": "SRM 6",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLSmallPulseLaser (omnipod)",
+          "normalized": "clan_small_pulse_laser",
+          "normalizedId": "clan_small_pulse_laser",
+          "type": "weapon",
+          "displayName": "Small Pulse Laser",
+          "referenceId": "clan_small_pulse_laser",
+          "referenceName": "Small Pulse Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ammo SRM-6 (omnipod)",
+          "normalized": "clan_srm_6_ammo",
+          "normalizedId": "clan_srm_6_ammo",
+          "type": "ammo",
+          "displayName": "SRM 6 Ammo",
+          "referenceId": "clan_srm_6_ammo",
+          "referenceName": "SRM 6 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_srm_6_ammo",
+          "bv": 7,
+          "costPerTon": 27000,
+          "shotsPerTon": 15
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightArm": {
+      "key": "rightArm",
+      "name": "Right Arm",
+      "armor": 12,
+      "structure": 6,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLSRM6 (omnipod)",
+          "normalized": "clan_srm_6",
+          "normalizedId": "clan_srm_6",
+          "type": "weapon",
+          "displayName": "SRM 6",
+          "referenceId": "clan_srm_6",
+          "referenceName": "SRM 6",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLSmallPulseLaser (omnipod)",
+          "normalized": "clan_small_pulse_laser",
+          "normalizedId": "clan_small_pulse_laser",
+          "type": "weapon",
+          "displayName": "Small Pulse Laser",
+          "referenceId": "clan_small_pulse_laser",
+          "referenceName": "Small Pulse Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ammo SRM-6 (omnipod)",
+          "normalized": "clan_srm_6_ammo",
+          "normalizedId": "clan_srm_6_ammo",
+          "type": "ammo",
+          "displayName": "SRM 6 Ammo",
+          "referenceId": "clan_srm_6_ammo",
+          "referenceName": "SRM 6 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_srm_6_ammo",
+          "bv": 7,
+          "costPerTon": 27000,
+          "shotsPerTon": 15
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "leftLeg": {
+      "key": "leftLeg",
+      "name": "Left Leg",
+      "armor": 20,
+      "structure": 10,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightLeg": {
+      "key": "rightLeg",
+      "name": "Right Leg",
+      "armor": 20,
+      "structure": 10,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Ferro-Fibrous",
+          "normalized": "ferroFibrousArmor",
+          "normalizedId": "ferroFibrousArmor",
+          "type": "system",
+          "displayName": "Ferro-Fibrous Armor",
+          "referenceId": "ferroFibrousArmor",
+          "referenceName": "Ferro-Fibrous Armor",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "armorTonnage",
+            "multiplier": 20000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    }
+  },
+  "warnings": []
+}

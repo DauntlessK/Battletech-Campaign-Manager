@@ -2101,7 +2101,8 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "ISMediumVSPLaser",
             "MediumVSPLaser",
             "Medium VSP",
-            "MediumVSP"
+            "MediumVSP",
+            "ISMediumVariableSpeedLaser"
         ],
         "category": "Energy",
         "techBase": "Inner Sphere",
@@ -4614,7 +4615,8 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "Machine Gun Array",
             "Light Machine Gun Array",
             "Heavy Machine Gun Array",
-            "MG Array"
+            "MG Array",
+            "ISMGA"
         ],
         "category": "Equipment",
         "techBase": "Inner Sphere",
@@ -4919,6 +4921,56 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
         },
         "bv": "D",
         "cost": 750000,
+    },
+    "is_c3_emergency_master": {
+        "id": "is_c3_emergency_master",
+        "name": "C3 Emergency Master",
+        "altNames": [
+            "C3 Emergency Master",
+            "C3 Emergency Master Computer",
+            "C3EM",
+            "C3 EM",
+            "C3 Emergency",
+            "ISC3EmergencyMaster",
+            "ISC3EmergencyMasterComputer",
+            "IS C3 Emergency Master",
+            "IS C3 Emergency Master Computer",
+            "C3 Emergency Master (OMNIPOD)",
+            "ISC3EmergencyMaster (OMNIPOD)"
+        ],
+        "category": "Equipment",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "c3",
+        "damage": 0,
+        "heat": 0,
+        "tons": 0,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "techRating": "E",
+        "flags": [
+            "c3",
+            "networkEquipment"
+        ],
+        "source": {
+            "weightSpacePage": 0,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+            "C3"
+        ],
+        "bv": 0,
+        "cost": 0,
+        "availability": {
+            "starLeague": "X",
+            "successionWars": "X",
+            "clanInvasion": "E"
+        },
+        "notes": [
+            "C3 network equipment. Placeholder cost/BV are set to 0 until final C3 Emergency Master values are verified."
+        ]
     },
     "is_guardian_ecm_suite": {
         "id": "is_guardian_ecm_suite",
@@ -7557,7 +7609,8 @@ export const WEAPONS: Record<string, WeaponDefinition> = {
             "Clan Improved Heavy Medium Laser",
             "CL Improved Heavy Medium Laser",
             "CLImprovedHeavyMediumLaser",
-            "ImprovedHeavyMediumLaser"
+            "ImprovedHeavyMediumLaser",
+            "CLImprovedMediumHeavyLaser"
         ],
         "category": "Energy",
         "techBase": "Clan",

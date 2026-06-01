@@ -1,0 +1,2141 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-01T02:32:03.999Z",
+  "catalog": {
+    "id": "meks-meks-3085u-phoenix-longbow-lgb-14c",
+    "unitType": "meks",
+    "chassis": "Longbow",
+    "model": "LGB-14C",
+    "name": "Longbow LGB-14C",
+    "fileName": "Longbow LGB-14C.mtf",
+    "relativePath": "meks/3085u/Phoenix/Longbow LGB-14C.mtf",
+    "mulId": "1935",
+    "tonnage": "85",
+    "weightClass": "Assault",
+    "bv": "1421",
+    "bvSource": "calculated",
+    "costCBills": "16040425",
+    "costSource": "calculated",
+    "techBase": "Inner Sphere",
+    "rulesLevel": "Standard",
+    "year": "3070",
+    "era": "Jihad",
+    "role": "Missile Boat",
+    "source": "TR:3085",
+    "walkMP": "3",
+    "runMP": "5",
+    "jumpMP": "",
+    "engineRating": "255",
+    "engineType": "XL Fusion",
+    "gyroType": "Standard",
+    "cockpitType": "Standard",
+    "heatSinkCount": "10",
+    "heatSinkType": "Double",
+    "armorType": "Standard(Inner Sphere)",
+    "structureType": "Standard",
+    "armorPoints": "224",
+    "armorTonnage": "14",
+    "warnings": ""
+  },
+  "mtf": {
+    "fileName": "Longbow LGB-14C.mtf",
+    "relativePath": "meks/3085u/Phoenix/Longbow LGB-14C.mtf",
+    "sourcePath": "server/data/units/meks/3085u/Phoenix/Longbow LGB-14C.mtf",
+    "rawFields": {
+      "chassis": "Longbow",
+      "model": "LGB-14C",
+      "mul id": "1935",
+      "TechBase": "Inner Sphere",
+      "Era": "3070",
+      "source": "TR:3085",
+      "Rules Level": "2",
+      "role": "Missile Boat",
+      "quirk": "no_arms",
+      "Mass": "85",
+      "Structure": "Standard",
+      "Heat Sinks": "10 Double",
+      "Walk MP": "3",
+      "Jump MP": "0",
+      "Armor": "Standard(Inner Sphere)",
+      "LA Armor": "24",
+      "RA Armor": "24",
+      "LT Armor": "23",
+      "RT Armor": "23",
+      "CT Armor": "32",
+      "HD Armor": "9",
+      "LL Armor": "31",
+      "RL Armor": "31",
+      "RTL Armor": "8",
+      "RTR Armor": "8",
+      "RTC Armor": "11",
+      "Weapons": "9",
+      "Left Arm": "",
+      "Right Arm": "",
+      "Left Torso": "",
+      "Right Torso": "",
+      "Center Torso": "",
+      "Head": "",
+      "Left Leg": "",
+      "Right Leg": ""
+    }
+  },
+  "fluff": {
+    "overview": "The Longbow, introduced in 2480 as the LGB-0C Longbow, has seen service in the armies of the Inner Sphere since the days of the Star League and is one of the most well-known fire support 'Mechs in existence.",
+    "capabilities": "The Longbow is a massive BattleMech weighing in at 85 tons and is able to move at a top speed of 54.0 km/h, thanks to a Strand 255 fusion engine. The Longbow is protected by fourteen and a half tons of armor. Some have criticized the design for its lack of CASE - making an otherwise rugged 'Mech vulnerable to a loss by an ammunition explosion. As a fire-support 'Mech though, the Longbow is a trusted and reliable machine that can be counted on to carry out the mission it is designed for.",
+    "deployment": "This upgrade of the 12C uses six Doombud MML 9s with ten tons of ammunition supplying them. For backup, it uses three ER Medium Lasers. It also mounts an additional ton and a half of armor, though it has two fewer double heat sinks. Pilots are cramped into a Small Cockpit, but seem to accept the additional firepower.",
+    "manufacturer": "StarCorps Industries,StarCorps (FWL) Industries,StarCorps Industries,StarCorps Industries",
+    "primaryFactory": "Crofton,Emris IV,Fletcher (TH),Loburg",
+    "systemManufacturer": {
+      "chassis": "StarCorps 100 LGB",
+      "engine": "Strand 255 XL",
+      "armor": "StarSlab/9.5 Mk II",
+      "communications": "O/P 3000 COMSET",
+      "targeting": "Octagon Tartrac System C"
+    }
+  },
+  "weapons": [
+    {
+      "ref": "weapon-1",
+      "index": 1,
+      "name": "MML 9",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-2",
+      "index": 2,
+      "name": "MML 9",
+      "location": "Left Arm",
+      "quantityIndex": 2,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "MML 9",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "MML 9",
+      "location": "Right Arm",
+      "quantityIndex": 2,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "MML 9",
+      "location": "Left Torso",
+      "quantityIndex": 1,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-6",
+      "index": 6,
+      "name": "MML 9",
+      "location": "Right Torso",
+      "quantityIndex": 1,
+      "referenceId": "is_mml_9",
+      "referenceName": "MML 9",
+      "referenceSource": "weapon",
+      "displayName": "MML 9",
+      "definition": {
+        "id": "is_mml_9",
+        "name": "MML 9",
+        "altNames": [
+          "IS MML 9 (LRM)",
+          "ISMML9(LRM)",
+          "MML9(LRM)",
+          "IS MML 9",
+          "ISMML9",
+          "MML9",
+          "MML 9",
+          "MML 9 (LRM)",
+          "IS MML 9 (SRM)",
+          "ISMML9(SRM)",
+          "MML9(SRM)",
+          "MML 9 (SRM)"
+        ],
+        "category": "Missile",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "mml",
+        "damage": "1/Msl or 2/Msl",
+        "heat": 5,
+        "tons": 6,
+        "critSlots": 5,
+        "spaceSlots": 5,
+        "range": {
+          "min": 6,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "E",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "bv": 86,
+        "cost": 125000,
+        "ammoOptions": [
+          {
+            "mode": "LRM",
+            "ammoId": "is_mml_9_lrm_ammo"
+          },
+          {
+            "mode": "SRM",
+            "ammoId": "is_mml_9_srm_ammo"
+          }
+        ],
+        "notes": [
+          "MML launchers are stored as one launcher entry; ammunition mode (LRM or SRM) is selected by ammo type, not by separate launcher definitions."
+        ]
+      }
+    },
+    {
+      "ref": "weapon-7",
+      "index": 7,
+      "name": "ER Medium Laser",
+      "location": "Center Torso",
+      "quantityIndex": 1,
+      "referenceId": "is_er_medium_laser",
+      "referenceName": "ER Medium Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Medium Laser",
+      "definition": {
+        "id": "is_er_medium_laser",
+        "name": "ER Medium Laser",
+        "altNames": [
+          "IS ER Medium Laser",
+          "ISERMediumLaser",
+          "ERMediumLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 5,
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 4,
+          "medium": 8,
+          "long": 12
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 62,
+        "cost": 80000
+      }
+    },
+    {
+      "ref": "weapon-8",
+      "index": 8,
+      "name": "ER Medium Laser",
+      "location": "Center Torso",
+      "quantityIndex": 2,
+      "referenceId": "is_er_medium_laser",
+      "referenceName": "ER Medium Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Medium Laser",
+      "definition": {
+        "id": "is_er_medium_laser",
+        "name": "ER Medium Laser",
+        "altNames": [
+          "IS ER Medium Laser",
+          "ISERMediumLaser",
+          "ERMediumLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 5,
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 4,
+          "medium": 8,
+          "long": 12
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 62,
+        "cost": 80000
+      }
+    },
+    {
+      "ref": "weapon-9",
+      "index": 9,
+      "name": "ER Medium Laser",
+      "location": "Head",
+      "quantityIndex": 1,
+      "referenceId": "is_er_medium_laser",
+      "referenceName": "ER Medium Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Medium Laser",
+      "definition": {
+        "id": "is_er_medium_laser",
+        "name": "ER Medium Laser",
+        "altNames": [
+          "IS ER Medium Laser",
+          "ISERMediumLaser",
+          "ERMediumLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 5,
+        "heat": 5,
+        "tons": 1,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 4,
+          "medium": 8,
+          "long": 12
+        },
+        "techRating": "E",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 62,
+        "cost": 80000
+      }
+    }
+  ],
+  "locations": {
+    "head": {
+      "key": "head",
+      "name": "Head",
+      "armor": 9,
+      "structure": 3,
+      "slotCapacity": 6,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Cockpit",
+          "normalized": "standardCockpit",
+          "normalizedId": "standardCockpit",
+          "type": "system",
+          "displayName": "Standard Cockpit",
+          "referenceId": "standardCockpit",
+          "referenceName": "Standard Cockpit",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 200000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISERMediumLaser",
+          "normalized": "is_er_medium_laser",
+          "normalizedId": "is_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "is_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-9"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        }
+      ]
+    },
+    "centerTorso": {
+      "key": "centerTorso",
+      "name": "Center Torso",
+      "armor": 32,
+      "structure": 27,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISERMediumLaser",
+          "normalized": "is_er_medium_laser",
+          "normalizedId": "is_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "is_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISERMediumLaser",
+          "normalized": "is_er_medium_laser",
+          "normalizedId": "is_er_medium_laser",
+          "type": "weapon",
+          "displayName": "ER Medium Laser",
+          "referenceId": "is_er_medium_laser",
+          "referenceName": "ER Medium Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        }
+      ],
+      "rearArmor": 11
+    },
+    "leftTorso": {
+      "key": "leftTorso",
+      "name": "Left Torso",
+      "armor": 23,
+      "structure": 18,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "IS Ammo MML-9 LRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 10,
+          "raw": "IS Ammo MML-9 LRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 11,
+          "raw": "IS Ammo MML-9 SRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISCASE",
+          "normalized": "is_case",
+          "normalizedId": "is_case",
+          "type": "equipment",
+          "displayName": "CASE",
+          "referenceId": "is_case",
+          "referenceName": "CASE",
+          "referenceSource": "weapon"
+        }
+      ],
+      "rearArmor": 8
+    },
+    "rightTorso": {
+      "key": "rightTorso",
+      "name": "Right Torso",
+      "armor": 23,
+      "structure": 18,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-6"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "IS Ammo MML-9 LRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 10,
+          "raw": "IS Ammo MML-9 SRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 11,
+          "raw": "IS Ammo MML-9 SRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISCASE",
+          "normalized": "is_case",
+          "normalizedId": "is_case",
+          "type": "equipment",
+          "displayName": "CASE",
+          "referenceId": "is_case",
+          "referenceName": "CASE",
+          "referenceSource": "weapon"
+        }
+      ],
+      "rearArmor": 8
+    },
+    "leftArm": {
+      "key": "leftArm",
+      "name": "Left Arm",
+      "armor": 24,
+      "structure": 14,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-2"
+        }
+      ]
+    },
+    "rightArm": {
+      "key": "rightArm",
+      "name": "Right Arm",
+      "armor": 24,
+      "structure": 14,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "ISMML9",
+          "normalized": "is_mml_9",
+          "normalizedId": "is_mml_9",
+          "type": "weapon",
+          "displayName": "MML 9",
+          "referenceId": "is_mml_9",
+          "referenceName": "MML 9",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        }
+      ]
+    },
+    "leftLeg": {
+      "key": "leftLeg",
+      "name": "Left Leg",
+      "armor": 31,
+      "structure": 18,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "IS Ammo MML-9 LRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 6,
+          "raw": "IS Ammo MML-9 SRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightLeg": {
+      "key": "rightLeg",
+      "name": "Right Leg",
+      "armor": 31,
+      "structure": 18,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "IS Ammo MML-9 LRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 6,
+          "raw": "IS Ammo MML-9 SRM",
+          "normalized": "is_mml_9_lrm_ammo",
+          "normalizedId": "is_mml_9_lrm_ammo",
+          "type": "ammo",
+          "displayName": "MML 9 LRM Ammo",
+          "referenceId": "is_mml_9_lrm_ammo",
+          "referenceName": "MML 9 LRM Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_mml_9_lrm_ammo",
+          "bv": 11,
+          "costPerTon": 30000,
+          "shotsPerTon": 13
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    }
+  },
+  "warnings": []
+}

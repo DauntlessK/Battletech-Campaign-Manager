@@ -1,0 +1,1744 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-01T02:28:22.504Z",
+  "catalog": {
+    "id": "meks-meks-tro-vehicle-annex-grommet-d90-militiamech",
+    "unitType": "meks",
+    "chassis": "Grommet",
+    "model": "D90 MilitiaMech",
+    "name": "Grommet D90 MilitiaMech",
+    "fileName": "Grommet D90 MilitiaMech.mtf",
+    "relativePath": "meks/TRO Vehicle Annex/Grommet D90 MilitiaMech.mtf",
+    "mulId": "7180",
+    "tonnage": "75",
+    "weightClass": "Heavy",
+    "bv": "878",
+    "bvSource": "calculated",
+    "costCBills": "5279750",
+    "costSource": "calculated",
+    "techBase": "Inner Sphere",
+    "rulesLevel": "Standard",
+    "year": "3000",
+    "era": "Succession Wars",
+    "role": "Brawler",
+    "source": "RS:VA",
+    "walkMP": "3",
+    "runMP": "5",
+    "jumpMP": "",
+    "engineRating": "225",
+    "engineType": "Standard Fusion",
+    "gyroType": "Standard",
+    "cockpitType": "Standard",
+    "heatSinkCount": "11",
+    "heatSinkType": "Single",
+    "armorType": "Standard(Inner Sphere)",
+    "structureType": "IS Industrial",
+    "armorPoints": "152",
+    "armorTonnage": "9.5",
+    "warnings": ""
+  },
+  "mtf": {
+    "fileName": "Grommet D90 MilitiaMech.mtf",
+    "relativePath": "meks/TRO Vehicle Annex/Grommet D90 MilitiaMech.mtf",
+    "sourcePath": "server/data/units/meks/TRO Vehicle Annex/Grommet D90 MilitiaMech.mtf",
+    "rawFields": {
+      "generator": "MegaMek Suite 0.50.1-SNAPSHOT on 2024-11-09",
+      "chassis": "Grommet",
+      "model": "D90 MilitiaMech",
+      "mul id": "7180",
+      "techbase": "Inner Sphere",
+      "era": "3000",
+      "source": "RS:VA",
+      "rules level": "2",
+      "role": "Brawler",
+      "mass": "75",
+      "structure": "IS Industrial",
+      "heat sinks": "11 Single",
+      "walk mp": "3",
+      "jump mp": "0",
+      "armor": "Standard(Inner Sphere)",
+      "LA armor": "16",
+      "RA armor": "16",
+      "LT armor": "16",
+      "RT armor": "16",
+      "CT armor": "20",
+      "HD armor": "8",
+      "LL armor": "20",
+      "RL armor": "20",
+      "RTL armor": "6",
+      "RTR armor": "6",
+      "RTC armor": "8",
+      "Weapons": "5",
+      "Left Arm": "",
+      "Right Arm": "",
+      "Left Torso": "",
+      "Cargo": "SIZE:4.0",
+      "Right Torso": "",
+      "Center Torso": "",
+      "Head": "",
+      "Left Leg": "",
+      "Right Leg": ""
+    }
+  },
+  "fluff": {},
+  "weapons": [
+    {
+      "ref": "weapon-1",
+      "index": 1,
+      "name": "Large Laser",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_large_laser",
+      "referenceName": "Large Laser",
+      "referenceSource": "weapon",
+      "displayName": "Large Laser",
+      "definition": {
+        "id": "is_large_laser",
+        "name": "Large Laser",
+        "altNames": [
+          "IS Large Laser",
+          "ISLargeLaser",
+          "LargeLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Introductory",
+        "variant": "IS",
+        "family": "laser",
+        "damage": 8,
+        "heat": 8,
+        "tons": 5,
+        "critSlots": 2,
+        "spaceSlots": 2,
+        "range": {
+          "min": 0,
+          "short": 5,
+          "medium": 10,
+          "long": 15
+        },
+        "techRating": "C",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "cost": 100000,
+        "bv": 123
+      }
+    },
+    {
+      "ref": "weapon-2",
+      "index": 2,
+      "name": "Flamer (Vehicle)",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_flamer_vehicle",
+      "referenceName": "Flamer (Vehicle)",
+      "referenceSource": "weapon",
+      "displayName": "Flamer (Vehicle)",
+      "definition": {
+        "id": "is_flamer_vehicle",
+        "name": "Flamer (Vehicle)",
+        "altNames": [
+          "IS Flamer (Vehicle)",
+          "ISFlamer(Vehicle)",
+          "Flamer(Vehicle)",
+          "Vehicle Flamer",
+          "IS Vehicle Flamer"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "flamer",
+        "damage": 2,
+        "heat": 3,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 1,
+          "medium": 2,
+          "long": 3
+        },
+        "techRating": "B",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DE",
+          "H",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "is_flamer_vehicle_ammo"
+        },
+        "bv": 5,
+        "cost": 7500,
+        "availability": {
+          "starLeague": "A",
+          "successionWars": "A",
+          "clanInvasion": "B"
+        }
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "Flamer (Vehicle)",
+      "location": "Left Arm",
+      "quantityIndex": 2,
+      "referenceId": "is_flamer_vehicle",
+      "referenceName": "Flamer (Vehicle)",
+      "referenceSource": "weapon",
+      "displayName": "Flamer (Vehicle)",
+      "definition": {
+        "id": "is_flamer_vehicle",
+        "name": "Flamer (Vehicle)",
+        "altNames": [
+          "IS Flamer (Vehicle)",
+          "ISFlamer(Vehicle)",
+          "Flamer(Vehicle)",
+          "Vehicle Flamer",
+          "IS Vehicle Flamer"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "flamer",
+        "damage": 2,
+        "heat": 3,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 1,
+          "medium": 2,
+          "long": 3
+        },
+        "techRating": "B",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DE",
+          "H",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "is_flamer_vehicle_ammo"
+        },
+        "bv": 5,
+        "cost": 7500,
+        "availability": {
+          "starLeague": "A",
+          "successionWars": "A",
+          "clanInvasion": "B"
+        }
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "Flamer (Vehicle)",
+      "location": "Left Arm",
+      "quantityIndex": 3,
+      "referenceId": "is_flamer_vehicle",
+      "referenceName": "Flamer (Vehicle)",
+      "referenceSource": "weapon",
+      "displayName": "Flamer (Vehicle)",
+      "definition": {
+        "id": "is_flamer_vehicle",
+        "name": "Flamer (Vehicle)",
+        "altNames": [
+          "IS Flamer (Vehicle)",
+          "ISFlamer(Vehicle)",
+          "Flamer(Vehicle)",
+          "Vehicle Flamer",
+          "IS Vehicle Flamer"
+        ],
+        "category": "Energy",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Standard",
+        "variant": "IS",
+        "family": "flamer",
+        "damage": 2,
+        "heat": 3,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 1,
+          "medium": 2,
+          "long": 3
+        },
+        "techRating": "B",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DE",
+          "H",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "is_flamer_vehicle_ammo"
+        },
+        "bv": 5,
+        "cost": 7500,
+        "availability": {
+          "starLeague": "A",
+          "successionWars": "A",
+          "clanInvasion": "B"
+        }
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "AC/5",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "is_ac_5",
+      "referenceName": "AC/5",
+      "referenceSource": "weapon",
+      "displayName": "AC/5",
+      "definition": {
+        "id": "is_ac_5",
+        "name": "AC/5",
+        "altNames": [
+          "IS Autocannon/5",
+          "AC/5",
+          "ISAC5",
+          "Auto Cannon/5"
+        ],
+        "category": "Ballistic",
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Introductory",
+        "variant": "IS",
+        "family": "autocannon",
+        "damage": 5,
+        "heat": 1,
+        "tons": 8,
+        "critSlots": 4,
+        "spaceSlots": 4,
+        "range": {
+          "min": 3,
+          "short": 6,
+          "medium": 12,
+          "long": 18
+        },
+        "techRating": "C",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 341,
+          "battleValuePage": 317,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "is_ac_5_ammo"
+        },
+        "cost": 125000,
+        "bv": 70,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "D"
+        }
+      }
+    }
+  ],
+  "locations": {
+    "head": {
+      "key": "head",
+      "name": "Head",
+      "armor": 8,
+      "structure": 3,
+      "slotCapacity": 6,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Cockpit",
+          "normalized": "standardCockpit",
+          "normalizedId": "standardCockpit",
+          "type": "system",
+          "displayName": "Standard Cockpit",
+          "referenceId": "standardCockpit",
+          "referenceName": "Standard Cockpit",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 200000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        }
+      ]
+    },
+    "centerTorso": {
+      "key": "centerTorso",
+      "name": "Center Torso",
+      "armor": 20,
+      "structure": 23,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Heat Sink",
+          "normalized": "standardSingleHeatSinkFusion",
+          "normalizedId": "standardSingleHeatSinkFusion",
+          "type": "system",
+          "displayName": "Heat Sink",
+          "referenceId": "standardSingleHeatSinkFusion",
+          "referenceName": "Heat Sink",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "B",
+            "successionWars": "B",
+            "clanInvasion": "B"
+          },
+          "cost": {
+            "type": "heatSinksOverFreeFusionSinks",
+            "multiplier": 2000,
+            "freeFusionSinks": 10
+          }
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Heat Sink",
+          "normalized": "standardSingleHeatSinkFusion",
+          "normalizedId": "standardSingleHeatSinkFusion",
+          "type": "system",
+          "displayName": "Heat Sink",
+          "referenceId": "standardSingleHeatSinkFusion",
+          "referenceName": "Heat Sink",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "B",
+            "successionWars": "B",
+            "clanInvasion": "B"
+          },
+          "cost": {
+            "type": "heatSinksOverFreeFusionSinks",
+            "multiplier": 2000,
+            "freeFusionSinks": 10
+          }
+        }
+      ],
+      "rearArmor": 8
+    },
+    "leftTorso": {
+      "key": "leftTorso",
+      "name": "Left Torso",
+      "armor": 16,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "IS Vehicle Flamer Ammo",
+          "normalized": "is_flamer_vehicle_ammo",
+          "normalizedId": "is_flamer_vehicle_ammo",
+          "type": "ammo",
+          "displayName": "Flamer (Vehicle) Ammo",
+          "referenceId": "is_flamer_vehicle_ammo",
+          "referenceName": "Flamer (Vehicle) Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_flamer_vehicle_ammo",
+          "bv": 1,
+          "costPerTon": 1000,
+          "shotsPerTon": 20
+        },
+        {
+          "slotIndex": 2,
+          "raw": "IS Vehicle Flamer Ammo",
+          "normalized": "is_flamer_vehicle_ammo",
+          "normalizedId": "is_flamer_vehicle_ammo",
+          "type": "ammo",
+          "displayName": "Flamer (Vehicle) Ammo",
+          "referenceId": "is_flamer_vehicle_ammo",
+          "referenceName": "Flamer (Vehicle) Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_flamer_vehicle_ammo",
+          "bv": 1,
+          "costPerTon": 1000,
+          "shotsPerTon": 20
+        },
+        {
+          "slotIndex": 3,
+          "raw": "IS Vehicle Flamer Ammo",
+          "normalized": "is_flamer_vehicle_ammo",
+          "normalizedId": "is_flamer_vehicle_ammo",
+          "type": "ammo",
+          "displayName": "Flamer (Vehicle) Ammo",
+          "referenceId": "is_flamer_vehicle_ammo",
+          "referenceName": "Flamer (Vehicle) Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_flamer_vehicle_ammo",
+          "bv": 1,
+          "costPerTon": 1000,
+          "shotsPerTon": 20
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Cargo:SIZE:4.0",
+          "normalized": "cargosize40",
+          "type": "equipment",
+          "displayName": "Cargo:SIZE:4.0",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Cargo:SIZE:4.0",
+          "normalized": "cargosize40",
+          "type": "equipment",
+          "displayName": "Cargo:SIZE:4.0",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Cargo:SIZE:4.0",
+          "normalized": "cargosize40",
+          "type": "equipment",
+          "displayName": "Cargo:SIZE:4.0",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Cargo:SIZE:4.0",
+          "normalized": "cargosize40",
+          "type": "equipment",
+          "displayName": "Cargo:SIZE:4.0",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Dumper (Front)",
+          "normalized": "dumperfront",
+          "type": "equipment",
+          "displayName": "Dumper (Front)",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 6
+    },
+    "rightTorso": {
+      "key": "rightTorso",
+      "name": "Right Torso",
+      "armor": 16,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Lift Hoist/Arresting Hoist",
+          "normalized": "lift_hoist",
+          "normalizedId": "lift_hoist",
+          "type": "equipment",
+          "displayName": "Lift Hoist",
+          "referenceId": "lift_hoist",
+          "referenceName": "Lift Hoist",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Lift Hoist/Arresting Hoist",
+          "normalized": "lift_hoist",
+          "normalizedId": "lift_hoist",
+          "type": "equipment",
+          "displayName": "Lift Hoist",
+          "referenceId": "lift_hoist",
+          "referenceName": "Lift Hoist",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lift Hoist/Arresting Hoist",
+          "normalized": "lift_hoist",
+          "normalizedId": "lift_hoist",
+          "type": "equipment",
+          "displayName": "Lift Hoist",
+          "referenceId": "lift_hoist",
+          "referenceName": "Lift Hoist",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "IS Ammo AC/5",
+          "normalized": "is_ac_5_ammo",
+          "normalizedId": "is_ac_5_ammo",
+          "type": "ammo",
+          "displayName": "AC/5 Ammo",
+          "referenceId": "is_ac_5_ammo",
+          "referenceName": "AC/5 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "is_ac_5_ammo",
+          "weaponRef": "weapon-5",
+          "bv": 9,
+          "costPerTon": 4500,
+          "shotsPerTon": 20
+        },
+        {
+          "slotIndex": 5,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 6,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 6
+    },
+    "leftArm": {
+      "key": "leftArm",
+      "name": "Left Arm",
+      "armor": 16,
+      "structure": 12,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Large Laser",
+          "normalized": "is_large_laser",
+          "normalizedId": "is_large_laser",
+          "type": "weapon",
+          "displayName": "Large Laser",
+          "referenceId": "is_large_laser",
+          "referenceName": "Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Large Laser",
+          "normalized": "is_large_laser",
+          "normalizedId": "is_large_laser",
+          "type": "weapon",
+          "displayName": "Large Laser",
+          "referenceId": "is_large_laser",
+          "referenceName": "Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Flamer (Vehicle)",
+          "normalized": "is_flamer_vehicle",
+          "normalizedId": "is_flamer_vehicle",
+          "type": "weapon",
+          "displayName": "Flamer (Vehicle)",
+          "referenceId": "is_flamer_vehicle",
+          "referenceName": "Flamer (Vehicle)",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Flamer (Vehicle)",
+          "normalized": "is_flamer_vehicle",
+          "normalizedId": "is_flamer_vehicle",
+          "type": "weapon",
+          "displayName": "Flamer (Vehicle)",
+          "referenceId": "is_flamer_vehicle",
+          "referenceName": "Flamer (Vehicle)",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Flamer (Vehicle)",
+          "normalized": "is_flamer_vehicle",
+          "normalizedId": "is_flamer_vehicle",
+          "type": "weapon",
+          "displayName": "Flamer (Vehicle)",
+          "referenceId": "is_flamer_vehicle",
+          "referenceName": "Flamer (Vehicle)",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Combine",
+          "normalized": "combine",
+          "type": "equipment",
+          "displayName": "Combine",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Combine",
+          "normalized": "combine",
+          "type": "equipment",
+          "displayName": "Combine",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Combine",
+          "normalized": "combine",
+          "type": "equipment",
+          "displayName": "Combine",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Combine",
+          "normalized": "combine",
+          "type": "equipment",
+          "displayName": "Combine",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightArm": {
+      "key": "rightArm",
+      "name": "Right Arm",
+      "armor": 16,
+      "structure": 12,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Arm Actuator",
+          "normalized": "lowerArmActuator",
+          "normalizedId": "lowerArmActuator",
+          "type": "system",
+          "displayName": "Lower Arm Actuator",
+          "referenceId": "lowerArmActuator",
+          "referenceName": "Lower Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 50
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Autocannon/5",
+          "normalized": "is_ac_5",
+          "normalizedId": "is_ac_5",
+          "type": "weapon",
+          "displayName": "AC/5",
+          "referenceId": "is_ac_5",
+          "referenceName": "AC/5",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Autocannon/5",
+          "normalized": "is_ac_5",
+          "normalizedId": "is_ac_5",
+          "type": "weapon",
+          "displayName": "AC/5",
+          "referenceId": "is_ac_5",
+          "referenceName": "AC/5",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Autocannon/5",
+          "normalized": "is_ac_5",
+          "normalizedId": "is_ac_5",
+          "type": "weapon",
+          "displayName": "AC/5",
+          "referenceId": "is_ac_5",
+          "referenceName": "AC/5",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Autocannon/5",
+          "normalized": "is_ac_5",
+          "normalizedId": "is_ac_5",
+          "type": "weapon",
+          "displayName": "AC/5",
+          "referenceId": "is_ac_5",
+          "referenceName": "AC/5",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-5"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Chainsaw",
+          "normalized": "chainsaw",
+          "normalizedId": "chainsaw",
+          "type": "equipment",
+          "displayName": "Chainsaw",
+          "referenceId": "chainsaw",
+          "referenceName": "Chainsaw",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Chainsaw",
+          "normalized": "chainsaw",
+          "normalizedId": "chainsaw",
+          "type": "equipment",
+          "displayName": "Chainsaw",
+          "referenceId": "chainsaw",
+          "referenceName": "Chainsaw",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Chainsaw",
+          "normalized": "chainsaw",
+          "normalizedId": "chainsaw",
+          "type": "equipment",
+          "displayName": "Chainsaw",
+          "referenceId": "chainsaw",
+          "referenceName": "Chainsaw",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Chainsaw",
+          "normalized": "chainsaw",
+          "normalizedId": "chainsaw",
+          "type": "equipment",
+          "displayName": "Chainsaw",
+          "referenceId": "chainsaw",
+          "referenceName": "Chainsaw",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Chainsaw",
+          "normalized": "chainsaw",
+          "normalizedId": "chainsaw",
+          "type": "equipment",
+          "displayName": "Chainsaw",
+          "referenceId": "chainsaw",
+          "referenceName": "Chainsaw",
+          "referenceSource": "weapon"
+        }
+      ]
+    },
+    "leftLeg": {
+      "key": "leftLeg",
+      "name": "Left Leg",
+      "armor": 20,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 6,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightLeg": {
+      "key": "rightLeg",
+      "name": "Right Leg",
+      "armor": 20,
+      "structure": 16,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 6,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    }
+  },
+  "warnings": [
+    "Unresolved slot: Grommet D90 MilitiaMech Left Torso slot 4: \"Cargo:SIZE:4.0\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Torso slot 5: \"Cargo:SIZE:4.0\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Torso slot 6: \"Cargo:SIZE:4.0\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Torso slot 7: \"Cargo:SIZE:4.0\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Torso slot 8: \"Dumper (Front)\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Arm slot 9: \"Combine\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Arm slot 10: \"Combine\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Arm slot 11: \"Combine\"",
+    "Unresolved slot: Grommet D90 MilitiaMech Left Arm slot 12: \"Combine\""
+  ]
+}

@@ -109,15 +109,18 @@ interface UnitDetailJson {
   catalog?: Record<string, any>;
   mtf?: {
     sourcePath?: string;
+    rawFields?: Record<string, any>;
   };
   fluff?: Record<string, any>;
   weapons?: Array<any>;
   locations?: Record<string, any>;
+  warnings?: Array<any>;
 }
 
 function mapDetailJsonToUnit(detail: UnitDetailJson, catalogItem: UnitCatalogItem): Unit {
   const catalog = detail.catalog ?? {};
   const fluff = detail.fluff ?? {};
+  const rawFields = detail.mtf?.rawFields ?? {};
   const weapons = Array.isArray(detail.weapons) ? detail.weapons : [];
   const locations = detail.locations ?? {};
 
@@ -161,18 +164,94 @@ function mapDetailJsonToUnit(detail: UnitDetailJson, catalogItem: UnitCatalogIte
     capabilities: fluff.capabilities,
     deployment: fluff.deployment,
     history: fluff.history,
-    quirks: fluff.quirks,
-    manufacturer: fluff.manufacturer,
-    factory: fluff.factory,
+    quirks: normalizeQuirks(fluff.quirks ?? catalog.quirks ?? rawFields.quirks ?? rawFields.quirk),
+    manufacturer: fluff.manufacturer ?? rawFields.manufacturer,
+    factory: fluff.primaryFactory ?? fluff.factory ?? rawFields.primaryFactory ?? rawFields.factory,
+    primaryFactory: fluff.primaryFactory ?? fluff.factory ?? rawFields.primaryFactory ?? rawFields.factory,
+    systemManufacturers: normalizeSystemManufacturers(fluff.systemManufacturer ?? fluff.systemManufacturers ?? rawFields.systemManufacturer),
     myomer: fluff.myomer,
     armorType: catalog.armorType ?? catalogItem.armorType,
     structureType: catalog.structureType ?? catalogItem.structureType,
-    weapons: mapDetailWeapons(weapons),
+    weapons: mapDetailWeapons(weapons, locations),
     locations: mapDetailLocations(locations),
+    warnings: normalizeUnitWarnings(detail.warnings),
   };
 }
 
-function mapDetailWeapons(weapons: any[]): Unit["weapons"] {
+function normalizeQuirks(value: unknown): string[] {
+  const rawValues = Array.isArray(value) ? value : String(value ?? "").split(/[,;|]/g);
+
+  return rawValues
+    .map((quirk) => String(quirk ?? "").trim())
+    .filter(Boolean)
+    .map(formatQuirkName);
+}
+
+function formatQuirkName(value: string): string {
+  const specialWords: Record<string, string> = {
+    is: "IS",
+    clan: "Clan",
+    c3: "C3",
+    lrm: "LRM",
+    srm: "SRM",
+  };
+
+  return value
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w+\b/g, (word) => specialWords[word.toLowerCase()] ?? word.charAt(0).toUpperCase() + word.slice(1));
+}
+
+function normalizeSystemManufacturers(value: unknown): Record<string, string> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .map(([key, manufacturer]) => [formatSystemManufacturerLabel(key), String(manufacturer ?? "").trim()])
+      .filter(([, manufacturer]) => Boolean(manufacturer))
+  );
+}
+
+function formatSystemManufacturerLabel(value: string): string {
+  const labels: Record<string, string> = {
+    chassis: "Chassis",
+    engine: "Engine",
+    armor: "Armor",
+    communications: "Communications",
+    targeting: "Targeting",
+    jumpjet: "Jump Jets",
+    myomer: "Myomer",
+  };
+
+  const normalized = value.trim().toLowerCase();
+  return labels[normalized] ?? value.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function normalizeUnitWarnings(warnings: UnitDetailJson["warnings"]): Unit["warnings"] {
+  if (!Array.isArray(warnings)) return [];
+  return warnings
+    .map((warning) => {
+      if (typeof warning === "string") return warning;
+      if (warning && typeof warning === "object") {
+        return {
+          severity: typeof warning.severity === "string" ? warning.severity : undefined,
+          code: typeof warning.code === "string" ? warning.code : undefined,
+          field: typeof warning.field === "string" ? warning.field : undefined,
+          message: typeof warning.message === "string" ? warning.message : String(warning.message ?? "").trim() || undefined,
+        };
+      }
+      return String(warning ?? "").trim();
+    })
+    .filter((warning) => {
+      if (typeof warning === "string") return warning.length > 0;
+      return Boolean(warning.message || warning.code || warning.field || warning.severity);
+    });
+}
+
+function mapDetailWeapons(weapons: any[], locations: UnitDetailJson["locations"]): Unit["weapons"] {
+  const ammoTotals = getAmmoShotTotals(locations);
+
   return weapons.map((weapon, index) => {
     const name = weapon.displayName ?? weapon.referenceName ?? weapon.name ?? "Unknown Weapon";
     const damage = weapon.definition?.damage ?? weapon.damage ?? "—";
@@ -180,6 +259,7 @@ function mapDetailWeapons(weapons: any[]): Unit["weapons"] {
     const slots = Number(
       weapon.definition?.critSlots ?? weapon.definition?.spaceSlots ?? weapon.slots ?? 1
     );
+    const ammoId = getWeaponAmmoId(weapon);
 
     return {
       id: `${slugForWeaponId(weapon.referenceId ?? weapon.name ?? name)}-${index + 1}`,
@@ -189,10 +269,92 @@ function mapDetailWeapons(weapons: any[]): Unit["weapons"] {
       heat,
       range: formatWeaponRange(weapon.definition?.range ?? weapon.range ?? "—"),
       slots: Math.max(1, slots),
-      ammo: weapon.definition?.ammo?.ammoId ?? weapon.definition?.ammo?.ammoType,
-      shots: weapon.definition?.ammo ? weapon.definition?.ammo.shotsPerTon ?? weapon.definition?.ammoPerTon ?? "∞" : isEnergyWeapon(name) ? "∞" : 0,
+      ammo: ammoId,
+      shots: getWeaponShotDisplay(name, ammoId, ammoTotals),
     };
   });
+}
+
+function getWeaponShotDisplay(
+  weaponName: string,
+  ammoId: string | undefined,
+  ammoTotals: Record<string, number>,
+): number | "∞" {
+  if (!ammoId) {
+    return isEnergyWeapon(weaponName) ? "∞" : 0;
+  }
+
+  return ammoTotals[normalizeAmmoKey(ammoId)] ?? 0;
+}
+
+function getWeaponAmmoId(weapon: any): string | undefined {
+  const explicitAmmoId =
+    weapon.definition?.ammo?.ammoId ??
+    weapon.definition?.ammo?.id ??
+    weapon.definition?.ammo?.ammoType ??
+    weapon.ammoId ??
+    weapon.ammo;
+
+  if (!explicitAmmoId) return undefined;
+
+  return String(explicitAmmoId);
+}
+
+function getAmmoShotTotals(locations: UnitDetailJson["locations"]): Record<string, number> {
+  const totals: Record<string, number> = {};
+
+  for (const location of Object.values(locations ?? {})) {
+    const slots = Array.isArray(location?.slots) ? location.slots : [];
+
+    for (const slot of slots) {
+      if (slot?.type !== "ammo") continue;
+
+      const ammoId = getAmmoSlotId(slot);
+      if (!ammoId) continue;
+
+      const shots = getAmmoSlotShots(slot);
+      if (!Number.isFinite(shots) || shots <= 0) continue;
+
+      totals[ammoId] = (totals[ammoId] ?? 0) + shots;
+    }
+  }
+
+  return totals;
+}
+
+function getAmmoSlotId(slot: any): string | undefined {
+  const ammoId =
+    slot.ammoRef ??
+    slot.referenceId ??
+    slot.normalizedId ??
+    slot.normalized;
+
+  const normalized = normalizeAmmoKey(ammoId);
+  return normalized || undefined;
+}
+
+function getAmmoSlotShots(slot: any): number {
+  const rawShots =
+    slot.shotsPerTon ??
+    slot.shots ??
+    slot.definition?.shotsPerTon ??
+    slot.definition?.shots;
+
+  if (typeof rawShots === "string" && rawShots.toUpperCase() === "OS") return 1;
+
+  const shots = Number(rawShots);
+  return Number.isFinite(shots) ? shots : 0;
+}
+
+function normalizeAmmoKey(value: unknown): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^is\s+/i, "is_")
+    .replace(/^clan\s+/i, "clan_")
+    .replace(/\bammo\b/i, "ammo")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 }
 
 function formatWeaponRange(range: any): string {
@@ -245,7 +407,7 @@ function slugForWeaponId(value: string): string {
 }
 
 function isEnergyWeapon(name: string): boolean {
-  return /laser|pulse laser|gauss|flamer|particle projection|ppc/i.test(name);
+  return /laser|pulse laser|flamer|particle projection|ppc/i.test(name);
 }
 
 function mapDetailLocations(locations: Record<string, any>): Unit["locations"] {

@@ -1,0 +1,2404 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-01T02:34:01.945Z",
+  "catalog": {
+    "id": "meks-meks-3060u-nova-cat-g",
+    "unitType": "meks",
+    "chassis": "Nova Cat",
+    "model": "G",
+    "name": "Nova Cat G",
+    "fileName": "Nova Cat G.mtf",
+    "relativePath": "meks/3060u/Nova Cat G.mtf",
+    "mulId": "2305",
+    "tonnage": "70",
+    "weightClass": "Heavy",
+    "bv": "2522",
+    "bvSource": "calculated",
+    "costCBills": "18595167",
+    "costSource": "calculated",
+    "techBase": "Clan",
+    "rulesLevel": "Standard",
+    "year": "3072",
+    "era": "Jihad",
+    "role": "Missile Boat",
+    "source": "TR:3060",
+    "walkMP": "4",
+    "runMP": "6",
+    "jumpMP": "",
+    "engineRating": "280",
+    "engineType": "XL Fusion",
+    "gyroType": "Standard",
+    "cockpitType": "Standard",
+    "heatSinkCount": "14",
+    "heatSinkType": "Double",
+    "armorType": "Standard(Clan)",
+    "structureType": "Clan Endo Steel",
+    "armorPoints": "216",
+    "armorTonnage": "13.5",
+    "warnings": ""
+  },
+  "mtf": {
+    "fileName": "Nova Cat G.mtf",
+    "relativePath": "meks/3060u/Nova Cat G.mtf",
+    "sourcePath": "server/data/units/meks/3060u/Nova Cat G.mtf",
+    "rawFields": {
+      "chassis": "Nova Cat",
+      "model": "G",
+      "mul id": "2305",
+      "TechBase": "Clan",
+      "Era": "3072",
+      "Source": "TR:3060",
+      "Rules Level": "2",
+      "role": "Missile Boat",
+      "quirk": "exp_actuator",
+      "Mass": "70",
+      "Structure": "Clan Endo Steel",
+      "Heat Sinks": "14 Double",
+      "Base Chassis Heat Sinks": "11",
+      "Walk MP": "4",
+      "Jump MP": "0",
+      "Armor": "Standard(Clan)",
+      "LA Armor": "22",
+      "RA Armor": "22",
+      "LT Armor": "23",
+      "RT Armor": "23",
+      "CT Armor": "35",
+      "HD Armor": "9",
+      "LL Armor": "30",
+      "RL Armor": "30",
+      "RTL Armor": "7",
+      "RTR Armor": "7",
+      "RTC Armor": "8",
+      "Weapons": "12",
+      "Left Arm": "",
+      "Right Arm": "",
+      "Left Torso": "",
+      "Right Torso": "",
+      "Center Torso": "",
+      "Head": "",
+      "Left Leg": "",
+      "Right Leg": ""
+    }
+  },
+  "fluff": {
+    "overview": "A Nova Cat heavy OmniMech built to protect the Nova Cats spiritually and militarily.",
+    "capabilities": "The basic components of this design, combined with its characteristics as an OmniMech, make it very simple to repair and leave room for the large amount of double heat sinks most variants carry. 13 ½ tons of standard armor make this 'Mech very difficult to kill.",
+    "deployment": "Another configuration developed during the Jihad, this configuration was developed for the fire support and anti-infantry role. The config, like the F, is given a Targeting Computer and ECM suite. For fire-support role, it has been given three Artemis IV guided LRM-20 launchers in the arms with five tons of ammunition. For its anti-infantry role, it has been given eight AP Gauss Rifles split between the two torsos. The guns shares a ton ammunition between them.",
+    "history": "After its defeat on Tukayyid, Khan Severen Leroux of Clan Nova Cat commissioned the Nova Cat OmniMech, meant to protect the Clan both militarily and spiritually. The 12 meter tall 'Mech is inspired by the Night Gyr created by Clan Jade Falcon.",
+    "manufacturer": "Barcella Alpha, Irece Alpha",
+    "primaryFactory": "Barcella, Irece",
+    "systemManufacturer": {
+      "chassis": "Mynx Type Heavy",
+      "engine": "Consolidated Fusion 280 Extralight",
+      "armor": "Alpha Compound Plate",
+      "communications": "JNE Integrated",
+      "targeting": "Build 2 CAT TTS"
+    }
+  },
+  "weapons": [
+    {
+      "ref": "weapon-1",
+      "index": 1,
+      "name": "LRM 20",
+      "location": "Left Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_lrm_20",
+      "referenceName": "LRM 20",
+      "referenceSource": "weapon",
+      "displayName": "LRM 20",
+      "definition": {
+        "id": "clan_lrm_20",
+        "name": "LRM 20",
+        "altNames": [
+          "Clan LRM 20",
+          "CL LRM 20",
+          "CLLRM20",
+          "LRM-20",
+          "LRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 6,
+        "tons": 5,
+        "critSlots": 4,
+        "spaceSlots": 4,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_lrm_20_ammo"
+        },
+        "bv": 220,
+        "oneShotBV": 44,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 250000,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "C"
+        }
+      }
+    },
+    {
+      "ref": "weapon-2",
+      "index": 2,
+      "name": "LRM 20",
+      "location": "Right Arm",
+      "quantityIndex": 1,
+      "referenceId": "clan_lrm_20",
+      "referenceName": "LRM 20",
+      "referenceSource": "weapon",
+      "displayName": "LRM 20",
+      "definition": {
+        "id": "clan_lrm_20",
+        "name": "LRM 20",
+        "altNames": [
+          "Clan LRM 20",
+          "CL LRM 20",
+          "CLLRM20",
+          "LRM-20",
+          "LRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 6,
+        "tons": 5,
+        "critSlots": 4,
+        "spaceSlots": 4,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_lrm_20_ammo"
+        },
+        "bv": 220,
+        "oneShotBV": 44,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 250000,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "C"
+        }
+      }
+    },
+    {
+      "ref": "weapon-3",
+      "index": 3,
+      "name": "LRM 20",
+      "location": "Right Arm",
+      "quantityIndex": 2,
+      "referenceId": "clan_lrm_20",
+      "referenceName": "LRM 20",
+      "referenceSource": "weapon",
+      "displayName": "LRM 20",
+      "definition": {
+        "id": "clan_lrm_20",
+        "name": "LRM 20",
+        "altNames": [
+          "Clan LRM 20",
+          "CL LRM 20",
+          "CLLRM20",
+          "LRM-20",
+          "LRM20"
+        ],
+        "category": "Missile",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "lrm",
+        "damage": "1/Msl",
+        "heat": 6,
+        "tons": 5,
+        "critSlots": 4,
+        "spaceSlots": 4,
+        "range": {
+          "min": 0,
+          "short": 7,
+          "medium": 14,
+          "long": 21
+        },
+        "techRating": "F",
+        "flags": [
+          "cluster",
+          "requiresAmmo",
+          "indirectFire",
+          "minimumRange"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 295
+        },
+        "typeCodes": [
+          "M",
+          "C",
+          "S"
+        ],
+        "ammo": {
+          "ammoId": "clan_lrm_20_ammo"
+        },
+        "bv": 220,
+        "oneShotBV": 44,
+        "notes": [
+          "BV after slash in the rules table is the single-shot/one-shot launcher BV."
+        ],
+        "cost": 250000,
+        "availability": {
+          "starLeague": "C",
+          "successionWars": "C",
+          "clanInvasion": "C"
+        }
+      }
+    },
+    {
+      "ref": "weapon-4",
+      "index": 4,
+      "name": "ER Large Laser",
+      "location": "Left Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_er_large_laser",
+      "referenceName": "ER Large Laser",
+      "referenceSource": "weapon",
+      "displayName": "ER Large Laser",
+      "definition": {
+        "id": "clan_er_large_laser",
+        "name": "ER Large Laser",
+        "altNames": [
+          "Clan ER Large Laser",
+          "CL ER Large Laser",
+          "CLERLargeLaser",
+          "ERLargeLaser"
+        ],
+        "category": "Energy",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "laser",
+        "damage": 10,
+        "heat": 12,
+        "tons": 4,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 8,
+          "medium": 15,
+          "long": 25
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 0
+        },
+        "typeCodes": [
+          "DE"
+        ],
+        "bv": 248,
+        "cost": 200000
+      }
+    },
+    {
+      "ref": "weapon-5",
+      "index": 5,
+      "name": "AP Gauss Rifle",
+      "location": "Left Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-6",
+      "index": 6,
+      "name": "AP Gauss Rifle",
+      "location": "Left Torso",
+      "quantityIndex": 2,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-7",
+      "index": 7,
+      "name": "AP Gauss Rifle",
+      "location": "Left Torso",
+      "quantityIndex": 3,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-8",
+      "index": 8,
+      "name": "AP Gauss Rifle",
+      "location": "Left Torso",
+      "quantityIndex": 4,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-9",
+      "index": 9,
+      "name": "AP Gauss Rifle",
+      "location": "Right Torso",
+      "quantityIndex": 1,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-10",
+      "index": 10,
+      "name": "AP Gauss Rifle",
+      "location": "Right Torso",
+      "quantityIndex": 2,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-11",
+      "index": 11,
+      "name": "AP Gauss Rifle",
+      "location": "Right Torso",
+      "quantityIndex": 3,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    },
+    {
+      "ref": "weapon-12",
+      "index": 12,
+      "name": "AP Gauss Rifle",
+      "location": "Right Torso",
+      "quantityIndex": 4,
+      "referenceId": "clan_ap_gauss_rifle",
+      "referenceName": "AP Gauss Rifle",
+      "referenceSource": "weapon",
+      "displayName": "AP Gauss Rifle",
+      "definition": {
+        "id": "clan_ap_gauss_rifle",
+        "name": "AP Gauss Rifle",
+        "altNames": [
+          "Clan AP Gauss Rifle",
+          "CL AP Gauss Rifle",
+          "CLAPGaussRifle",
+          "APGaussRifle"
+        ],
+        "category": "Ballistic",
+        "techBase": "Clan",
+        "rulesLevel": "Standard",
+        "variant": "Clan",
+        "family": "gauss",
+        "damage": 3,
+        "heat": 1,
+        "tons": 0.5,
+        "critSlots": 1,
+        "spaceSlots": 1,
+        "range": {
+          "min": 0,
+          "short": 3,
+          "medium": 6,
+          "long": 9
+        },
+        "techRating": "F",
+        "flags": [
+          "directFire",
+          "antiInfantry",
+          "requiresAmmo"
+        ],
+        "source": {
+          "weightSpacePage": 343,
+          "battleValuePage": 318,
+          "costAvailabilityPage": 294
+        },
+        "typeCodes": [
+          "DB",
+          "X",
+          "AI"
+        ],
+        "ammo": {
+          "ammoId": "clan_ap_gauss_rifle_ammo"
+        },
+        "bv": 21,
+        "cost": 10000,
+        "notes": [
+          "Ammo BV marked § in the BV table; ammunition is not counted as explosive."
+        ],
+        "availability": {
+          "starLeague": "X",
+          "successionWars": "X",
+          "clanInvasion": "E"
+        }
+      }
+    }
+  ],
+  "locations": {
+    "head": {
+      "key": "head",
+      "name": "Head",
+      "armor": 9,
+      "structure": 3,
+      "slotCapacity": 6,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Cockpit",
+          "normalized": "standardCockpit",
+          "normalizedId": "standardCockpit",
+          "type": "system",
+          "displayName": "Standard Cockpit",
+          "referenceId": "standardCockpit",
+          "referenceName": "Standard Cockpit",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 200000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Sensors",
+          "normalized": "sensors",
+          "normalizedId": "sensors",
+          "type": "system",
+          "displayName": "Sensors",
+          "referenceId": "sensors",
+          "referenceName": "Sensors",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 2000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Life Support",
+          "normalized": "lifeSupport",
+          "normalizedId": "lifeSupport",
+          "type": "system",
+          "displayName": "Life Support",
+          "referenceId": "lifeSupport",
+          "referenceName": "Life Support",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "fixed",
+            "amount": 50000
+          }
+        }
+      ]
+    },
+    "centerTorso": {
+      "key": "centerTorso",
+      "name": "Center Torso",
+      "armor": 35,
+      "structure": 22,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "Gyro",
+          "normalized": "standardGyro",
+          "normalizedId": "standardGyro",
+          "type": "system",
+          "displayName": "Standard Gyro",
+          "referenceId": "standardGyro",
+          "referenceName": "Standard Gyro",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "gyroTonnage",
+            "multiplier": 300000
+          }
+        },
+        {
+          "slotIndex": 8,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 9,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        }
+      ],
+      "rearArmor": 8
+    },
+    "leftTorso": {
+      "key": "leftTorso",
+      "name": "Left Torso",
+      "armor": 23,
+      "structure": 15,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLERLargeLaser (omnipod)",
+          "normalized": "clan_er_large_laser",
+          "normalizedId": "clan_er_large_laser",
+          "type": "weapon",
+          "displayName": "ER Large Laser",
+          "referenceId": "clan_er_large_laser",
+          "referenceName": "ER Large Laser",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-4"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-8"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "CLAPGaussRifle Ammo (omnipod)",
+          "normalized": "clan_ap_gauss_rifle_ammo",
+          "normalizedId": "clan_ap_gauss_rifle_ammo",
+          "type": "ammo",
+          "displayName": "AP Gauss Rifle Ammo",
+          "referenceId": "clan_ap_gauss_rifle_ammo",
+          "referenceName": "AP Gauss Rifle Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_ap_gauss_rifle_ammo",
+          "bv": 3,
+          "costPerTon": 3000,
+          "shotsPerTon": 40
+        },
+        {
+          "slotIndex": 9,
+          "raw": "CLTargeting Computer (omnipod)",
+          "normalized": "clan_targeting_computer",
+          "normalizedId": "clan_targeting_computer",
+          "type": "equipment",
+          "displayName": "Targeting Computer",
+          "referenceId": "clan_targeting_computer",
+          "referenceName": "Targeting Computer",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "CLTargeting Computer (omnipod)",
+          "normalized": "clan_targeting_computer",
+          "normalizedId": "clan_targeting_computer",
+          "type": "equipment",
+          "displayName": "Targeting Computer",
+          "referenceId": "clan_targeting_computer",
+          "referenceName": "Targeting Computer",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "CLECMSuite (omnipod)",
+          "normalized": "clan_ecm_suite",
+          "normalizedId": "clan_ecm_suite",
+          "type": "equipment",
+          "displayName": "ECM Suite",
+          "referenceId": "clan_ecm_suite",
+          "referenceName": "ECM Suite",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ],
+      "rearArmor": 7
+    },
+    "rightTorso": {
+      "key": "rightTorso",
+      "name": "Right Torso",
+      "armor": 23,
+      "structure": 15,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Fusion Engine",
+          "normalized": "standardFusionEngine",
+          "normalizedId": "standardFusionEngine",
+          "type": "system",
+          "displayName": "Standard Fusion Engine",
+          "referenceId": "standardFusionEngine",
+          "referenceName": "Standard Fusion Engine",
+          "referenceSource": "component",
+          "techRating": "D",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "engineRatingUnitTonnageDiv75",
+            "multiplier": 5000
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-12"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-12"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-12"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "CLAPGaussRifle (omnipod)",
+          "normalized": "clan_ap_gauss_rifle",
+          "normalizedId": "clan_ap_gauss_rifle",
+          "type": "weapon",
+          "displayName": "AP Gauss Rifle",
+          "referenceId": "clan_ap_gauss_rifle",
+          "referenceName": "AP Gauss Rifle",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-12"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Clan Ammo LRM-20 (Clan) Artemis-capable (omnipod)",
+          "normalized": "clan_lrm_20_ammo",
+          "normalizedId": "clan_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "LRM 20 Ammo",
+          "referenceId": "clan_lrm_20_ammo",
+          "referenceName": "LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_20_ammo",
+          "bv": 27,
+          "costPerTon": 30000,
+          "shotsPerTon": 6
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Clan Ammo LRM-20 (Clan) Artemis-capable (omnipod)",
+          "normalized": "clan_lrm_20_ammo",
+          "normalizedId": "clan_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "LRM 20 Ammo",
+          "referenceId": "clan_lrm_20_ammo",
+          "referenceName": "LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_20_ammo",
+          "bv": 27,
+          "costPerTon": 30000,
+          "shotsPerTon": 6
+        }
+      ],
+      "rearArmor": 7
+    },
+    "leftArm": {
+      "key": "leftArm",
+      "name": "Left Arm",
+      "armor": 22,
+      "structure": 11,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLDoubleHeatSink (omnipod)",
+          "normalized": "doubleHeatSink",
+          "normalizedId": "doubleHeatSink",
+          "type": "system",
+          "displayName": "Double Heat Sink",
+          "referenceId": "doubleHeatSink",
+          "referenceName": "Double Heat Sink",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "E",
+            "clanInvasion": "D"
+          },
+          "cost": {
+            "type": "totalHeatSinks",
+            "multiplier": 6000
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-1"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "CLArtemisIV (omnipod)",
+          "normalized": "artemis_iv_fcs",
+          "normalizedId": "artemis_iv_fcs",
+          "type": "equipment",
+          "displayName": "Artemis IV FCS",
+          "referenceId": "artemis_iv_fcs",
+          "referenceName": "Artemis IV FCS",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "Clan Ammo LRM-20 (Clan) Artemis-capable (omnipod)",
+          "normalized": "clan_lrm_20_ammo",
+          "normalizedId": "clan_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "LRM 20 Ammo",
+          "referenceId": "clan_lrm_20_ammo",
+          "referenceName": "LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_20_ammo",
+          "bv": 27,
+          "costPerTon": 30000,
+          "shotsPerTon": 6
+        },
+        {
+          "slotIndex": 11,
+          "raw": "Clan Ammo LRM-20 (Clan) Artemis-capable (omnipod)",
+          "normalized": "clan_lrm_20_ammo",
+          "normalizedId": "clan_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "LRM 20 Ammo",
+          "referenceId": "clan_lrm_20_ammo",
+          "referenceName": "LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_20_ammo",
+          "bv": 27,
+          "costPerTon": 30000,
+          "shotsPerTon": 6
+        },
+        {
+          "slotIndex": 12,
+          "raw": "Clan Ammo LRM-20 (Clan) Artemis-capable (omnipod)",
+          "normalized": "clan_lrm_20_ammo",
+          "normalizedId": "clan_lrm_20_ammo",
+          "type": "ammo",
+          "displayName": "LRM 20 Ammo",
+          "referenceId": "clan_lrm_20_ammo",
+          "referenceName": "LRM 20 Ammo",
+          "referenceSource": "ammo",
+          "ammoRef": "clan_lrm_20_ammo",
+          "bv": 27,
+          "costPerTon": 30000,
+          "shotsPerTon": 6
+        }
+      ]
+    },
+    "rightArm": {
+      "key": "rightArm",
+      "name": "Right Arm",
+      "armor": 22,
+      "structure": 11,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Shoulder",
+          "normalized": "shoulder",
+          "type": "system",
+          "displayName": "Shoulder",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Arm Actuator",
+          "normalized": "upperArmActuator",
+          "normalizedId": "upperArmActuator",
+          "type": "system",
+          "displayName": "Upper Arm Actuator",
+          "referenceId": "upperArmActuator",
+          "referenceName": "Upper Arm Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 100
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 4,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 5,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 6,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 7,
+          "raw": "CLArtemisIV (omnipod)",
+          "normalized": "artemis_iv_fcs",
+          "normalizedId": "artemis_iv_fcs",
+          "type": "equipment",
+          "displayName": "Artemis IV FCS",
+          "referenceId": "artemis_iv_fcs",
+          "referenceName": "Artemis IV FCS",
+          "referenceSource": "weapon"
+        },
+        {
+          "slotIndex": 8,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 9,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 10,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 11,
+          "raw": "CLLRM20 (omnipod)",
+          "normalized": "clan_lrm_20",
+          "normalizedId": "clan_lrm_20",
+          "type": "weapon",
+          "displayName": "LRM 20",
+          "referenceId": "clan_lrm_20",
+          "referenceName": "LRM 20",
+          "referenceSource": "weapon",
+          "weaponRef": "weapon-3"
+        },
+        {
+          "slotIndex": 12,
+          "raw": "CLArtemisIV (omnipod)",
+          "normalized": "artemis_iv_fcs",
+          "normalizedId": "artemis_iv_fcs",
+          "type": "equipment",
+          "displayName": "Artemis IV FCS",
+          "referenceId": "artemis_iv_fcs",
+          "referenceName": "Artemis IV FCS",
+          "referenceSource": "weapon"
+        }
+      ]
+    },
+    "leftLeg": {
+      "key": "leftLeg",
+      "name": "Left Leg",
+      "armor": 30,
+      "structure": 15,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    },
+    "rightLeg": {
+      "key": "rightLeg",
+      "name": "Right Leg",
+      "armor": 30,
+      "structure": 15,
+      "slotCapacity": 12,
+      "slots": [
+        {
+          "slotIndex": 1,
+          "raw": "Hip",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 2,
+          "raw": "Upper Leg Actuator",
+          "normalized": "upperLegActuator",
+          "normalizedId": "upperLegActuator",
+          "type": "system",
+          "displayName": "Upper Leg Actuator",
+          "referenceId": "upperLegActuator",
+          "referenceName": "Upper Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 150
+          }
+        },
+        {
+          "slotIndex": 3,
+          "raw": "Lower Leg Actuator",
+          "normalized": "lowerLegActuator",
+          "normalizedId": "lowerLegActuator",
+          "type": "system",
+          "displayName": "Lower Leg Actuator",
+          "referenceId": "lowerLegActuator",
+          "referenceName": "Lower Leg Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 80
+          }
+        },
+        {
+          "slotIndex": 4,
+          "raw": "Foot Actuator",
+          "normalized": "footActuator",
+          "normalizedId": "footActuator",
+          "type": "system",
+          "displayName": "Foot Actuator",
+          "referenceId": "footActuator",
+          "referenceName": "Foot Actuator",
+          "referenceSource": "component",
+          "techRating": "C",
+          "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 120
+          }
+        },
+        {
+          "slotIndex": 5,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 6,
+          "raw": "Clan Endo Steel",
+          "normalized": "endoSteelInternalStructure",
+          "normalizedId": "endoSteelInternalStructure",
+          "type": "system",
+          "displayName": "Endo-Steel Internal Structure",
+          "referenceId": "endoSteelInternalStructure",
+          "referenceName": "Endo-Steel Internal Structure",
+          "referenceSource": "component",
+          "techRating": "E",
+          "availability": {
+            "starLeague": "D",
+            "successionWars": "F",
+            "clanInvasion": "E"
+          },
+          "cost": {
+            "type": "unitTonnage",
+            "multiplier": 1600
+          }
+        },
+        {
+          "slotIndex": 7,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 8,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 9,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 10,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 11,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        },
+        {
+          "slotIndex": 12,
+          "raw": "-Empty-",
+          "normalized": "empty",
+          "type": "empty",
+          "displayName": "Empty",
+          "referenceId": "",
+          "referenceName": "",
+          "referenceSource": ""
+        }
+      ]
+    }
+  },
+  "warnings": []
+}

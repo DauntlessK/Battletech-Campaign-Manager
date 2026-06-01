@@ -1406,7 +1406,8 @@ export const AMMO: Record<string, AmmoDefinition> = {
         "altNames": [
             "IS Machine Gun",
             "IS Machine Gun Ammo",
-            "Machine Gun"
+            "Machine Gun",
+            "IS Ammo MG - Full"
         ],
         "ammoType": "is_machine_gun",
         "weaponIds": ["is_machine_gun"],
@@ -4628,6 +4629,281 @@ export const AMMO: Record<string, AmmoDefinition> = {
             "weightSpacePage": 0,
             "costAvailabilityPage": 0,
             "battleValuePage": 0
+        }
+    },
+        "is_mech_mortar_1_sc_ammo": {
+        "id": "is_mech_mortar_1_sc_ammo",
+        "name": "Mech Mortar/1 SC Ammo",
+        "altNames": [
+            "IS Ammo SC Mortar-1",
+            "IS SC Mortar-1 Ammo",
+            "ISSCMortar1Ammo",
+            "IS Mech Mortar/1 SC Ammo",
+            "IS Mech Mortar-1 SC Ammo",
+            "Ammo SC Mortar-1",
+            "SC Mortar-1 Ammo",
+            "Mech Mortar/1 SC Ammo",
+            "Mech Mortar-1 SC Ammo"
+        ],
+        "ammoType": "is_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_1"],
+        "compatibleWeaponNames": ["Mech Mortar/1", "Mech Mortar-1"],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 24,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "is_mech_mortar_2_sc_ammo": {
+        "id": "is_mech_mortar_2_sc_ammo",
+        "name": "Mech Mortar/2 SC Ammo",
+        "altNames": [
+            "IS Ammo SC Mortar-2",
+            "IS SC Mortar-2 Ammo",
+            "ISSCMortar2Ammo",
+            "IS Mech Mortar/2 SC Ammo",
+            "IS Mech Mortar-2 SC Ammo",
+            "Ammo SC Mortar-2",
+            "SC Mortar-2 Ammo",
+            "Mech Mortar/2 SC Ammo",
+            "Mech Mortar-2 SC Ammo"
+        ],
+        "ammoType": "is_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_2"],
+        "compatibleWeaponNames": ["Mech Mortar/2", "Mech Mortar-2"],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 12,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "is_mech_mortar_4_sc_ammo": {
+        "id": "is_mech_mortar_4_sc_ammo",
+        "name": "Mech Mortar/4 SC Ammo",
+        "altNames": [
+            "IS Ammo SC Mortar-4",
+            "IS SC Mortar-4 Ammo",
+            "ISSCMortar4Ammo",
+            "IS Mech Mortar/4 SC Ammo",
+            "IS Mech Mortar-4 SC Ammo",
+            "Ammo SC Mortar-4",
+            "SC Mortar-4 Ammo",
+            "Mech Mortar/4 SC Ammo",
+            "Mech Mortar-4 SC Ammo"
+        ],
+        "ammoType": "is_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_4"],
+        "compatibleWeaponNames": ["Mech Mortar/4", "Mech Mortar-4"],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 6,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "is_mech_mortar_8_sc_ammo": {
+        "id": "is_mech_mortar_8_sc_ammo",
+        "name": "Mech Mortar/8 SC Ammo",
+        "altNames": [
+            "IS Ammo SC Mortar-8",
+            "IS SC Mortar-8 Ammo",
+            "ISSCMortar8Ammo",
+            "IS Mech Mortar/8 SC Ammo",
+            "IS Mech Mortar-8 SC Ammo",
+            "Ammo SC Mortar-8",
+            "SC Mortar-8 Ammo",
+            "Mech Mortar/8 SC Ammo",
+            "Mech Mortar-8 SC Ammo"
+        ],
+        "ammoType": "is_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_8"],
+        "compatibleWeaponNames": ["Mech Mortar/8", "Mech Mortar-8"],
+        "techBase": "Inner Sphere",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 4,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "clan_mech_mortar_1_sc_ammo": {
+        "id": "clan_mech_mortar_1_sc_ammo",
+        "name": "Mech Mortar/1 SC Ammo",
+        "altNames": [
+            "Clan Ammo SC Mortar-1",
+            "Clan SC Mortar-1 Ammo",
+            "CL Ammo SC Mortar-1",
+            "CLSCMortar1Ammo",
+            "Clan Mech Mortar/1 SC Ammo",
+            "Clan Mech Mortar-1 SC Ammo",
+            "Ammo SC Mortar-1",
+            "SC Mortar-1 Ammo",
+            "Mech Mortar/1 SC Ammo",
+            "Mech Mortar-1 SC Ammo"
+        ],
+        "ammoType": "clan_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_1"],
+        "compatibleWeaponNames": ["Mech Mortar/1", "Mech Mortar-1"],
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 24,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "clan_mech_mortar_2_sc_ammo": {
+        "id": "clan_mech_mortar_2_sc_ammo",
+        "name": "Mech Mortar/2 SC Ammo",
+        "altNames": [
+            "Clan Ammo SC Mortar-2",
+            "Clan SC Mortar-2 Ammo",
+            "CL Ammo SC Mortar-2",
+            "CLSCMortar2Ammo",
+            "Clan Mech Mortar/2 SC Ammo",
+            "Clan Mech Mortar-2 SC Ammo",
+            "Ammo SC Mortar-2",
+            "SC Mortar-2 Ammo",
+            "Mech Mortar/2 SC Ammo",
+            "Mech Mortar-2 SC Ammo"
+        ],
+        "ammoType": "clan_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_2"],
+        "compatibleWeaponNames": ["Mech Mortar/2", "Mech Mortar-2"],
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 12,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "clan_mech_mortar_4_sc_ammo": {
+        "id": "clan_mech_mortar_4_sc_ammo",
+        "name": "Mech Mortar/4 SC Ammo",
+        "altNames": [
+            "Clan Ammo SC Mortar-4",
+            "Clan SC Mortar-4 Ammo",
+            "CL Ammo SC Mortar-4",
+            "CLSCMortar4Ammo",
+            "Clan Mech Mortar/4 SC Ammo",
+            "Clan Mech Mortar-4 SC Ammo",
+            "Ammo SC Mortar-4",
+            "SC Mortar-4 Ammo",
+            "Mech Mortar/4 SC Ammo",
+            "Mech Mortar-4 SC Ammo"
+        ],
+        "ammoType": "clan_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_4"],
+        "compatibleWeaponNames": ["Mech Mortar/4", "Mech Mortar-4"],
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 6,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
+        }
+    },
+
+    "clan_mech_mortar_8_sc_ammo": {
+        "id": "clan_mech_mortar_8_sc_ammo",
+        "name": "Mech Mortar/8 SC Ammo",
+        "altNames": [
+            "Clan Ammo SC Mortar-8",
+            "Clan SC Mortar-8 Ammo",
+            "CL Ammo SC Mortar-8",
+            "CLSCMortar8Ammo",
+            "Clan Mech Mortar/8 SC Ammo",
+            "Clan Mech Mortar-8 SC Ammo",
+            "Ammo SC Mortar-8",
+            "SC Mortar-8 Ammo",
+            "Mech Mortar/8 SC Ammo",
+            "Mech Mortar-8 SC Ammo"
+        ],
+        "ammoType": "clan_mech_mortar_sc",
+        "weaponIds": ["mech_mortar_8"],
+        "compatibleWeaponNames": ["Mech Mortar/8", "Mech Mortar-8"],
+        "techBase": "Clan",
+        "rulesLevel": "Advanced",
+        "shotsPerTon": 4,
+        "costPerTon": 0,
+        "bv": 0,
+        "availability": {
+            "starLeague": "C",
+            "successionWars": "C",
+            "clanInvasion": "C"
+        },
+        "source": {
+            "weightSpacePage": 136,
+            "battleValuePage": 0,
+            "costAvailabilityPage": 0
         }
     },
 };

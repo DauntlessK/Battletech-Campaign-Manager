@@ -1013,6 +1013,8 @@ function MechSummary({
         </div>
       )}
 
+      <UnitWarningSummary warnings={unit.warnings ?? []} />
+
       <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-3">
         <DetailStat
           label="Tons"
@@ -1245,16 +1247,7 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
         <TextInfoSection title="Deployment" value={unit.deployment} />
         <TextInfoSection title="History" value={unit.history} />
 
-        <InfoSection
-          title="Manufacturing"
-          items={[
-            "Manufacturer",
-            "Primary Factory",
-            "Known Production Lines",
-            "Availability Notes",
-          ]}
-          values={[unit.manufacturer ?? "—", unit.factory ?? "—", "—", "—"]}
-        />
+        <ManufacturingInfoSection unit={unit} />
 
         <QuirksInfoSection quirks={unit.quirks ?? []} />
 
@@ -1305,9 +1298,80 @@ function FullInfoPanel({ unit }: { unit: Unit }) {
             unit.mulId ? String(unit.mulId) : "—",
           ]}
         />
+
+        <JsonWarningsInfoSection warnings={unit.warnings ?? []} />
       </div>
     </section>
   );
+}
+
+function UnitWarningSummary({ warnings }: { warnings: Unit["warnings"] }) {
+  const warningCount = getUnitWarningMessages(warnings).length;
+
+  if (warningCount === 0) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+      <div className="flex items-center gap-2 font-black text-red-100">
+        <AlertTriangle size={16} />
+        JSON warnings / issues detected
+      </div>
+      <p className="mt-1 text-red-200/85">
+        This generated JSON has {warningCount} warning
+        {warningCount === 1 ? "" : "s"}. Check the Details tab before relying on
+        this unit's parsed data.
+      </p>
+    </div>
+  );
+}
+
+function JsonWarningsInfoSection({ warnings }: { warnings: Unit["warnings"] }) {
+  const warningMessages = getUnitWarningMessages(warnings);
+
+  return (
+    <div className="rounded-3xl border border-red-500/35 bg-red-950/20 p-4 xl:col-span-2">
+      <h4 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.16em] text-red-200">
+        <AlertTriangle size={16} />
+        JSON Warnings / Issues
+      </h4>
+
+      {warningMessages.length > 0 ? (
+        <ul className="mt-3 space-y-2 text-sm text-red-100">
+          {warningMessages.map((warning, index) => (
+            <li
+              key={`${warning}-${index}`}
+              className="rounded-2xl border border-red-500/30 bg-red-950/30 px-3 py-2 leading-6"
+            >
+              {warning}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 text-sm text-zinc-400">
+          No JSON warnings reported for this unit.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function getUnitWarningMessages(warnings: Unit["warnings"]): string[] {
+  if (!Array.isArray(warnings)) return [];
+
+  return warnings
+    .map((warning) => {
+      if (typeof warning === "string") return warning.trim();
+
+      const message = warning?.message?.trim();
+      const metadata = [warning?.severity, warning?.code, warning?.field]
+        .filter(Boolean)
+        .join(" — ");
+
+      if (message && metadata) return `${metadata}: ${message}`;
+      if (message) return message;
+      return metadata;
+    })
+    .filter((warning): warning is string => Boolean(warning));
 }
 
 function TextInfoSection({ title, value }: { title: string; value?: string }) {
@@ -1319,6 +1383,57 @@ function TextInfoSection({ title, value }: { title: string; value?: string }) {
       <p className="mt-3 min-h-28 whitespace-pre-wrap rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-6 text-zinc-400">
         {value?.trim() || "—"}
       </p>
+    </div>
+  );
+}
+
+function ManufacturingInfoSection({ unit }: { unit: Unit }) {
+  const systemManufacturers = Object.entries(unit.systemManufacturers ?? {}).filter(
+    ([, manufacturer]) => Boolean(String(manufacturer ?? "").trim()),
+  );
+
+  return (
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4 xl:col-span-2">
+      <h4 className="text-sm font-black uppercase tracking-[0.16em] text-lime-300">
+        Manufacturing
+      </h4>
+      <div className="mt-3 grid gap-2 md:grid-cols-2">
+        <ManufacturingField label="Manufacturer" value={unit.manufacturer} />
+        <ManufacturingField label="Primary Factory" value={unit.primaryFactory ?? unit.factory} />
+      </div>
+
+      {systemManufacturers.length > 0 ? (
+        <div className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+            System Manufacturers
+          </div>
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
+            {systemManufacturers.map(([system, manufacturer]) => (
+              <div key={system} className="rounded-xl border border-zinc-800 bg-zinc-900/70 px-3 py-2">
+                <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+                  {system}
+                </div>
+                <div className="mt-1 text-sm text-zinc-300">{manufacturer}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4 text-sm text-zinc-500">
+          No system manufacturer details loaded.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ManufacturingField({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3">
+      <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+        {label}
+      </div>
+      <div className="mt-1 min-h-5 text-sm text-zinc-300">{value?.trim() || "—"}</div>
     </div>
   );
 }

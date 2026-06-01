@@ -25,6 +25,11 @@ export function normalizeCatalogUnit(unit: Unit): Unit {
     weapons: unit.weapons ?? [],
     locations: unit.locations ?? [],
     quirks: unit.quirks ?? [],
+    manufacturer: unit.manufacturer,
+    factory: unit.factory,
+    primaryFactory: unit.primaryFactory ?? unit.factory,
+    systemManufacturers: unit.systemManufacturers ?? {},
+    warnings: normalizeUnitWarnings(unit.warnings),
   };
 }
 
@@ -76,4 +81,10 @@ export function weightClassFromTonnage(tonnage: number) {
   if (tonnage <= 55) return "Medium";
   if (tonnage <= 75) return "Heavy";
   return "Assault";
+}
+
+
+function normalizeUnitWarnings(value: Unit["warnings"]): Unit["warnings"] {
+  if (!Array.isArray(value)) return [];
+  return value;
 }

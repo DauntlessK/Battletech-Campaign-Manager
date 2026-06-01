@@ -360,6 +360,35 @@ export const COMPONENTS = {
     },
     cost: { type: "unitTonnage", multiplier: 120 },
   },
+    actuatorEnhancementSystem: {
+    id: "actuatorEnhancementSystem",
+    name: "Actuator Enhancement System",
+    altNames: [
+      "Actuator Enhancement System",
+      "AES",
+      "IS AES",
+      "ISAES",
+      "CL AES",
+      "CLAES",
+      "Actuator Enhancement",
+      "IS Actuator Enhancement System",
+      "Clan Actuator Enhancement System",
+      "Actuator Enhancement System (OMNIPOD)",
+      "ISAES (OMNIPOD)",
+      "CLAES (OMNIPOD)"
+    ],
+    category: "actuator",
+    techRating: "E",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "E",
+    },
+    cost: { type: "fixed", amount: 0 },
+    notes: [
+      "Critical-slot component for Actuator Enhancement System. Usually installed in a limb and handled as mounted equipment; verify final cost formula before using for C-bill calculations."
+    ],
+  },
 
   // Engines
   standardFusionEngine: {
@@ -746,6 +775,33 @@ export const COMPONENTS = {
     },
     cost: { type: "armorTonnage", multiplier: 120000 },
   },
+  reflectiveArmor: {
+    id: "reflectiveArmor",
+    name: "Reflective Armor",
+    altNames: [
+      "Reflective",
+      "Reflective Armor",
+      "IS Reflective",
+      "IS Reflective Armor",
+      "ISReflective",
+      "ISReflectiveArmor",
+      "Clan Reflective",
+      "Clan Reflective Armor",
+      "CLReflective",
+      "CLReflectiveArmor"
+    ],
+    category: "armor",
+    techRating: "F",
+    availability: {
+      starLeague: "X",
+      successionWars: "X",
+      clanInvasion: "F",
+    },
+    cost: { type: "armorTonnage", multiplier: 150000 },
+    notes: [
+      "Critical-slot component for Reflective armor. Used for slot resolution and armor type metadata."
+    ],
+  },
 
   // Weapon Enhancement
   ppcCapacitor: {
@@ -775,7 +831,7 @@ export const COMPONENTS = {
     cost: { type: "fixed", amount: 45000 },
   },
 
-  //Equipment
+  //Flight Equipment
     avionics: {
     id: "avionics",
     name: "Avionics",
