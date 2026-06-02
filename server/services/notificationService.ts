@@ -50,3 +50,23 @@ export async function markNotificationRead(notificationId: string, userId: strin
   await saveStore(store);
   return n;
 }
+
+export async function clearNotificationsForUser(userId: string): Promise<void> {
+  const store = await loadStore();
+  store.notifications = (store.notifications ?? []).filter((n) => n.userId !== userId);
+  await saveStore(store);
+}
+
+export async function clearNotificationsForUserByPayload(
+  userId: string,
+  criteria: { type?: string; payload?: Record<string, any> },
+): Promise<void> {
+  const store = await loadStore();
+  store.notifications = (store.notifications ?? []).filter((n) => {
+    if (n.userId !== userId) return true;
+    if (criteria.type && n.type !== criteria.type) return true;
+    const payloadCriteria = criteria.payload ?? {};
+    return !Object.entries(payloadCriteria).every(([key, value]) => n.payload?.[key] === value);
+  });
+  await saveStore(store);
+}

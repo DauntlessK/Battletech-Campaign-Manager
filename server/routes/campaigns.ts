@@ -1,6 +1,17 @@
 import express from "express";
 import { requireAuth, RequestWithUser } from "../middleware/authMiddleware";
-import { createCampaign, getCampaignById, listCampaignsForUser, inviteParticipant, isUserParticipant, respondToInvitation } from "../services/campaignService";
+import {
+  createCampaign,
+  getCampaignById,
+  inviteFriendToCampaign,
+  inviteParticipant,
+  isUserParticipant,
+  listCampaignsForUser,
+  respondToInvitation,
+  setCampaignForce,
+  uninviteCampaignParticipant,
+  updateCampaign,
+} from "../services/campaignService";
 
 const router = express.Router();
 
@@ -33,12 +44,39 @@ router.get("/", requireAuth, async (req: RequestWithUser, res) => {
   }
 });
 
+router.patch("/:id", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const campaign = await updateCampaign(req.params.id, user.id, req.body ?? {});
+    res.json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Update campaign failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.patch("/:id/force", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const { forceId } = req.body ?? {};
+    const campaign = await setCampaignForce(req.params.id, user.id, forceId || null);
+    res.json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Set campaign force failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 router.get("/:id", requireAuth, async (req: RequestWithUser, res) => {
   try {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "Authentication required." });
 
-    const campaign = await getCampaignById(req.params.id);
+    const campaign = await getCampaignById(req.params.id, user.id);
     if (!campaign) return res.status(404).json({ error: "Campaign not found." });
     // Very small access control: ensure the requesting user is an accepted participant
     // For MVP we require membership to view private campaign details.
@@ -49,6 +87,39 @@ router.get("/:id", requireAuth, async (req: RequestWithUser, res) => {
   } catch (error) {
     console.error("[routes/campaigns] Get campaign failed:", error);
     res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+
+router.post("/:id/invite-friend", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const { friendUserId } = req.body ?? {};
+    if (!friendUserId) return res.status(400).json({ error: "friendUserId is required." });
+
+    const campaign = await inviteFriendToCampaign(req.params.id, user.id, String(friendUserId));
+    res.status(201).json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Invite friend failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.post("/:id/uninvite", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const { participantUserId } = req.body ?? {};
+    if (!participantUserId) return res.status(400).json({ error: "participantUserId is required." });
+
+    const campaign = await uninviteCampaignParticipant(req.params.id, user.id, String(participantUserId));
+    res.json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Uninvite failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -73,11 +144,11 @@ router.post("/:id/respond", requireAuth, async (req: RequestWithUser, res) => {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "Authentication required." });
 
-    const { accept, forceId } = req.body;
+    const { accept } = req.body;
     if (accept === undefined) return res.status(400).json({ error: "accept (true|false) is required." });
 
-    const participant = await respondToInvitation(req.params.id, user.id, Boolean(accept), forceId);
-    res.json(participant);
+    const campaign = await respondToInvitation(req.params.id, user.id, Boolean(accept));
+    res.json(campaign);
   } catch (error) {
     console.error("[routes/campaigns] Respond to invite failed:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });

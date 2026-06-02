@@ -10,8 +10,34 @@ export type PageKey =
   | "battles"
   | "myAccount";
 
-export type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace" | string;
+export type UnitType =
+  | "BattleMech"
+  | "Vehicle"
+  | "Infantry"
+  | "Aerospace"
+  | string;
 export type BattleStatus = "Proposed" | "Confirmed" | "Disputed" | "Finalized";
+
+export type Battle = {
+  id: string;
+  campaignId: string;
+  turnNumber?: number;
+  date: string;
+  location?: string;
+  status: BattleStatus;
+  submittedByUserId: string;
+  defendingUserId?: string;
+  winnerUserId?: string;
+  attackerForceId?: string;
+  defenderForceId?: string;
+  attackerScore?: number;
+  defenderScore?: number;
+  summary?: string;
+  confirmedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type UnitPanelMode = "slots" | "weapons" | "details";
 export type SortMode = "name" | "tonnage" | "bv" | "cost";
 
@@ -64,7 +90,13 @@ export type Unit = {
   tonnage: number;
   weightClass: "Light" | "Medium" | "Heavy" | "Assault" | string;
   costCBills: number;
-  rulesLevel: "Introductory" | "Standard" | "Advanced" | "Experimental" | "Unknown" | string;
+  rulesLevel:
+    | "Introductory"
+    | "Standard"
+    | "Advanced"
+    | "Experimental"
+    | "Unknown"
+    | string;
   walk: number;
   run: number;
   jump: number;
@@ -118,27 +150,86 @@ export type User = {
 };
 
 export type CampaignType = "Chaos" | "Advanced" | "Conquest" | string;
-export type CampaignStatus = "Setup" | "Active" | "Paused" | "Completed" | "Archived" | string;
+export type CampaignStatus =
+  | "Setup"
+  | "Active"
+  | "Paused"
+  | "Completed"
+  | "Archived"
+  | string;
 export type ObjectiveControlType = "Binary" | "Percentage" | string;
-export type ResourceBalance = Partial<Record<"CBills" | "RepairPoints" | "Warchest" | "Time" | "Salvage" | string, number>>;
+export type ResourceBalance = Partial<
+  Record<"CBills" | "Warchest" | "Time" | string, number>
+>;
 
 export type CampaignSettings = {
   type: CampaignType;
-  scoringMethod?: string;
   era: string;
   rulesLevel: string;
   forceBVLimit: number;
-  factionRestriction?: string;
   maxPlayers?: number;
   maxTurnsAhead?: number;
   maxTurns?: number;
   combatTeamRules?: boolean;
+  combatTeamCount?: number;
   combatTeamBVLimit?: number;
   combatTeamSize?: number;
   objectiveControlType?: ObjectiveControlType;
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
-  victoryConditions?: string[];
+};
+
+
+export type FriendSummary = {
+  id: string;
+  friendUserId: string;
+  displayName: string;
+  friendCode: string;
+  createdAt?: string;
+};
+
+export type FriendRequestSummary = {
+  id: string;
+  requesterId: string;
+  recipientId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  respondedAt?: string;
+  requester?: {
+    id: string;
+    displayName: string;
+    friendCode: string;
+  };
+  recipient?: {
+    id: string;
+    displayName: string;
+    friendCode: string;
+  };
+};
+
+export type CampaignParticipantSummary = {
+  id: string;
+  campaignId: string;
+  userId: string;
+  role: string;
+  status: string;
+  invitedById?: string;
+  invitedAt: string;
+  joinedAt?: string;
+  leftAt?: string;
+  forceId?: string;
+  user?: {
+    id: string;
+    displayName: string;
+    friendCode: string;
+  };
+  force?: {
+    id: string;
+    name: string;
+    totalBV?: number;
+    faction?: string;
+  };
 };
 
 export type Campaign = {
@@ -152,6 +243,8 @@ export type Campaign = {
   updatedAt?: string;
   startDate?: string;
   finishDate?: string;
+  assignedForceId?: string;
+  participants?: CampaignParticipantSummary[];
 };
 
 export type ForceUnit = {
@@ -220,9 +313,16 @@ export type PendingInvite = {
   };
   campaign: {
     id: string;
-    name: string;
-    ownerId: string;
+    name?: string;
+    description?: string;
+    ownerId?: string;
     status?: string;
+    settings?: CampaignSettings;
+  };
+  inviter?: {
+    id: string;
+    displayName: string;
+    friendCode: string;
   };
 };
 

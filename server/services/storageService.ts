@@ -20,6 +20,7 @@ const DEFAULT_STORE: StoreData = {
   resourceTransactions: [],
   authTokens: [],
   notifications: [],
+  friendRequests: [],
 };
 
 async function pathExists(filePath: string): Promise<boolean> {

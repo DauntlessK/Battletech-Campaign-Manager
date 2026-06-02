@@ -1,8 +1,9 @@
 import express from "express";
 import { requireAuth, RequestWithUser } from "../middleware/authMiddleware";
 import { sanitizeUser, updateUserProfile } from "../services/authService";
-import { listNotificationsForUser } from "../services/notificationService";
+import { clearNotificationsForUser, listNotificationsForUser } from "../services/notificationService";
 import { listPendingInvitesForUser } from "../services/campaignService";
+import { createFriendRequestByCode, listFriendRequestsForUser, listFriendsForUser, respondToFriendRequest } from "../services/friendService";
 
 const router = express.Router();
 
@@ -35,6 +36,65 @@ router.patch("/me", requireAuth, async (req: RequestWithUser, res) => {
   }
 });
 
+
+router.get("/me/friends", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const friends = await listFriendsForUser(user.id);
+    res.json(friends);
+  } catch (error) {
+    console.error("[routes/users] List friends failed:", error);
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.get("/me/friend-requests", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const requests = await listFriendRequestsForUser(user.id);
+    res.json(requests);
+  } catch (error) {
+    console.error("[routes/users] List friend requests failed:", error);
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.post("/me/friend-requests", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const { friendCode } = req.body ?? {};
+    if (!friendCode) return res.status(400).json({ error: "friendCode is required." });
+
+    const request = await createFriendRequestByCode(user.id, String(friendCode));
+    res.status(201).json(request);
+  } catch (error) {
+    console.error("[routes/users] Create friend request failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.post("/me/friend-requests/:id/respond", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const { accept } = req.body ?? {};
+    if (accept === undefined) return res.status(400).json({ error: "accept is required." });
+
+    const request = await respondToFriendRequest(user.id, req.params.id, Boolean(accept));
+    res.json(request);
+  } catch (error) {
+    console.error("[routes/users] Respond to friend request failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 router.get("/me/invites", requireAuth, async (req: RequestWithUser, res) => {
   try {
     const user = req.user;
@@ -44,6 +104,20 @@ router.get("/me/invites", requireAuth, async (req: RequestWithUser, res) => {
     res.json(invites);
   } catch (error) {
     console.error("[routes/users] List invites failed:", error);
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+
+router.post("/me/notifications/clear", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    await clearNotificationsForUser(user.id);
+    res.json([]);
+  } catch (error) {
+    console.error("[routes/users] Clear notifications failed:", error);
     res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
