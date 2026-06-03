@@ -162,6 +162,48 @@ export type ResourceBalance = Partial<
   Record<"CBills" | "Warchest" | "Time" | string, number>
 >;
 
+
+export type VictoryConditions = {
+  totalBattlesEnabled?: boolean;
+  totalBattles?: number;
+  capitulationBVEnabled?: boolean;
+  capitulationBVPercent?: number;
+  capitulationResourcesEnabled?: boolean;
+  capitulationResourcesPercent?: number;
+  dominationEnabled?: boolean;
+  dominationControlPercent?: number;
+  keyObjectivesEnabled?: boolean;
+  turnsElapsedEnabled?: boolean;
+  turnsElapsed?: number;
+  mapControlEnabled?: boolean;
+  mapControlPercent?: number;
+};
+
+export type CampaignObjectiveType =
+  | "Factory"
+  | "Depot"
+  | "Comms Array"
+  | "Small City"
+  | "Large City"
+  | "Fort Holding"
+  | "Repair Facility"
+  | "Space Port"
+  | "Medical Facility"
+  | string;
+
+export type CampaignObjective = {
+  id: string;
+  name: string;
+  type: CampaignObjectiveType;
+  isKey?: boolean;
+};
+
+export type CampaignFluff = {
+  year?: number;
+  planet?: string;
+  conflictDescription?: string;
+};
+
 export type CampaignSettings = {
   type: CampaignType;
   era: string;
@@ -177,6 +219,9 @@ export type CampaignSettings = {
   objectiveControlType?: ObjectiveControlType;
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
+  victoryConditions?: VictoryConditions;
+  objectives?: CampaignObjective[];
+  fluff?: CampaignFluff;
 };
 
 
@@ -219,6 +264,7 @@ export type CampaignParticipantSummary = {
   joinedAt?: string;
   leftAt?: string;
   forceId?: string;
+  color?: string;
   user?: {
     id: string;
     displayName: string;
@@ -228,6 +274,7 @@ export type CampaignParticipantSummary = {
     id: string;
     name: string;
     totalBV?: number;
+    startingBV?: number;
     faction?: string;
   };
 };
@@ -286,6 +333,7 @@ export type Force = {
   era?: string;
   rulesLevel?: string;
   totalBV?: number;
+  startingBV?: number;
   currencyCBills?: number;
   faction?: string;
   forConquest?: boolean;

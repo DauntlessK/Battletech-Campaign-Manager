@@ -27,6 +27,32 @@ function isFriendInStore(store: any, userAId: string, userBId: string): boolean 
   );
 }
 
+
+const CAMPAIGN_PLAYER_COLORS = [
+  "#ef4444", // red
+  "#2563eb", // blue
+  "#f59e0b", // amber
+  "#22c55e", // green
+  "#a855f7", // purple
+  "#f97316", // orange
+  "#ec4899", // pink
+  "#14b8a6", // teal
+  "#eab308", // yellow
+  "#06b6d4", // cyan
+];
+
+function assignParticipantColor(store: any, campaignId: string, participant: any) {
+  if (participant.color && CAMPAIGN_PLAYER_COLORS.includes(participant.color)) return;
+  const used = new Set(
+    (store.campaignParticipants ?? [])
+      .filter((entry: any) => entry.campaignId === campaignId && entry.id !== participant.id && entry.color)
+      .map((entry: any) => entry.color),
+  );
+  const available = CAMPAIGN_PLAYER_COLORS.filter((color) => !used.has(color));
+  const pool = available.length ? available : CAMPAIGN_PLAYER_COLORS;
+  participant.color = pool[Math.floor(Math.random() * pool.length)];
+}
+
 const VALID_CAMPAIGN_TYPES: CampaignType[] = ["Chaos", "Advanced", "Conquest"];
 const VALID_ERAS = [
   "Star League",
@@ -39,6 +65,33 @@ const VALID_ERAS = [
   "IlClan",
 ];
 const VALID_RULES_LEVELS = ["Introductory", "Standard", "Advanced"];
+const ERA_YEAR_RANGES: Record<string, { min: number; max: number }> = {
+  "Star League": { min: 2571, max: 2780 },
+  "Succession Wars": { min: 2781, max: 3049 },
+  "Clan Invasion": { min: 3050, max: 3061 },
+  "Civil War": { min: 3062, max: 3067 },
+  Jihad: { min: 3068, max: 3085 },
+  Republic: { min: 3086, max: 3130 },
+  "Dark Age": { min: 3131, max: 3150 },
+  IlClan: { min: 3151, max: 3999 },
+};
+
+function normalizeCampaignFluff(raw: any, era: string) {
+  const source = raw ?? {};
+  const planet = String(source.planet ?? "").trim();
+  const conflictDescription = String(source.conflictDescription ?? "").trim();
+  const range = ERA_YEAR_RANGES[era];
+  const parsedYear = Math.floor(Number(source.year));
+  const year = Number.isFinite(parsedYear) && range && parsedYear >= range.min && parsedYear <= range.max
+    ? parsedYear
+    : undefined;
+  const fluff: { year?: number; planet?: string; conflictDescription?: string } = {};
+  if (year) fluff.year = year;
+  if (planet) fluff.planet = planet;
+  if (conflictDescription) fluff.conflictDescription = conflictDescription;
+  return Object.keys(fluff).length ? fluff : undefined;
+}
+
 const VALID_OBJECTIVE_CONTROL_TYPES = ["Binary", "Percentage"];
 
 function toPositiveNumber(value: unknown, fallback: number): number {
@@ -103,6 +156,59 @@ function normalizeStartingResources(
   return {
     CBills: toNonNegativeNumber(resources.CBills, 5_000_000),
   };
+}
+
+
+const OBJECTIVE_TYPES = [
+  "Factory",
+  "Depot",
+  "Comms Array",
+  "Small City",
+  "Large City",
+  "Fort Holding",
+  "Repair Facility",
+  "Space Port",
+  "Medical Facility",
+];
+
+function toBoolean(value: unknown, fallback = false): boolean {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function normalizeVictoryConditions(raw: any, type: CampaignType, objectiveControlType: ObjectiveControlType) {
+  const source = raw ?? {};
+  const keyObjectivesEnabled =
+    objectiveControlType === "Binary" ? false : toBoolean(source.keyObjectivesEnabled, false);
+  return {
+    totalBattlesEnabled: toBoolean(source.totalBattlesEnabled, false),
+    totalBattles: clampInteger(source.totalBattles, 10, 1, 999),
+    capitulationBVEnabled: true,
+    capitulationBVPercent: clampInteger(source.capitulationBVPercent, 10, 1, 100),
+    capitulationResourcesEnabled: true,
+    capitulationResourcesPercent: clampInteger(source.capitulationResourcesPercent, 10, 1, 100),
+    dominationEnabled: toBoolean(source.dominationEnabled, true),
+    dominationControlPercent: clampInteger(source.dominationControlPercent, 70, 1, 100),
+    keyObjectivesEnabled,
+    turnsElapsedEnabled: type === "Conquest" ? toBoolean(source.turnsElapsedEnabled, false) : false,
+    turnsElapsed: type === "Conquest" ? clampInteger(source.turnsElapsed, 25, 1, 999) : undefined,
+    mapControlEnabled: type === "Conquest" ? toBoolean(source.mapControlEnabled, false) : false,
+    mapControlPercent: type === "Conquest" ? clampInteger(source.mapControlPercent, 75, 1, 100) : undefined,
+  };
+}
+
+function normalizeCampaignObjectives(raw: any) {
+  const objectives = Array.isArray(raw) ? raw : [];
+  return objectives.slice(0, 20).map((objective: any, index: number) => {
+    const type = OBJECTIVE_TYPES.includes(String(objective?.type))
+      ? String(objective.type)
+      : OBJECTIVE_TYPES[index % OBJECTIVE_TYPES.length];
+    return {
+      id: String(objective?.id || crypto.randomUUID()),
+      name: String(objective?.name || `${type} ${index + 1}`).trim(),
+      type,
+      isKey: Boolean(objective?.isKey),
+    };
+  });
 }
 
 function normalizeCampaignSettings(
@@ -170,6 +276,9 @@ function normalizeCampaignSettings(
     objectiveControlType,
     salariesEnabled: type !== "Chaos" && Boolean(rawSettings.salariesEnabled),
     startingResources: normalizeStartingResources(rawSettings, type),
+    victoryConditions: normalizeVictoryConditions(rawSettings.victoryConditions, type, objectiveControlType),
+    objectives: normalizeCampaignObjectives(rawSettings.objectives),
+    fluff: normalizeCampaignFluff(rawSettings.fluff, era),
   };
 }
 
@@ -208,6 +317,7 @@ export async function createCampaign(
     invitedAt: now,
     joinedAt: now,
   };
+  assignParticipantColor(store, campaign.id, participant);
 
   store.campaignParticipants.push(participant);
 
@@ -247,6 +357,7 @@ function withUserCampaignState(campaign: Campaign, userId: string, storeOrPartic
               id: participantForce.id,
               name: participantForce.name,
               totalBV: forceBV,
+              startingBV: participantForce.startingBV ?? participantForce.totalBV ?? forceBV,
               faction: participantForce.faction,
             }
           : undefined,
@@ -294,7 +405,14 @@ export async function updateCampaign(
   const participant = store.campaignParticipants.find(
     (entry) => entry.campaignId === campaignId && entry.userId === userId && entry.status === "Accepted",
   );
-  if (participant?.forceId) {
+  const settingsKeys = updates.settings ? Object.keys(updates.settings) : [];
+  const objectiveOnlySettingsUpdate =
+    settingsKeys.length > 0 &&
+    settingsKeys.every((key) => key === "victoryConditions" || key === "objectives" || key === "fluff");
+  const restrictedSetupUpdate =
+    !objectiveOnlySettingsUpdate &&
+    (typeof updates.name === "string" || "description" in updates || settingsKeys.length > 0);
+  if (participant?.forceId && restrictedSetupUpdate) {
     throw new Error("Campaign setup is locked while a force is committed. Uncommit the force before changing setup details.");
   }
 
@@ -404,8 +522,9 @@ export async function inviteFriendToCampaign(
     existing.invitedById = inviterId;
     existing.invitedAt = now;
     existing.leftAt = undefined;
+    assignParticipantColor(store, campaignId, existing);
   } else {
-    store.campaignParticipants.push({
+    const participant: CampaignParticipant = {
       id: crypto.randomUUID(),
       campaignId,
       userId: friendUserId,
@@ -413,7 +532,9 @@ export async function inviteFriendToCampaign(
       status: "Pending",
       invitedById: inviterId,
       invitedAt: now,
-    });
+    };
+    assignParticipantColor(store, campaignId, participant);
+    store.campaignParticipants.push(participant);
   }
 
   campaign.updatedAt = now;
@@ -456,6 +577,82 @@ export async function uninviteCampaignParticipant(
   return withUserCampaignState(campaign, requesterId, store);
 }
 
+
+function copyCommittedForcesToCampaignInStore(store: any, campaign: Campaign) {
+  const acceptedParticipants = store.campaignParticipants.filter(
+    (participant: any) => participant.campaignId === campaign.id && participant.status === "Accepted",
+  );
+
+  for (const participant of acceptedParticipants) {
+    if (!participant.forceId) throw new Error("Every accepted player must assign a force before the campaign can begin.");
+    const existingForce = store.forces.find((force: any) => force.id === participant.forceId);
+    if (!existingForce) throw new Error("Committed force not found.");
+    if (existingForce.origin === "CampaignCopy" && existingForce.campaignId === campaign.id) continue;
+
+    const startingBV = forceCurrentBV(existingForce.id, existingForce.totalBV, store.forceUnits);
+    const copiedForce = {
+      ...existingForce,
+      id: crypto.randomUUID(),
+      campaignId: campaign.id,
+      originalForceId: existingForce.id,
+      origin: "CampaignCopy",
+      startingBV,
+      totalBV: startingBV,
+      status: "Assigned",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const originalUnits = store.forceUnits.filter((unit: any) => unit.forceId === existingForce.id);
+    const copiedUnits = originalUnits.map((unit: any) => ({
+      ...unit,
+      id: crypto.randomUUID(),
+      forceId: copiedForce.id,
+      pilot: unit.pilot ?? { gunnery: 4, piloting: 5 },
+    }));
+    copiedForce.unitIds = copiedUnits
+      .sort((a: any, b: any) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .map((unit: any) => unit.baseUnitId);
+    store.forces.push(copiedForce);
+    store.forceUnits.push(...copiedUnits);
+    participant.forceId = copiedForce.id;
+  }
+}
+
+function campaignPlayersReady(campaign: Campaign, store: any) {
+  const accepted = store.campaignParticipants.filter((participant: any) => participant.campaignId === campaign.id && participant.status === "Accepted");
+  const maxPlayers = Number(campaign.settings?.maxPlayers ?? 2);
+  const countReady = maxPlayers > 2 ? accepted.length >= 3 && accepted.length <= 10 : accepted.length === 2;
+  const forcesReady = accepted.every((participant: any) => Boolean(participant.forceId));
+  return countReady && forcesReady;
+}
+
+function campaignObjectivesReady(campaign: Campaign) {
+  const victory = campaign.settings?.victoryConditions;
+  const objectives = campaign.settings?.objectives ?? [];
+  if (!victory) return false;
+  if (objectives.length < 2) return false;
+  if (victory.keyObjectivesEnabled && !objectives.some((objective: any) => objective.isKey)) return false;
+  return true;
+}
+
+export async function beginCampaign(campaignId: string, userId: string): Promise<Campaign> {
+  const store = await loadStore();
+  const campaign = store.campaigns.find((candidate) => candidate.id === campaignId);
+  if (!campaign) throw new Error("Campaign not found.");
+  if (campaign.ownerId !== userId) throw new Error("Only the campaign owner can begin the campaign.");
+  if (campaign.status !== "Setup") throw new Error("Only setup campaigns can be begun.");
+  if (!campaignObjectivesReady(campaign)) throw new Error("Objectives and victory conditions must be configured before beginning the campaign.");
+  if (!campaignPlayersReady(campaign, store)) throw new Error("Player count and assigned forces must be complete before beginning the campaign.");
+
+  copyCommittedForcesToCampaignInStore(store, campaign);
+  campaign.status = "Active";
+  campaign.startDate = new Date().toISOString();
+  campaign.updatedAt = campaign.startDate;
+  await saveStore(store);
+  return withUserCampaignState(campaign, userId, store);
+}
+
 export async function isUserParticipant(
   campaignId: string,
   userId: string,
@@ -493,6 +690,7 @@ export async function respondToInvitation(
   if (accept) {
     participant.status = "Accepted";
     participant.joinedAt = now;
+    assignParticipantColor(store, campaignId, participant);
   } else {
     participant.status = "Declined";
     participant.leftAt = now;
@@ -560,6 +758,7 @@ export async function inviteParticipant(
     invitedById: inviterId,
     invitedAt: new Date().toISOString(),
   };
+  assignParticipantColor(store, campaignId, participant);
 
   store.campaignParticipants.push(participant);
   await saveStore(store);

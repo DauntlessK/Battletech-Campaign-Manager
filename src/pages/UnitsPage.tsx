@@ -368,6 +368,7 @@ function AddUnitToForceModal({
   addUnitError: string | null;
 }) {
   const [selectedTeams, setSelectedTeams] = useState<Record<string, number>>({});
+  const [addConfirmation, setAddConfirmation] = useState<string | null>(null);
   const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
   const forceRows = forces.map((force) => {
     const currentBV = getForceCurrentBV(force, units);
@@ -406,6 +407,12 @@ function AddUnitToForceModal({
             <X size={18} />
           </button>
         </div>
+
+        {addConfirmation && !addUnitError && (
+          <div className="mx-5 mt-4 rounded-2xl border border-lime-400/40 bg-lime-400/10 p-3 text-sm text-lime-100">
+            {addConfirmation}
+          </div>
+        )}
 
         {addUnitError && (
           <div className="mx-5 mt-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
@@ -495,7 +502,10 @@ function AddUnitToForceModal({
                         )}
                         <button
                           type="button"
-                          onClick={() => onAddUnitToForce(unit.id, force.id, force.forConquest ? selectedTeams[force.id] : undefined)}
+                          onClick={() => {
+                            onAddUnitToForce(unit.id, force.id, force.forConquest ? selectedTeams[force.id] : undefined);
+                            setAddConfirmation(`${unit.chassis || unit.name} ${unit.model || ""} mek has been added to ${force.name}.`.replace(/\s+/g, " ").trim());
+                          }}
                           disabled={!validation.eligible || addUnitLoading || (force.forConquest && !selectedTeams[force.id])}
                           className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 disabled:shadow-none"
                         >

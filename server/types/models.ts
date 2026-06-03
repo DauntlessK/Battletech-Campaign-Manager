@@ -24,6 +24,48 @@ export type CampaignStatus =
   | "Archived";
 export type ObjectiveControlType = "Binary" | "Percentage";
 
+
+export type VictoryConditions = {
+  totalBattlesEnabled?: boolean;
+  totalBattles?: number;
+  capitulationBVEnabled?: boolean;
+  capitulationBVPercent?: number;
+  capitulationResourcesEnabled?: boolean;
+  capitulationResourcesPercent?: number;
+  dominationEnabled?: boolean;
+  dominationControlPercent?: number;
+  keyObjectivesEnabled?: boolean;
+  turnsElapsedEnabled?: boolean;
+  turnsElapsed?: number;
+  mapControlEnabled?: boolean;
+  mapControlPercent?: number;
+};
+
+export type CampaignObjectiveType =
+  | "Factory"
+  | "Depot"
+  | "Comms Array"
+  | "Small City"
+  | "Large City"
+  | "Fort Holding"
+  | "Repair Facility"
+  | "Space Port"
+  | "Medical Facility"
+  | string;
+
+export type CampaignSetupObjective = {
+  id: string;
+  name: string;
+  type: CampaignObjectiveType;
+  isKey?: boolean;
+};
+
+export type CampaignFluff = {
+  year?: number;
+  planet?: string;
+  conflictDescription?: string;
+};
+
 export type CampaignSettings = {
   type: CampaignType;
   era:
@@ -54,6 +96,9 @@ export type CampaignSettings = {
   objectiveControlType?: ObjectiveControlType;
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
+  victoryConditions?: VictoryConditions;
+  objectives?: CampaignSetupObjective[];
+  fluff?: CampaignFluff;
 };
 
 export type Campaign = {
@@ -85,6 +130,7 @@ export type CampaignParticipant = {
   joinedAt?: string;
   leftAt?: string;
   forceId?: string;
+  color?: string;
 };
 
 
@@ -98,6 +144,7 @@ export type CampaignParticipantSummary = CampaignParticipant & {
     id: string;
     name: string;
     totalBV?: number;
+    startingBV?: number;
     faction?: string;
   };
 };
@@ -113,6 +160,7 @@ export type Force = {
   era?: CampaignSettings["era"];
   rulesLevel?: CampaignSettings["rulesLevel"];
   totalBV?: number;
+  startingBV?: number;
   currencyCBills?: number;
   faction?: string;
   forConquest?: boolean;

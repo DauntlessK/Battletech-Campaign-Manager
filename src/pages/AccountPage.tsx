@@ -166,7 +166,7 @@ export default function AccountPage({
     <section className="space-y-6">
       <PageTitle
         eyebrow="Account"
-        title="Commander login"
+        title="My Account"
         description="Create a BattleTech Campaign Manager account or sign in to access campaigns, friends, invites, and notifications."
         actions={
           user ? (

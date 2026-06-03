@@ -4,6 +4,7 @@ import { X, ChevronRight } from "lucide-react";
 import Header from "./components/AppHeader";
 import PageTitle from "./components/PageTitle";
 import Footer from "./components/Footer";
+import planetProjectionImage from "./assets/Planet-Projection.png";
 import AccountPage from "./pages/AccountPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import ForcesPage from "./pages/ForcesPage";
@@ -69,6 +70,7 @@ export default function App() {
   const [campaignForceError, setCampaignForceError] = useState<string | null>(
     null,
   );
+  const [campaignFocusId, setCampaignFocusId] = useState<string | null>(null);
   const [forces, setForces] = useState<Force[]>([]);
   const [forcesLoading, setForcesLoading] = useState(false);
   const [forcesError, setForcesError] = useState<string | null>(null);
@@ -348,6 +350,40 @@ export default function App() {
     } catch (error) {
       setCampaignUpdateError(
         error instanceof Error ? error.message : "Unable to update campaign.",
+      );
+      return null;
+    } finally {
+      setCampaignUpdateLoading(false);
+    }
+  };
+
+
+  const beginCampaignForUser = async (
+    campaignId: string,
+  ): Promise<Campaign | null> => {
+    setCampaignUpdateLoading(true);
+    setCampaignUpdateError(null);
+
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/begin`, {
+        method: "POST",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to begin campaign.");
+      }
+
+      const updatedCampaign = result as Campaign;
+      replaceCampaignInState(updatedCampaign);
+      void fetchForces();
+      return updatedCampaign;
+    } catch (error) {
+      setCampaignUpdateError(
+        error instanceof Error ? error.message : "Unable to begin campaign.",
       );
       return null;
     } finally {
@@ -1072,6 +1108,10 @@ export default function App() {
             }}
             onUpdateForce={updateForceDetails}
             onDeleteForce={deleteForceById}
+            onOpenCampaignForForce={(campaignId: string) => {
+              setCampaignFocusId(campaignId);
+              navigate("myCampaigns");
+            }}
             onCreateForce={async () => {
               if (!forceName.trim()) {
                 setForceFormError("Force name is required.");
@@ -1151,8 +1191,11 @@ export default function App() {
             onCreateCampaign={createCampaignForUser}
             onUpdateCampaign={updateCampaignForUser}
             onAssignForceToCampaign={assignForceToCampaignForUser}
+            onBeginCampaign={beginCampaignForUser}
             invites={invites}
             openInvitesSignal={campaignInvitePanelSignal}
+            focusCampaignId={campaignFocusId}
+            onCampaignFocusConsumed={() => setCampaignFocusId(null)}
             onInviteFriendToCampaign={inviteFriendToCampaign}
             onUninviteCampaignPlayer={uninviteCampaignPlayer}
             onRespondToCampaignInvitation={respondToCampaignInvitation}
@@ -1396,6 +1439,32 @@ function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
           </div>
         </div>
       </div>
+
+      <div className="overflow-hidden rounded-3xl border border-lime-400/20 bg-zinc-900/70 shadow-2xl">
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+          <div className="relative min-h-[18rem] overflow-hidden lg:min-h-[28rem]">
+            <img
+              src={planetProjectionImage}
+              alt="Holographic planet projection over a tactical command console"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-950/80" />
+          </div>
+          <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-lime-300">Campaign command</div>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-zinc-50 sm:text-3xl">Run the war from orbit.</h2>
+            <p className="mt-4 text-sm leading-7 text-zinc-300 sm:text-base">
+              Track planetary control, objectives, combat teams, pilot rosters, and campaign status from one tactical command view built for BattleTech-style campaigns.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-zinc-300">
+              <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-lime-200">Planet control</span>
+              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">Force readiness</span>
+              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">Battle history</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
           <div className="text-2xl font-bold text-lime-300 mb-2">⚙️</div>

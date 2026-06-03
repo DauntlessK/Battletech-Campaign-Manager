@@ -174,8 +174,8 @@ Suggested rules levels:
 1. Introductory
 2. Standard
 3. Advanced
-4. Experimental
-5. Unofficial
+4. Experimental (Not supported at launch)
+5. Unofficial (Not supported at launch)
 
 ## 3.5 Force BV Limit
 

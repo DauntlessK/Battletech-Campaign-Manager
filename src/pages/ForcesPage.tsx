@@ -309,6 +309,7 @@ export default function ForcesPage({
   onBeginForceUnitAssignment,
   onUpdateForce,
   onDeleteForce,
+  onOpenCampaignForForce,
   onCreateForce,
 }: {
   authUser: User | null;
@@ -339,6 +340,7 @@ export default function ForcesPage({
   onBeginForceUnitAssignment: (force: Force) => void;
   onUpdateForce: (forceId: string, updates: { name?: string; description?: string; forceUnits?: ForceUnit[] }) => Promise<void>;
   onDeleteForce: (forceId: string) => Promise<void>;
+  onOpenCampaignForForce?: (campaignId: string) => void;
   onCreateForce: () => Promise<boolean>;
 }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -448,11 +450,16 @@ export default function ForcesPage({
   };
 
   const handleAddUnitToDraft = () => {
-    if (!selectedForce || !selectedAddUnit || !selectedAddValidation.eligible) return;
+    if (!selectedForce || !selectedAddUnit) return;
+    if (!selectedAddValidation.eligible) {
+      setActionError(selectedAddValidation.reasons.join(" ") || "This unit is not eligible for the selected force.");
+      return;
+    }
     const teamNumber = selectedForce.forConquest ? selectedAddTeam : 1;
     const sortOrder = selectedForceUnits.filter((forceUnit) => (forceUnit.teamNumber ?? 1) === teamNumber).length;
     const nextForceUnit = makeForceUnitFromUnit(selectedForce, selectedAddUnit, teamNumber, sortOrder);
     updateDraftForce((force) => ({ ...force, forceUnits: [...(force.forceUnits ?? []), nextForceUnit] }));
+    setActionError(null);
     setSelectedAddUnitId(null);
     setAddUnitSearch("");
     setSelectedAddTeam(1);
@@ -503,10 +510,14 @@ export default function ForcesPage({
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <PageTitle eyebrow="Forces" title="My Forces" description="Create forces, filter the library, and view selected force details." />
-        <button type="button" onClick={() => setShowCreateModal(true)} className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300">New Force</button>
-      </div>
+      <PageTitle
+        eyebrow="Forces"
+        title="My Forces"
+        description="Create forces, filter the library, and view selected force details."
+        actions={
+          <button type="button" onClick={() => setShowCreateModal(true)} className="rounded-2xl bg-lime-400 px-6 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300">New Force</button>
+        }
+      />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6">
@@ -528,8 +539,10 @@ export default function ForcesPage({
               {displayForces.length === 0 ? (
                 <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-zinc-400">No forces available.</div>
               ) : (
-                displayForces.map((force) => (
-                  <div key={force.id} onClick={() => setSelectedForceId(force.id)} className={`cursor-pointer rounded-3xl border p-5 transition ${selectedForceId === force.id ? "border-lime-400/60 bg-lime-400/10" : "border-zinc-800 bg-zinc-950/70 hover:border-zinc-700 hover:bg-zinc-900/80"}`}>
+                displayForces.map((force) => {
+                  const campaignForce = isCampaignForce(force);
+                  return (
+                  <div key={force.id} onClick={() => { if (campaignForce && force.campaignId && onOpenCampaignForForce) { onOpenCampaignForForce(force.campaignId); return; } setSelectedForceId(force.id); }} className={`cursor-pointer rounded-3xl border p-5 transition ${selectedForceId === force.id ? "border-lime-400/60 bg-lime-400/10" : "border-zinc-800 bg-zinc-950/70 hover:border-zinc-700 hover:bg-zinc-900/80"}`}>
                     <div className="flex flex-col gap-3">
                       <div>
                         <div className="text-lg font-black text-zinc-50">{force.name}</div>
@@ -541,12 +554,13 @@ export default function ForcesPage({
                         </div>
                       </div>
                       <div className="flex items-center justify-between gap-2 text-xs text-zinc-400">
-                        <span>{force.forceUnits?.length ?? force.unitIds?.length ?? 0} units</span>
+                        <span>{campaignForce ? "Open campaign" : `${force.forceUnits?.length ?? force.unitIds?.length ?? 0} units`}</span>
                         <span>{formatNumber(forceUnitBVTotal(force) || force.totalBV)} BV</span>
                       </div>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
@@ -689,10 +703,10 @@ export default function ForcesPage({
 
             <div className="space-y-5">
               <label className="block text-sm font-semibold text-zinc-200">Search chassis, model, or name<input value={addUnitSearch} onChange={(event) => setAddUnitSearch(event.target.value)} placeholder="Search for a unit..." className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4" /></label>
-              <label className="block text-sm font-semibold text-zinc-200">Choose unit<select value={selectedAddUnitId ?? ""} disabled={!hasAddUnitSearch} onChange={(event) => setSelectedAddUnitId(event.target.value || null)} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50"><option value="">{hasAddUnitSearch ? "Select a unit" : "Search first to choose a unit"}</option>{filteredAddUnitOptions.map((unit) => <option key={unit.id} value={unit.id}>{unit.chassis} {unit.model} — {unit.name}</option>)}</select></label>
+              <label className="block text-sm font-semibold text-zinc-200">Choose unit<select value={selectedAddUnitId ?? ""} disabled={!hasAddUnitSearch} onChange={(event) => setSelectedAddUnitId(event.target.value || null)} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50"><option value="">{hasAddUnitSearch ? "Select a unit" : "Search first to choose a unit"}</option>{filteredAddUnitOptions.map((unit) => { const eligibility = selectedForce ? getForceEligibility(selectedForce, unit, selectedForceBV, selectedForceUnits, selectedForce.forConquest ? selectedAddTeam : 1) : { eligible: true, reasons: [] }; return <option key={unit.id} value={unit.id}>{eligibility.eligible ? "" : "⚠ "}{unit.chassis} {unit.model} — {unit.name}{eligibility.eligible ? "" : " — Not eligible"}</option>; })}</select><span className="mt-2 block text-xs text-zinc-500">Ineligible units are marked with ⚠. You can still select one to see the exact reason before adding.</span></label>
               {selectedForce.forConquest && <label className="block text-sm font-semibold text-zinc-200">Assign to {addUnitLabel.toLowerCase()}<select value={selectedAddTeam} onChange={(event) => setSelectedAddTeam(Number(event.target.value))} className="mt-2 w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-3 py-3 text-sm text-zinc-100 outline-none ring-lime-400/20 focus:border-lime-400 focus:ring-4">{Array.from({ length: selectedForce.combatTeamCount ?? 0 }, (_, index) => <option key={index} value={index + 1}>{`${addUnitLabel} ${index + 1}`}</option>)}</select></label>}
               {!selectedAddValidation.eligible && <ul className="rounded-3xl border border-amber-500/40 bg-amber-950/30 p-4 text-sm text-amber-100">{selectedAddValidation.reasons.map((reason) => <li key={reason}>• {reason}</li>)}</ul>}
-              <div className="flex gap-3 pt-4"><button type="button" onClick={() => setShowAddUnitModal(false)} className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-zinc-600 hover:text-zinc-100">Cancel</button><button type="button" onClick={handleAddUnitToDraft} disabled={!hasAddUnitSearch || !selectedAddUnitId || !selectedAddValidation.eligible} className="flex-1 rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:opacity-50">Add unit to draft</button></div>
+              <div className="flex gap-3 pt-4"><button type="button" onClick={() => setShowAddUnitModal(false)} className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-zinc-600 hover:text-zinc-100">Cancel</button><button type="button" onClick={handleAddUnitToDraft} disabled={!hasAddUnitSearch || !selectedAddUnitId} className="flex-1 rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:opacity-50">Add unit to draft</button></div>
             </div>
           </div>
         </div>

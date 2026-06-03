@@ -1,6 +1,7 @@
 import express from "express";
 import { requireAuth, RequestWithUser } from "../middleware/authMiddleware";
 import {
+  beginCampaign,
   createCampaign,
   getCampaignById,
   inviteFriendToCampaign,
@@ -53,6 +54,20 @@ router.patch("/:id", requireAuth, async (req: RequestWithUser, res) => {
     res.json(campaign);
   } catch (error) {
     console.error("[routes/campaigns] Update campaign failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+
+router.post("/:id/begin", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const campaign = await beginCampaign(req.params.id, user.id);
+    res.json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Begin campaign failed:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
