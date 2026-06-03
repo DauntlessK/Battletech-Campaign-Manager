@@ -4,9 +4,13 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
+  HelpCircle,
+  Info,
   Plus,
   Settings,
   Swords,
+  Wrench,
+  DollarSign,
   X,
   XCircle,
 } from "lucide-react";
@@ -27,6 +31,35 @@ const ERA_OPTIONS = APP_ERA_OPTIONS.filter((era) => era !== "All");
 const RULES_LEVEL_OPTIONS = ["Introductory", "Standard", "Advanced"];
 const OBJECTIVE_CONTROL_OPTIONS = ["Binary", "Percentage"];
 const OBJECTIVE_TYPES = ["Factory", "Depot", "Comms Array", "Small City", "Large City", "Fort Holding", "Repair Facility", "Space Port", "Medical Facility"];
+const REPAIR_PRIORITY_OPTIONS = [
+  "General Repair Priority",
+  "Armor and Structure Priority",
+  "Limbs and Components Priority",
+  "Weapons Priority",
+  "Repair, Scrounge, and Salvage Priority",
+];
+const REPAIR_PRIORITY_DETAILS = [
+  {
+    title: "General Repair Priority",
+    description: "The tech force chooses repairs using the general repair flow: rearm all units; repair or replace missing legs; repair gyros and engines; repair or replace missing arms; repair or replace weapons; repair broken equipment or components; repair armor; then repair structure.",
+  },
+  {
+    title: "Armor and Structure Priority",
+    description: "Prioritizes restoring armor and internal structure across the force.",
+  },
+  {
+    title: "Limbs and Components Priority",
+    description: "Prioritizes major repair jobs such as limb replacement and component replacement.",
+  },
+  {
+    title: "Weapons Priority",
+    description: "Prioritizes replacing or repairing weapons first, then armor.",
+  },
+  {
+    title: "Repair, Scrounge, and Salvage Priority",
+    description: "Uses general repairs while increasing emphasis on acquiring parts or salvage. Less total time may be devoted to direct repair work.",
+  },
+];
 const ACTIVE_STATUSES = new Set(["Setup", "Active", "Paused"]);
 const ERA_YEAR_RANGES: Record<string, { min: number; max: number }> = {
   "Star League": { min: 2571, max: 2780 },
@@ -2284,9 +2317,12 @@ function ActiveCampaignDashboard({
   const acceptedPlayers = sortPlayersForControl((campaign.participants ?? []).filter((participant) => participant.status === "Accepted"), authUserId);
   const objectives = settings?.objectives ?? [];
   const playerShare = acceptedPlayers.length ? 100 / acceptedPlayers.length : 100;
-  const planet = settings?.fluff?.planet;
   const forceUnits = force?.forceUnits ?? [];
-  const resources = resourceLabel(settings);
+  const campaignType = settings?.type ?? "Campaign";
+  const isChaos = campaignType === "Chaos";
+  const [repairPriority, setRepairPriority] = useState(REPAIR_PRIORITY_OPTIONS[0]);
+  const [repairHelpOpen, setRepairHelpOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (
     <section className="space-y-5">
@@ -2319,21 +2355,61 @@ function ActiveCampaignDashboard({
         }
       />
 
-      <div className="rounded-3xl border border-lime-400/20 bg-lime-400/5 p-5">
-        <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-8">
-          <CampaignFactCard label="Date" value={campaignDateLabel(campaign)} />
-          <CampaignFactCard label="Turn" value={String(settings?.maxTurnsAhead ? 1 : 1)} />
-          <CampaignFactCard label="Planet" value={planet || "Not set"} />
-          <CampaignFactCard label="Players" value={`${acceptedPlayers.length}/${settings?.maxPlayers ?? 2}`} />
-          <CampaignFactCard label="Resources" value={resources} />
-          <CampaignFactCard label="Era" value={settings?.era ?? "—"} />
-          <CampaignFactCard label="Rules" value={settings?.rulesLevel ?? "—"} />
-          <CampaignFactCard label="Force BV Limit" value={formatNumber(settings?.forceBVLimit)} />
+      <div className="rounded-3xl border border-lime-400/20 bg-lime-400/5 p-4 sm:p-5">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:items-center">
+            <CampaignFactCard label="Turn" value={campaignTurnLabel(campaign)} />
+            <CampaignFactCard label="Resources" value={resourceLabel(settings)} />
+            <CampaignFactCard label="Players" value={`${acceptedPlayers.length}/${settings?.maxPlayers ?? 2}`} className="hidden md:block" />
+            <CampaignFactCard label="Era" value={settings?.era ?? "—"} className="hidden lg:block" />
+            <CampaignFactCard label="Rules" value={settings?.rulesLevel ?? "—"} className="hidden lg:block" />
+            <CampaignFactCard label="Planet" value={settings?.fluff?.planet || "Not set"} className="hidden xl:block" />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+            {isChaos ? (
+              <button
+                type="button"
+                className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-black text-zinc-200 transition hover:border-lime-400/50 hover:text-lime-200"
+              >
+                Repair
+              </button>
+            ) : (
+              <select
+                value={repairPriority}
+                onChange={(event) => setRepairPriority(event.target.value)}
+                className="min-w-[12rem] rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-200 outline-none transition focus:border-lime-400/60"
+                aria-label="Repair priority"
+              >
+                {REPAIR_PRIORITY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option.replace(" Priority", "")}</option>
+                ))}
+              </select>
+            )}
+            {!isChaos && (
+              <ActionSquareButton label="Repair priority help" onClick={() => setRepairHelpOpen(true)}>
+                <HelpCircle size={17} />
+              </ActionSquareButton>
+            )}
+            <ActionSquareButton label="Open MechBay">
+              <Wrench size={17} />
+            </ActionSquareButton>
+            <ActionSquareButton label="Open spending and purchasing">
+              <DollarSign size={17} />
+            </ActionSquareButton>
+            <ActionSquareButton label="Spend pilot XP">
+              <span className="text-xs font-black">XP</span>
+            </ActionSquareButton>
+            <ActionSquareButton label="Campaign details" onClick={() => setDetailsOpen(true)}>
+              <Info size={17} />
+            </ActionSquareButton>
+          </div>
         </div>
+
         {isCampaignOwner && !settings?.fluff && (
           <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/40 p-4 text-sm text-zinc-300">
             Optional campaign fluff has not been set. You can add it once here; existing fluff is locked after saving.
-            <button type="button" onClick={onOpenFluff} className="ml-3 rounded-xl border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 transition hover:bg-lime-400/20">
+            <button type="button" onClick={onOpenFluff} className="mt-3 rounded-xl border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 transition hover:bg-lime-400/20 sm:ml-3 sm:mt-0">
               Add Fluff
             </button>
           </div>
@@ -2431,7 +2507,107 @@ function ActiveCampaignDashboard({
           </div>
         </div>
       </div>
+
+      {repairHelpOpen && <RepairPriorityHelpModal onClose={() => setRepairHelpOpen(false)} />}
+      {detailsOpen && <CampaignDetailsModal campaign={campaign} onClose={() => setDetailsOpen(false)} />}
     </section>
+  );
+}
+
+function ActionSquareButton({
+  label,
+  children,
+  onClick,
+}: {
+  label: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="grid h-10 w-10 place-items-center rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-200 transition hover:border-lime-400/50 hover:text-lime-200"
+      aria-label={label}
+      title={label}
+    >
+      {children}
+    </button>
+  );
+}
+
+function campaignTurnLabel(campaign: Campaign) {
+  const settings = campaign.settings;
+  const currentTurn = Number((campaign as any).turnNumber ?? (settings as any)?.currentTurn ?? 1);
+  const victoryTurnLimit = settings?.victoryConditions?.turnsElapsedEnabled ? settings.victoryConditions.turnsElapsed : undefined;
+  const setupTurnLimit = Number((settings as any)?.maxTurnsAhead ?? 0) > 0 ? Number((settings as any).maxTurnsAhead) : undefined;
+  const limit = victoryTurnLimit ?? setupTurnLimit;
+  return limit ? `${currentTurn}/${limit}` : String(currentTurn);
+}
+
+function CampaignDetailsModal({ campaign, onClose }: { campaign: Campaign; onClose: () => void }) {
+  const settings = campaign.settings;
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign Details</div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">{campaign.name}</h2>
+            <p className="mt-1 text-sm text-zinc-400">High-level campaign information and setup context.</p>
+          </div>
+          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close campaign details"><X size={18} /></button>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <MiniFact label="Campaign Type" value={settings?.type ?? "—"} />
+          <MiniFact label="Status" value={campaign.status ?? "—"} />
+          <MiniFact label="Year / Date" value={campaignDateLabel(campaign)} />
+          <MiniFact label="Planet" value={settings?.fluff?.planet || "Not set"} />
+          <MiniFact label="Era" value={settings?.era ?? "—"} />
+          <MiniFact label="Rules Level" value={settings?.rulesLevel ?? "—"} />
+          <MiniFact label="Players" value={`${(campaign.participants ?? []).filter((participant) => participant.status === "Accepted").length}/${settings?.maxPlayers ?? 2}`} />
+          <MiniFact label="Force BV Limit" value={formatNumber(settings?.forceBVLimit)} />
+          <MiniFact label="Starting Resources" value={resourceLabel(settings)} />
+          <MiniFact label="Objective Control" value={settings?.objectiveControlType ?? "—"} />
+          {settings?.type === "Conquest" && (
+            <>
+              <MiniFact label="Combat Teams" value={String(settings?.combatTeamCount ?? "—")} />
+              <MiniFact label="Team BV Limit" value={formatNumber(settings?.combatTeamBVLimit)} />
+            </>
+          )}
+        </div>
+        {settings?.fluff?.conflictDescription && (
+          <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-sm leading-6 text-zinc-300">
+            {settings.fluff.conflictDescription}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RepairPriorityHelpModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Repair Orders</div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">Repair priority breakdown</h2>
+            <p className="mt-1 text-sm text-zinc-400">Choose how the tech force prioritizes limited repair time between battles.</p>
+          </div>
+          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close repair priority help"><X size={18} /></button>
+        </div>
+        <div className="space-y-3">
+          {REPAIR_PRIORITY_DETAILS.map((detail) => (
+            <div key={detail.title} className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+              <h3 className="text-sm font-black text-zinc-100">{detail.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-400">{detail.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -2939,9 +3115,9 @@ function MiniFact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CampaignFactCard({ label, value }: { label: string; value: string }) {
+function CampaignFactCard({ label, value, className = "" }: { label: string; value: string; className?: string }) {
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4">
+    <div className={`rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4 ${className}`}>
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </div>
