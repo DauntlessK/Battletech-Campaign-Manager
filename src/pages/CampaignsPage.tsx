@@ -19,6 +19,7 @@ import type {
   CampaignObjective,
   CampaignSettings,
   Force,
+  ForceUnit,
   FriendSummary,
   PendingInvite,
   User,
@@ -129,9 +130,14 @@ function normalizeObjectiveControl(
 
 function resourceLabel(settings?: CampaignSettings): string {
   const resources = settings?.startingResources ?? {};
-  if (settings?.type === "Chaos")
+  if (settings?.type === "Chaos") {
     return `${formatNumber(resources.Warchest ?? 0)} WP`;
-  return `${formatNumber(resources.CBills ?? 0)} C-bills`;
+  }
+  return `Ꞓ${formatNumber(resources.CBills ?? 0)}`;
+}
+
+function resourceTypeLabel(settings?: CampaignSettings): string {
+  return settings?.type === "Chaos" ? "Warchest Points" : "C-Bills";
 }
 
 function campaignFluffSummary(settings?: CampaignSettings): string {
@@ -2281,6 +2287,29 @@ function VictoryDetail({ title, status, detail }: { title: string; status: strin
   );
 }
 
+function forceUnitDisplayName(forceUnit: ForceUnit): string {
+  return [forceUnit.snapshot?.chassis, forceUnit.snapshot?.model].filter(Boolean).join(" ").trim() || forceUnit.snapshot?.name || "Unknown Unit";
+}
+
+function forceUnitStatusLabel(forceUnit: ForceUnit): string {
+  const status = forceUnit.status ?? "Ready";
+  return status === "Available" ? "Ready" : status;
+}
+
+function teamSortValue(forceUnit: ForceUnit): number {
+  return Number(forceUnit.teamNumber ?? 9999);
+}
+
+function sortForceUnitsForCampaign(forceUnits: ForceUnit[], isConquest: boolean): ForceUnit[] {
+  return [...forceUnits].sort((a, b) => {
+    if (isConquest) {
+      const teamDelta = teamSortValue(a) - teamSortValue(b);
+      if (teamDelta !== 0) return teamDelta;
+    }
+    return forceUnitDisplayName(a).localeCompare(forceUnitDisplayName(b));
+  });
+}
+
 function ActiveCampaignDashboard({
   campaign,
   force,
@@ -2305,6 +2334,10 @@ function ActiveCampaignDashboard({
   const objectives = settings?.objectives ?? [];
   const playerShare = acceptedPlayers.length ? 100 / acceptedPlayers.length : 100;
   const forceUnits = force?.forceUnits ?? [];
+  const forceUnitCount = forceUnits.length;
+  const pilotCount = forceUnits.filter((forceUnit) => forceUnit.pilot).length;
+  const readyUnitCount = forceUnits.filter((forceUnit) => forceUnitStatusLabel(forceUnit) === "Ready").length;
+  const currentBVTotal = forceUnits.reduce((total, forceUnit) => total + Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0), 0);
   const campaignType = settings?.type ?? "Campaign";
   const isChaos = campaignType === "Chaos";
   const [repairPriority, setRepairPriority] = useState(REPAIR_PRIORITY_OPTIONS[0]);
@@ -2346,7 +2379,7 @@ function ActiveCampaignDashboard({
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:items-center">
             <CampaignFactCard label="Turn" value={campaignTurnLabel(campaign)} />
-            <CampaignFactCard label="Resources" value={resourceLabel(settings)} />
+            <CampaignFactCard label={resourceTypeLabel(settings)} value={resourceLabel(settings)} />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -2462,31 +2495,71 @@ function ActiveCampaignDashboard({
         </div>
 
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Force Status</div>
-              <h2 className="mt-1 text-xl font-black text-zinc-50">{force?.name ?? "No force assigned"}</h2>
-              <p className="mt-1 text-sm text-zinc-500">Campaign-specific force copy status.</p>
-            </div>
-            {force && <span className="rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-semibold text-zinc-300">BV {formatNumber(force.forceUnits?.reduce((total, unit) => total + Number(unit.currentBV ?? unit.snapshot?.totalBV ?? 0), 0) || force.totalBV)}</span>}
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Force Status</div>
+            <h2 className="mt-1 text-xl font-black text-zinc-50">{force?.name ?? "No force assigned"}</h2>
+            <p className="mt-1 text-sm text-zinc-500">Campaign-specific force copy status.</p>
           </div>
 
-          <div className="mt-5 space-y-3">
-            {forceUnits.length ? forceUnits.map((forceUnit) => (
-              <div key={forceUnit.id} className="rounded-2xl border border-zinc-800 bg-zinc-950/45 p-4">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <div className="font-black text-zinc-100">{forceUnit.snapshot?.chassis} {forceUnit.snapshot?.model}</div>
-                    <div className="text-xs text-zinc-500">Pilot: {forceUnit.pilot?.name || "Unnamed Pilot"} • {forceUnit.pilot?.gunnery ?? 4}/{forceUnit.pilot?.piloting ?? 5}</div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">{forceUnit.status ?? "Available"}</span>
-                    <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">BV {formatNumber(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV)}</span>
-                    {forceUnit.teamNumber && <span className="rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-300">Team {forceUnit.teamNumber}</span>}
-                  </div>
-                </div>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
+            {forceUnits.length ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-fixed text-left text-sm">
+                  <thead className="border-b border-zinc-800 bg-zinc-950/80 text-xs uppercase tracking-[0.16em] text-zinc-500">
+                    <tr>
+                      <th className="w-[34%] px-4 py-3 font-semibold">Unit</th>
+                      <th className="w-[28%] px-4 py-3 font-semibold">Pilot</th>
+                      <th className="w-[16%] px-4 py-3 font-semibold">Status</th>
+                      <th className="w-[14%] px-4 py-3 text-right font-semibold">Current BV</th>
+                      {campaignType === "Conquest" && <th className="w-[8%] px-4 py-3 text-right font-semibold">Team</th>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/80">
+                    {sortForceUnitsForCampaign(forceUnits, campaignType === "Conquest").map((forceUnit, index, sortedUnits) => {
+                      const previous = sortedUnits[index - 1];
+                      const showTeamDivider = campaignType === "Conquest" && (index === 0 || previous?.teamNumber !== forceUnit.teamNumber);
+
+                      return (
+                        <React.Fragment key={forceUnit.id}>
+                          {showTeamDivider && (
+                            <tr className="bg-zinc-900/80">
+                              <td colSpan={campaignType === "Conquest" ? 5 : 4} className="px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-lime-300">
+                                Team {forceUnit.teamNumber ?? "Unassigned"}
+                              </td>
+                            </tr>
+                          )}
+                          <tr className="align-middle transition hover:bg-zinc-900/70">
+                            <td className="px-4 py-3 font-black text-zinc-100">{forceUnitDisplayName(forceUnit)}</td>
+                            <td className="px-4 py-3 text-zinc-300">
+                              <div className="font-semibold">{forceUnit.pilot?.name || "Unnamed Pilot"}</div>
+                              <div className="text-xs text-zinc-500">{forceUnit.pilot?.gunnery ?? 4}/{forceUnit.pilot?.piloting ?? 5}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs font-semibold text-zinc-300">
+                                {forceUnitStatusLabel(forceUnit)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-zinc-300">BV {formatNumber(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV)}</td>
+                            {campaignType === "Conquest" && <td className="px-4 py-3 text-right text-zinc-300">{forceUnit.teamNumber ?? "—"}</td>}
+                          </tr>
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot className="border-t border-zinc-700 bg-zinc-950/85 text-sm">
+                    <tr>
+                      <td className="px-4 py-3 font-black text-zinc-100">{forceUnitCount} {forceUnitCount === 1 ? "Mek" : "Meks"}</td>
+                      <td className="px-4 py-3 font-semibold text-zinc-300">{pilotCount} {pilotCount === 1 ? "Pilot" : "Pilots"}</td>
+                      <td className="px-4 py-3 font-semibold text-zinc-300">{readyUnitCount} Ready</td>
+                      <td className="px-4 py-3 text-right font-black text-lime-200">BV {formatNumber(currentBVTotal)}</td>
+                      {campaignType === "Conquest" && <td className="px-4 py-3 text-right text-zinc-500">—</td>}
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
-            )) : <p className="rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/40 p-6 text-sm text-zinc-400">No unit status records found for this campaign force yet.</p>}
+            ) : (
+              <p className="p-6 text-sm text-zinc-400">No unit status records found for this campaign force yet.</p>
+            )}
           </div>
         </div>
       </div>
