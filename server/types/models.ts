@@ -26,8 +26,6 @@ export type ObjectiveControlType = "Binary" | "Percentage";
 
 
 export type VictoryConditions = {
-  totalBattlesEnabled?: boolean;
-  totalBattles?: number;
   capitulationBVEnabled?: boolean;
   capitulationBVPercent?: number;
   capitulationResourcesEnabled?: boolean;

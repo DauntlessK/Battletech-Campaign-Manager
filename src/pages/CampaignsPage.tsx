@@ -155,18 +155,17 @@ function campaignDateLabel(campaign: Campaign): string {
 }
 
 function defaultVictoryConditions(type: string, objectiveControlType?: string) {
+  const isBinaryControl = objectiveControlType === "Binary";
   return {
-    totalBattlesEnabled: false,
-    totalBattles: 10,
     capitulationBVEnabled: true,
     capitulationBVPercent: 10,
     capitulationResourcesEnabled: true,
     capitulationResourcesPercent: 10,
-    dominationEnabled: true,
+    dominationEnabled: !isBinaryControl,
     dominationControlPercent: 70,
-    keyObjectivesEnabled: objectiveControlType === "Binary" ? false : false,
+    keyObjectivesEnabled: false,
     turnsElapsedEnabled: false,
-    turnsElapsed: type === "Conquest" ? 25 : undefined,
+    turnsElapsed: type === "Conquest" ? 25 : 10,
     mapControlEnabled: false,
     mapControlPercent: type === "Conquest" ? 75 : undefined,
   };
@@ -188,7 +187,7 @@ function objectivesAreReady(campaign: Campaign): boolean {
   const settings = campaign.settings;
   const victory = settings?.victoryConditions;
   const objectives = settings?.objectives ?? [];
-  if (!victory) return false;
+  if (!victory || !settings?.victoryConditionsReviewed) return false;
   if (objectives.length < 2) return false;
   if (victory.keyObjectivesEnabled && !objectives.some((objective) => objective.isKey)) return false;
   return true;
@@ -205,7 +204,6 @@ function victorySummary(settings?: CampaignSettings): string {
   const victory = settings?.victoryConditions;
   if (!victory) return "Victory conditions not configured.";
   const enabled = [
-    victory.totalBattlesEnabled ? `${victory.totalBattles ?? 10} battles` : null,
     victory.capitulationBVEnabled ? `BV capitulation at ${victory.capitulationBVPercent ?? 10}%` : null,
     victory.capitulationResourcesEnabled ? `Resource capitulation at ${victory.capitulationResourcesPercent ?? 10}%` : null,
     victory.dominationEnabled ? `${victory.dominationControlPercent ?? 70}% planet control` : null,
@@ -518,20 +516,20 @@ export default function CampaignsPage({
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [campaignType, setCampaignType] = useState("Chaos");
+  const [campaignType, setCampaignType] = useState("Advanced");
   const [playerMode, setPlayerMode] = useState<PlayerMode>("2");
-  const [era, setEra] = useState("Star League");
+  const [era, setEra] = useState("");
   const [rulesLevel, setRulesLevel] = useState("Standard");
   const [forceBVLimit, setForceBVLimit] = useState(15000);
-  const [maxTurnsAhead, setMaxTurnsAhead] = useState(1);
+  const [maxTurnsAhead, setMaxTurnsAhead] = useState(4);
   const [combatTeamCount, setCombatTeamCount] = useState(3);
   const [combatTeamBVLimit, setCombatTeamBVLimit] = useState(5000);
   const [combatTeamSize, setCombatTeamSize] = useState(4);
-  const [objectiveControlType, setObjectiveControlType] = useState("Binary");
+  const [objectiveControlType, setObjectiveControlType] = useState("Percentage");
   const [salariesEnabled, setSalariesEnabled] = useState(false);
   const [warchest, setWarchest] = useState(1000);
   const [cBills, setCBills] = useState(5000000);
-  const [victoryConditions, setVictoryConditions] = useState(defaultVictoryConditions("Chaos", "Binary"));
+  const [victoryConditions, setVictoryConditions] = useState(defaultVictoryConditions("Advanced", "Percentage"));
   const [objectiveCount, setObjectiveCount] = useState(4);
   const [objectiveMode, setObjectiveMode] = useState<"random" | "select">("random");
   const [selectedObjectiveTypes, setSelectedObjectiveTypes] = useState<string[]>(OBJECTIVE_TYPES);
@@ -560,20 +558,20 @@ export default function CampaignsPage({
   const resetCreateForm = () => {
     setName("");
     setDescription("");
-    setCampaignType("Chaos");
+    setCampaignType("Advanced");
     setPlayerMode("2");
-    setEra("Star League");
+    setEra("");
     setRulesLevel("Standard");
     setForceBVLimit(15000);
-    setMaxTurnsAhead(1);
+    setMaxTurnsAhead(4);
     setCombatTeamCount(3);
     setCombatTeamBVLimit(5000);
     setCombatTeamSize(4);
-    setObjectiveControlType("Binary");
-    setSalariesEnabled(false);
+    setObjectiveControlType("Percentage");
+    setSalariesEnabled(true);
     setWarchest(1000);
     setCBills(5000000);
-    setVictoryConditions(defaultVictoryConditions("Chaos", "Binary"));
+    setVictoryConditions(defaultVictoryConditions("Advanced", "Percentage"));
     setObjectiveCount(4);
     setObjectiveMode("random");
     setSelectedObjectiveTypes(OBJECTIVE_TYPES);
@@ -587,12 +585,10 @@ export default function CampaignsPage({
     setCampaignType(nextType);
     if (nextType === "Conquest") {
       setPlayerMode("2");
-      setObjectiveControlType("Binary");
-    } else {
-      setObjectiveControlType(playerMode === "3-10" ? "Percentage" : "Binary");
     }
+    setObjectiveControlType("Percentage");
     setSalariesEnabled(nextType !== "Chaos");
-    setVictoryConditions(defaultVictoryConditions(nextType, nextType === "Conquest" ? "Binary" : objectiveControlType));
+    setVictoryConditions(defaultVictoryConditions(nextType, "Percentage"));
     const resources = defaultResourcesForType(nextType);
     setWarchest(resources.Warchest ?? 1000);
     setCBills(resources.CBills ?? 5000000);
@@ -622,6 +618,7 @@ export default function CampaignsPage({
       startingResources:
         campaignType === "Chaos" ? { Warchest: warchest } : { CBills: cBills },
       victoryConditions: defaultVictoryConditions(campaignType, normalizeObjectiveControl(finalPlayerMode, objectiveControlType)),
+      victoryConditionsReviewed: false,
       fluff: {
         year: fluffYear,
         planet: fluffPlanet.trim() || undefined,
@@ -634,25 +631,25 @@ export default function CampaignsPage({
     const settings = campaign.settings;
     setName(campaign.name);
     setDescription(campaign.description ?? "");
-    setCampaignType(settings?.type ?? "Chaos");
+    setCampaignType(settings?.type ?? "Advanced");
     setPlayerMode(
       settings?.type === "Conquest" ? "2" : playerModeFromSettings(settings),
     );
-    setEra(settings?.era ?? "Star League");
+    setEra(settings?.era ?? "");
     setRulesLevel(settings?.rulesLevel ?? "Standard");
     setForceBVLimit(Number(settings?.forceBVLimit ?? 15000));
     setMaxTurnsAhead(
-      Number(settings?.maxTurnsAhead ?? settings?.maxTurns ?? 1),
+      Number(settings?.maxTurnsAhead ?? settings?.maxTurns ?? 4),
     );
     setCombatTeamCount(Number(settings?.combatTeamCount ?? 3));
     setCombatTeamBVLimit(Number(settings?.combatTeamBVLimit ?? 5000));
     setCombatTeamSize(Number(settings?.combatTeamSize ?? 4));
-    setObjectiveControlType(settings?.objectiveControlType ?? "Binary");
+    setObjectiveControlType(settings?.objectiveControlType ?? "Percentage");
     setSalariesEnabled(Boolean(settings?.salariesEnabled));
     setWarchest(Number(settings?.startingResources?.Warchest ?? 1000));
     setCBills(Number(settings?.startingResources?.CBills ?? 5000000));
     setVictoryConditions({
-      ...defaultVictoryConditions(settings?.type ?? "Chaos", settings?.objectiveControlType),
+      ...defaultVictoryConditions(settings?.type ?? "Advanced", settings?.objectiveControlType),
       ...(settings?.victoryConditions ?? {}),
     });
     const currentObjectives = settings?.objectives ?? [];
@@ -667,6 +664,7 @@ export default function CampaignsPage({
 
   const submitCreateCampaign = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!era) return;
     if (fluffYear && !campaignYearIsValid(fluffYear, era)) return;
     const created = await onCreateCampaign({
       name,
@@ -683,6 +681,7 @@ export default function CampaignsPage({
   const submitCampaignSettingsUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedCampaign) return;
+    if (!era) return;
     if (fluffYear && !campaignYearIsValid(fluffYear, era)) return;
     const updated = await onUpdateCampaign(selectedCampaign.id, {
       name,
@@ -703,18 +702,18 @@ export default function CampaignsPage({
       ...victoryConditions,
       capitulationBVEnabled: true,
       capitulationResourcesEnabled: true,
-      totalBattles: Math.max(1, Math.floor(Number(victoryConditions.totalBattles ?? 10))),
       capitulationBVPercent: normalizePercent(victoryConditions.capitulationBVPercent, 10),
       capitulationResourcesPercent: normalizePercent(victoryConditions.capitulationResourcesPercent, 10),
+      dominationEnabled: settings?.objectiveControlType === "Binary" ? false : Boolean(victoryConditions.dominationEnabled),
       dominationControlPercent: normalizePercent(victoryConditions.dominationControlPercent, 70),
       keyObjectivesEnabled: settings?.objectiveControlType === "Binary" ? false : Boolean(victoryConditions.keyObjectivesEnabled),
-      turnsElapsedEnabled: settings?.type === "Conquest" ? Boolean(victoryConditions.turnsElapsedEnabled) : false,
-      turnsElapsed: settings?.type === "Conquest" ? Math.max(1, Math.floor(Number(victoryConditions.turnsElapsed ?? 25))) : undefined,
+      turnsElapsedEnabled: Boolean(victoryConditions.turnsElapsedEnabled),
+      turnsElapsed: Math.max(1, Math.floor(Number(victoryConditions.turnsElapsed ?? (settings?.type === "Conquest" ? 25 : 10)))),
       mapControlEnabled: settings?.type === "Conquest" ? Boolean(victoryConditions.mapControlEnabled) : false,
       mapControlPercent: settings?.type === "Conquest" ? normalizePercent(victoryConditions.mapControlPercent, 75) : undefined,
     };
     const updated = await onUpdateCampaign(selectedCampaign.id, {
-      settings: { victoryConditions: cleanedVictory },
+      settings: { victoryConditions: cleanedVictory, victoryConditionsReviewed: true },
     });
     if (updated) {
       setEditingVictoryConditions(false);
@@ -1037,7 +1036,7 @@ export default function CampaignsPage({
                 title="Objectives & Victory Conditions"
                 description={
                   objectivesReady
-                    ? "Objectives and victory conditions are configured."
+                    ? "Objectives and victory conditions have been reviewed and configured."
                     : isCampaignOwner
                       ? "Configure victory conditions and the campaign objective list before beginning."
                       : "Campaign objectives and victory conditions will be visible here once the owner configures them."
@@ -1053,7 +1052,7 @@ export default function CampaignsPage({
                       type="button"
                       onClick={() => {
                         setVictoryConditions({
-                          ...defaultVictoryConditions(settings?.type ?? "Chaos", settings?.objectiveControlType),
+                          ...defaultVictoryConditions(settings?.type ?? "Advanced", settings?.objectiveControlType),
                           ...(settings?.victoryConditions ?? {}),
                         });
                         setEditingVictoryConditions(true);
@@ -1105,7 +1104,7 @@ export default function CampaignsPage({
                   </p>
                 )}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {isCampaignOwner && !settings?.fluff && (
+                  {isCampaignOwner && (
                     <button
                       type="button"
                       onClick={() => {
@@ -1114,13 +1113,8 @@ export default function CampaignsPage({
                       }}
                       className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
                     >
-                      Add Fluff
+                      {settings?.fluff ? "Edit Fluff" : "Add Fluff"}
                     </button>
-                  )}
-                  {settings?.fluff && (
-                    <span className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-zinc-300">
-                      Existing fluff is locked after it is added.
-                    </span>
                   )}
                 </div>
               </DashboardStep>
@@ -1583,6 +1577,16 @@ export default function CampaignsPage({
           <>
             <button
               type="button"
+              onClick={() => {
+                resetCreateForm();
+                setCreating(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300"
+            >
+              <Plus size={16} /> New Campaign
+            </button>
+            <button
+              type="button"
               onClick={() => setShowInactive((value) => !value)}
               className="inline-flex items-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
             >
@@ -1597,16 +1601,6 @@ export default function CampaignsPage({
               className="inline-flex items-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
             >
               Pending invitations ({invites.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                resetCreateForm();
-                setCreating(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300"
-            >
-              <Plus size={16} /> Create Campaign
             </button>
           </>
         }
@@ -2010,12 +2004,12 @@ function VictoryConditionsModal({
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <ToggleField label="Total number of battles" description="End the campaign after a fixed number of battles." checked={Boolean(values.totalBattlesEnabled)} onChange={(checked) => update({ totalBattlesEnabled: checked })} />
-              {values.totalBattlesEnabled && <div className="mt-3"><NumberField label="Battle Count" value={Number(values.totalBattles ?? 10)} onChange={(value) => update({ totalBattles: value })} min={1} /></div>}
+              <ToggleField label="Turn limit" description="End or check the campaign after a fixed number of turns. For non-Conquest campaigns, this replaces total battle count." checked={Boolean(values.turnsElapsedEnabled)} onChange={(checked) => update({ turnsElapsedEnabled: checked })} />
+              {values.turnsElapsedEnabled && <div className="mt-3"><NumberField label="Turn Count" value={Number(values.turnsElapsed ?? (isConquest ? 25 : 10))} onChange={(value) => update({ turnsElapsed: value })} min={1} /></div>}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <ToggleField label="Planet control domination" description="Victory by controlling a percentage of the planet across all objectives combined." checked={Boolean(values.dominationEnabled)} onChange={(checked) => update({ dominationEnabled: checked })} />
-              {values.dominationEnabled && <div className="mt-3"><NumberField label="Objective Control %" value={Number(values.dominationControlPercent ?? 70)} onChange={(value) => update({ dominationControlPercent: value })} min={1} max={100} /></div>}
+              <ToggleField label="Planet control domination" description={keyObjectivesDisabled ? "Planet-control domination is unavailable with binary objective control." : "Victory by controlling a percentage of the planet across all objectives combined."} checked={Boolean(values.dominationEnabled) && !keyObjectivesDisabled} disabled={keyObjectivesDisabled} onChange={(checked) => update({ dominationEnabled: checked })} />
+              {values.dominationEnabled && !keyObjectivesDisabled && <div className="mt-3"><NumberField label="Planet Control %" value={Number(values.dominationControlPercent ?? 70)} onChange={(value) => update({ dominationControlPercent: value })} min={1} max={100} /></div>}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
               <div className="text-sm font-black text-zinc-100">BV capitulation</div>
@@ -2032,10 +2026,6 @@ function VictoryConditionsModal({
             </div>
             {isConquest && (
               <>
-                <div className="rounded-2xl border border-lime-400/20 bg-lime-400/5 p-4">
-                  <ToggleField label="Time or turns elapsed" description="Conquest-only victory condition based on campaign turns." checked={Boolean(values.turnsElapsedEnabled)} onChange={(checked) => update({ turnsElapsedEnabled: checked })} />
-                  {values.turnsElapsedEnabled && <div className="mt-3"><NumberField label="Turn Count" value={Number(values.turnsElapsed ?? 25)} onChange={(value) => update({ turnsElapsed: value })} min={1} /></div>}
-                </div>
                 <div className="rounded-2xl border border-lime-400/20 bg-lime-400/5 p-4">
                   <ToggleField label="Control of map percentage" description="Conquest-only victory condition based on map control." checked={Boolean(values.mapControlEnabled)} onChange={(checked) => update({ mapControlEnabled: checked })} />
                   {values.mapControlEnabled && <div className="mt-3"><NumberField label="Map Control %" value={Number(values.mapControlPercent ?? 75)} onChange={(value) => update({ mapControlPercent: value })} min={1} max={100} /></div>}
@@ -2247,9 +2237,6 @@ function VictoryConditionDetails({ campaign, authUserId, force, playerShare }: {
   }
   return (
     <div className="space-y-3 text-sm text-zinc-300">
-      {victory.totalBattlesEnabled && (
-        <VictoryDetail title="Total battles" status={`0 / ${victory.totalBattles ?? 10} battles completed`} detail="The campaign ends or checks victory once the configured battle count is reached." />
-      )}
       <VictoryDetail
         title="BV capitulation"
         status={`Currently: ${bvPercent.toFixed(1)}% of your starting BV · capitulation at ${victory.capitulationBVPercent ?? 10}%`}
@@ -2275,7 +2262,7 @@ function VictoryConditionDetails({ campaign, authUserId, force, playerShare }: {
         />
       )}
       {victory.turnsElapsedEnabled && (
-        <VictoryDetail title="Turns elapsed" status={`Current turn: 1 · limit ${victory.turnsElapsed ?? 25}`} detail="Conquest-only timing condition." />
+        <VictoryDetail title="Turns elapsed" status={`Current turn: 1 · limit ${victory.turnsElapsed ?? 25}`} detail="Timing condition based on campaign turns." />
       )}
       {victory.mapControlEnabled && (
         <VictoryDetail title="Map control" status={`Your current map control: ${playerShare.toFixed(1)}% · victory at ${victory.mapControlPercent ?? 75}%`} detail="Conquest-only map-control condition." />
@@ -2360,10 +2347,6 @@ function ActiveCampaignDashboard({
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:items-center">
             <CampaignFactCard label="Turn" value={campaignTurnLabel(campaign)} />
             <CampaignFactCard label="Resources" value={resourceLabel(settings)} />
-            <CampaignFactCard label="Players" value={`${acceptedPlayers.length}/${settings?.maxPlayers ?? 2}`} className="hidden md:block" />
-            <CampaignFactCard label="Era" value={settings?.era ?? "—"} className="hidden lg:block" />
-            <CampaignFactCard label="Rules" value={settings?.rulesLevel ?? "—"} className="hidden lg:block" />
-            <CampaignFactCard label="Planet" value={settings?.fluff?.planet || "Not set"} className="hidden xl:block" />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -2408,7 +2391,7 @@ function ActiveCampaignDashboard({
 
         {isCampaignOwner && !settings?.fluff && (
           <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/40 p-4 text-sm text-zinc-300">
-            Optional campaign fluff has not been set. You can add it once here; existing fluff is locked after saving.
+            Optional campaign fluff has not been set. You can add or edit it from here.
             <button type="button" onClick={onOpenFluff} className="mt-3 rounded-xl border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 transition hover:bg-lime-400/20 sm:ml-3 sm:mt-0">
               Add Fluff
             </button>
@@ -2657,7 +2640,7 @@ function CampaignFluffModal({
           <div>
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign Fluff</div>
             <h2 className="mt-2 text-2xl font-black text-zinc-50">Add optional campaign flavor</h2>
-            <p className="mt-1 text-sm text-zinc-400">This can be set once. Existing fluff cannot be edited or deleted.</p>
+            <p className="mt-1 text-sm text-zinc-400">Add optional flavor details for the campaign. These can be edited later by the campaign owner.</p>
           </div>
           <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close campaign fluff modal"><X size={18} /></button>
         </div>
@@ -2822,6 +2805,8 @@ function CampaignSettingsModal(props: {
                 value={props.era}
                 onChange={props.setEra}
                 options={ERA_OPTIONS}
+                placeholder="Select an era"
+                required
               />
               <SelectField
                 label="Rules Level"
@@ -3017,22 +3002,28 @@ function SelectField({
   value,
   onChange,
   options,
+  placeholder,
+  required,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  placeholder?: string;
+  required?: boolean;
 }) {
   return (
     <label className="space-y-2 text-sm font-semibold text-zinc-200">
       {label}
       <select
         value={value}
+        required={required}
         onChange={(event) => onChange(event.target.value)}
         className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70"
       >
+        {placeholder && <option value="" disabled>{placeholder}</option>}
         {options.map((option) => (
-          <option key={option}>{option}</option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
     </label>

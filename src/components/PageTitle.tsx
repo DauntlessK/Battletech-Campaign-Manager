@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import React from "react";
 
 export default function PageTitle({
   eyebrow,
@@ -12,41 +11,31 @@ export default function PageTitle({
   description: string;
   actions?: React.ReactNode;
 }) {
-  const [actionsOpen, setActionsOpen] = useState(false);
+  const content = (
+    <div className="mx-auto flex h-full max-w-5xl flex-col items-center justify-center text-center">
+      <div className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">{eyebrow}</div>
+      <h1 className="mt-2 text-3xl font-black tracking-tight text-zinc-50 sm:text-4xl">{title}</h1>
+      <p className="mx-auto mt-3 max-w-4xl text-sm leading-6 text-zinc-400 sm:text-base">{description}</p>
+    </div>
+  );
+
+  if (!actions) {
+    return (
+      <div className="flex min-h-[7.5rem] w-full items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-900/55 p-4 text-center sm:min-h-[8.5rem] sm:p-5 lg:min-h-[9rem]">
+        {content}
+      </div>
+    );
+  }
 
   return (
-    <div className="relative flex min-h-[11rem] w-full items-center justify-center rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 text-center sm:p-6 lg:min-h-[12rem] lg:px-36">
-      <div className="mx-auto max-w-5xl text-center">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">{eyebrow}</div>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-zinc-50 sm:text-4xl">{title}</h1>
-        <p className="mx-auto mt-3 max-w-4xl text-sm leading-6 text-zinc-400 sm:text-base">{description}</p>
+    <div className="grid min-h-[8.5rem] w-full grid-cols-[minmax(0,4fr)_minmax(5.5rem,1fr)] overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 text-center sm:min-h-[9.5rem] lg:min-h-[10rem]">
+      <div className="flex items-center justify-center p-4 sm:p-5 lg:p-6">
+        {content}
       </div>
 
-      {actions && (
-        <>
-          <div className="absolute right-4 top-4 lg:hidden">
-            <button
-              type="button"
-              onClick={() => setActionsOpen((open) => !open)}
-              className="grid h-10 w-10 place-items-center rounded-xl border border-zinc-700 bg-zinc-950/90 text-zinc-200 shadow-lg transition hover:border-lime-400/50 hover:text-lime-200"
-              aria-label={actionsOpen ? "Close page actions" : "Open page actions"}
-              aria-expanded={actionsOpen}
-            >
-              {actionsOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
-          </div>
-
-          {actionsOpen && (
-            <div className="absolute right-4 top-16 z-20 flex w-56 flex-col items-stretch gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/95 p-3 text-left shadow-2xl lg:hidden [&>button]:w-full">
-              {actions}
-            </div>
-          )}
-
-          <div className="absolute right-5 top-5 hidden max-w-[13rem] shrink-0 flex-col items-stretch gap-2 sm:right-6 sm:top-6 lg:flex [&>button]:w-full">
-            {actions}
-          </div>
-        </>
-      )}
+      <div className="flex h-full flex-col items-stretch justify-start gap-2 border-l border-zinc-800 bg-zinc-950/35 p-2 sm:p-3 [&>button]:w-full [&>button]:min-w-0 [&>button]:justify-center [&>button]:whitespace-normal [&>button]:break-words [&>button]:px-2 [&>button]:py-2 [&>button]:text-center [&>button]:text-xs sm:[&>button]:px-3 sm:[&>button]:text-sm">
+        {actions}
+      </div>
     </div>
   );
 }

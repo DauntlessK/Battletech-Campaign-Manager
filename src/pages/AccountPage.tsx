@@ -168,17 +168,6 @@ export default function AccountPage({
         eyebrow="Account"
         title="My Account"
         description="Create a BattleTech Campaign Manager account or sign in to access campaigns, friends, invites, and notifications."
-        actions={
-          user ? (
-            <button
-              type="button"
-              onClick={onLogout}
-              className="rounded-2xl bg-lime-400 px-4 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300"
-            >
-              Logout
-            </button>
-          ) : null
-        }
       />
 
       {loading && (

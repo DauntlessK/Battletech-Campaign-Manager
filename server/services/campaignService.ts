@@ -177,20 +177,18 @@ function toBoolean(value: unknown, fallback = false): boolean {
 
 function normalizeVictoryConditions(raw: any, type: CampaignType, objectiveControlType: ObjectiveControlType) {
   const source = raw ?? {};
-  const keyObjectivesEnabled =
-    objectiveControlType === "Binary" ? false : toBoolean(source.keyObjectivesEnabled, false);
+  const isBinaryControl = objectiveControlType === "Binary";
+  const keyObjectivesEnabled = isBinaryControl ? false : toBoolean(source.keyObjectivesEnabled, false);
   return {
-    totalBattlesEnabled: toBoolean(source.totalBattlesEnabled, false),
-    totalBattles: clampInteger(source.totalBattles, 10, 1, 999),
     capitulationBVEnabled: true,
     capitulationBVPercent: clampInteger(source.capitulationBVPercent, 10, 1, 100),
     capitulationResourcesEnabled: true,
     capitulationResourcesPercent: clampInteger(source.capitulationResourcesPercent, 10, 1, 100),
-    dominationEnabled: toBoolean(source.dominationEnabled, true),
+    dominationEnabled: isBinaryControl ? false : toBoolean(source.dominationEnabled, true),
     dominationControlPercent: clampInteger(source.dominationControlPercent, 70, 1, 100),
     keyObjectivesEnabled,
-    turnsElapsedEnabled: type === "Conquest" ? toBoolean(source.turnsElapsedEnabled, false) : false,
-    turnsElapsed: type === "Conquest" ? clampInteger(source.turnsElapsed, 25, 1, 999) : undefined,
+    turnsElapsedEnabled: toBoolean(source.turnsElapsedEnabled, false),
+    turnsElapsed: clampInteger(source.turnsElapsed, type === "Conquest" ? 25 : 10, 1, 999),
     mapControlEnabled: type === "Conquest" ? toBoolean(source.mapControlEnabled, false) : false,
     mapControlPercent: type === "Conquest" ? clampInteger(source.mapControlPercent, 75, 1, 100) : undefined,
   };
@@ -216,10 +214,10 @@ function normalizeCampaignSettings(
 ): CampaignSettings {
   const type = VALID_CAMPAIGN_TYPES.includes(rawSettings.type as CampaignType)
     ? (rawSettings.type as CampaignType)
-    : "Chaos";
+    : "Advanced";
   const era = VALID_ERAS.includes(String(rawSettings.era))
     ? String(rawSettings.era)
-    : "Star League";
+    : "";
   const rulesLevel = VALID_RULES_LEVELS.includes(String(rawSettings.rulesLevel))
     ? String(rawSettings.rulesLevel)
     : "Standard";
@@ -227,7 +225,7 @@ function normalizeCampaignSettings(
     String(rawSettings.objectiveControlType),
   )
     ? String(rawSettings.objectiveControlType)
-    : "Binary";
+    : "Percentage";
 
   const forceBVLimit = toPositiveNumber(rawSettings.forceBVLimit, 15000);
   const requestedMaxPlayers = clampInteger(rawSettings.maxPlayers, 2, 2, 10);
@@ -239,7 +237,7 @@ function normalizeCampaignSettings(
           Math.floor(
             toPositiveNumber(
               rawSettings.maxTurnsAhead ?? rawSettings.maxTurns,
-              1,
+              4,
             ),
           ),
         )
@@ -277,6 +275,7 @@ function normalizeCampaignSettings(
     salariesEnabled: type !== "Chaos" && Boolean(rawSettings.salariesEnabled),
     startingResources: normalizeStartingResources(rawSettings, type),
     victoryConditions: normalizeVictoryConditions(rawSettings.victoryConditions, type, objectiveControlType),
+    victoryConditionsReviewed: Boolean(rawSettings.victoryConditionsReviewed),
     objectives: normalizeCampaignObjectives(rawSettings.objectives),
     fluff: normalizeCampaignFluff(rawSettings.fluff, era),
   };
@@ -290,6 +289,7 @@ export async function createCampaign(
 ): Promise<Campaign> {
   const cleanName = name.trim();
   if (!cleanName) throw new Error("Campaign name is required.");
+  if (!settings.era) throw new Error("Campaign era is required.");
 
   const store = await loadStore();
   const now = new Date().toISOString();
@@ -408,7 +408,7 @@ export async function updateCampaign(
   const settingsKeys = updates.settings ? Object.keys(updates.settings) : [];
   const objectiveOnlySettingsUpdate =
     settingsKeys.length > 0 &&
-    settingsKeys.every((key) => key === "victoryConditions" || key === "objectives" || key === "fluff");
+    settingsKeys.every((key) => key === "victoryConditions" || key === "victoryConditionsReviewed" || key === "objectives" || key === "fluff");
   const restrictedSetupUpdate =
     !objectiveOnlySettingsUpdate &&
     (typeof updates.name === "string" || "description" in updates || settingsKeys.length > 0);
@@ -630,7 +630,7 @@ function campaignPlayersReady(campaign: Campaign, store: any) {
 function campaignObjectivesReady(campaign: Campaign) {
   const victory = campaign.settings?.victoryConditions;
   const objectives = campaign.settings?.objectives ?? [];
-  if (!victory) return false;
+  if (!victory || !campaign.settings?.victoryConditionsReviewed) return false;
   if (objectives.length < 2) return false;
   if (victory.keyObjectivesEnabled && !objectives.some((objective: any) => objective.isKey)) return false;
   return true;

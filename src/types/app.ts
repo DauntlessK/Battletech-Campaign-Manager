@@ -164,8 +164,6 @@ export type ResourceBalance = Partial<
 
 
 export type VictoryConditions = {
-  totalBattlesEnabled?: boolean;
-  totalBattles?: number;
   capitulationBVEnabled?: boolean;
   capitulationBVPercent?: number;
   capitulationResourcesEnabled?: boolean;
@@ -220,6 +218,7 @@ export type CampaignSettings = {
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
   victoryConditions?: VictoryConditions;
+  victoryConditionsReviewed?: boolean;
   objectives?: CampaignObjective[];
   fluff?: CampaignFluff;
 };
