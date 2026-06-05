@@ -171,6 +171,23 @@ export default function LogBattlePage({
   const participatingUnits = forceUnits.filter((unit) =>
     participatingIds.has(unit.id),
   );
+  const selectedBV = participatingUnits.reduce(
+    (sum, unit) =>
+      sum + Number(unit.currentBV ?? unit.snapshot?.totalBV ?? unit.bv ?? 0),
+    0,
+  );
+  const selectedDestroyedCount = participatingUnits.filter((unit) => {
+    const draft = damageDrafts[unit.id];
+    if (!draft) return false;
+    return getUnitStatus(unit, draft, isChaos) === "Destroyed";
+  }).length;
+  const selectedWoundedPilots = participatingUnits.filter((unit) => {
+    const pilotDamage = damageDrafts[unit.id]?.pilotDamage;
+    return typeof pilotDamage === "number" && pilotDamage > 0;
+  }).length;
+  const selectedKiaPilots = participatingUnits.filter(
+    (unit) => damageDrafts[unit.id]?.pilotDamage === "KIA",
+  ).length;
   const unsavedDetailedUnits = needsDamageSave
     ? participatingUnits.filter((unit) => !damageDrafts[unit.id]?.saved)
     : [];
@@ -276,6 +293,18 @@ export default function LogBattlePage({
           <div className="flex flex-col gap-2">
             <button
               type="button"
+              disabled={!canSubmit || submitting}
+              onClick={submitBattleLog}
+              className="inline-flex items-center justify-center rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting
+                ? "Submitting..."
+                : isEditingSourceLog
+                  ? "Resubmit Battle Log"
+                  : "Log Battle"}
+            </button>
+            <button
+              type="button"
               onClick={onBack}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
             >
@@ -300,6 +329,18 @@ export default function LogBattlePage({
           <p className="mt-1 text-orange-100/80">
             Save this log again to resubmit it. If the corrected fields now match the opponent’s log, the battle can move out of dispute.
           </p>
+        </div>
+      )}
+
+      {(error || submitMessage) && (
+        <div
+          className={`rounded-3xl border p-4 text-sm ${
+            error
+              ? "border-red-500/40 bg-red-950/30 text-red-200"
+              : "border-lime-400/30 bg-lime-400/10 text-lime-100"
+          }`}
+        >
+          {error || submitMessage}
         </div>
       )}
 
@@ -388,6 +429,14 @@ export default function LogBattlePage({
               </button>
             </div>
           </Field>
+        </div>
+
+        <div className="mt-4 grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/45 p-3 sm:grid-cols-2 xl:grid-cols-5">
+          <BattleSummaryFact label="Units Participated" value={String(participatingUnits.length)} />
+          <BattleSummaryFact label="Selected BV" value={formatNumber(selectedBV)} />
+          <BattleSummaryFact label="Kills Logged" value={String(totalKillsMade)} />
+          <BattleSummaryFact label="Destroyed Units" value={String(selectedDestroyedCount)} />
+          <BattleSummaryFact label="Wounded/KIA" value={`${selectedWoundedPilots}/${selectedKiaPilots}`} />
         </div>
       </section>
 
@@ -574,36 +623,6 @@ export default function LogBattlePage({
           onSave={saveSelectedDamage}
         />
       )}
-
-      <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="text-sm font-black text-zinc-100">
-              Ready to log battle?
-            </div>
-            <p className="mt-1 text-sm text-zinc-500">
-              {unsavedDetailedUnits.length
-                ? `${unsavedDetailedUnits.length} participating unit${unsavedDetailedUnits.length === 1 ? " still needs" : "s still need"} damage/ammo saved.`
-                : `All required battle details are ready. Kills made by your side: ${totalKillsMade}.`}
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled={!canSubmit || submitting}
-            onClick={submitBattleLog}
-            className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {submitting ? "Submitting..." : isEditingSourceLog ? "Resubmit Battle Log" : "Log Battle"}
-          </button>
-        </div>
-        {(error || submitMessage) && (
-          <div
-            className={`mt-4 rounded-2xl border p-3 text-sm ${error ? "border-red-500/40 bg-red-950/30 text-red-200" : "border-lime-400/30 bg-lime-400/10 text-lime-100"}`}
-          >
-            {error || submitMessage}
-          </div>
-        )}
-      </section>
 
       {editingBattleNotes && (
         <BattleNotesModal
@@ -1259,6 +1278,18 @@ function AmmoExpenditureSection({
     </div>
   );
 }
+
+function BattleSummaryFact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-center">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-black text-zinc-100">{value}</div>
+    </div>
+  );
+}
+
 
 function Field({
   label,

@@ -249,6 +249,9 @@ export default function App() {
       setFriends([]);
       setFriendRequests([]);
       setNotifications([]);
+      setCampaignFocusId(null);
+      setMobileMenuOpen(false);
+      setActivePage("landing");
       setAuthLoading(false);
       setAuthSuccess("You have been signed out.");
     }

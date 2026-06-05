@@ -3945,7 +3945,7 @@ function ActiveCampaignDashboard({
                           width: `${playerShare}%`,
                           backgroundColor: getPlayerColor(player, index),
                         }}
-                        title={playerDisplayName(player)}
+                        title={`${Math.trunc(playerShare)}%`}
                       />
                     ))}
                   </div>
@@ -4316,7 +4316,7 @@ function ControlStack({
               width: `${share}%`,
               backgroundColor: getPlayerColor(player, index),
             }}
-            title={playerDisplayName(player)}
+            title={`${Math.trunc(share)}%`}
           />
         ))}
       </div>
