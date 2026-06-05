@@ -16,7 +16,72 @@ export type UnitType =
   | "Infantry"
   | "Aerospace"
   | string;
-export type BattleStatus = "Proposed" | "Confirmed" | "Disputed" | "Finalized";
+export type BattleStatus =
+  | "Proposed"
+  | "AwaitingOpponent"
+  | "Confirmed"
+  | "Disputed"
+  | "Complete"
+  | "Finalized";
+
+export type BattleOutcome = "Victory" | "Defeat" | "Draw" | string;
+
+export type CampaignUnitDamageOverlay = {
+  campaignForceUnitId: string;
+  participated?: boolean;
+  unitName?: string;
+  pilotName?: string;
+  pilotDamage?: number | "KIA";
+  killsMade?: number;
+  status?: string;
+  damageSummary?: {
+    armor: number;
+    internal: number;
+    weapons: number;
+    components: number;
+    engineHits: number;
+    gyroHits: number;
+    ammo: number;
+    limbs: number;
+  };
+  chaos?: {
+    condition: "ready" | "damaged" | "destroyed";
+  };
+  detailed?: {
+    locations: Record<
+      string,
+      {
+        armorDamage?: number;
+        rearArmorDamage?: number;
+        structureDamage?: number;
+        missing?: boolean;
+        destroyed?: boolean;
+        damagedSlots?: number[];
+        destroyedSlots?: number[];
+      }
+    >;
+    ammoSpent?: Record<string, number>;
+    ammoConfirmed?: boolean;
+    destroyedEquipmentIds?: string[];
+    damagedEquipmentIds?: string[];
+    notes?: string;
+  };
+};
+
+export type BattleLogEntry = {
+  id: string;
+  userId: string;
+  date?: string;
+  campaignForceId?: string;
+  opponentUserId?: string;
+  objectiveId?: string;
+  objectiveName?: string;
+  outcome?: BattleOutcome;
+  controlsField?: boolean;
+  unitDamage?: CampaignUnitDamageOverlay[];
+  summary?: string;
+  submittedAt: string;
+};
 
 export type Battle = {
   id: string;
@@ -24,15 +89,28 @@ export type Battle = {
   turnNumber?: number;
   date: string;
   location?: string;
+  objectiveId?: string;
+  objectiveName?: string;
   status: BattleStatus;
   submittedByUserId: string;
   defendingUserId?: string;
+  opponentUserId?: string;
   winnerUserId?: string;
   attackerForceId?: string;
   defenderForceId?: string;
   attackerScore?: number;
   defenderScore?: number;
+  outcome?: BattleOutcome;
+  controlsField?: boolean;
   summary?: string;
+  battleLogs?: BattleLogEntry[];
+  controlChangePercent?: number;
+  controlSwingBreakdown?: Record<string, number | string | boolean>;
+  disputeNotes?: Array<{
+    userId: string;
+    notes: string;
+    submittedAt: string;
+  }>;
   confirmedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -162,7 +240,6 @@ export type ResourceBalance = Partial<
   Record<"CBills" | "Warchest" | "Time" | string, number>
 >;
 
-
 export type VictoryConditions = {
   capitulationBVEnabled?: boolean;
   capitulationBVPercent?: number;
@@ -194,6 +271,7 @@ export type CampaignObjective = {
   name: string;
   type: CampaignObjectiveType;
   isKey?: boolean;
+  currentControl?: Array<{ userId: string; percentage: number }>;
 };
 
 export type CampaignFluff = {
@@ -222,7 +300,6 @@ export type CampaignSettings = {
   objectives?: CampaignObjective[];
   fluff?: CampaignFluff;
 };
-
 
 export type FriendSummary = {
   id: string;
@@ -293,24 +370,28 @@ export type Campaign = {
   participants?: CampaignParticipantSummary[];
 };
 
+export type CampaignUnitSnapshot = {
+  id: string;
+  name: string;
+  model: string;
+  chassis: string;
+  type?: string;
+  techBase?: string;
+  era?: string;
+  year?: number;
+  tonnage?: number;
+  weightClass?: string;
+  totalBV?: number;
+  role?: string;
+  weapons?: UnitWeapon[];
+  locations?: UnitLocation[];
+};
+
 export type ForceUnit = {
   id: string;
   forceId: string;
   baseUnitId: string;
-  snapshot?: {
-    id: string;
-    name: string;
-    model: string;
-    chassis: string;
-    type?: string;
-    techBase?: string;
-    era?: string;
-    year?: number;
-    tonnage?: number;
-    weightClass?: string;
-    totalBV?: number;
-    role?: string;
-  };
+  snapshot?: CampaignUnitSnapshot;
   currentBV: number;
   status?: string;
   kills?: number;

@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import { getUnitDefinitionById } from "./unitLibraryService";
+import { randomPilotName } from "../data/pilotNames";
 import type { CampaignUnitSnapshot, Force, ForceUnit } from "../types/models";
 import type { Unit } from "../types/unit";
 
@@ -13,7 +14,7 @@ function withForceUnits(force: Force, forceUnits: ForceUnit[]): Force {
         ...unit,
         teamNumber: unit.teamNumber ?? 1,
         sortOrder: unit.sortOrder ?? index,
-        pilot: unit.pilot ?? { gunnery: 4, piloting: 5 },
+        pilot: unit.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
       }))
       .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   };
@@ -190,7 +191,7 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
       ...u,
       id: crypto.randomUUID(),
       forceId: copy.id,
-      pilot: u.pilot ?? { gunnery: 4, piloting: 5 },
+      pilot: u.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
     };
     store.forceUnits.push(newUnit);
   }
@@ -275,7 +276,7 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
     isDestroyed: false,
     teamNumber: normalizedTeam,
     sortOrder: nextSortOrder,
-    pilot: { gunnery: 4, piloting: 5 },
+    pilot: { name: randomPilotName(), gunnery: 4, piloting: 5 },
   };
 
   store.forceUnits.push(newForceUnit);
@@ -337,7 +338,7 @@ export async function updateForce(
 
       const incomingTeamNumber = Number(incoming.teamNumber ?? existing?.teamNumber ?? 1);
       const normalizedTeamNumber = force.forConquest ? Math.max(1, Math.min(maxTeamNumber, incomingTeamNumber)) : 1;
-      const incomingPilot = incoming.pilot ?? existing?.pilot ?? { gunnery: 4, piloting: 5 };
+      const incomingPilot = incoming.pilot ?? existing?.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 };
 
       sanitizedForceUnits.push({
         id: typeof incoming.id === "string" && !incoming.id.startsWith("draft-") ? incoming.id : crypto.randomUUID(),
@@ -353,7 +354,7 @@ export async function updateForce(
         teamNumber: normalizedTeamNumber,
         sortOrder: Number(incoming.sortOrder ?? index),
         pilot: {
-          name: incomingPilot.name,
+          name: incomingPilot.name || randomPilotName(),
           gunnery: Number(incomingPilot.gunnery ?? 4),
           piloting: Number(incomingPilot.piloting ?? 5),
         },
@@ -398,7 +399,7 @@ export async function updateForceUnit(forceId: string, forceUnitId: string, owne
   if (updates.sortOrder !== undefined) forceUnit.sortOrder = Number(updates.sortOrder);
   if (updates.pilotName !== undefined || updates.gunnery !== undefined || updates.piloting !== undefined) {
     forceUnit.pilot = {
-      name: updates.pilotName ?? forceUnit.pilot?.name,
+      name: updates.pilotName ?? forceUnit.pilot?.name ?? randomPilotName(),
       gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : forceUnit.pilot?.gunnery ?? 4,
       piloting: updates.piloting !== undefined ? Number(updates.piloting) : forceUnit.pilot?.piloting ?? 5,
     };

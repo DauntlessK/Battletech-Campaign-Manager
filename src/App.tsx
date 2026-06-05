@@ -357,7 +357,6 @@ export default function App() {
     }
   };
 
-
   const beginCampaignForUser = async (
     campaignId: string,
   ): Promise<Campaign | null> => {
@@ -770,6 +769,57 @@ export default function App() {
       return null;
     } finally {
       setCampaignUpdateLoading(false);
+    }
+  };
+
+  const submitBattleLogForUser = async (
+    campaignId: string,
+    payload: {
+      date: string;
+      opponentUserId?: string;
+      objectiveId?: string;
+      objectiveName?: string;
+      outcome: string;
+      controlsField: boolean;
+      campaignForceId?: string;
+      unitDamage: unknown[];
+      summary?: string;
+    },
+  ): Promise<Battle | null> => {
+    setBattleFormLoading(true);
+    setBattleFormError(null);
+    try {
+      const response = await fetch(
+        `/api/battles/campaigns/${campaignId}/battles`,
+        {
+          method: "POST",
+          headers: {
+            ...authHeaders(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to submit battle log.");
+      }
+      const createdBattle = result as Battle;
+      setBattles((current) => [
+        createdBattle,
+        ...current.filter((battle) => battle.id !== createdBattle.id),
+      ]);
+      if (["Complete", "Confirmed", "Finalized", "Disputed"].includes(createdBattle.status)) {
+        await fetchCampaigns();
+      }
+      return createdBattle;
+    } catch (error) {
+      setBattleFormError(
+        error instanceof Error ? error.message : "Unable to submit battle log.",
+      );
+      return null;
+    } finally {
+      setBattleFormLoading(false);
     }
   };
 
@@ -1199,6 +1249,7 @@ export default function App() {
             onInviteFriendToCampaign={inviteFriendToCampaign}
             onUninviteCampaignPlayer={uninviteCampaignPlayer}
             onRespondToCampaignInvitation={respondToCampaignInvitation}
+            onSubmitBattleLog={submitBattleLogForUser}
           />
         )}
         {activePage === "battles" && (
@@ -1451,15 +1502,27 @@ function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-950/80" />
           </div>
           <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-lime-300">Campaign command</div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-zinc-50 sm:text-3xl">Run the war from orbit.</h2>
+            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-lime-300">
+              Campaign command
+            </div>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-zinc-50 sm:text-3xl">
+              Run the war from orbit.
+            </h2>
             <p className="mt-4 text-sm leading-7 text-zinc-300 sm:text-base">
-              Track planetary control, objectives, combat teams, pilot rosters, and campaign status from one tactical command view built for BattleTech-style campaigns.
+              Track planetary control, objectives, combat teams, pilot rosters,
+              and campaign status from one tactical command view built for
+              BattleTech-style campaigns.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-zinc-300">
-              <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-lime-200">Planet control</span>
-              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">Force readiness</span>
-              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">Battle history</span>
+              <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-lime-200">
+                Planet control
+              </span>
+              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">
+                Force readiness
+              </span>
+              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">
+                Battle history
+              </span>
             </div>
           </div>
         </div>

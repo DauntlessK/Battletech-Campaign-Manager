@@ -15,6 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import type {
+  Battle,
   Campaign,
   CampaignObjective,
   CampaignSettings,
@@ -25,13 +26,24 @@ import type {
   User,
 } from "../types/app";
 import PageTitle from "../components/PageTitle";
+import LogBattlePage from "./LogBattlePage";
 import { ERA_OPTIONS as APP_ERA_OPTIONS } from "../constants/appOptions";
 
 const CAMPAIGN_TYPES = ["Chaos", "Advanced", "Conquest"];
 const ERA_OPTIONS = APP_ERA_OPTIONS.filter((era) => era !== "All");
 const RULES_LEVEL_OPTIONS = ["Introductory", "Standard", "Advanced"];
 const OBJECTIVE_CONTROL_OPTIONS = ["Binary", "Percentage"];
-const OBJECTIVE_TYPES = ["Factory", "Depot", "Comms Array", "Small City", "Large City", "Fort Holding", "Repair Facility", "Space Port", "Medical Facility"];
+const OBJECTIVE_TYPES = [
+  "Factory",
+  "Depot",
+  "Comms Array",
+  "Small City",
+  "Large City",
+  "Fort Holding",
+  "Repair Facility",
+  "Space Port",
+  "Medical Facility",
+];
 const REPAIR_PRIORITY_OPTIONS = [
   "General Repair Priority",
   "Armor and Structure Priority",
@@ -42,23 +54,28 @@ const REPAIR_PRIORITY_OPTIONS = [
 const REPAIR_PRIORITY_DETAILS = [
   {
     title: "General Repair Priority",
-    description: "The tech force chooses repairs using the general repair flow: rearm all units; repair or replace missing legs; repair gyros and engines; repair or replace missing arms; repair or replace weapons; repair broken equipment or components; repair armor; then repair structure.",
+    description:
+      "The tech force chooses repairs using the general repair flow: rearm all units; repair or replace missing legs; repair gyros and engines; repair or replace missing arms; repair or replace weapons; repair broken equipment or components; repair armor; then repair structure.",
   },
   {
     title: "Armor and Structure Priority",
-    description: "Prioritizes restoring armor and internal structure across the force.",
+    description:
+      "Prioritizes restoring armor and internal structure across the force.",
   },
   {
     title: "Limbs and Components Priority",
-    description: "Prioritizes major repair jobs such as limb replacement and component replacement.",
+    description:
+      "Prioritizes major repair jobs such as limb replacement and component replacement.",
   },
   {
     title: "Weapons Priority",
-    description: "Prioritizes replacing or repairing weapons first, then armor.",
+    description:
+      "Prioritizes replacing or repairing weapons first, then armor.",
   },
   {
     title: "Repair, Scrounge, and Salvage Priority",
-    description: "Uses general repairs while increasing emphasis on acquiring parts or salvage. Less total time may be devoted to direct repair work.",
+    description:
+      "Uses general repairs while increasing emphasis on acquiring parts or salvage. Less total time may be devoted to direct repair work.",
   },
 ];
 const ACTIVE_STATUSES = new Set(["Setup", "Active", "Paused"]);
@@ -142,11 +159,21 @@ function resourceTypeLabel(settings?: CampaignSettings): string {
 
 function campaignFluffSummary(settings?: CampaignSettings): string {
   const fluff = settings?.fluff;
-  if (!fluff?.year && !fluff?.planet && !fluff?.conflictDescription) return "No campaign fluff added yet.";
-  return [fluff.year ? String(fluff.year) : null, fluff.planet, fluff.conflictDescription].filter(Boolean).join(" • ");
+  if (!fluff?.year && !fluff?.planet && !fluff?.conflictDescription)
+    return "No campaign fluff added yet.";
+  return [
+    fluff.year ? String(fluff.year) : null,
+    fluff.planet,
+    fluff.conflictDescription,
+  ]
+    .filter(Boolean)
+    .join(" • ");
 }
 
-function campaignYearIsValid(year: number | undefined, era: string | undefined) {
+function campaignYearIsValid(
+  year: number | undefined,
+  era: string | undefined,
+) {
   if (!year || !era) return true;
   const range = ERA_YEAR_RANGES[era];
   if (!range) return true;
@@ -156,7 +183,8 @@ function campaignYearIsValid(year: number | undefined, era: string | undefined) 
 function campaignDateLabel(campaign: Campaign): string {
   const year = campaign.settings?.fluff?.year;
   if (year) return String(year);
-  if (campaign.startDate) return new Date(campaign.startDate).toLocaleDateString();
+  if (campaign.startDate)
+    return new Date(campaign.startDate).toLocaleDateString();
   return "Not dated";
 }
 
@@ -195,7 +223,11 @@ function objectivesAreReady(campaign: Campaign): boolean {
   const objectives = settings?.objectives ?? [];
   if (!victory || !settings?.victoryConditionsReviewed) return false;
   if (objectives.length < 2) return false;
-  if (victory.keyObjectivesEnabled && !objectives.some((objective) => objective.isKey)) return false;
+  if (
+    victory.keyObjectivesEnabled &&
+    !objectives.some((objective) => objective.isKey)
+  )
+    return false;
   return true;
 }
 
@@ -210,12 +242,22 @@ function victorySummary(settings?: CampaignSettings): string {
   const victory = settings?.victoryConditions;
   if (!victory) return "Victory conditions not configured.";
   const enabled = [
-    victory.capitulationBVEnabled ? `BV capitulation at ${victory.capitulationBVPercent ?? 10}%` : null,
-    victory.capitulationResourcesEnabled ? `Resource capitulation at ${victory.capitulationResourcesPercent ?? 10}%` : null,
-    victory.dominationEnabled ? `${victory.dominationControlPercent ?? 70}% planet control` : null,
+    victory.capitulationBVEnabled
+      ? `BV capitulation at ${victory.capitulationBVPercent ?? 10}%`
+      : null,
+    victory.capitulationResourcesEnabled
+      ? `Resource capitulation at ${victory.capitulationResourcesPercent ?? 10}%`
+      : null,
+    victory.dominationEnabled
+      ? `${victory.dominationControlPercent ?? 70}% planet control`
+      : null,
     victory.keyObjectivesEnabled ? "Key objective control" : null,
-    victory.turnsElapsedEnabled ? `${victory.turnsElapsed ?? 25} turns elapsed` : null,
-    victory.mapControlEnabled ? `${victory.mapControlPercent ?? 75}% map control` : null,
+    victory.turnsElapsedEnabled
+      ? `${victory.turnsElapsed ?? 25} turns elapsed`
+      : null,
+    victory.mapControlEnabled
+      ? `${victory.mapControlPercent ?? 75}% map control`
+      : null,
   ].filter(Boolean);
   return enabled.length ? enabled.join(" • ") : "No active victory conditions.";
 }
@@ -409,6 +451,16 @@ function forceSummaryForParticipant(
       }
     : undefined;
 }
+type BattleLogPrefill = {
+  date?: string;
+  opponentUserId?: string;
+  objectiveId?: string;
+  objectiveName?: string;
+  outcome?: string;
+  controlsField?: boolean;
+  summary?: string;
+};
+
 export default function CampaignsPage({
   authUser,
   campaigns,
@@ -433,6 +485,7 @@ export default function CampaignsPage({
   onInviteFriendToCampaign,
   onUninviteCampaignPlayer,
   onRespondToCampaignInvitation,
+  onSubmitBattleLog,
 }: {
   authUser: User | null;
   campaigns: Campaign[];
@@ -480,6 +533,20 @@ export default function CampaignsPage({
     campaignId: string,
     accept: boolean,
   ) => Promise<Campaign | null>;
+  onSubmitBattleLog: (
+    campaignId: string,
+    payload: {
+      date: string;
+      opponentUserId?: string;
+      objectiveId?: string;
+      objectiveName?: string;
+      outcome: string;
+      controlsField: boolean;
+      campaignForceId?: string;
+      unitDamage: any[];
+      summary?: string;
+    },
+  ) => Promise<any>;
 }) {
   const [showInactive, setShowInactive] = useState(false);
   const [showPendingInvites, setShowPendingInvites] = useState(false);
@@ -499,10 +566,29 @@ export default function CampaignsPage({
     string | null
   >(null);
   const [editingSettings, setEditingSettings] = useState(false);
-  const [editingVictoryConditions, setEditingVictoryConditions] = useState(false);
+  const [editingVictoryConditions, setEditingVictoryConditions] =
+    useState(false);
   const [editingObjectives, setEditingObjectives] = useState(false);
   const [editingFluff, setEditingFluff] = useState(false);
-  const [activeDashboardView, setActiveDashboardView] = useState<"objectives" | "planet" | "victory">("objectives");
+  const [activeDashboardView, setActiveDashboardView] = useState<
+    "objectives" | "planet" | "victory"
+  >("objectives");
+  const [loggingBattle, setLoggingBattle] = useState(false);
+  const [battleLogError, setBattleLogError] = useState<string | null>(null);
+  const [battleLogLoading, setBattleLogLoading] = useState(false);
+  const [battleLogPrefill, setBattleLogPrefill] =
+    useState<BattleLogPrefill | null>(null);
+  const [battleHistoryOpen, setBattleHistoryOpen] = useState(false);
+  const [battleHistoryFilter, setBattleHistoryFilter] = useState<
+    "complete" | "pending" | "disputed"
+  >("complete");
+  const [selectedBattleDetails, setSelectedBattleDetails] =
+    useState<Battle | null>(null);
+  const [campaignBattles, setCampaignBattles] = useState<Battle[]>([]);
+  const [campaignBattlesLoading, setCampaignBattlesLoading] = useState(false);
+  const [campaignBattlesError, setCampaignBattlesError] = useState<
+    string | null
+  >(null);
   const [candidateForceId, setCandidateForceId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -520,6 +606,77 @@ export default function CampaignsPage({
     }
   }, [focusCampaignId, onCampaignFocusConsumed]);
 
+  const fetchCampaignBattles = async (campaignId: string) => {
+    setCampaignBattlesLoading(true);
+    setCampaignBattlesError(null);
+    try {
+      const token = localStorage.getItem("bcm-auth-token");
+      const response = await fetch(
+        `/api/battles/campaigns/${campaignId}/battles`,
+        {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const result = await response.json().catch(() => null);
+      if (!response.ok)
+        throw new Error(result?.error || "Unable to load battle history.");
+      setCampaignBattles(Array.isArray(result) ? result : []);
+    } catch (error) {
+      setCampaignBattlesError(
+        error instanceof Error
+          ? error.message
+          : "Unable to load battle history.",
+      );
+    } finally {
+      setCampaignBattlesLoading(false);
+    }
+  };
+
+  const disputeBattle = async (battle: Battle, notes: string) => {
+    const token = localStorage.getItem("bcm-auth-token");
+    const response = await fetch(`/api/battles/${battle.id}`, {
+      method: "PATCH",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: "Disputed",
+        disputeNotes: [
+          ...((battle as any).disputeNotes ?? []),
+          {
+            userId: authUser.id,
+            notes,
+            submittedAt: new Date().toISOString(),
+          },
+        ],
+      }),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(result?.error || "Unable to dispute battle.");
+    setCampaignBattles((current) =>
+      current.map((entry) => (entry.id === result.id ? result : entry)),
+    );
+    setSelectedBattleDetails(result as Battle);
+    setBattleHistoryFilter("disputed");
+  };
+
+  useEffect(() => {
+    const campaign = campaigns.find(
+      (candidate) => candidate.id === selectedCampaignId,
+    );
+    if (campaign?.status === "Active") {
+      fetchCampaignBattles(campaign.id);
+    } else {
+      setCampaignBattles([]);
+      setBattleHistoryOpen(false);
+      setBattleLogPrefill(null);
+    }
+  }, [selectedCampaignId, campaigns]);
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [campaignType, setCampaignType] = useState("Advanced");
@@ -531,15 +688,23 @@ export default function CampaignsPage({
   const [combatTeamCount, setCombatTeamCount] = useState(3);
   const [combatTeamBVLimit, setCombatTeamBVLimit] = useState(5000);
   const [combatTeamSize, setCombatTeamSize] = useState(4);
-  const [objectiveControlType, setObjectiveControlType] = useState("Percentage");
+  const [objectiveControlType, setObjectiveControlType] =
+    useState("Percentage");
   const [salariesEnabled, setSalariesEnabled] = useState(false);
   const [warchest, setWarchest] = useState(1000);
   const [cBills, setCBills] = useState(5000000);
-  const [victoryConditions, setVictoryConditions] = useState(defaultVictoryConditions("Advanced", "Percentage"));
+  const [victoryConditions, setVictoryConditions] = useState(
+    defaultVictoryConditions("Advanced", "Percentage"),
+  );
   const [objectiveCount, setObjectiveCount] = useState(4);
-  const [objectiveMode, setObjectiveMode] = useState<"random" | "select">("random");
-  const [selectedObjectiveTypes, setSelectedObjectiveTypes] = useState<string[]>(OBJECTIVE_TYPES);
-  const [objectiveDrafts, setObjectiveDrafts] = useState<CampaignObjective[]>([]);
+  const [objectiveMode, setObjectiveMode] = useState<"random" | "select">(
+    "random",
+  );
+  const [selectedObjectiveTypes, setSelectedObjectiveTypes] =
+    useState<string[]>(OBJECTIVE_TYPES);
+  const [objectiveDrafts, setObjectiveDrafts] = useState<CampaignObjective[]>(
+    [],
+  );
   const [fluffYear, setFluffYear] = useState<number | undefined>(undefined);
   const [fluffPlanet, setFluffPlanet] = useState("");
   const [fluffDescription, setFluffDescription] = useState("");
@@ -549,11 +714,15 @@ export default function CampaignsPage({
   const visibleCampaigns = useMemo(
     () =>
       campaigns.filter((campaign) =>
-        showInactive ? isInactiveCampaign(campaign) : !isInactiveCampaign(campaign),
+        showInactive
+          ? isInactiveCampaign(campaign)
+          : !isInactiveCampaign(campaign),
       ),
     [campaigns, showInactive],
   );
-  const activeCount = campaigns.filter((campaign) => !isInactiveCampaign(campaign)).length;
+  const activeCount = campaigns.filter(
+    (campaign) => !isInactiveCampaign(campaign),
+  ).length;
   const inactiveCount = campaigns.filter(isInactiveCampaign).length;
   const isMultiPlayerMode = playerMode === "3-10";
   const effectiveObjectiveControlType = normalizeObjectiveControl(
@@ -623,7 +792,10 @@ export default function CampaignsPage({
       salariesEnabled,
       startingResources:
         campaignType === "Chaos" ? { Warchest: warchest } : { CBills: cBills },
-      victoryConditions: defaultVictoryConditions(campaignType, normalizeObjectiveControl(finalPlayerMode, objectiveControlType)),
+      victoryConditions: defaultVictoryConditions(
+        campaignType,
+        normalizeObjectiveControl(finalPlayerMode, objectiveControlType),
+      ),
       victoryConditionsReviewed: false,
       fluff: {
         year: fluffYear,
@@ -655,7 +827,10 @@ export default function CampaignsPage({
     setWarchest(Number(settings?.startingResources?.Warchest ?? 1000));
     setCBills(Number(settings?.startingResources?.CBills ?? 5000000));
     setVictoryConditions({
-      ...defaultVictoryConditions(settings?.type ?? "Advanced", settings?.objectiveControlType),
+      ...defaultVictoryConditions(
+        settings?.type ?? "Advanced",
+        settings?.objectiveControlType,
+      ),
       ...(settings?.victoryConditions ?? {}),
     });
     const currentObjectives = settings?.objectives ?? [];
@@ -708,18 +883,50 @@ export default function CampaignsPage({
       ...victoryConditions,
       capitulationBVEnabled: true,
       capitulationResourcesEnabled: true,
-      capitulationBVPercent: normalizePercent(victoryConditions.capitulationBVPercent, 10),
-      capitulationResourcesPercent: normalizePercent(victoryConditions.capitulationResourcesPercent, 10),
-      dominationEnabled: settings?.objectiveControlType === "Binary" ? false : Boolean(victoryConditions.dominationEnabled),
-      dominationControlPercent: normalizePercent(victoryConditions.dominationControlPercent, 70),
-      keyObjectivesEnabled: settings?.objectiveControlType === "Binary" ? false : Boolean(victoryConditions.keyObjectivesEnabled),
+      capitulationBVPercent: normalizePercent(
+        victoryConditions.capitulationBVPercent,
+        10,
+      ),
+      capitulationResourcesPercent: normalizePercent(
+        victoryConditions.capitulationResourcesPercent,
+        10,
+      ),
+      dominationEnabled:
+        settings?.objectiveControlType === "Binary"
+          ? false
+          : Boolean(victoryConditions.dominationEnabled),
+      dominationControlPercent: normalizePercent(
+        victoryConditions.dominationControlPercent,
+        70,
+      ),
+      keyObjectivesEnabled:
+        settings?.objectiveControlType === "Binary"
+          ? false
+          : Boolean(victoryConditions.keyObjectivesEnabled),
       turnsElapsedEnabled: Boolean(victoryConditions.turnsElapsedEnabled),
-      turnsElapsed: Math.max(1, Math.floor(Number(victoryConditions.turnsElapsed ?? (settings?.type === "Conquest" ? 25 : 10)))),
-      mapControlEnabled: settings?.type === "Conquest" ? Boolean(victoryConditions.mapControlEnabled) : false,
-      mapControlPercent: settings?.type === "Conquest" ? normalizePercent(victoryConditions.mapControlPercent, 75) : undefined,
+      turnsElapsed: Math.max(
+        1,
+        Math.floor(
+          Number(
+            victoryConditions.turnsElapsed ??
+              (settings?.type === "Conquest" ? 25 : 10),
+          ),
+        ),
+      ),
+      mapControlEnabled:
+        settings?.type === "Conquest"
+          ? Boolean(victoryConditions.mapControlEnabled)
+          : false,
+      mapControlPercent:
+        settings?.type === "Conquest"
+          ? normalizePercent(victoryConditions.mapControlPercent, 75)
+          : undefined,
     };
     const updated = await onUpdateCampaign(selectedCampaign.id, {
-      settings: { victoryConditions: cleanedVictory, victoryConditionsReviewed: true },
+      settings: {
+        victoryConditions: cleanedVictory,
+        victoryConditionsReviewed: true,
+      },
     });
     if (updated) {
       setEditingVictoryConditions(false);
@@ -731,15 +938,21 @@ export default function CampaignsPage({
     event.preventDefault();
     if (!selectedCampaign) return;
     const count = clampObjectiveCount(objectiveCount);
-    const allowedTypes = selectedObjectiveTypes.length ? selectedObjectiveTypes : OBJECTIVE_TYPES;
-    const keyRequired = Boolean(selectedCampaign.settings?.victoryConditions?.keyObjectivesEnabled);
+    const allowedTypes = selectedObjectiveTypes.length
+      ? selectedObjectiveTypes
+      : OBJECTIVE_TYPES;
+    const keyRequired = Boolean(
+      selectedCampaign.settings?.victoryConditions?.keyObjectivesEnabled,
+    );
     let objectives: CampaignObjective[];
 
     if (objectiveMode === "random") {
       objectives = Array.from({ length: count }, (_, index) => {
         const type = allowedTypes[index % allowedTypes.length];
         return {
-          id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${index}`,
+          id: crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${index}`,
           name: `${type} ${index + 1}`,
           type,
           isKey: keyRequired && index === 0,
@@ -748,9 +961,16 @@ export default function CampaignsPage({
     } else {
       objectives = Array.from({ length: count }, (_, index) => {
         const current = objectiveDrafts[index];
-        const type = current?.type && OBJECTIVE_TYPES.includes(current.type) ? current.type : allowedTypes[0] ?? OBJECTIVE_TYPES[0];
+        const type =
+          current?.type && OBJECTIVE_TYPES.includes(current.type)
+            ? current.type
+            : (allowedTypes[0] ?? OBJECTIVE_TYPES[0]);
         return {
-          id: current?.id ?? (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${index}`),
+          id:
+            current?.id ??
+            (crypto.randomUUID
+              ? crypto.randomUUID()
+              : `${Date.now()}-${index}`),
           name: current?.name?.trim() || `${type} ${index + 1}`,
           type,
           isKey: Boolean(current?.isKey),
@@ -770,13 +990,16 @@ export default function CampaignsPage({
     }
   };
 
-
   const submitFluff = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedCampaign) return;
     const range = ERA_YEAR_RANGES[selectedCampaign.settings?.era ?? ""];
     const cleanYear = fluffYear ? Math.floor(Number(fluffYear)) : undefined;
-    if (cleanYear && range && (cleanYear < range.min || cleanYear > range.max)) {
+    if (
+      cleanYear &&
+      range &&
+      (cleanYear < range.min || cleanYear > range.max)
+    ) {
       return;
     }
     const updated = await onUpdateCampaign(selectedCampaign.id, {
@@ -836,7 +1059,9 @@ export default function CampaignsPage({
     const invitedPlayersReady = playerStatus.ready;
     const canBeginCampaign =
       ownerReady && objectivesReady && invitedPlayersReady;
-    const fluffReady = Boolean(settings?.fluff?.year && settings?.fluff?.planet?.trim());
+    const fluffReady = Boolean(
+      settings?.fluff?.year && settings?.fluff?.planet?.trim(),
+    );
     const matchingForces = forces.filter(
       (candidate) =>
         candidate.status !== "Deleted" && candidate.origin !== "CampaignCopy",
@@ -848,7 +1073,67 @@ export default function CampaignsPage({
       ? getForceEligibility(selectedCandidate, selectedCampaign)
       : null;
 
+    const awaitingMyLog = getAwaitingMyBattleLog(
+      campaignBattles,
+      selectedCampaign.id,
+      authUser.id,
+    );
+
     if (selectedCampaign.status === "Active") {
+      if (loggingBattle) {
+        return (
+          <LogBattlePage
+            campaign={selectedCampaign}
+            force={force}
+            authUser={authUser}
+            submitting={battleLogLoading}
+            error={battleLogError}
+            initialValues={battleLogPrefill ?? undefined}
+            onBack={() => {
+              setLoggingBattle(false);
+              setBattleLogError(null);
+              setBattleLogPrefill(null);
+              fetchCampaignBattles(selectedCampaign.id);
+            }}
+            onSubmit={async (campaignId, payload) => {
+              setBattleLogLoading(true);
+              setBattleLogError(null);
+              try {
+                const created = await onSubmitBattleLog(campaignId, payload);
+                await fetchCampaignBattles(campaignId);
+                return created;
+              } catch (error) {
+                setBattleLogError(
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to submit battle log.",
+                );
+                return null;
+              } finally {
+                setBattleLogLoading(false);
+              }
+            }}
+          />
+        );
+      }
+
+      if (battleHistoryOpen) {
+        return (
+          <BattleHistoryView
+            campaign={selectedCampaign}
+            battles={campaignBattles}
+            loading={campaignBattlesLoading}
+            error={campaignBattlesError}
+            filter={battleHistoryFilter}
+            setFilter={setBattleHistoryFilter}
+            selectedBattle={selectedBattleDetails}
+            setSelectedBattle={setSelectedBattleDetails}
+            onDispute={disputeBattle}
+            onBack={() => setBattleHistoryOpen(false)}
+          />
+        );
+      }
+
       return (
         <>
           <ActiveCampaignDashboard
@@ -859,6 +1144,22 @@ export default function CampaignsPage({
             activeView={activeDashboardView}
             setActiveView={setActiveDashboardView}
             onBack={() => setSelectedCampaignId(null)}
+            awaitingBattleLog={awaitingMyLog}
+            onLogBattle={() => {
+              setBattleLogPrefill(null);
+              setLoggingBattle(true);
+            }}
+            onStartAwaitingBattleLog={() => {
+              if (!awaitingMyLog) return;
+              setBattleLogPrefill(
+                createBattlePrefillFromOpponentLog(awaitingMyLog, authUser.id),
+              );
+              setLoggingBattle(true);
+            }}
+            onBattleHistory={() => {
+              setBattleHistoryOpen(true);
+              fetchCampaignBattles(selectedCampaign.id);
+            }}
             onOpenFluff={() => {
               loadFormFromCampaign(selectedCampaign);
               setEditingFluff(true);
@@ -1049,8 +1350,18 @@ export default function CampaignsPage({
                 }
               >
                 <div className="mt-3 space-y-2 text-xs text-zinc-400">
-                  <div><span className="font-semibold text-zinc-200">Victory:</span> {victorySummary(settings)}</div>
-                  <div><span className="font-semibold text-zinc-200">Objectives:</span> {objectiveSummary(settings)}</div>
+                  <div>
+                    <span className="font-semibold text-zinc-200">
+                      Victory:
+                    </span>{" "}
+                    {victorySummary(settings)}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-zinc-200">
+                      Objectives:
+                    </span>{" "}
+                    {objectiveSummary(settings)}
+                  </div>
                 </div>
                 {isCampaignOwner && (
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -1058,7 +1369,10 @@ export default function CampaignsPage({
                       type="button"
                       onClick={() => {
                         setVictoryConditions({
-                          ...defaultVictoryConditions(settings?.type ?? "Advanced", settings?.objectiveControlType),
+                          ...defaultVictoryConditions(
+                            settings?.type ?? "Advanced",
+                            settings?.objectiveControlType,
+                          ),
                           ...(settings?.victoryConditions ?? {}),
                         });
                         setEditingVictoryConditions(true);
@@ -1071,7 +1385,9 @@ export default function CampaignsPage({
                       type="button"
                       onClick={() => {
                         const existing = settings?.objectives ?? [];
-                        setObjectiveCount(existing.length ? existing.length : 4);
+                        setObjectiveCount(
+                          existing.length ? existing.length : 4,
+                        );
                         setObjectiveDrafts(existing.length ? existing : []);
                         setObjectiveMode(existing.length ? "select" : "random");
                         setSelectedObjectiveTypes(OBJECTIVE_TYPES);
@@ -1957,7 +2273,9 @@ function ToggleField({
   disabled?: boolean;
 }) {
   return (
-    <label className={`flex gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-sm ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}>
+    <label
+      className={`flex gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-sm ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+    >
       <input
         type="checkbox"
         checked={checked}
@@ -1967,7 +2285,11 @@ function ToggleField({
       />
       <span>
         <span className="block font-black text-zinc-100">{label}</span>
-        {description && <span className="mt-1 block text-xs leading-5 text-zinc-400">{description}</span>}
+        {description && (
+          <span className="mt-1 block text-xs leading-5 text-zinc-400">
+            {description}
+          </span>
+        )}
       </span>
     </label>
   );
@@ -1984,66 +2306,209 @@ function VictoryConditionsModal({
 }: {
   campaign: Campaign;
   values: ReturnType<typeof defaultVictoryConditions>;
-  setValues: React.Dispatch<React.SetStateAction<ReturnType<typeof defaultVictoryConditions>>>;
+  setValues: React.Dispatch<
+    React.SetStateAction<ReturnType<typeof defaultVictoryConditions>>
+  >;
   updateLoading: boolean;
   updateError: string | null;
   onClose: () => void;
   onSubmit: (event: React.FormEvent) => void;
 }) {
   const isConquest = campaign.settings?.type === "Conquest";
-  const keyObjectivesDisabled = campaign.settings?.objectiveControlType === "Binary";
-  const update = (patch: Partial<ReturnType<typeof defaultVictoryConditions>>) =>
-    setValues((current) => ({ ...current, ...patch }));
+  const keyObjectivesDisabled =
+    campaign.settings?.objectiveControlType === "Binary";
+  const update = (
+    patch: Partial<ReturnType<typeof defaultVictoryConditions>>,
+  ) => setValues((current) => ({ ...current, ...patch }));
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
       <div className="mx-auto max-w-4xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Victory Conditions</div>
-            <h2 className="mt-2 text-2xl font-black text-zinc-50">Configure victory conditions</h2>
-            <p className="mt-1 text-sm text-zinc-400">These rules determine when the campaign can end. Conquest-only map and turn conditions appear only for Conquest campaigns.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Victory Conditions
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              Configure victory conditions
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              These rules determine when the campaign can end. Conquest-only map
+              and turn conditions appear only for Conquest campaigns.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close victory conditions modal"><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close victory conditions modal"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <ToggleField label="Turn limit" description="End or check the campaign after a fixed number of turns. For non-Conquest campaigns, this replaces total battle count." checked={Boolean(values.turnsElapsedEnabled)} onChange={(checked) => update({ turnsElapsedEnabled: checked })} />
-              {values.turnsElapsedEnabled && <div className="mt-3"><NumberField label="Turn Count" value={Number(values.turnsElapsed ?? (isConquest ? 25 : 10))} onChange={(value) => update({ turnsElapsed: value })} min={1} /></div>}
+              <ToggleField
+                label="Turn limit"
+                description="End or check the campaign after a fixed number of turns. For non-Conquest campaigns, this replaces total battle count."
+                checked={Boolean(values.turnsElapsedEnabled)}
+                onChange={(checked) => update({ turnsElapsedEnabled: checked })}
+              />
+              {values.turnsElapsedEnabled && (
+                <div className="mt-3">
+                  <NumberField
+                    label="Turn Count"
+                    value={Number(
+                      values.turnsElapsed ?? (isConquest ? 25 : 10),
+                    )}
+                    onChange={(value) => update({ turnsElapsed: value })}
+                    min={1}
+                  />
+                </div>
+              )}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <ToggleField label="Planet control domination" description={keyObjectivesDisabled ? "Planet-control domination is unavailable with binary objective control." : "Victory by controlling a percentage of the planet across all objectives combined."} checked={Boolean(values.dominationEnabled) && !keyObjectivesDisabled} disabled={keyObjectivesDisabled} onChange={(checked) => update({ dominationEnabled: checked })} />
-              {values.dominationEnabled && !keyObjectivesDisabled && <div className="mt-3"><NumberField label="Planet Control %" value={Number(values.dominationControlPercent ?? 70)} onChange={(value) => update({ dominationControlPercent: value })} min={1} max={100} /></div>}
+              <ToggleField
+                label="Planet control domination"
+                description={
+                  keyObjectivesDisabled
+                    ? "Planet-control domination is unavailable with binary objective control."
+                    : "Victory by controlling a percentage of the planet across all objectives combined."
+                }
+                checked={
+                  Boolean(values.dominationEnabled) && !keyObjectivesDisabled
+                }
+                disabled={keyObjectivesDisabled}
+                onChange={(checked) => update({ dominationEnabled: checked })}
+              />
+              {values.dominationEnabled && !keyObjectivesDisabled && (
+                <div className="mt-3">
+                  <NumberField
+                    label="Planet Control %"
+                    value={Number(values.dominationControlPercent ?? 70)}
+                    onChange={(value) =>
+                      update({ dominationControlPercent: value })
+                    }
+                    min={1}
+                    max={100}
+                  />
+                </div>
+              )}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-sm font-black text-zinc-100">BV capitulation</div>
-              <p className="mt-1 text-xs text-zinc-500">Always enabled. A player capitulates when remaining BV drops to this percentage.</p>
-              <div className="mt-3"><NumberField label="Remaining BV %" value={Number(values.capitulationBVPercent ?? 10)} onChange={(value) => update({ capitulationBVEnabled: true, capitulationBVPercent: value })} min={1} max={100} /></div>
+              <div className="text-sm font-black text-zinc-100">
+                BV capitulation
+              </div>
+              <p className="mt-1 text-xs text-zinc-500">
+                Always enabled. A player capitulates when remaining BV drops to
+                this percentage.
+              </p>
+              <div className="mt-3">
+                <NumberField
+                  label="Remaining BV %"
+                  value={Number(values.capitulationBVPercent ?? 10)}
+                  onChange={(value) =>
+                    update({
+                      capitulationBVEnabled: true,
+                      capitulationBVPercent: value,
+                    })
+                  }
+                  min={1}
+                  max={100}
+                />
+              </div>
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <div className="text-sm font-black text-zinc-100">Resource capitulation</div>
-              <p className="mt-1 text-xs text-zinc-500">Always enabled. A player capitulates when remaining resources drop to this percentage.</p>
-              <div className="mt-3"><NumberField label="Remaining Resources %" value={Number(values.capitulationResourcesPercent ?? 10)} onChange={(value) => update({ capitulationResourcesEnabled: true, capitulationResourcesPercent: value })} min={1} max={100} /></div>
+              <div className="text-sm font-black text-zinc-100">
+                Resource capitulation
+              </div>
+              <p className="mt-1 text-xs text-zinc-500">
+                Always enabled. A player capitulates when remaining resources
+                drop to this percentage.
+              </p>
+              <div className="mt-3">
+                <NumberField
+                  label="Remaining Resources %"
+                  value={Number(values.capitulationResourcesPercent ?? 10)}
+                  onChange={(value) =>
+                    update({
+                      capitulationResourcesEnabled: true,
+                      capitulationResourcesPercent: value,
+                    })
+                  }
+                  min={1}
+                  max={100}
+                />
+              </div>
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <ToggleField label="Control of key objectives" description={keyObjectivesDisabled ? "Key-objective victory is incompatible with binary objective control." : "At least one objective must be marked as a key objective."} checked={Boolean(values.keyObjectivesEnabled) && !keyObjectivesDisabled} disabled={keyObjectivesDisabled} onChange={(checked) => update({ keyObjectivesEnabled: checked })} />
+              <ToggleField
+                label="Control of key objectives"
+                description={
+                  keyObjectivesDisabled
+                    ? "Key-objective victory is incompatible with binary objective control."
+                    : "At least one objective must be marked as a key objective."
+                }
+                checked={
+                  Boolean(values.keyObjectivesEnabled) && !keyObjectivesDisabled
+                }
+                disabled={keyObjectivesDisabled}
+                onChange={(checked) =>
+                  update({ keyObjectivesEnabled: checked })
+                }
+              />
             </div>
             {isConquest && (
               <>
                 <div className="rounded-2xl border border-lime-400/20 bg-lime-400/5 p-4">
-                  <ToggleField label="Control of map percentage" description="Conquest-only victory condition based on map control." checked={Boolean(values.mapControlEnabled)} onChange={(checked) => update({ mapControlEnabled: checked })} />
-                  {values.mapControlEnabled && <div className="mt-3"><NumberField label="Map Control %" value={Number(values.mapControlPercent ?? 75)} onChange={(value) => update({ mapControlPercent: value })} min={1} max={100} /></div>}
+                  <ToggleField
+                    label="Control of map percentage"
+                    description="Conquest-only victory condition based on map control."
+                    checked={Boolean(values.mapControlEnabled)}
+                    onChange={(checked) =>
+                      update({ mapControlEnabled: checked })
+                    }
+                  />
+                  {values.mapControlEnabled && (
+                    <div className="mt-3">
+                      <NumberField
+                        label="Map Control %"
+                        value={Number(values.mapControlPercent ?? 75)}
+                        onChange={(value) =>
+                          update({ mapControlPercent: value })
+                        }
+                        min={1}
+                        max={100}
+                      />
+                    </div>
+                  )}
                 </div>
               </>
             )}
           </div>
 
-          {updateError && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{updateError}</div>}
+          {updateError && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+              {updateError}
+            </div>
+          )}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button type="button" onClick={onClose} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500">Cancel</button>
-            <button type="submit" disabled={updateLoading} className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60">{updateLoading ? "Saving..." : "Save Victory Conditions"}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updateLoading}
+              className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateLoading ? "Saving..." : "Save Victory Conditions"}
+            </button>
           </div>
         </form>
       </div>
@@ -2081,11 +2546,21 @@ function ObjectivesModal({
   onSubmit: (event: React.FormEvent) => void;
 }) {
   const count = clampObjectiveCount(objectiveCount);
-  const keyRequired = Boolean(campaign.settings?.victoryConditions?.keyObjectivesEnabled);
-  const updateObjectiveDraft = (index: number, patch: Partial<CampaignObjective>) => {
+  const keyRequired = Boolean(
+    campaign.settings?.victoryConditions?.keyObjectivesEnabled,
+  );
+  const updateObjectiveDraft = (
+    index: number,
+    patch: Partial<CampaignObjective>,
+  ) => {
     setObjectiveDrafts((current) => {
       const next = [...current];
-      const currentObjective = next[index] ?? { id: `${Date.now()}-${index}`, name: `${OBJECTIVE_TYPES[0]} ${index + 1}`, type: OBJECTIVE_TYPES[0], isKey: false };
+      const currentObjective = next[index] ?? {
+        id: `${Date.now()}-${index}`,
+        name: `${OBJECTIVE_TYPES[0]} ${index + 1}`,
+        type: OBJECTIVE_TYPES[0],
+        isKey: false,
+      };
       next[index] = { ...currentObjective, ...patch };
       return next;
     });
@@ -2096,30 +2571,69 @@ function ObjectivesModal({
       <div className="mx-auto max-w-5xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Objectives</div>
-            <h2 className="mt-2 text-2xl font-black text-zinc-50">Configure objectives</h2>
-            <p className="mt-1 text-sm text-zinc-400">Choose 2-20 objectives. You can randomize them from selected types or select every objective manually.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Objectives
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              Configure objectives
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Choose 2-20 objectives. You can randomize them from selected types
+              or select every objective manually.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close objectives modal"><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close objectives modal"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-3">
-            <NumberField label="# of Objectives" value={count} onChange={(value) => setObjectiveCount(clampObjectiveCount(value))} min={2} max={20} />
+            <NumberField
+              label="# of Objectives"
+              value={count}
+              onChange={(value) =>
+                setObjectiveCount(clampObjectiveCount(value))
+              }
+              min={2}
+              max={20}
+            />
             <div className="space-y-2 text-sm font-semibold text-zinc-200 md:col-span-2">
               Objective Selection
               <div className="grid gap-2 sm:grid-cols-2">
-                <RadioCard name="objectiveMode" label="Randomize" description="Generate the objective list from selected objective types." checked={objectiveMode === "random"} onChange={() => setObjectiveMode("random")} />
-                <RadioCard name="objectiveMode" label="Select each objective" description="Choose the exact type and key status for every objective." checked={objectiveMode === "select"} onChange={() => setObjectiveMode("select")} />
+                <RadioCard
+                  name="objectiveMode"
+                  label="Randomize"
+                  description="Generate the objective list from selected objective types."
+                  checked={objectiveMode === "random"}
+                  onChange={() => setObjectiveMode("random")}
+                />
+                <RadioCard
+                  name="objectiveMode"
+                  label="Select each objective"
+                  description="Choose the exact type and key status for every objective."
+                  checked={objectiveMode === "select"}
+                  onChange={() => setObjectiveMode("select")}
+                />
               </div>
             </div>
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-4">
-            <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">Allowed Objective Types</div>
+            <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">
+              Allowed Objective Types
+            </div>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {OBJECTIVE_TYPES.map((type) => (
-                <label key={type} className="flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-200">
+                <label
+                  key={type}
+                  className="flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-200"
+                >
                   <input
                     type="checkbox"
                     checked={selectedObjectiveTypes.includes(type)}
@@ -2140,25 +2654,65 @@ function ObjectivesModal({
 
           {objectiveMode === "select" && (
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-4">
-              <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">Selected Objectives</div>
+              <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">
+                Selected Objectives
+              </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {Array.from({ length: count }, (_, index) => {
-                  const objective = objectiveDrafts[index] ?? { id: `${Date.now()}-${index}`, name: `Objective ${index + 1}`, type: selectedObjectiveTypes[0] ?? OBJECTIVE_TYPES[0], isKey: false };
+                  const objective = objectiveDrafts[index] ?? {
+                    id: `${Date.now()}-${index}`,
+                    name: `Objective ${index + 1}`,
+                    type: selectedObjectiveTypes[0] ?? OBJECTIVE_TYPES[0],
+                    isKey: false,
+                  };
                   return (
-                    <div key={index} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3">
+                    <div
+                      key={index}
+                      className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3"
+                    >
                       <label className="space-y-1 text-xs font-semibold text-zinc-300">
                         Name
-                        <input value={objective.name} onChange={(event) => updateObjectiveDraft(index, { name: event.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-lime-400/60" />
+                        <input
+                          value={objective.name}
+                          onChange={(event) =>
+                            updateObjectiveDraft(index, {
+                              name: event.target.value,
+                            })
+                          }
+                          className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-lime-400/60"
+                        />
                       </label>
                       <label className="mt-3 block space-y-1 text-xs font-semibold text-zinc-300">
                         Type
-                        <select value={objective.type} onChange={(event) => updateObjectiveDraft(index, { type: event.target.value, name: objective.name?.startsWith("Objective ") ? `${event.target.value} ${index + 1}` : objective.name })} className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-lime-400/60">
-                          {OBJECTIVE_TYPES.map((type) => <option key={type}>{type}</option>)}
+                        <select
+                          value={objective.type}
+                          onChange={(event) =>
+                            updateObjectiveDraft(index, {
+                              type: event.target.value,
+                              name: objective.name?.startsWith("Objective ")
+                                ? `${event.target.value} ${index + 1}`
+                                : objective.name,
+                            })
+                          }
+                          className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-lime-400/60"
+                        >
+                          {OBJECTIVE_TYPES.map((type) => (
+                            <option key={type}>{type}</option>
+                          ))}
                         </select>
                       </label>
                       {keyRequired && (
                         <label className="mt-3 flex items-center gap-2 text-xs font-semibold text-lime-200">
-                          <input type="checkbox" checked={Boolean(objective.isKey)} onChange={(event) => updateObjectiveDraft(index, { isKey: event.target.checked })} className="h-4 w-4 accent-lime-400" />
+                          <input
+                            type="checkbox"
+                            checked={Boolean(objective.isKey)}
+                            onChange={(event) =>
+                              updateObjectiveDraft(index, {
+                                isKey: event.target.checked,
+                              })
+                            }
+                            className="h-4 w-4 accent-lime-400"
+                          />
                           Key objective
                         </label>
                       )}
@@ -2169,11 +2723,32 @@ function ObjectivesModal({
             </div>
           )}
 
-          {keyRequired && <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">Key objective victory is enabled, so at least one generated or selected objective will be marked as key.</div>}
-          {updateError && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{updateError}</div>}
+          {keyRequired && (
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">
+              Key objective victory is enabled, so at least one generated or
+              selected objective will be marked as key.
+            </div>
+          )}
+          {updateError && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+              {updateError}
+            </div>
+          )}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button type="button" onClick={onClose} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500">Cancel</button>
-            <button type="submit" disabled={updateLoading || selectedObjectiveTypes.length === 0} className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60">{updateLoading ? "Saving..." : "Save Objectives"}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updateLoading || selectedObjectiveTypes.length === 0}
+              className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateLoading ? "Saving..." : "Save Objectives"}
+            </button>
           </div>
         </form>
       </div>
@@ -2182,7 +2757,8 @@ function ObjectivesModal({
 }
 
 function getPlayerColor(player: CampaignParticipantView, index: number) {
-  return player?.color && PLAYER_CONTROL_COLORS.some((color) => color.hex === player.color)
+  return player?.color &&
+    PLAYER_CONTROL_COLORS.some((color) => color.hex === player.color)
     ? player.color
     : PLAYER_CONTROL_COLORS[index % PLAYER_CONTROL_COLORS.length].hex;
 }
@@ -2191,20 +2767,35 @@ function playerDisplayName(player: CampaignParticipantView) {
   return player?.user?.displayName ?? "Player";
 }
 
-function sortPlayersForControl(players: NonNullable<Campaign["participants"]>, authUserId: string) {
+function sortPlayersForControl(
+  players: NonNullable<Campaign["participants"]>,
+  authUserId: string,
+) {
   return [...players].sort((a, b) => {
     if (a.userId === authUserId) return -1;
     if (b.userId === authUserId) return 1;
-    return (a.joinedAt ?? a.invitedAt ?? "").localeCompare(b.joinedAt ?? b.invitedAt ?? "");
+    return (a.joinedAt ?? a.invitedAt ?? "").localeCompare(
+      b.joinedAt ?? b.invitedAt ?? "",
+    );
   });
 }
 
-function PlayerColorLegend({ players }: { players: NonNullable<Campaign["participants"]> }) {
+function PlayerColorLegend({
+  players,
+}: {
+  players: NonNullable<Campaign["participants"]>;
+}) {
   return (
     <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold text-zinc-300">
       {players.map((player, index) => (
-        <span key={player.id} className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-1">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: getPlayerColor(player, index) }} />
+        <span
+          key={player.id}
+          className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-1"
+        >
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: getPlayerColor(player, index) }}
+          />
           {playerDisplayName(player)}
         </span>
       ))}
@@ -2212,34 +2803,552 @@ function PlayerColorLegend({ players }: { players: NonNullable<Campaign["partici
   );
 }
 
-function currentPlayerForce(campaign: Campaign, authUserId: string, force?: Force) {
-  const participant = (campaign.participants ?? []).find((entry) => entry.userId === authUserId && entry.status === "Accepted");
+function currentPlayerForce(
+  campaign: Campaign,
+  authUserId: string,
+  force?: Force,
+) {
+  const participant = (campaign.participants ?? []).find(
+    (entry) => entry.userId === authUserId && entry.status === "Accepted",
+  );
   if (!participant) return undefined;
   if (force && participant.forceId === force.id) return force;
   return participant.force;
 }
 
-function participantForceBV(participant: NonNullable<Campaign["participants"]>[number] | undefined, fallbackForce?: Force) {
+function participantForceBV(
+  participant: NonNullable<Campaign["participants"]>[number] | undefined,
+  fallbackForce?: Force,
+) {
   if (fallbackForce?.forceUnits?.length) {
-    return fallbackForce.forceUnits.reduce((total, unit) => total + Number(unit.currentBV ?? unit.snapshot?.totalBV ?? 0), 0);
+    return fallbackForce.forceUnits.reduce(
+      (total, unit) =>
+        total + Number(unit.currentBV ?? unit.snapshot?.totalBV ?? 0),
+      0,
+    );
   }
   if (fallbackForce?.totalBV) return Number(fallbackForce.totalBV);
   return Number(participant?.force?.totalBV ?? 0);
 }
 
-function VictoryConditionDetails({ campaign, authUserId, force, playerShare }: { campaign: Campaign; authUserId: string; force?: Force; playerShare: number }) {
+function getAwaitingMyBattleLog(
+  battles: Battle[],
+  campaignId: string,
+  authUserId: string,
+): Battle | null {
+  return (
+    battles.find((battle) => {
+      if (battle.campaignId !== campaignId) return false;
+      if (battle.status !== "AwaitingOpponent") return false;
+      const logs = battle.battleLogs ?? [];
+      const hasMyLog = logs.some((log) => log.userId === authUserId);
+      const isAgainstMe =
+        battle.opponentUserId === authUserId ||
+        battle.defendingUserId === authUserId ||
+        logs.some((log) => log.opponentUserId === authUserId);
+      return isAgainstMe && !hasMyLog;
+    }) ?? null
+  );
+}
+
+function createBattlePrefillFromOpponentLog(
+  battle: Battle,
+  authUserId: string,
+): BattleLogPrefill {
+  const opponentLog = (battle.battleLogs ?? []).find(
+    (log) => log.userId !== authUserId,
+  );
+  const opponentOutcome = opponentLog?.outcome ?? battle.outcome ?? "Victory";
+  const flippedOutcome =
+    opponentOutcome === "Victory"
+      ? "Defeat"
+      : opponentOutcome === "Defeat"
+        ? "Victory"
+        : opponentOutcome;
+  return {
+    date: battle.date?.slice(0, 10),
+    opponentUserId: opponentLog?.userId ?? battle.submittedByUserId,
+    objectiveId: opponentLog?.objectiveId ?? battle.objectiveId,
+    objectiveName: opponentLog?.objectiveName ?? battle.objectiveName,
+    outcome: flippedOutcome,
+    controlsField: !Boolean(opponentLog?.controlsField ?? battle.controlsField),
+    summary: battle.summary,
+  };
+}
+
+function BattleHistoryView({
+  campaign,
+  battles,
+  loading,
+  error,
+  filter,
+  setFilter,
+  selectedBattle,
+  setSelectedBattle,
+  onDispute,
+  onBack,
+}: {
+  campaign: Campaign;
+  battles: Battle[];
+  loading: boolean;
+  error?: string | null;
+  filter: "complete" | "pending" | "disputed";
+  setFilter: (filter: "complete" | "pending" | "disputed") => void;
+  selectedBattle: Battle | null;
+  setSelectedBattle: (battle: Battle | null) => void;
+  onDispute: (battle: Battle, notes: string) => Promise<void>;
+  onBack: () => void;
+}) {
+  const isTwoPlayer =
+    (campaign.participants ?? []).filter(
+      (participant) => participant.status === "Accepted",
+    ).length <= 2;
+  const filteredBattles = battles.filter((battle) => {
+    if (filter === "complete")
+      return ["Complete", "Confirmed", "Finalized"].includes(battle.status);
+    if (filter === "pending")
+      return (
+        battle.status === "AwaitingOpponent" || battle.status === "Proposed"
+      );
+    return battle.status === "Disputed";
+  });
+
+  return (
+    <section className="space-y-5">
+      <PageTitle
+        eyebrow="Campaign Battle History"
+        title={`${campaign.name} · Battle History`}
+        description="Review official, pending, and disputed battle records for this campaign."
+        actions={
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </button>
+        }
+      />
+
+      <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["complete", "Official Logs"],
+              ["pending", "Pending Logs"],
+              ["disputed", "Disputed Logs"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setFilter(value)}
+              className={`rounded-xl px-3 py-2 text-xs font-black transition ${filter === value ? "bg-lime-400 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-lime-400/40"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
+        {loading ? (
+          <p className="mt-5 text-sm text-zinc-400">
+            Loading battle history...
+          </p>
+        ) : (
+          <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
+            {filteredBattles.length ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-fixed text-left text-sm">
+                  <thead className="border-b border-zinc-800 bg-zinc-950/80 text-xs uppercase tracking-[0.16em] text-zinc-500">
+                    <tr>
+                      <th className="w-[10%] px-4 py-3 font-semibold">
+                        Battle #
+                      </th>
+                      {!isTwoPlayer && (
+                        <th className="w-[18%] px-4 py-3 font-semibold">
+                          Opponent
+                        </th>
+                      )}
+                      <th className="w-[15%] px-4 py-3 font-semibold">
+                        Result
+                      </th>
+                      <th className="w-[16%] px-4 py-3 font-semibold">Field</th>
+                      <th className="w-[25%] px-4 py-3 font-semibold">
+                        Objective
+                      </th>
+                      <th className="w-[16%] px-4 py-3 text-right font-semibold">
+                        Control Change
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/80">
+                    {filteredBattles.map((battle, index) => (
+                      <tr
+                        key={battle.id}
+                        onClick={() => setSelectedBattle(battle)}
+                        className="cursor-pointer transition hover:bg-zinc-900/70"
+                      >
+                        <td className="px-4 py-3 font-black text-zinc-100">
+                          #{battle.turnNumber ?? index + 1}
+                        </td>
+                        {!isTwoPlayer && (
+                          <td className="px-4 py-3 text-zinc-300">
+                            {battle.opponentUserId ? "Opponent" : "—"}
+                          </td>
+                        )}
+                        <td className="px-4 py-3 text-zinc-300">
+                          {battle.outcome ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-300">
+                          {battle.controlsField ? "Claimed" : "Not claimed"}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-300">
+                          {battle.objectiveName ?? battle.location ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right text-zinc-400">
+                          {(battle as any).controlChangePercent !== undefined
+                            ? `${battle.status === "AwaitingOpponent" ? "Potential " : ""}${(battle as any).controlChangePercent}%`
+                            : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="p-6 text-sm text-zinc-400">
+                No {filter} battle records yet.
+              </p>
+            )}
+          </div>
+        )}
+      </section>
+
+      {selectedBattle && (
+        <BattleDetailsModal
+          battle={selectedBattle}
+          onClose={() => setSelectedBattle(null)}
+          onDispute={onDispute}
+        />
+      )}
+    </section>
+  );
+}
+
+function BattleDetailsModal({
+  battle,
+  onClose,
+  onDispute,
+}: {
+  battle: Battle;
+  onClose: () => void;
+  onDispute: (battle: Battle, notes: string) => Promise<void>;
+}) {
+  const logs = battle.battleLogs ?? [];
+  const [showSourceLogId, setShowSourceLogId] = useState<string | null>(null);
+  const [disputeNotes, setDisputeNotes] = useState("");
+  const [disputing, setDisputing] = useState(false);
+  const isOfficial = ["Complete", "Confirmed", "Finalized"].includes(battle.status);
+  const orderedLogs = isOfficial ? orderBattleLogsWinnerFirst(battle, logs) : logs;
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
+      <div className="mx-auto max-w-4xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Battle Details
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              Battle #{battle.turnNumber ?? "—"}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              {formatBattleDate(battle.date)} ·{" "}
+              {battle.objectiveName ?? battle.location ?? "No objective"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close battle details"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-4">
+          <CampaignFactCard label="Status" value={battle.status} />
+          <CampaignFactCard label="Result" value={battle.outcome ?? "—"} />
+          <CampaignFactCard
+            label="Field"
+            value={battle.controlsField ? "Claimed" : "Not claimed"}
+          />
+          <CampaignFactCard
+            label="Objective"
+            value={battle.objectiveName ?? "—"}
+          />
+          <CampaignFactCard
+            label="Control Swing"
+            value={(battle as any).controlChangePercent !== undefined ? `${(battle as any).controlChangePercent}%` : "—"}
+          />
+        </div>
+
+
+        {isOfficial && (
+          <div className="mt-4 rounded-2xl border border-orange-400/30 bg-orange-500/10 p-4">
+            <div className="text-sm font-black text-orange-100">Dispute official result</div>
+            <p className="mt-1 text-xs text-orange-100/70">If the confirmed battle result is wrong, add notes and move it back to disputed status.</p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <input
+                value={disputeNotes}
+                onChange={(event) => setDisputeNotes(event.target.value)}
+                className="min-w-0 flex-1 rounded-xl border border-orange-400/30 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none"
+                placeholder="What needs to be corrected?"
+              />
+              <button
+                type="button"
+                disabled={!disputeNotes.trim() || disputing}
+                onClick={async () => {
+                  setDisputing(true);
+                  try {
+                    await onDispute(battle, disputeNotes.trim());
+                    setDisputeNotes("");
+                  } finally {
+                    setDisputing(false);
+                  }
+                }}
+                className="rounded-xl border border-orange-400/40 bg-orange-500/15 px-3 py-2 text-sm font-black text-orange-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Dispute Result
+              </button>
+            </div>
+          </div>
+        )}
+
+        {battle.summary && (
+          <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-sm leading-relaxed text-zinc-300">
+            {battle.summary}
+          </div>
+        )}
+
+        <div className="mt-5 space-y-3">
+          {orderedLogs.map((log, logIndex) => {
+            const damageSummary = summarizeBattleLogDamage(
+              log.unitDamage ?? [],
+            );
+            return (
+              <div
+                key={log.id}
+                className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"
+              >
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="font-black text-zinc-100">
+                      Submitted log
+                    </div>
+                    <div className="text-xs text-zinc-500">
+                      {new Date(log.submittedAt).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="text-sm font-semibold text-zinc-300">
+                    {log.outcome ?? "—"} ·{" "}
+                    {log.controlsField
+                      ? "Controlled field"
+                      : "Did not control field"}
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSourceLogId(showSourceLogId === log.id ? null : log.id)}
+                    className="rounded-xl border border-zinc-700 px-3 py-2 text-xs font-black text-zinc-300 transition hover:border-lime-400/40 hover:text-lime-100"
+                  >
+                    {showSourceLogId === log.id ? "Hide source log" : `Source log ${logIndex + 1}`}
+                  </button>
+                </div>
+                <div className="mt-3 grid gap-2 md:grid-cols-3">
+                  <CampaignFactCard
+                    label="Meks involved"
+                    value={String((log.unitDamage ?? []).length)}
+                  />
+                  <CampaignFactCard
+                    label="Armor damage"
+                    value={String(damageSummary.armor)}
+                  />
+                  <CampaignFactCard
+                    label="Internal"
+                    value={String(damageSummary.internal)}
+                  />
+                  <CampaignFactCard
+                    label="Weapons / components"
+                    value={`${damageSummary.weapons} / ${damageSummary.components}`}
+                  />
+                  <CampaignFactCard
+                    label="Engine / gyro"
+                    value={`${damageSummary.engineHits} / ${damageSummary.gyroHits}`}
+                  />
+                  <CampaignFactCard
+                    label="Ammo spent"
+                    value={String(damageSummary.ammo)}
+                  />
+                  <CampaignFactCard
+                    label="Kills made"
+                    value={String(damageSummary.kills)}
+                  />
+                </div>
+                {showSourceLogId === log.id && (
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
+                    <table className="min-w-full text-left text-xs">
+                      <thead className="border-b border-zinc-800 bg-zinc-950/80 uppercase tracking-[0.14em] text-zinc-500">
+                        <tr>
+                          <th className="px-3 py-2">Unit</th>
+                          <th className="px-3 py-2">Pilot</th>
+                          <th className="px-3 py-2">Status</th>
+                          <th className="px-3 py-2 text-right">Damage Summary</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800/80">
+                        {(log.unitDamage ?? []).map((unit: any) => {
+                          const summary = unit.damageSummary ?? summarizeUnitDamage(unit);
+                          return (
+                            <tr key={unit.campaignForceUnitId}>
+                              <td className="px-3 py-2 font-black text-zinc-100">{unit.unitName ?? unit.campaignForceUnitId}</td>
+                              <td className="px-3 py-2 text-zinc-300">{unit.pilotName ?? "—"}</td>
+                              <td className="px-3 py-2 text-zinc-300">{unit.status ?? "—"}</td>
+                              <td className="px-3 py-2 text-right text-zinc-400">
+                                {summary.armor} armor · {summary.internal} internal · {summary.weapons} weapons · {summary.components} components · {summary.engineHits} engine · {summary.gyroHits} gyro · {summary.limbs} limbs
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {!logs.length && (
+            <p className="text-sm text-zinc-400">
+              No submitted logs are attached to this battle yet.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function summarizeBattleLogDamage(unitDamage: any[]) {
+  return unitDamage.reduce(
+    (totals, entry) => {
+      totals.kills += Number(entry?.killsMade ?? 0);
+      const unit = entry?.damageSummary ?? summarizeUnitDamage(entry);
+      totals.armor += Number(unit.armor ?? 0);
+      totals.internal += Number(unit.internal ?? 0);
+      totals.weapons += Number(unit.weapons ?? 0);
+      totals.components += Number(unit.components ?? 0);
+      totals.engineHits += Number(unit.engineHits ?? 0);
+      totals.gyroHits += Number(unit.gyroHits ?? 0);
+      totals.limbs += Number(unit.limbs ?? 0);
+      totals.ammo += Number(unit.ammo ?? 0);
+      return totals;
+    },
+    { armor: 0, internal: 0, weapons: 0, components: 0, engineHits: 0, gyroHits: 0, limbs: 0, ammo: 0, kills: 0 },
+  );
+}
+
+function summarizeUnitDamage(entry: any) {
+  const ammoSpent = entry?.detailed?.ammoSpent ?? {};
+  const ammo = Object.values(ammoSpent).reduce(
+    (sum: number, value: any) => sum + Number(value ?? 0),
+    0,
+  );
+  const locations = entry?.detailed?.locations ?? {};
+  let armor = 0;
+  let internal = 0;
+  let weapons = 0;
+  let components = 0;
+  let engineHits = 0;
+  let gyroHits = 0;
+  let limbs = 0;
+  Object.values(locations).forEach((loc: any) => {
+    armor += Number(loc.armorDamage ?? 0) + Number(loc.rearArmorDamage ?? 0);
+    internal += Number(loc.structureDamage ?? 0);
+    weapons += Number(loc.weaponsDamaged ?? 0);
+    components += Number(loc.componentsDamaged ?? 0);
+    engineHits += Number(loc.engineHits ?? 0);
+    gyroHits += Number(loc.gyroHits ?? 0);
+    if (loc.destroyed || loc.missing) limbs += 1;
+  });
+  return { armor, internal, weapons, components, engineHits, gyroHits, limbs, ammo };
+}
+
+function orderBattleLogsWinnerFirst(battle: Battle, logs: any[]) {
+  return [...logs].sort((a, b) => {
+    const aWins = a.outcome === "Victory" ? 0 : 1;
+    const bWins = b.outcome === "Victory" ? 0 : 1;
+    return aWins - bWins;
+  });
+}
+
+function formatBattleDate(value?: string) {
+  if (!value) return "Unknown date";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
+}
+
+function VictoryConditionDetails({
+  campaign,
+  authUserId,
+  force,
+  playerShare,
+}: {
+  campaign: Campaign;
+  authUserId: string;
+  force?: Force;
+  playerShare: number;
+}) {
   const settings = campaign.settings;
   const victory = settings?.victoryConditions;
-  const participant = (campaign.participants ?? []).find((entry) => entry.userId === authUserId && entry.status === "Accepted");
+  const participant = (campaign.participants ?? []).find(
+    (entry) => entry.userId === authUserId && entry.status === "Accepted",
+  );
   const ownForce = currentPlayerForce(campaign, authUserId, force);
-  const forceBV = participantForceBV(participant, ownForce as Force | undefined);
-  const bvBaseline = Number((ownForce as Force | undefined)?.startingBV ?? ownForce?.totalBV ?? participant?.force?.startingBV ?? participant?.force?.totalBV ?? forceBV ?? 0);
-  const bvPercent = bvBaseline > 0 ? Math.min(100, Math.max(0, (forceBV / bvBaseline) * 100)) : 0;
+  const forceBV = participantForceBV(
+    participant,
+    ownForce as Force | undefined,
+  );
+  const bvBaseline = Number(
+    (ownForce as Force | undefined)?.startingBV ??
+      ownForce?.totalBV ??
+      participant?.force?.startingBV ??
+      participant?.force?.totalBV ??
+      forceBV ??
+      0,
+  );
+  const bvPercent =
+    bvBaseline > 0
+      ? Math.min(100, Math.max(0, (forceBV / bvBaseline) * 100))
+      : 0;
   const resources = settings?.startingResources ?? {};
-  const resourceValue = settings?.type === "Chaos" ? Number(resources.Warchest ?? 0) : Number(resources.CBills ?? 0);
-  const keyObjectives = settings?.objectives?.filter((objective) => objective.isKey) ?? [];
+  const resourceValue =
+    settings?.type === "Chaos"
+      ? Number(resources.Warchest ?? 0)
+      : Number(resources.CBills ?? 0);
+  const keyObjectives =
+    settings?.objectives?.filter((objective) => objective.isKey) ?? [];
   if (!victory) {
-    return <p className="text-sm text-zinc-400">Victory conditions are not configured.</p>;
+    return (
+      <p className="text-sm text-zinc-400">
+        Victory conditions are not configured.
+      </p>
+    );
   }
   return (
     <div className="space-y-3 text-sm text-zinc-300">
@@ -2264,20 +3373,40 @@ function VictoryConditionDetails({ campaign, authUserId, force, playerShare }: {
         <VictoryDetail
           title="Control of key objectives"
           status={`${keyObjectives.length} key objective${keyObjectives.length === 1 ? "" : "s"} configured`}
-          detail={keyObjectives.length ? keyObjectives.map((objective) => objective.name).join(" • ") : "No key objectives are configured yet."}
+          detail={
+            keyObjectives.length
+              ? keyObjectives.map((objective) => objective.name).join(" • ")
+              : "No key objectives are configured yet."
+          }
         />
       )}
       {victory.turnsElapsedEnabled && (
-        <VictoryDetail title="Turns elapsed" status={`Current turn: 1 · limit ${victory.turnsElapsed ?? 25}`} detail="Timing condition based on campaign turns." />
+        <VictoryDetail
+          title="Turns elapsed"
+          status={`Current turn: 1 · limit ${victory.turnsElapsed ?? 25}`}
+          detail="Timing condition based on campaign turns."
+        />
       )}
       {victory.mapControlEnabled && (
-        <VictoryDetail title="Map control" status={`Your current map control: ${playerShare.toFixed(1)}% · victory at ${victory.mapControlPercent ?? 75}%`} detail="Conquest-only map-control condition." />
+        <VictoryDetail
+          title="Map control"
+          status={`Your current map control: ${playerShare.toFixed(1)}% · victory at ${victory.mapControlPercent ?? 75}%`}
+          detail="Conquest-only map-control condition."
+        />
       )}
     </div>
   );
 }
 
-function VictoryDetail({ title, status, detail }: { title: string; status: string; detail: string }) {
+function VictoryDetail({
+  title,
+  status,
+  detail,
+}: {
+  title: string;
+  status: string;
+  detail: string;
+}) {
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-950/55 p-4">
       <div className="text-sm font-black text-zinc-100">{title}</div>
@@ -2288,7 +3417,14 @@ function VictoryDetail({ title, status, detail }: { title: string; status: strin
 }
 
 function forceUnitDisplayName(forceUnit: ForceUnit): string {
-  return [forceUnit.snapshot?.chassis, forceUnit.snapshot?.model].filter(Boolean).join(" ").trim() || forceUnit.snapshot?.name || "Unknown Unit";
+  return (
+    [forceUnit.snapshot?.chassis, forceUnit.snapshot?.model]
+      .filter(Boolean)
+      .join(" ")
+      .trim() ||
+    forceUnit.snapshot?.name ||
+    "Unknown Unit"
+  );
 }
 
 function forceUnitStatusLabel(forceUnit: ForceUnit): string {
@@ -2300,7 +3436,10 @@ function teamSortValue(forceUnit: ForceUnit): number {
   return Number(forceUnit.teamNumber ?? 9999);
 }
 
-function sortForceUnitsForCampaign(forceUnits: ForceUnit[], isConquest: boolean): ForceUnit[] {
+function sortForceUnitsForCampaign(
+  forceUnits: ForceUnit[],
+  isConquest: boolean,
+): ForceUnit[] {
   return [...forceUnits].sort((a, b) => {
     if (isConquest) {
       const teamDelta = teamSortValue(a) - teamSortValue(b);
@@ -2318,6 +3457,10 @@ function ActiveCampaignDashboard({
   activeView,
   setActiveView,
   onBack,
+  onLogBattle,
+  onBattleHistory,
+  awaitingBattleLog,
+  onStartAwaitingBattleLog,
   onOpenFluff,
 }: {
   campaign: Campaign;
@@ -2327,20 +3470,39 @@ function ActiveCampaignDashboard({
   activeView: "objectives" | "planet" | "victory";
   setActiveView: (view: "objectives" | "planet" | "victory") => void;
   onBack: () => void;
+  onLogBattle: () => void;
+  onBattleHistory: () => void;
+  awaitingBattleLog?: Battle | null;
+  onStartAwaitingBattleLog: () => void;
   onOpenFluff: () => void;
 }) {
   const settings = campaign.settings;
-  const acceptedPlayers = sortPlayersForControl((campaign.participants ?? []).filter((participant) => participant.status === "Accepted"), authUserId);
+  const acceptedPlayers = sortPlayersForControl(
+    (campaign.participants ?? []).filter(
+      (participant) => participant.status === "Accepted",
+    ),
+    authUserId,
+  );
   const objectives = settings?.objectives ?? [];
-  const playerShare = acceptedPlayers.length ? 100 / acceptedPlayers.length : 100;
+  const playerShare = acceptedPlayers.length
+    ? 100 / acceptedPlayers.length
+    : 100;
   const forceUnits = force?.forceUnits ?? [];
   const forceUnitCount = forceUnits.length;
   const pilotCount = forceUnits.filter((forceUnit) => forceUnit.pilot).length;
-  const readyUnitCount = forceUnits.filter((forceUnit) => forceUnitStatusLabel(forceUnit) === "Ready").length;
-  const currentBVTotal = forceUnits.reduce((total, forceUnit) => total + Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0), 0);
+  const readyUnitCount = forceUnits.filter(
+    (forceUnit) => forceUnitStatusLabel(forceUnit) === "Ready",
+  ).length;
+  const currentBVTotal = forceUnits.reduce(
+    (total, forceUnit) =>
+      total + Number(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV ?? 0),
+    0,
+  );
   const campaignType = settings?.type ?? "Campaign";
   const isChaos = campaignType === "Chaos";
-  const [repairPriority, setRepairPriority] = useState(REPAIR_PRIORITY_OPTIONS[0]);
+  const [repairPriority, setRepairPriority] = useState(
+    REPAIR_PRIORITY_OPTIONS[0],
+  );
   const [repairHelpOpen, setRepairHelpOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
@@ -2349,17 +3511,23 @@ function ActiveCampaignDashboard({
       <PageTitle
         eyebrow="Campaign Dashboard"
         title={campaign.name}
-        description={campaign.description || settings?.fluff?.conflictDescription || "Active campaign operations dashboard."}
+        description={
+          campaign.description ||
+          settings?.fluff?.conflictDescription ||
+          "Active campaign operations dashboard."
+        }
         actions={
           <>
             <button
               type="button"
+              onClick={onLogBattle}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300"
             >
               <Swords size={16} /> Log Battle
             </button>
             <button
               type="button"
+              onClick={onBattleHistory}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
             >
               Battle History
@@ -2375,11 +3543,39 @@ function ActiveCampaignDashboard({
         }
       />
 
+      {awaitingBattleLog && (
+        <div className="rounded-3xl border border-yellow-400/40 bg-yellow-500/10 p-4 text-sm text-yellow-100">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="font-black">Battle log awaiting your entry</div>
+              <p className="mt-1 text-yellow-100/80">
+                Your opponent has logged a battle for{" "}
+                {formatBattleDate(awaitingBattleLog.date)}. Start your matching
+                log to review and submit your side.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onStartAwaitingBattleLog}
+              className="rounded-xl bg-yellow-300 px-4 py-2 text-xs font-black text-zinc-950 transition hover:bg-yellow-200"
+            >
+              Start Matching Log
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-3xl border border-lime-400/20 bg-lime-400/5 p-4 sm:p-5">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:items-center">
-            <CampaignFactCard label="Turn" value={campaignTurnLabel(campaign)} />
-            <CampaignFactCard label={resourceTypeLabel(settings)} value={resourceLabel(settings)} />
+            <CampaignFactCard
+              label="Turn"
+              value={campaignTurnLabel(campaign)}
+            />
+            <CampaignFactCard
+              label={resourceTypeLabel(settings)}
+              value={resourceLabel(settings)}
+            />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -2398,12 +3594,17 @@ function ActiveCampaignDashboard({
                 aria-label="Repair priority"
               >
                 {REPAIR_PRIORITY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option.replace(" Priority", "")}</option>
+                  <option key={option} value={option}>
+                    {option.replace(" Priority", "")}
+                  </option>
                 ))}
               </select>
             )}
             {!isChaos && (
-              <ActionSquareButton label="Repair priority help" onClick={() => setRepairHelpOpen(true)}>
+              <ActionSquareButton
+                label="Repair priority help"
+                onClick={() => setRepairHelpOpen(true)}
+              >
                 <HelpCircle size={17} />
               </ActionSquareButton>
             )}
@@ -2416,7 +3617,10 @@ function ActiveCampaignDashboard({
             <ActionSquareButton label="Spend pilot XP">
               <span className="text-xs font-black">XP</span>
             </ActionSquareButton>
-            <ActionSquareButton label="Campaign details" onClick={() => setDetailsOpen(true)}>
+            <ActionSquareButton
+              label="Campaign details"
+              onClick={() => setDetailsOpen(true)}
+            >
               <Info size={17} />
             </ActionSquareButton>
           </div>
@@ -2424,8 +3628,13 @@ function ActiveCampaignDashboard({
 
         {isCampaignOwner && !settings?.fluff && (
           <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/40 p-4 text-sm text-zinc-300">
-            Optional campaign fluff has not been set. You can add or edit it from here.
-            <button type="button" onClick={onOpenFluff} className="mt-3 rounded-xl border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 transition hover:bg-lime-400/20 sm:ml-3 sm:mt-0">
+            Optional campaign fluff has not been set. You can add or edit it
+            from here.
+            <button
+              type="button"
+              onClick={onOpenFluff}
+              className="mt-3 rounded-xl border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 transition hover:bg-lime-400/20 sm:ml-3 sm:mt-0"
+            >
               Add Fluff
             </button>
           </div>
@@ -2435,11 +3644,13 @@ function ActiveCampaignDashboard({
       <div className="grid gap-5 xl:grid-cols-[1fr_3fr]">
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
           <div className="flex flex-wrap gap-2">
-            {([
-              ["objectives", "Objectives"],
-              ["planet", "Planet Control"],
-              ["victory", "Victory Conditions"],
-            ] as const).map(([value, label]) => (
+            {(
+              [
+                ["objectives", "Objectives"],
+                ["planet", "Planet Control"],
+                ["victory", "Victory Conditions"],
+              ] as const
+            ).map(([value, label]) => (
               <button
                 key={value}
                 type="button"
@@ -2451,54 +3662,106 @@ function ActiveCampaignDashboard({
             ))}
           </div>
 
-          {(activeView === "objectives" || activeView === "planet") && <PlayerColorLegend players={acceptedPlayers} />}
+          {(activeView === "objectives" || activeView === "planet") && (
+            <PlayerColorLegend players={acceptedPlayers} />
+          )}
 
           <div className="mt-5 space-y-3">
-            {activeView === "objectives" && (
-              objectives.length ? objectives.map((objective) => (
-                <div key={objective.id} className="rounded-2xl border border-zinc-800 bg-zinc-950/50 p-3">
-                  <div className="flex items-center justify-between gap-3 text-sm">
-                    <div>
-                      <div className="font-black text-zinc-100">{objective.name}</div>
-                      <div className="text-xs text-zinc-500">{objective.type}{objective.isKey ? " • Key Objective" : ""}</div>
+            {activeView === "objectives" &&
+              (objectives.length ? (
+                objectives.map((objective) => (
+                  <div
+                    key={objective.id}
+                    className="rounded-2xl border border-zinc-800 bg-zinc-950/50 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <div>
+                        <div className="font-black text-zinc-100">
+                          {objective.name}
+                        </div>
+                        <div className="text-xs text-zinc-500">
+                          {objective.type}
+                          {objective.isKey ? " • Key Objective" : ""}
+                        </div>
+                      </div>
+                      <span className="text-xs text-zinc-400">Control</span>
                     </div>
-                    <span className="text-xs text-zinc-400">Control</span>
+                    <ControlStack
+                      players={acceptedPlayers}
+                      share={playerShare}
+                    />
                   </div>
-                  <ControlStack players={acceptedPlayers} share={playerShare} />
-                </div>
-              )) : <p className="text-sm text-zinc-400">No objectives configured.</p>
-            )}
+                ))
+              ) : (
+                <p className="text-sm text-zinc-400">
+                  No objectives configured.
+                </p>
+              ))}
             {activeView === "planet" && (
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/50 p-4">
-                <div className="text-sm font-black text-zinc-100">Total Planet Control</div>
+                <div className="text-sm font-black text-zinc-100">
+                  Total Planet Control
+                </div>
                 <div className="mt-3 h-7 overflow-hidden rounded-full border border-zinc-800 bg-zinc-900">
                   <div className="flex h-full w-full">
                     {acceptedPlayers.map((player, index) => (
-                      <div key={player.id} className="h-full" style={{ width: `${playerShare}%`, backgroundColor: getPlayerColor(player, index) }} title={playerDisplayName(player)} />
+                      <div
+                        key={player.id}
+                        className="h-full"
+                        style={{
+                          width: `${playerShare}%`,
+                          backgroundColor: getPlayerColor(player, index),
+                        }}
+                        title={playerDisplayName(player)}
+                      />
                     ))}
                   </div>
                 </div>
                 <div className="mt-3 grid gap-2">
                   {acceptedPlayers.map((player, index) => (
-                    <div key={player.id} className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm">
-                      <span className="flex items-center gap-2 text-zinc-200"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: getPlayerColor(player, index) }} />{playerDisplayName(player)}</span>
-                      <span className="font-semibold text-zinc-400">{playerShare.toFixed(1)}%</span>
+                    <div
+                      key={player.id}
+                      className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm"
+                    >
+                      <span className="flex items-center gap-2 text-zinc-200">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor: getPlayerColor(player, index),
+                          }}
+                        />
+                        {playerDisplayName(player)}
+                      </span>
+                      <span className="font-semibold text-zinc-400">
+                        {playerShare.toFixed(1)}%
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             {activeView === "victory" && (
-              <VictoryConditionDetails campaign={campaign} authUserId={authUserId} force={force} playerShare={playerShare} />
+              <VictoryConditionDetails
+                campaign={campaign}
+                authUserId={authUserId}
+                force={force}
+                playerShare={playerShare}
+              />
             )}
           </div>
         </div>
 
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Force Status</div>
-            <h2 className="mt-1 text-xl font-black text-zinc-50">{force?.name ?? "No force assigned"}</h2>
-            <p className="mt-1 text-sm text-zinc-500">Campaign-specific force copy status.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Force Status
+            </div>
+            <h2 className="mt-1 text-xl font-black text-zinc-50">
+              {force?.name ?? "No force assigned"}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Campaign-specific force copy status.
+            </p>
           </div>
 
           <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
@@ -2509,38 +3772,72 @@ function ActiveCampaignDashboard({
                     <tr>
                       <th className="w-[34%] px-4 py-3 font-semibold">Unit</th>
                       <th className="w-[28%] px-4 py-3 font-semibold">Pilot</th>
-                      <th className="w-[16%] px-4 py-3 font-semibold">Status</th>
-                      <th className="w-[14%] px-4 py-3 text-right font-semibold">Current BV</th>
-                      {campaignType === "Conquest" && <th className="w-[8%] px-4 py-3 text-right font-semibold">Team</th>}
+                      <th className="w-[16%] px-4 py-3 font-semibold">
+                        Status
+                      </th>
+                      <th className="w-[14%] px-4 py-3 text-right font-semibold">
+                        Current BV
+                      </th>
+                      {campaignType === "Conquest" && (
+                        <th className="w-[8%] px-4 py-3 text-right font-semibold">
+                          Team
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/80">
-                    {sortForceUnitsForCampaign(forceUnits, campaignType === "Conquest").map((forceUnit, index, sortedUnits) => {
+                    {sortForceUnitsForCampaign(
+                      forceUnits,
+                      campaignType === "Conquest",
+                    ).map((forceUnit, index, sortedUnits) => {
                       const previous = sortedUnits[index - 1];
-                      const showTeamDivider = campaignType === "Conquest" && (index === 0 || previous?.teamNumber !== forceUnit.teamNumber);
+                      const showTeamDivider =
+                        campaignType === "Conquest" &&
+                        (index === 0 ||
+                          previous?.teamNumber !== forceUnit.teamNumber);
 
                       return (
                         <React.Fragment key={forceUnit.id}>
                           {showTeamDivider && (
                             <tr className="bg-zinc-900/80">
-                              <td colSpan={campaignType === "Conquest" ? 5 : 4} className="px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-lime-300">
+                              <td
+                                colSpan={campaignType === "Conquest" ? 5 : 4}
+                                className="px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-lime-300"
+                              >
                                 Team {forceUnit.teamNumber ?? "Unassigned"}
                               </td>
                             </tr>
                           )}
                           <tr className="align-middle transition hover:bg-zinc-900/70">
-                            <td className="px-4 py-3 font-black text-zinc-100">{forceUnitDisplayName(forceUnit)}</td>
+                            <td className="px-4 py-3 font-black text-zinc-100">
+                              {forceUnitDisplayName(forceUnit)}
+                            </td>
                             <td className="px-4 py-3 text-zinc-300">
-                              <div className="font-semibold">{forceUnit.pilot?.name || "Unnamed Pilot"}</div>
-                              <div className="text-xs text-zinc-500">{forceUnit.pilot?.gunnery ?? 4}/{forceUnit.pilot?.piloting ?? 5}</div>
+                              <div className="font-semibold">
+                                {forceUnit.pilot?.name || "Unnamed Pilot"}
+                              </div>
+                              <div className="text-xs text-zinc-500">
+                                {forceUnit.pilot?.gunnery ?? 4}/
+                                {forceUnit.pilot?.piloting ?? 5}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
                               <span className="inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs font-semibold text-zinc-300">
                                 {forceUnitStatusLabel(forceUnit)}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right font-semibold text-zinc-300">BV {formatNumber(forceUnit.currentBV ?? forceUnit.snapshot?.totalBV)}</td>
-                            {campaignType === "Conquest" && <td className="px-4 py-3 text-right text-zinc-300">{forceUnit.teamNumber ?? "—"}</td>}
+                            <td className="px-4 py-3 text-right font-semibold text-zinc-300">
+                              BV{" "}
+                              {formatNumber(
+                                forceUnit.currentBV ??
+                                  forceUnit.snapshot?.totalBV,
+                              )}
+                            </td>
+                            {campaignType === "Conquest" && (
+                              <td className="px-4 py-3 text-right text-zinc-300">
+                                {forceUnit.teamNumber ?? "—"}
+                              </td>
+                            )}
                           </tr>
                         </React.Fragment>
                       );
@@ -2548,24 +3845,45 @@ function ActiveCampaignDashboard({
                   </tbody>
                   <tfoot className="border-t border-zinc-700 bg-zinc-950/85 text-sm">
                     <tr>
-                      <td className="px-4 py-3 font-black text-zinc-100">{forceUnitCount} {forceUnitCount === 1 ? "Mek" : "Meks"}</td>
-                      <td className="px-4 py-3 font-semibold text-zinc-300">{pilotCount} {pilotCount === 1 ? "Pilot" : "Pilots"}</td>
-                      <td className="px-4 py-3 font-semibold text-zinc-300">{readyUnitCount} Ready</td>
-                      <td className="px-4 py-3 text-right font-black text-lime-200">BV {formatNumber(currentBVTotal)}</td>
-                      {campaignType === "Conquest" && <td className="px-4 py-3 text-right text-zinc-500">—</td>}
+                      <td className="px-4 py-3 font-black text-zinc-100">
+                        {forceUnitCount} {forceUnitCount === 1 ? "Mek" : "Meks"}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-zinc-300">
+                        {pilotCount} {pilotCount === 1 ? "Pilot" : "Pilots"}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-zinc-300">
+                        {readyUnitCount} Ready
+                      </td>
+                      <td className="px-4 py-3 text-right font-black text-lime-200">
+                        BV {formatNumber(currentBVTotal)}
+                      </td>
+                      {campaignType === "Conquest" && (
+                        <td className="px-4 py-3 text-right text-zinc-500">
+                          —
+                        </td>
+                      )}
                     </tr>
                   </tfoot>
                 </table>
               </div>
             ) : (
-              <p className="p-6 text-sm text-zinc-400">No unit status records found for this campaign force yet.</p>
+              <p className="p-6 text-sm text-zinc-400">
+                No unit status records found for this campaign force yet.
+              </p>
             )}
           </div>
         </div>
       </div>
 
-      {repairHelpOpen && <RepairPriorityHelpModal onClose={() => setRepairHelpOpen(false)} />}
-      {detailsOpen && <CampaignDetailsModal campaign={campaign} onClose={() => setDetailsOpen(false)} />}
+      {repairHelpOpen && (
+        <RepairPriorityHelpModal onClose={() => setRepairHelpOpen(false)} />
+      )}
+      {detailsOpen && (
+        <CampaignDetailsModal
+          campaign={campaign}
+          onClose={() => setDetailsOpen(false)}
+        />
+      )}
     </section>
   );
 }
@@ -2594,41 +3912,88 @@ function ActionSquareButton({
 
 function campaignTurnLabel(campaign: Campaign) {
   const settings = campaign.settings;
-  const currentTurn = Number((campaign as any).turnNumber ?? (settings as any)?.currentTurn ?? 1);
-  const victoryTurnLimit = settings?.victoryConditions?.turnsElapsedEnabled ? settings.victoryConditions.turnsElapsed : undefined;
-  const setupTurnLimit = Number((settings as any)?.maxTurnsAhead ?? 0) > 0 ? Number((settings as any).maxTurnsAhead) : undefined;
+  const currentTurn = Number(
+    (campaign as any).turnNumber ?? (settings as any)?.currentTurn ?? 1,
+  );
+  const victoryTurnLimit = settings?.victoryConditions?.turnsElapsedEnabled
+    ? settings.victoryConditions.turnsElapsed
+    : undefined;
+  const setupTurnLimit =
+    Number((settings as any)?.maxTurnsAhead ?? 0) > 0
+      ? Number((settings as any).maxTurnsAhead)
+      : undefined;
   const limit = victoryTurnLimit ?? setupTurnLimit;
   return limit ? `${currentTurn}/${limit}` : String(currentTurn);
 }
 
-function CampaignDetailsModal({ campaign, onClose }: { campaign: Campaign; onClose: () => void }) {
+function CampaignDetailsModal({
+  campaign,
+  onClose,
+}: {
+  campaign: Campaign;
+  onClose: () => void;
+}) {
   const settings = campaign.settings;
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
       <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign Details</div>
-            <h2 className="mt-2 text-2xl font-black text-zinc-50">{campaign.name}</h2>
-            <p className="mt-1 text-sm text-zinc-400">High-level campaign information and setup context.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Campaign Details
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              {campaign.name}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              High-level campaign information and setup context.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close campaign details"><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close campaign details"
+          >
+            <X size={18} />
+          </button>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <MiniFact label="Campaign Type" value={settings?.type ?? "—"} />
           <MiniFact label="Status" value={campaign.status ?? "—"} />
           <MiniFact label="Year / Date" value={campaignDateLabel(campaign)} />
-          <MiniFact label="Planet" value={settings?.fluff?.planet || "Not set"} />
+          <MiniFact
+            label="Planet"
+            value={settings?.fluff?.planet || "Not set"}
+          />
           <MiniFact label="Era" value={settings?.era ?? "—"} />
           <MiniFact label="Rules Level" value={settings?.rulesLevel ?? "—"} />
-          <MiniFact label="Players" value={`${(campaign.participants ?? []).filter((participant) => participant.status === "Accepted").length}/${settings?.maxPlayers ?? 2}`} />
-          <MiniFact label="Force BV Limit" value={formatNumber(settings?.forceBVLimit)} />
-          <MiniFact label="Starting Resources" value={resourceLabel(settings)} />
-          <MiniFact label="Objective Control" value={settings?.objectiveControlType ?? "—"} />
+          <MiniFact
+            label="Players"
+            value={`${(campaign.participants ?? []).filter((participant) => participant.status === "Accepted").length}/${settings?.maxPlayers ?? 2}`}
+          />
+          <MiniFact
+            label="Force BV Limit"
+            value={formatNumber(settings?.forceBVLimit)}
+          />
+          <MiniFact
+            label="Starting Resources"
+            value={resourceLabel(settings)}
+          />
+          <MiniFact
+            label="Objective Control"
+            value={settings?.objectiveControlType ?? "—"}
+          />
           {settings?.type === "Conquest" && (
             <>
-              <MiniFact label="Combat Teams" value={String(settings?.combatTeamCount ?? "—")} />
-              <MiniFact label="Team BV Limit" value={formatNumber(settings?.combatTeamBVLimit)} />
+              <MiniFact
+                label="Combat Teams"
+                value={String(settings?.combatTeamCount ?? "—")}
+              />
+              <MiniFact
+                label="Team BV Limit"
+                value={formatNumber(settings?.combatTeamBVLimit)}
+              />
             </>
           )}
         </div>
@@ -2648,17 +4013,38 @@ function RepairPriorityHelpModal({ onClose }: { onClose: () => void }) {
       <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Repair Orders</div>
-            <h2 className="mt-2 text-2xl font-black text-zinc-50">Repair priority breakdown</h2>
-            <p className="mt-1 text-sm text-zinc-400">Choose how the tech force prioritizes limited repair time between battles.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Repair Orders
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              Repair priority breakdown
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Choose how the tech force prioritizes limited repair time between
+              battles.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close repair priority help"><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close repair priority help"
+          >
+            <X size={18} />
+          </button>
         </div>
         <div className="space-y-3">
           {REPAIR_PRIORITY_DETAILS.map((detail) => (
-            <div key={detail.title} className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-              <h3 className="text-sm font-black text-zinc-100">{detail.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-400">{detail.description}</p>
+            <div
+              key={detail.title}
+              className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4"
+            >
+              <h3 className="text-sm font-black text-zinc-100">
+                {detail.title}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-400">
+                {detail.description}
+              </p>
             </div>
           ))}
         </div>
@@ -2667,12 +4053,26 @@ function RepairPriorityHelpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ControlStack({ players, share }: { players: NonNullable<Campaign["participants"]>; share: number }) {
+function ControlStack({
+  players,
+  share,
+}: {
+  players: NonNullable<Campaign["participants"]>;
+  share: number;
+}) {
   return (
     <div className="mt-3 h-5 overflow-hidden rounded-full border border-zinc-800 bg-zinc-900">
       <div className="flex h-full w-full">
         {players.map((player, index) => (
-          <div key={player.id} className="h-full" style={{ width: `${share}%`, backgroundColor: getPlayerColor(player, index) }} title={playerDisplayName(player)} />
+          <div
+            key={player.id}
+            className="h-full"
+            style={{
+              width: `${share}%`,
+              backgroundColor: getPlayerColor(player, index),
+            }}
+            title={playerDisplayName(player)}
+          />
         ))}
       </div>
     </div>
@@ -2705,36 +4105,97 @@ function CampaignFluffModal({
   onSubmit: (event: React.FormEvent) => void;
 }) {
   const range = ERA_YEAR_RANGES[campaign.settings?.era ?? ""];
-  const yearInvalid = Boolean(year && !campaignYearIsValid(year, campaign.settings?.era));
+  const yearInvalid = Boolean(
+    year && !campaignYearIsValid(year, campaign.settings?.era),
+  );
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
       <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Campaign Fluff</div>
-            <h2 className="mt-2 text-2xl font-black text-zinc-50">Add optional campaign flavor</h2>
-            <p className="mt-1 text-sm text-zinc-400">Add optional flavor details for the campaign. These can be edited later by the campaign owner.</p>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Campaign Fluff
+            </div>
+            <h2 className="mt-2 text-2xl font-black text-zinc-50">
+              Add optional campaign flavor
+            </h2>
+            <p className="mt-1 text-sm text-zinc-400">
+              Add optional flavor details for the campaign. These can be edited
+              later by the campaign owner.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200" aria-label="Close campaign fluff modal"><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-red-400/50 hover:text-red-200"
+            aria-label="Close campaign fluff modal"
+          >
+            <X size={18} />
+          </button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <label className="space-y-2 text-sm font-semibold text-zinc-200">
-            Campaign Year {range ? <span className="text-xs font-normal text-zinc-500">({range.min}-{range.max} for {campaign.settings?.era})</span> : null}
-            <input type="number" value={year ?? ""} onChange={(event) => setYear(event.target.value ? Number(event.target.value) : undefined)} min={range?.min} max={range?.max} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60" />
+            Campaign Year{" "}
+            {range ? (
+              <span className="text-xs font-normal text-zinc-500">
+                ({range.min}-{range.max} for {campaign.settings?.era})
+              </span>
+            ) : null}
+            <input
+              type="number"
+              value={year ?? ""}
+              onChange={(event) =>
+                setYear(
+                  event.target.value ? Number(event.target.value) : undefined,
+                )
+              }
+              min={range?.min}
+              max={range?.max}
+              className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60"
+            />
           </label>
-          {yearInvalid && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">Year must be inside the selected era range.</div>}
+          {yearInvalid && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+              Year must be inside the selected era range.
+            </div>
+          )}
           <label className="space-y-2 text-sm font-semibold text-zinc-200">
             Planet
-            <input value={planet} onChange={(event) => setPlanet(event.target.value)} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60" />
+            <input
+              value={planet}
+              onChange={(event) => setPlanet(event.target.value)}
+              className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60"
+            />
           </label>
           <label className="space-y-2 text-sm font-semibold text-zinc-200">
             Conflict Description
-            <textarea value={conflictDescription} onChange={(event) => setConflictDescription(event.target.value)} rows={4} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60" />
+            <textarea
+              value={conflictDescription}
+              onChange={(event) => setConflictDescription(event.target.value)}
+              rows={4}
+              className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60"
+            />
           </label>
-          {updateError && <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{updateError}</div>}
+          {updateError && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+              {updateError}
+            </div>
+          )}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button type="button" onClick={onClose} className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500">Cancel</button>
-            <button type="submit" disabled={updateLoading || yearInvalid} className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60">{updateLoading ? "Saving..." : "Save Fluff"}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updateLoading || yearInvalid}
+              className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateLoading ? "Saving..." : "Save Fluff"}
+            </button>
           </div>
         </form>
       </div>
@@ -2964,20 +4425,53 @@ function CampaignSettingsModal(props: {
             </div>
 
             <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-4">
-              <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">Optional Fluff</div>
+              <div className="mb-3 text-sm font-black uppercase tracking-[0.16em] text-zinc-300">
+                Optional Fluff
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2 text-sm font-semibold text-zinc-200">
                   Campaign Year
-                  <input type="number" value={props.fluffYear ?? ""} onChange={(event) => props.setFluffYear(event.target.value ? Number(event.target.value) : undefined)} min={ERA_YEAR_RANGES[props.era]?.min} max={ERA_YEAR_RANGES[props.era]?.max} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70" />
-                  {ERA_YEAR_RANGES[props.era] && <span className="text-xs font-normal text-zinc-500">Allowed: {ERA_YEAR_RANGES[props.era].min}-{ERA_YEAR_RANGES[props.era].max}</span>}
+                  <input
+                    type="number"
+                    value={props.fluffYear ?? ""}
+                    onChange={(event) =>
+                      props.setFluffYear(
+                        event.target.value
+                          ? Number(event.target.value)
+                          : undefined,
+                      )
+                    }
+                    min={ERA_YEAR_RANGES[props.era]?.min}
+                    max={ERA_YEAR_RANGES[props.era]?.max}
+                    className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70"
+                  />
+                  {ERA_YEAR_RANGES[props.era] && (
+                    <span className="text-xs font-normal text-zinc-500">
+                      Allowed: {ERA_YEAR_RANGES[props.era].min}-
+                      {ERA_YEAR_RANGES[props.era].max}
+                    </span>
+                  )}
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-zinc-200">
                   Planet
-                  <input value={props.fluffPlanet} onChange={(event) => props.setFluffPlanet(event.target.value)} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70" />
+                  <input
+                    value={props.fluffPlanet}
+                    onChange={(event) =>
+                      props.setFluffPlanet(event.target.value)
+                    }
+                    className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70"
+                  />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-zinc-200 md:col-span-2">
                   Conflict Description
-                  <textarea value={props.fluffDescription} onChange={(event) => props.setFluffDescription(event.target.value)} rows={3} className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70" />
+                  <textarea
+                    value={props.fluffDescription}
+                    onChange={(event) =>
+                      props.setFluffDescription(event.target.value)
+                    }
+                    rows={3}
+                    className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70"
+                  />
                 </label>
               </div>
             </div>
@@ -3094,9 +4588,15 @@ function SelectField({
         onChange={(event) => onChange(event.target.value)}
         className="w-full rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-zinc-100 outline-none focus:border-lime-400/60 disabled:opacity-70"
       >
-        {placeholder && <option value="" disabled>{placeholder}</option>}
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
         {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </label>
@@ -3179,9 +4679,19 @@ function MiniFact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CampaignFactCard({ label, value, className = "" }: { label: string; value: string; className?: string }) {
+function CampaignFactCard({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
-    <div className={`rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4 ${className}`}>
+    <div
+      className={`rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4 ${className}`}
+    >
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </div>

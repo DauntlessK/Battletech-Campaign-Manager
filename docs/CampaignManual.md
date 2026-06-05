@@ -425,7 +425,7 @@ Supported objective types may include:
 | Depot            | +1 bonus for stock rolls.                                                                          |
 | Comms Array      | Improves hex gain rolls in Conquest; may grant bonus objective control gains in Chaos or Advanced. |
 | City             | Provides c-bill income per turn, or Warchest income in Chaos.                                      |
-| Fort             | Provides defensive bonuses and c-bill income.                                                      |
+| Fort Holding     | Provides defensive bonuses and c-bill income.                                                      |
 | Repair Facility  | +1 bonus to repair rolls when repairs are performed at a facility.                                 |
 | Space Port       | +1 bonus for delivery time rolls.                                                                  |
 | Medical Facility | +1 bonus for healing rolls.                                                                        |
