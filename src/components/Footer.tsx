@@ -12,7 +12,7 @@ export default function Footer() {
       return;
     }
 
-    const options = ["Buy me a coffee!", "Donate to help run this site..."];
+    const options = ["Buy me a coffee!", "Donate to help run this site"];
     const pick = options[Math.floor(Math.random() * options.length)];
     sessionStorage.setItem(key, pick);
     setDonationLabel(pick);

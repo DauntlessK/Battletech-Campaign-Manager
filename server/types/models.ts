@@ -111,6 +111,8 @@ export type Campaign = {
   startDate?: string;
   finishDate?: string;
   assignedForceId?: string;
+  turnNumber?: number;
+  planetaryControl?: Array<{ userId: string; percentage: number }>;
   participants?: CampaignParticipantSummary[];
 };
 
@@ -233,6 +235,8 @@ export type ForceUnit = {
     name?: string;
     gunnery: number;
     piloting: number;
+    wounds?: number;
+    dead?: boolean;
   };
 };
 
@@ -254,6 +258,8 @@ export type CampaignUnitDamageOverlay = {
   pilotDamage?: number | "KIA";
   killsMade?: number;
   status?: string;
+  currentBV?: number;
+  recalculatedBV?: number;
   damageSummary?: {
     armor: number;
     internal: number;
@@ -265,7 +271,7 @@ export type CampaignUnitDamageOverlay = {
     limbs: number;
   };
   chaos?: {
-    condition: "ready" | "damaged" | "destroyed";
+    condition: "ready" | "damaged" | "crippled" | "destroyed";
   };
   detailed?: {
     locations: Record<
@@ -331,6 +337,7 @@ export type Battle = {
     notes: string;
     submittedAt: string;
   }>;
+  validationIssues?: string[];
   confirmedAt?: string;
   createdAt: string;
   updatedAt: string;

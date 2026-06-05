@@ -1,11 +1,12 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import { X, ChevronRight } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { X, ChevronRight, CheckCircle2, ClipboardList, ShieldCheck, Wrench } from "lucide-react";
 import Header from "./components/AppHeader";
 import PageTitle from "./components/PageTitle";
 import Footer from "./components/Footer";
 import planetProjectionImage from "./assets/Planet-Projection.png";
 import AccountPage from "./pages/AccountPage";
+import AdminPage from "./pages/AdminPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import ForcesPage from "./pages/ForcesPage";
 import BattlesPage from "./pages/BattlesPage";
@@ -33,6 +34,8 @@ import type {
   NotificationItem,
   AuthMode,
 } from "./types/app";
+
+const DEV_ADMIN_ENABLED = true;
 
 export default function App() {
   const [activePage, setActivePage] = useState<PageKey>("landing");
@@ -775,6 +778,8 @@ export default function App() {
   const submitBattleLogForUser = async (
     campaignId: string,
     payload: {
+      battleId?: string;
+      sourceLogId?: string;
       date: string;
       opponentUserId?: string;
       objectiveId?: string;
@@ -1366,6 +1371,19 @@ export default function App() {
             }}
           />
         )}
+
+        {activePage === "devAdmin" && DEV_ADMIN_ENABLED && (
+          <AdminPage
+            onBack={() => navigate("landing")}
+            onDataChanged={() => {
+              void fetchCampaigns();
+              void fetchForces();
+              if (battleCampaignId) {
+                void fetchBattlesForCampaign(battleCampaignId);
+              }
+            }}
+          />
+        )}
         {activePage === "myAccount" && (
           <AccountPage
             user={authUser}
@@ -1396,6 +1414,18 @@ export default function App() {
             onSubmit={() => submitAuthForm(authMode)}
             onLogout={handleLogout}
           />
+        )}
+
+        {DEV_ADMIN_ENABLED && activePage !== "devAdmin" && (
+          <div className="mt-10 flex justify-center border-t border-zinc-900 pt-5">
+            <button
+              type="button"
+              onClick={() => navigate("devAdmin")}
+              className="rounded-2xl border border-amber-400/30 bg-amber-950/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-200 transition hover:bg-amber-900/30"
+            >
+              Dev Admin
+            </button>
+          </div>
         )}
       </main>
 
@@ -1455,6 +1485,15 @@ function MobileMenu({
 }
 
 function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
+  const managementPoints = [
+    "Track planetary control on hex maps or objective-based systems",
+    "Make repairs in the field or a dedicated bay with limited time and resources",
+    "Feel attrition as you deploy units that are not fully repaired when your techs are stretched thin",
+    "Capture units, upgrade pilots, and reap the rewards of holding key objectives",
+    "Detailed battle logs and campaign history",
+    "Assisted salary and repair management for minimal bookkeeping",
+  ];
+
   return (
     <section className="space-y-5">
       <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-950 to-lime-950/40 p-6 shadow-2xl sm:p-10">
@@ -1464,31 +1503,49 @@ function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
             alt="Logo"
             className="h-60 w-auto"
           />
-          <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
+          <h1 className="mt-6 max-w-3xl text-zinc-50">
             Run a mercenary unit with deep Battletech Campaign Ops complexity,
             without the need for a GM, Opfor, accountant, or finance degree.
-          </p>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">
+          </h1>
+          <p className="mt-7 max-w-2xl text-base leading-8 text-zinc-400 sm:text-lg">
             Build and manage forces, track resources, conduct campaigns for
             days, weeks, or even months as you battle for control of a planet
-            against your opponent. No spreadsheets. No overhead. Just the crunch
-            you crave.
+            against your opponent(s). No spreadsheets. No overhead. Just the
+            crunch you love from Battletech.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row justify-center">
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <button
               onClick={() => onNavigate("units")}
               className="rounded-2xl bg-lime-400 px-5 py-3 font-bold text-zinc-950 shadow-lg shadow-lime-950/40 transition hover:bg-lime-300"
             >
-              View units
+              FAQ
             </button>
             <button
               onClick={() => onNavigate("about")}
               className="rounded-2xl border border-zinc-700 bg-zinc-900 px-5 py-3 font-bold text-zinc-100 transition hover:bg-zinc-800"
             >
-              Read about the project
+              Get Started
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <FeatureCard
+          icon={<ClipboardList size={26} />}
+          title="Campaign Logistics"
+          description="Manage resources, finances, and unit logistics with real Battletech campaign complexity drawn from campaign-scale play."
+        />
+        <FeatureCard
+          icon={<Wrench size={26} />}
+          title="Attritional Warfare"
+          description="Make hasty repairs and tough deployment decisions when units are missing armor, damaged components, or even entire limbs."
+        />
+        <FeatureCard
+          icon={<ShieldCheck size={26} />}
+          title="Mercenary Command"
+          description="Build and maintain your mercenary forces with detailed unit and pilot management, repairs, upgrades, and battlefield consequences."
+        />
       </div>
 
       <div className="overflow-hidden rounded-3xl border border-lime-400/20 bg-zinc-900/70 shadow-2xl">
@@ -1501,64 +1558,54 @@ function LandingPage({ onNavigate }: { onNavigate: (page: PageKey) => void }) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-zinc-950/80" />
           </div>
-          <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+          <div className="flex flex-col justify-center p-6 text-left sm:p-8 lg:p-10">
             <div className="text-xs font-semibold uppercase tracking-[0.22em] text-lime-300">
-              Campaign command
+              Campaign Management Made Easy
             </div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-zinc-50 sm:text-3xl">
-              Run the war from orbit.
+            <h2 className="mt-3 text-2xl tracking-tight text-zinc-50 sm:text-3xl">
+              Run your mercenary unit or your house's forces in a campaign to
+              control a planet, with meaningful strategic decisions against your
+              friends.
             </h2>
-            <p className="mt-4 text-sm leading-7 text-zinc-300 sm:text-base">
-              Track planetary control, objectives, combat teams, pilot rosters,
-              and campaign status from one tactical command view built for
-              BattleTech-style campaigns.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2 text-xs font-semibold text-zinc-300">
-              <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-lime-200">
-                Planet control
-              </span>
-              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">
-                Force readiness
-              </span>
-              <span className="rounded-full border border-zinc-700 bg-zinc-950/70 px-3 py-1">
-                Battle history
-              </span>
-            </div>
+            <ul className="mt-6 space-y-2 text-left">
+              {managementPoints.map((point) => (
+                <li
+                  key={point}
+                  className="flex items-start gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/45 px-3 py-2.5 text-sm leading-6 text-zinc-300"
+                >
+                  <CheckCircle2
+                    size={17}
+                    className="mt-1 shrink-0 text-lime-300"
+                    aria-hidden="true"
+                  />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
-          <div className="text-2xl font-bold text-lime-300 mb-2">⚙️</div>
-          <div className="text-lg font-bold text-zinc-50">
-            Campaign Logistics
-          </div>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
-            Manage resources, finances, and unit logistics with true Battletech
-            complexity.
-          </p>
-        </div>
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
-          <div className="text-2xl font-bold text-lime-300 mb-2">🤖</div>
-          <div className="text-lg font-bold text-zinc-50">Roster Control</div>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
-            Build and maintain your mercenary forces with detailed unit tracking
-            and validation.
-          </p>
-        </div>
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
-          <div className="text-2xl font-bold text-lime-300 mb-2">⚔️</div>
-          <div className="text-lg font-bold text-zinc-50">
-            Battle Management
-          </div>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
-            Track campaigns and battles as you compete for control with no GM
-            needed.
-          </p>
         </div>
       </div>
     </section>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
+      <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl border border-lime-400/20 bg-lime-400/10 text-lime-300">
+        {icon}
+      </div>
+      <div className="text-lg font-bold text-zinc-50">{title}</div>
+      <p className="mt-3 text-sm leading-7 text-zinc-400">{description}</p>
+    </div>
   );
 }
 

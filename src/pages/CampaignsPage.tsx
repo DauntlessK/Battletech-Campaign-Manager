@@ -452,6 +452,9 @@ function forceSummaryForParticipant(
     : undefined;
 }
 type BattleLogPrefill = {
+  battleId?: string;
+  sourceLogId?: string;
+  unitDamage?: any[];
   date?: string;
   opponentUserId?: string;
   objectiveId?: string;
@@ -459,6 +462,7 @@ type BattleLogPrefill = {
   outcome?: string;
   controlsField?: boolean;
   summary?: string;
+  editingSourceLog?: boolean;
 };
 
 export default function CampaignsPage({
@@ -536,6 +540,8 @@ export default function CampaignsPage({
   onSubmitBattleLog: (
     campaignId: string,
     payload: {
+      battleId?: string;
+      sourceLogId?: string;
       date: string;
       opponentUserId?: string;
       objectiveId?: string;
@@ -662,6 +668,63 @@ export default function CampaignsPage({
     );
     setSelectedBattleDetails(result as Battle);
     setBattleHistoryFilter("disputed");
+  };
+
+
+  const resubmitBattleSourceLog = async (payload: any): Promise<Battle | null> => {
+    if (!payload?.battleId || !payload?.sourceLogId) return null;
+    const token = localStorage.getItem("bcm-auth-token");
+    const response = await fetch(`/api/battles/${payload.battleId}`, {
+      method: "PATCH",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sourceLogId: payload.sourceLogId,
+        sourceLog: {
+          date: payload.date,
+          opponentUserId: payload.opponentUserId,
+          objectiveId: payload.objectiveId,
+          objectiveName: payload.objectiveName,
+          outcome: payload.outcome,
+          controlsField: payload.controlsField,
+          campaignForceId: payload.campaignForceId,
+          unitDamage: payload.unitDamage,
+          summary: payload.summary,
+        },
+      }),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(result?.error || "Unable to resubmit battle log.");
+    setCampaignBattles((current) =>
+      current.map((entry) => (entry.id === result.id ? result : entry)),
+    );
+    setSelectedBattleDetails(result as Battle);
+    setBattleHistoryFilter(result.status === "Disputed" ? "disputed" : result.status === "AwaitingOpponent" ? "pending" : "complete");
+    if (["Complete", "Confirmed", "Finalized", "Disputed"].includes(result.status)) {
+      await fetchCampaignBattles(result.campaignId);
+    }
+    return result as Battle;
+  };
+
+  const startEditingSourceLog = (battle: Battle, log: NonNullable<Battle["battleLogs"]>[number]) => {
+    setBattleLogPrefill({
+      battleId: battle.id,
+      sourceLogId: log.id,
+      date: log.date ?? battle.date,
+      opponentUserId: log.opponentUserId,
+      objectiveId: log.objectiveId ?? battle.objectiveId,
+      objectiveName: log.objectiveName ?? battle.objectiveName,
+      outcome: log.outcome ?? battle.outcome,
+      controlsField: Boolean(log.controlsField),
+      summary: log.summary ?? battle.summary,
+      unitDamage: log.unitDamage ?? [],
+      editingSourceLog: true,
+    });
+    setSelectedBattleDetails(null);
+    setBattleHistoryOpen(false);
+    setLoggingBattle(true);
   };
 
   useEffect(() => {
@@ -1090,16 +1153,20 @@ export default function CampaignsPage({
             error={battleLogError}
             initialValues={battleLogPrefill ?? undefined}
             onBack={() => {
+              const returningFromSourceEdit = Boolean(battleLogPrefill?.battleId);
               setLoggingBattle(false);
               setBattleLogError(null);
               setBattleLogPrefill(null);
               fetchCampaignBattles(selectedCampaign.id);
+              if (returningFromSourceEdit) setBattleHistoryOpen(true);
             }}
-            onSubmit={async (campaignId, payload) => {
+            onSubmit={async (campaignId, payload: any) => {
               setBattleLogLoading(true);
               setBattleLogError(null);
               try {
-                const created = await onSubmitBattleLog(campaignId, payload);
+                const created = payload.battleId && payload.sourceLogId
+                  ? await resubmitBattleSourceLog(payload)
+                  : await onSubmitBattleLog(campaignId, payload);
                 await fetchCampaignBattles(campaignId);
                 return created;
               } catch (error) {
@@ -1129,6 +1196,8 @@ export default function CampaignsPage({
             selectedBattle={selectedBattleDetails}
             setSelectedBattle={setSelectedBattleDetails}
             onDispute={disputeBattle}
+            onEditSourceLog={startEditingSourceLog}
+            authUserId={authUser.id}
             onBack={() => setBattleHistoryOpen(false)}
           />
         );
@@ -2038,7 +2107,7 @@ export default function CampaignsPage({
                         {campaign.description ?? "No description provided."}
                       </div>
                     </div>
-                    <div className="grid gap-2 text-sm text-zinc-300 sm:grid-cols-2 lg:min-w-[420px]">
+                    <div className="grid w-full gap-2 text-sm text-zinc-300 sm:grid-cols-2 lg:min-w-[420px] lg:max-w-[460px]">
                       <MiniFact label="Era" value={settings?.era ?? "—"} />
                       <MiniFact
                         label="Rules"
@@ -2886,6 +2955,8 @@ function BattleHistoryView({
   selectedBattle,
   setSelectedBattle,
   onDispute,
+  onEditSourceLog,
+  authUserId,
   onBack,
 }: {
   campaign: Campaign;
@@ -2897,13 +2968,21 @@ function BattleHistoryView({
   selectedBattle: Battle | null;
   setSelectedBattle: (battle: Battle | null) => void;
   onDispute: (battle: Battle, notes: string) => Promise<void>;
+  onEditSourceLog: (battle: Battle, log: NonNullable<Battle["battleLogs"]>[number]) => void;
+  authUserId: string;
   onBack: () => void;
 }) {
-  const isTwoPlayer =
-    (campaign.participants ?? []).filter(
-      (participant) => participant.status === "Accepted",
-    ).length <= 2;
-  const filteredBattles = battles.filter((battle) => {
+  const [involvedOnly, setInvolvedOnly] = useState(false);
+  const [resultFilter, setResultFilter] = useState<"all" | "won" | "lost">("all");
+  const [objectiveFilter, setObjectiveFilter] = useState("all");
+
+  const participantName = (userId?: string) =>
+    (campaign.participants ?? []).find(
+      (participant) => participant.userId === userId,
+    )?.user?.displayName ??
+    (userId === authUserId ? "You" : userId ? "Commander" : "—");
+
+  const statusBattles = battles.filter((battle) => {
     if (filter === "complete")
       return ["Complete", "Confirmed", "Finalized"].includes(battle.status);
     if (filter === "pending")
@@ -2912,6 +2991,41 @@ function BattleHistoryView({
       );
     return battle.status === "Disputed";
   });
+
+  const objectiveOptions = Array.from(
+    new Set(
+      battles
+        .map((battle) => battle.objectiveName ?? battle.location)
+        .filter((value): value is string => Boolean(value)),
+    ),
+  );
+
+  const filteredBattles = statusBattles.filter((battle) => {
+    const summary = getBattleOutcomeSummary(battle);
+    if (involvedOnly && !isUserInvolvedInBattle(battle, authUserId)) {
+      return false;
+    }
+    if (resultFilter === "won" && summary.victorUserId !== authUserId) {
+      return false;
+    }
+    if (resultFilter === "lost" && summary.defeatedUserId !== authUserId) {
+      return false;
+    }
+    if (
+      objectiveFilter !== "all" &&
+      (battle.objectiveName ?? battle.location ?? "") !== objectiveFilter
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  const pendingBattleCount = battles.filter(
+    (battle) => battle.status === "AwaitingOpponent" || battle.status === "Proposed",
+  ).length;
+  const disputedBattleCount = battles.filter(
+    (battle) => battle.status === "Disputed",
+  ).length;
 
   return (
     <section className="space-y-5">
@@ -2934,20 +3048,72 @@ function BattleHistoryView({
         <div className="flex flex-wrap gap-2">
           {(
             [
-              ["complete", "Official Logs"],
-              ["pending", "Pending Logs"],
-              ["disputed", "Disputed Logs"],
+              ["complete", "Official Logs", 0],
+              ["pending", "Pending Logs", pendingBattleCount],
+              ["disputed", "Disputed Logs", disputedBattleCount],
             ] as const
-          ).map(([value, label]) => (
+          ).map(([value, label, count]) => (
             <button
               key={value}
               type="button"
               onClick={() => setFilter(value)}
-              className={`rounded-xl px-3 py-2 text-xs font-black transition ${filter === value ? "bg-lime-400 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-lime-400/40"}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition ${filter === value ? "bg-lime-400 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-zinc-300 hover:border-lime-400/40"}`}
             >
-              {label}
+              <span>{label}</span>
+              {count > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] ${
+                    filter === value
+                      ? "bg-zinc-950/15 text-zinc-950"
+                      : "bg-red-500/15 text-red-200"
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
             </button>
           ))}
+        </div>
+
+        <div className="mt-4 grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/45 p-3 md:grid-cols-[repeat(4,minmax(0,1fr))]">
+          <label className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm font-semibold text-zinc-300">
+            <input
+              type="checkbox"
+              checked={involvedOnly}
+              onChange={(event) => setInvolvedOnly(event.target.checked)}
+              className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-lime-400"
+            />
+            My battles only
+          </label>
+          <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            Result
+            <select
+              value={resultFilter}
+              onChange={(event) =>
+                setResultFilter(event.target.value as "all" | "won" | "lost")
+              }
+              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm normal-case tracking-normal text-zinc-100 outline-none focus:border-lime-400/70"
+            >
+              <option value="all">All results</option>
+              <option value="won">Won by me</option>
+              <option value="lost">Lost by me</option>
+            </select>
+          </label>
+          <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500 md:col-span-2">
+            Objective
+            <select
+              value={objectiveFilter}
+              onChange={(event) => setObjectiveFilter(event.target.value)}
+              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm normal-case tracking-normal text-zinc-100 outline-none focus:border-lime-400/70"
+            >
+              <option value="all">All objectives</option>
+              {objectiveOptions.map((objective) => (
+                <option key={objective} value={objective}>
+                  {objective}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {error && (
@@ -2969,60 +3135,59 @@ function BattleHistoryView({
                       <th className="w-[10%] px-4 py-3 font-semibold">
                         Battle #
                       </th>
-                      {!isTwoPlayer && (
-                        <th className="w-[18%] px-4 py-3 font-semibold">
-                          Opponent
-                        </th>
-                      )}
-                      <th className="w-[15%] px-4 py-3 font-semibold">
-                        Result
+                      <th className="w-[17%] px-4 py-3 font-semibold">
+                        Victor
                       </th>
-                      <th className="w-[16%] px-4 py-3 font-semibold">Field</th>
-                      <th className="w-[25%] px-4 py-3 font-semibold">
+                      <th className="w-[17%] px-4 py-3 font-semibold">
+                        Defeated
+                      </th>
+                      <th className="w-[18%] px-4 py-3 font-semibold">
+                        Field Holder
+                      </th>
+                      <th className="w-[24%] px-4 py-3 font-semibold">
                         Objective
                       </th>
-                      <th className="w-[16%] px-4 py-3 text-right font-semibold">
+                      <th className="w-[14%] px-4 py-3 text-right font-semibold">
                         Control Change
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/80">
-                    {filteredBattles.map((battle, index) => (
-                      <tr
-                        key={battle.id}
-                        onClick={() => setSelectedBattle(battle)}
-                        className="cursor-pointer transition hover:bg-zinc-900/70"
-                      >
-                        <td className="px-4 py-3 font-black text-zinc-100">
-                          #{battle.turnNumber ?? index + 1}
-                        </td>
-                        {!isTwoPlayer && (
-                          <td className="px-4 py-3 text-zinc-300">
-                            {battle.opponentUserId ? "Opponent" : "—"}
+                    {filteredBattles.map((battle, index) => {
+                      const summary = getBattleOutcomeSummary(battle);
+                      return (
+                        <tr
+                          key={battle.id}
+                          onClick={() => setSelectedBattle(battle)}
+                          className="cursor-pointer transition hover:bg-zinc-900/70"
+                        >
+                          <td className="px-4 py-3 font-black text-zinc-100">
+                            #{battle.turnNumber ?? index + 1}
                           </td>
-                        )}
-                        <td className="px-4 py-3 text-zinc-300">
-                          {battle.outcome ?? "—"}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-300">
-                          {battle.controlsField ? "Claimed" : "Not claimed"}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-300">
-                          {battle.objectiveName ?? battle.location ?? "—"}
-                        </td>
-                        <td className="px-4 py-3 text-right text-zinc-400">
-                          {(battle as any).controlChangePercent !== undefined
-                            ? `${battle.status === "AwaitingOpponent" ? "Potential " : ""}${(battle as any).controlChangePercent}%`
-                            : "—"}
-                        </td>
-                      </tr>
-                    ))}
+                          <td className="px-4 py-3 text-zinc-300">
+                            {participantName(summary.victorUserId)}
+                          </td>
+                          <td className="px-4 py-3 text-zinc-300">
+                            {participantName(summary.defeatedUserId)}
+                          </td>
+                          <td className="px-4 py-3 text-zinc-300">
+                            {participantName(summary.fieldHolderUserId)}
+                          </td>
+                          <td className="px-4 py-3 text-zinc-300">
+                            {battle.objectiveName ?? battle.location ?? "—"}
+                          </td>
+                          <td className="px-4 py-3 text-right text-zinc-400">
+                            {formatControlSwingValue(battle)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             ) : (
               <p className="p-6 text-sm text-zinc-400">
-                No {filter} battle records yet.
+                No {filter} battle records match the current filters.
               </p>
             )}
           </div>
@@ -3032,8 +3197,11 @@ function BattleHistoryView({
       {selectedBattle && (
         <BattleDetailsModal
           battle={selectedBattle}
+          campaign={campaign}
+          authUserId={authUserId}
           onClose={() => setSelectedBattle(null)}
           onDispute={onDispute}
+          onEditSourceLog={onEditSourceLog}
         />
       )}
     </section>
@@ -3042,22 +3210,35 @@ function BattleHistoryView({
 
 function BattleDetailsModal({
   battle,
+  campaign,
+  authUserId,
   onClose,
   onDispute,
+  onEditSourceLog,
 }: {
   battle: Battle;
+  campaign: Campaign;
+  authUserId: string;
   onClose: () => void;
   onDispute: (battle: Battle, notes: string) => Promise<void>;
+  onEditSourceLog: (battle: Battle, log: NonNullable<Battle["battleLogs"]>[number]) => void;
 }) {
   const logs = battle.battleLogs ?? [];
-  const [showSourceLogId, setShowSourceLogId] = useState<string | null>(null);
   const [disputeNotes, setDisputeNotes] = useState("");
   const [disputing, setDisputing] = useState(false);
   const isOfficial = ["Complete", "Confirmed", "Finalized"].includes(battle.status);
   const orderedLogs = isOfficial ? orderBattleLogsWinnerFirst(battle, logs) : logs;
+  const validationIssues = ((battle as any).validationIssues ?? []) as string[];
+  const isChaos = campaign.settings?.type === "Chaos";
+  const playerName = (userId?: string) =>
+    (campaign.participants ?? []).find((participant) => participant.userId === userId)
+      ?.user?.displayName ??
+    (userId === authUserId ? "You" : "Commander");
+  const battleSummary = getBattleOutcomeSummary(battle);
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
-      <div className="mx-auto max-w-4xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
+      <div className="mx-auto max-w-6xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
@@ -3067,8 +3248,7 @@ function BattleDetailsModal({
               Battle #{battle.turnNumber ?? "—"}
             </h2>
             <p className="mt-1 text-sm text-zinc-400">
-              {formatBattleDate(battle.date)} ·{" "}
-              {battle.objectiveName ?? battle.location ?? "No objective"}
+              {formatBattleDate(battle.date)} · {battle.objectiveName ?? battle.location ?? "No objective"}
             </p>
           </div>
           <button
@@ -3081,28 +3261,47 @@ function BattleDetailsModal({
           </button>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-4">
-          <CampaignFactCard label="Status" value={battle.status} />
-          <CampaignFactCard label="Result" value={battle.outcome ?? "—"} />
-          <CampaignFactCard
-            label="Field"
-            value={battle.controlsField ? "Claimed" : "Not claimed"}
-          />
-          <CampaignFactCard
-            label="Objective"
-            value={battle.objectiveName ?? "—"}
-          />
-          <CampaignFactCard
-            label="Control Swing"
-            value={(battle as any).controlChangePercent !== undefined ? `${(battle as any).controlChangePercent}%` : "—"}
-          />
-        </div>
+        {battle.status === "Disputed" && (
+          <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-950/30 p-4">
+            <div className="text-sm font-black text-red-100">Dispute issues</div>
+            {validationIssues.length ? (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-red-200">
+                {validationIssues.map((issue) => (
+                  <li key={issue}>{issue}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-red-200">
+                This battle was disputed by a player. Review the source logs and edit/resubmit the incorrect log.
+              </p>
+            )}
+            {((battle as any).disputeNotes ?? []).length ? (
+              <div className="mt-3 space-y-2">
+                {((battle as any).disputeNotes ?? []).map((note: any, index: number) => (
+                  <div key={`${note.submittedAt}-${index}`} className="rounded-xl border border-red-500/30 bg-zinc-950/50 p-3 text-sm text-red-100">
+                    <div className="font-semibold">{playerName(note.userId)}</div>
+                    <div className="mt-1 text-red-100/80">{note.notes}</div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        )}
 
+        <div className="grid gap-3 md:grid-cols-5">
+          <CampaignFactCard label="Status" value={battle.status} />
+          <CampaignFactCard label="Victor" value={playerName(battleSummary.victorUserId)} />
+          <CampaignFactCard label="Defeated" value={playerName(battleSummary.defeatedUserId)} />
+          <CampaignFactCard label="Field Holder" value={playerName(battleSummary.fieldHolderUserId)} />
+          <CampaignFactCard label={battle.status === "AwaitingOpponent" ? "Potential Swing" : "Control Swing"} value={formatControlSwingValue(battle).replace("Potential ", "")} />
+        </div>
 
         {isOfficial && (
           <div className="mt-4 rounded-2xl border border-orange-400/30 bg-orange-500/10 p-4">
             <div className="text-sm font-black text-orange-100">Dispute official result</div>
-            <p className="mt-1 text-xs text-orange-100/70">If the confirmed battle result is wrong, add notes and move it back to disputed status.</p>
+            <p className="mt-1 text-xs text-orange-100/70">
+              If the confirmed battle result is wrong, add notes and move it back to disputed status.
+            </p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <input
                 value={disputeNotes}
@@ -3136,112 +3335,146 @@ function BattleDetailsModal({
           </div>
         )}
 
-        <div className="mt-5 space-y-3">
-          {orderedLogs.map((log, logIndex) => {
-            const damageSummary = summarizeBattleLogDamage(
-              log.unitDamage ?? [],
-            );
-            return (
-              <div
-                key={log.id}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"
-              >
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <div className="font-black text-zinc-100">
-                      Submitted log
-                    </div>
-                    <div className="text-xs text-zinc-500">
-                      {new Date(log.submittedAt).toLocaleString()}
-                    </div>
+        <div className="mt-5 space-y-5">
+          {orderedLogs.map((log, logIndex) => (
+            <div key={log.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <div className="font-black text-zinc-100">
+                    {isOfficial ? (log.userId === battleSummary.victorUserId ? "Victor's log" : "Defeated player's log") : `Submitted log ${logIndex + 1}`}
+                    <span className="ml-2 text-sm font-semibold text-zinc-400">{playerName(log.userId)}</span>
                   </div>
+                  <div className="text-xs text-zinc-500">
+                    Submitted {new Date(log.submittedAt).toLocaleString()}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
                   <div className="text-sm font-semibold text-zinc-300">
-                    {log.outcome ?? "—"} ·{" "}
-                    {log.controlsField
-                      ? "Controlled field"
-                      : "Did not control field"}
+                    {log.outcome === "Victory" ? "Victor" : log.outcome === "Defeat" ? "Defeated" : (log.outcome ?? "—")} · {log.controlsField ? "Field holder" : "Did not hold field"}
                   </div>
+                  {log.userId === authUserId && (
+                    <button
+                      type="button"
+                      onClick={() => onEditSourceLog(battle, log)}
+                      className="rounded-xl border border-zinc-700 px-3 py-2 text-xs font-black text-zinc-300 transition hover:border-lime-400/40 hover:text-lime-100"
+                    >
+                      Edit source log
+                    </button>
+                  )}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowSourceLogId(showSourceLogId === log.id ? null : log.id)}
-                    className="rounded-xl border border-zinc-700 px-3 py-2 text-xs font-black text-zinc-300 transition hover:border-lime-400/40 hover:text-lime-100"
-                  >
-                    {showSourceLogId === log.id ? "Hide source log" : `Source log ${logIndex + 1}`}
-                  </button>
-                </div>
-                <div className="mt-3 grid gap-2 md:grid-cols-3">
-                  <CampaignFactCard
-                    label="Meks involved"
-                    value={String((log.unitDamage ?? []).length)}
-                  />
-                  <CampaignFactCard
-                    label="Armor damage"
-                    value={String(damageSummary.armor)}
-                  />
-                  <CampaignFactCard
-                    label="Internal"
-                    value={String(damageSummary.internal)}
-                  />
-                  <CampaignFactCard
-                    label="Weapons / components"
-                    value={`${damageSummary.weapons} / ${damageSummary.components}`}
-                  />
-                  <CampaignFactCard
-                    label="Engine / gyro"
-                    value={`${damageSummary.engineHits} / ${damageSummary.gyroHits}`}
-                  />
-                  <CampaignFactCard
-                    label="Ammo spent"
-                    value={String(damageSummary.ammo)}
-                  />
-                  <CampaignFactCard
-                    label="Kills made"
-                    value={String(damageSummary.kills)}
-                  />
-                </div>
-                {showSourceLogId === log.id && (
-                  <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
-                    <table className="min-w-full text-left text-xs">
-                      <thead className="border-b border-zinc-800 bg-zinc-950/80 uppercase tracking-[0.14em] text-zinc-500">
-                        <tr>
-                          <th className="px-3 py-2">Unit</th>
-                          <th className="px-3 py-2">Pilot</th>
-                          <th className="px-3 py-2">Status</th>
-                          <th className="px-3 py-2 text-right">Damage Summary</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-800/80">
-                        {(log.unitDamage ?? []).map((unit: any) => {
-                          const summary = unit.damageSummary ?? summarizeUnitDamage(unit);
-                          return (
-                            <tr key={unit.campaignForceUnitId}>
-                              <td className="px-3 py-2 font-black text-zinc-100">{unit.unitName ?? unit.campaignForceUnitId}</td>
-                              <td className="px-3 py-2 text-zinc-300">{unit.pilotName ?? "—"}</td>
-                              <td className="px-3 py-2 text-zinc-300">{unit.status ?? "—"}</td>
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/45">
+                <table className="min-w-full text-left text-xs">
+                  <thead className="border-b border-zinc-800 bg-zinc-950/80 uppercase tracking-[0.14em] text-zinc-500">
+                    <tr>
+                      <th className="px-3 py-2">Unit</th>
+                      <th className="px-3 py-2">Pilot</th>
+                      <th className="px-3 py-2">Status</th>
+                      <th className="px-3 py-2">Kills</th>
+                      {isChaos ? (
+                        <th className="px-3 py-2">Pilot Wounds</th>
+                      ) : (
+                        <th className="px-3 py-2 text-right">Damage Summary</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/80">
+                    {(log.unitDamage ?? []).length ? (
+                      (log.unitDamage ?? []).map((unit: any) => {
+                        const summary = unit.damageSummary ?? summarizeUnitDamage(unit);
+                        return (
+                          <tr key={unit.campaignForceUnitId}>
+                            <td className="px-3 py-2 font-black text-zinc-100">{unit.unitName ?? unit.campaignForceUnitId}</td>
+                            <td className="px-3 py-2 text-zinc-300">{unit.pilotName ?? "—"}</td>
+                            <td className="px-3 py-2 text-zinc-300">{unit.status ?? "—"}</td>
+                            <td className="px-3 py-2 text-zinc-300">{unit.killsMade ?? 0}</td>
+                            {isChaos ? (
+                              <td className="px-3 py-2 text-zinc-300">{unit.pilotDamage ?? 0}</td>
+                            ) : (
                               <td className="px-3 py-2 text-right text-zinc-400">
                                 {summary.armor} armor · {summary.internal} internal · {summary.weapons} weapons · {summary.components} components · {summary.engineHits} engine · {summary.gyroHits} gyro · {summary.limbs} limbs
                               </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                            )}
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-3 py-4 text-center text-zinc-500">
+                          No participating units recorded for this source log.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            );
-          })}
-          {!logs.length && (
-            <p className="text-sm text-zinc-400">
-              No submitted logs are attached to this battle yet.
-            </p>
-          )}
+            </div>
+          ))}
+          {!logs.length && <p className="text-sm text-zinc-400">No submitted logs are attached to this battle yet.</p>}
         </div>
       </div>
     </div>
   );
+}
+
+
+function getBattleOutcomeSummary(battle: Battle) {
+  const logs = ((battle as any).battleLogs ?? []) as Array<Record<string, any>>;
+  const directWinner = (battle as any).winnerUserId as string | undefined;
+  const directLoser = (battle as any).loserUserId as string | undefined;
+
+  const winningLog = logs.find((log) => log.outcome === "Victory");
+  const losingLog = logs.find((log) => log.outcome === "Defeat");
+  const fieldLog = logs.find((log) => Boolean(log.controlsField));
+
+  const victorUserId =
+    directWinner ??
+    winningLog?.userId ??
+    (battle.outcome === "Victory"
+      ? (battle as any).submittedByUserId
+      : battle.outcome === "Defeat"
+        ? (battle as any).opponentUserId
+        : undefined);
+
+  const defeatedUserId =
+    directLoser ??
+    losingLog?.userId ??
+    (victorUserId
+      ? logs.find((log) => log.userId && log.userId !== victorUserId)?.userId ??
+        ((battle as any).submittedByUserId === victorUserId
+          ? (battle as any).opponentUserId
+          : (battle as any).submittedByUserId)
+      : undefined);
+
+  const fieldHolderUserId =
+    (battle as any).fieldHolderUserId ??
+    fieldLog?.userId ??
+    (battle.controlsField
+      ? (battle as any).submittedByUserId
+      : (battle as any).opponentUserId);
+
+  return { victorUserId, defeatedUserId, fieldHolderUserId };
+}
+
+function isUserInvolvedInBattle(battle: Battle, userId: string) {
+  if (!userId) return false;
+  if ((battle as any).submittedByUserId === userId) return true;
+  if ((battle as any).opponentUserId === userId) return true;
+  if ((battle as any).winnerUserId === userId) return true;
+  if ((battle as any).loserUserId === userId) return true;
+  return (((battle as any).battleLogs ?? []) as Array<Record<string, any>>).some(
+    (log) => log.userId === userId || log.opponentUserId === userId,
+  );
+}
+
+function formatControlSwingValue(battle: Battle) {
+  const direct = Number((battle as any).controlChangePercent);
+  const breakdown = ((battle as any).controlSwingBreakdown ?? {}) as Record<string, unknown>;
+  const fallback = Number(breakdown.actualSwing ?? breakdown.rawSwing ?? 0);
+  const value = Number.isFinite(direct) && direct > 0 ? direct : Number.isFinite(fallback) ? fallback : 0;
+  const label = `${Number(value).toFixed(value % 1 === 0 ? 0 : 2)}%`;
+  return battle.status === "AwaitingOpponent" ? `Potential ${label}` : label;
 }
 
 function summarizeBattleLogDamage(unitDamage: any[]) {
@@ -3813,8 +4046,20 @@ function ActiveCampaignDashboard({
                               {forceUnitDisplayName(forceUnit)}
                             </td>
                             <td className="px-4 py-3 text-zinc-300">
-                              <div className="font-semibold">
-                                {forceUnit.pilot?.name || "Unnamed Pilot"}
+                              <div
+                                className={`font-semibold ${forceUnit.pilot?.dead ? "text-red-300 line-through decoration-red-300 decoration-2" : ""}`}
+                                title={forceUnit.pilot?.dead ? "Pilot killed in action" : undefined}
+                              >
+                                {forceUnit.pilot?.name || "No pilot assigned"}
+                                {forceUnit.pilot?.dead ? (
+                                  <span className="ml-2 rounded-full border border-red-400/40 bg-red-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-red-200 no-underline">
+                                    KIA
+                                  </span>
+                                ) : Number(forceUnit.pilot?.wounds ?? 0) > 0 ? (
+                                  <span className="ml-2 rounded-full border border-orange-400/40 bg-orange-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-orange-200">
+                                    {forceUnit.pilot?.wounds} wound{Number(forceUnit.pilot?.wounds ?? 0) === 1 ? "" : "s"}
+                                  </span>
+                                ) : null}
                               </div>
                               <div className="text-xs text-zinc-500">
                                 {forceUnit.pilot?.gunnery ?? 4}/
@@ -4670,11 +4915,13 @@ function RadioCard({
 
 function MiniFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 px-3 py-2">
+    <div className="flex min-h-[4.25rem] flex-col justify-center rounded-2xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-left">
       <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </div>
-      <div className="mt-1 truncate font-semibold text-zinc-200">{value}</div>
+      <div className="mt-1 min-h-[1.25rem] truncate text-sm font-semibold leading-5 text-zinc-200" title={value}>
+        {value}
+      </div>
     </div>
   );
 }

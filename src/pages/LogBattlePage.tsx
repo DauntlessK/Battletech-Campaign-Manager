@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   FileText,
+  Info,
+  MapPin,
   Save,
   Swords,
   XCircle,
@@ -25,10 +27,12 @@ type UnitStatusLabel = "Ready" | "Damaged" | "Crippled" | "Destroyed";
 
 type UnitDamageDraft = CampaignUnitDamageOverlay & {
   saved?: boolean;
-  chaosCondition?: "ready" | "damaged" | "destroyed";
+  chaosCondition?: "ready" | "damaged" | "crippled" | "destroyed";
 };
 
 type BattleLogPayload = {
+  battleId?: string;
+  sourceLogId?: string;
   date: string;
   opponentUserId?: string;
   objectiveId?: string;
@@ -50,8 +54,11 @@ type BattleLogPrefill = Partial<
     | "outcome"
     | "controlsField"
     | "summary"
+    | "battleId"
+    | "sourceLogId"
+    | "unitDamage"
   >
->;
+> & { editingSourceLog?: boolean };
 
 export default function LogBattlePage({
   campaign,
@@ -92,7 +99,7 @@ export default function LogBattlePage({
   const forceUnits = force?.forceUnits ?? [];
 
   const [battleDate, setBattleDate] = useState(
-    () => initialValues?.date ?? new Date().toISOString().slice(0, 10),
+    () => toInputDate(initialValues?.date) ?? new Date().toISOString().slice(0, 10),
   );
   const [opponentUserId, setOpponentUserId] = useState(
     initialValues?.opponentUserId ??
@@ -114,6 +121,7 @@ export default function LogBattlePage({
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [battleNotes, setBattleNotes] = useState(initialValues?.summary ?? "");
+  const isEditingSourceLog = Boolean(initialValues?.battleId && initialValues?.sourceLogId);
   const totalKillsMade = Object.values(damageDrafts).reduce(
     (sum: number, draft: UnitDamageDraft) =>
       sum + Number(draft.killsMade ?? 0),
@@ -128,7 +136,7 @@ export default function LogBattlePage({
 
   useEffect(() => {
     if (!initialValues) return;
-    setBattleDate(initialValues.date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
+    setBattleDate(toInputDate(initialValues.date) ?? new Date().toISOString().slice(0, 10));
     setOpponentUserId(
       initialValues.opponentUserId ??
         (acceptedOpponents.length === 1 ? acceptedOpponents[0].userId : ""),
@@ -137,7 +145,18 @@ export default function LogBattlePage({
     setOutcome(initialValues.outcome ?? "Victory");
     setControlsField(Boolean(initialValues.controlsField));
     setBattleNotes(initialValues.summary ?? "");
-  }, [initialValues, acceptedOpponents, objectives]);
+    if (Array.isArray((initialValues as any).unitDamage)) {
+      const nextParticipating = new Set<string>();
+      const nextDrafts: Record<string, UnitDamageDraft> = {};
+      ((initialValues as any).unitDamage as CampaignUnitDamageOverlay[]).forEach((overlay) => {
+        if (!overlay?.campaignForceUnitId) return;
+        nextParticipating.add(overlay.campaignForceUnitId);
+        nextDrafts[overlay.campaignForceUnitId] = damageOverlayToDraft(overlay, isChaos);
+      });
+      setParticipatingIds(nextParticipating);
+      setDamageDrafts(nextDrafts);
+    }
+  }, [initialValues, acceptedOpponents, objectives, isChaos]);
 
   const selectedUnit =
     forceUnits.find((unit) => unit.id === selectedUnitId) ?? null;
@@ -148,7 +167,7 @@ export default function LogBattlePage({
     selectedUnit && selectedDraft
       ? validateDamageDraft(selectedUnit, selectedDraft)
       : [];
-  const needsDamageSave = !isChaos;
+  const needsDamageSave = true;
   const participatingUnits = forceUnits.filter((unit) =>
     participatingIds.has(unit.id),
   );
@@ -181,11 +200,11 @@ export default function LogBattlePage({
             [forceUnit.id]: createBlankDamageDraft(forceUnit, isChaos),
           };
     });
-    if (checked && !isChaos) setSelectedUnitId(forceUnit.id);
+    if (checked) setSelectedUnitId(forceUnit.id);
   };
 
   const openUnitDamage = (forceUnit: ForceUnit) => {
-    if (isChaos || !participatingIds.has(forceUnit.id)) return;
+    if (!participatingIds.has(forceUnit.id)) return;
     setSelectedUnitId(forceUnit.id);
   };
 
@@ -223,6 +242,8 @@ export default function LogBattlePage({
       return sanitizeDamageDraft(draft, isChaos, forceUnit);
     });
     const created = await onSubmit(campaign.id, {
+      battleId: initialValues?.battleId,
+      sourceLogId: initialValues?.sourceLogId,
       date: battleDate,
       opponentUserId,
       objectiveId: isConquest ? undefined : objective?.id,
@@ -244,19 +265,43 @@ export default function LogBattlePage({
   return (
     <section className="space-y-5">
       <PageTitle
-        eyebrow="Campaign Battle Log"
-        title={`Log Battle · ${campaign.name}`}
-        description="Record battle metadata, participating units, and campaign damage overlays. The opponent will be notified after submission."
+        eyebrow={isEditingSourceLog ? "Edit Battle Source Log" : "Campaign Battle Log"}
+        title={`${isEditingSourceLog ? "Edit Battle Log" : "Log Battle"} · ${campaign.name}`}
+        description={
+          isEditingSourceLog
+            ? "Revise this submitted source log and resubmit it for validation against the opponent’s log."
+            : "Record battle metadata, participating units, and campaign damage overlays. The opponent will be notified after submission."
+        }
         actions={
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
-          >
-            <ArrowLeft size={16} /> Back to Campaign Dashboard
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-lime-400/40 hover:text-lime-200"
+            >
+              <ArrowLeft size={16} /> Back to Campaign Dashboard
+            </button>
+            {isEditingSourceLog && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-500/40 bg-red-950/30 px-4 py-2 text-sm font-semibold text-red-100 transition hover:border-red-400/70"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
         }
       />
+
+      {isEditingSourceLog && (
+        <div className="rounded-3xl border border-orange-400/40 bg-orange-500/10 p-4 text-sm text-orange-100">
+          <div className="font-black">Editing an existing source log</div>
+          <p className="mt-1 text-orange-100/80">
+            Save this log again to resubmit it. If the corrected fields now match the opponent’s log, the battle can move out of dispute.
+          </p>
+        </div>
+      )}
 
       <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
@@ -396,7 +441,7 @@ export default function LogBattlePage({
                           : "";
                       const rowState = !participated
                         ? "neutral"
-                        : isChaos || draft?.saved
+                        : draft?.saved
                           ? "saved"
                           : "needs";
                       return (
@@ -413,7 +458,7 @@ export default function LogBattlePage({
                           )}
                           <tr
                             onClick={() => openUnitDamage(forceUnit)}
-                            className={`${rowState === "needs" ? "bg-red-950/30" : rowState === "saved" ? "bg-lime-950/20" : ""} ${participated && !isChaos ? "cursor-pointer" : ""} transition hover:bg-zinc-900/70`}
+                            className={`${rowState === "needs" ? "bg-red-950/30" : rowState === "saved" ? "bg-lime-950/20" : ""} ${participated ? "cursor-pointer" : ""} transition hover:bg-zinc-900/70`}
                           >
                             <td className="px-4 py-3">
                               <input
@@ -451,7 +496,7 @@ export default function LogBattlePage({
                               )}
                             </td>
                             <td className="px-4 py-3">
-                              {isChaos && participated ? (
+                              {isChaos && participated && draft?.saved ? (
                                 <select
                                   onClick={(event) => event.stopPropagation()}
                                   value={draft?.chaosCondition ?? "ready"}
@@ -466,7 +511,7 @@ export default function LogBattlePage({
                                           )),
                                         chaosCondition: event.target
                                           .value as any,
-                                        saved: true,
+                                        saved: false,
                                       },
                                     }))
                                   }
@@ -474,10 +519,11 @@ export default function LogBattlePage({
                                 >
                                   <option value="ready">Ready</option>
                                   <option value="damaged">Damaged</option>
+                                  <option value="crippled">Crippled</option>
                                   <option value="destroyed">Destroyed</option>
                                 </select>
                               ) : rowState === "needs" ? (
-                                <StatusPill color="red" label={unitHasAmmo(forceUnit) ? "Damage/ammo needed" : "Damage needed"} />
+                                <StatusPill color="red" label={isChaos ? "Kills/wounds needed" : unitHasAmmo(forceUnit) ? "Damage/ammo needed" : "Damage needed"} />
                               ) : rowState === "saved" ? (
                                 <StatusPill
                                   color="green"
@@ -510,6 +556,15 @@ export default function LogBattlePage({
         </div>
       </section>
 
+      {isChaos && selectedUnit && selectedDraft && (
+        <ChaosDamageEditor
+          forceUnit={selectedUnit}
+          draft={selectedDraft}
+          onChange={updateSelectedDraft}
+          onSave={saveSelectedDamage}
+        />
+      )}
+
       {!isChaos && selectedUnit && selectedDraft && (
         <DamageEditor
           forceUnit={selectedUnit}
@@ -538,7 +593,7 @@ export default function LogBattlePage({
             onClick={submitBattleLog}
             className="rounded-2xl bg-lime-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Log Battle"}
+            {submitting ? "Submitting..." : isEditingSourceLog ? "Resubmit Battle Log" : "Log Battle"}
           </button>
         </div>
         {(error || submitMessage) && (
@@ -620,6 +675,128 @@ function BattleNotesModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function ChaosDamageEditor({
+  forceUnit,
+  draft,
+  onChange,
+  onSave,
+}: {
+  forceUnit: ForceUnit;
+  draft: UnitDamageDraft;
+  onChange: (update: (draft: UnitDamageDraft) => UnitDamageDraft) => void;
+  onSave: () => void;
+}) {
+  return (
+    <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">
+              Chaos Battle Result
+            </div>
+            <h2 className="mt-1 text-xl font-black text-zinc-50">
+              {forceUnitDisplayName(forceUnit)}
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Pilot: {forceUnit.pilot?.name || "Unnamed Pilot"}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-2 py-1">
+              <span className="text-xs font-black uppercase tracking-[0.16em] text-zinc-500">
+                Pilot Kills
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange((current) => ({
+                    ...current,
+                    saved: false,
+                    killsMade: Math.max(0, Number(current.killsMade ?? 0) - 1),
+                  }))
+                }
+                className="grid h-7 w-7 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
+              >
+                −
+              </button>
+              <span className="min-w-6 text-center text-sm font-black text-zinc-100">
+                {draft.killsMade ?? 0}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange((current) => ({
+                    ...current,
+                    saved: false,
+                    killsMade: Number(current.killsMade ?? 0) + 1,
+                  }))
+                }
+                className="grid h-7 w-7 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
+              >
+                +
+              </button>
+            </div>
+            <div className="text-xs font-black uppercase tracking-[0.16em] text-zinc-500">
+              Pilot Wounds
+            </div>
+            <div className="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-950 p-1">
+              {PILOT_DAMAGE_OPTIONS.map((value) => (
+                <button
+                  key={String(value)}
+                  type="button"
+                  title={`Pilot wounds: ${value}`}
+                  onClick={() =>
+                    onChange((current) => ({
+                      ...current,
+                      saved: false,
+                      pilotDamage: value,
+                    }))
+                  }
+                  className={`h-8 min-w-8 rounded-lg px-2 text-xs font-black transition ${draft.pilotDamage === value ? "bg-red-500 text-white" : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"}`}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={draft.chaosCondition ?? draft.chaos?.condition ?? "ready"}
+                onChange={(event) =>
+                  onChange((current) => ({
+                    ...current,
+                    saved: false,
+                    chaosCondition: event.target.value as any,
+                    chaos: { condition: event.target.value as any },
+                  }))
+                }
+                className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100"
+              >
+                <option value="ready">Ready</option>
+                <option value="damaged">Damaged</option>
+                <option value="crippled">Crippled</option>
+                <option value="destroyed">Destroyed</option>
+              </select>
+              <span
+                className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-400"
+                title="Crippled follows forced-withdrawal style conditions: two engine critical hits, two destroyed limbs including at least one leg, or one destroyed torso. For Chaos campaigns, select Crippled manually when the unit should withdraw but is not destroyed."
+              >
+                <Info size={15} />
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onSave}
+              className="inline-flex items-center gap-2 rounded-xl bg-lime-400 px-3 py-2 text-xs font-black text-zinc-950 transition hover:bg-lime-300"
+            >
+              <Save size={15} /> Save Chaos Result
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -788,27 +965,26 @@ function DamageEditor({
         {locations.map((location) => renderLocation(location))}
       </div>
 
-      <div className="mt-5 hidden xl:block">
-        <div className="grid grid-cols-[minmax(160px,1fr)_minmax(180px,1.05fr)_minmax(180px,1.05fr)_minmax(180px,1.05fr)_minmax(160px,1fr)] gap-3">
-          <div />
-          <div />
-          <div className="-mt-4">
-            {renderLocation(byName.head, { head: true })}
+      <div className="mt-5 hidden min-w-0 w-full max-w-full xl:block">
+        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
+          <div className="space-y-3 pt-20 2xl:pt-10">
+            {renderLocation(byName.leftArm)}
           </div>
-          <div />
-          <div />
-
-          <div>{renderLocation(byName.leftArm)}</div>
-          <div>{renderLocation(byName.leftTorso, { tall: true })}</div>
-          <div>{renderLocation(byName.centerTorso, { tall: true })}</div>
-          <div>{renderLocation(byName.rightTorso, { tall: true })}</div>
-          <div>{renderLocation(byName.rightArm)}</div>
-
-          <div />
-          <div>{renderLocation(byName.leftLeg)}</div>
-          <div />
-          <div>{renderLocation(byName.rightLeg)}</div>
-          <div />
+          <div className="space-y-3">
+            {renderLocation(byName.leftTorso, { tall: true })}
+            {renderLocation(byName.leftLeg)}
+          </div>
+          <div className="space-y-3">
+            {renderLocation(byName.head, { head: true })}
+            {renderLocation(byName.centerTorso, { tall: true })}
+          </div>
+          <div className="space-y-3">
+            {renderLocation(byName.rightTorso, { tall: true })}
+            {renderLocation(byName.rightLeg)}
+          </div>
+          <div className="space-y-3 pt-20 2xl:pt-10">
+            {renderLocation(byName.rightArm)}
+          </div>
         </div>
       </div>
 
@@ -892,42 +1068,48 @@ function DamageLocationCard({
     });
   };
 
+  const visibleSlots = head ? (location.slots ?? []).slice(0, 6) : (location.slots ?? []);
+  const occupiedSlots = visibleSlots.filter((slot) => !isEmptySlot(slot)).length;
+
   return (
-    <div
-      className={`rounded-2xl border p-4 ${locationDestroyed ? "border-red-400 border-dashed bg-red-950/30" : "border-zinc-800 bg-zinc-950/50"} ${head ? "xl:min-h-0" : ""} ${tall ? "xl:min-h-[22rem]" : ""}`}
+    <article
+      className={`min-w-0 rounded-3xl border p-3 ${locationDestroyed ? "border-red-400 border-dashed bg-red-950/30" : "border-zinc-800 bg-zinc-950/70"} ${head ? "xl:min-h-0" : ""} ${tall ? "xl:min-h-[520px]" : ""}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-black text-zinc-100">{location.name}</h3>
-          <p className="text-xs text-zinc-500">
-            Current armor/internal after battle
-          </p>
+      <div className="mb-3 text-center">
+        <div className="mx-auto mb-1 grid h-7 w-7 place-items-center rounded-xl bg-lime-400/10 text-lime-300">
+          <MapPin size={15} />
         </div>
-        <div className="flex flex-wrap justify-end gap-1">
+        <h3 className="text-base font-black text-zinc-50">{location.name}</h3>
+        <p className="text-[11px] text-zinc-500">
+          {occupiedSlots}/{visibleSlots.length} slots occupied
+        </p>
+      </div>
+
+      <div className="mb-3 flex flex-wrap justify-center gap-1">
+        <ToggleMini
+          active={Boolean(state.destroyed)}
+          label="Destroyed"
+          onClick={() =>
+            setLocationState(state.destroyed ? "reset" : "destroyed")
+          }
+        />
+        {canBeBlownOff && (
           <ToggleMini
-            active={Boolean(state.destroyed)}
-            label="Destroyed"
+            active={Boolean(state.missing)}
+            label="Blown Off"
             onClick={() =>
-              setLocationState(state.destroyed ? "reset" : "destroyed")
+              setLocationState(state.missing ? "reset" : "missing")
             }
           />
-          {canBeBlownOff && (
-            <ToggleMini
-              active={Boolean(state.missing)}
-              label="Blown Off"
-              onClick={() =>
-                setLocationState(state.missing ? "reset" : "missing")
-              }
-            />
-          )}
-          <ToggleMini
-            active={false}
-            label="Reset"
-            onClick={() => setLocationState("reset")}
-          />
-        </div>
+        )}
+        <ToggleMini
+          active={false}
+          label="Reset"
+          onClick={() => setLocationState("reset")}
+        />
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
+
+      <div className={`mb-4 grid gap-2 ${location.rearArmor ? "grid-cols-3" : "grid-cols-2"}`}>
         <HealthStepper
           label="Armor"
           value={getCurrentArmor(location, state)}
@@ -961,8 +1143,8 @@ function DamageLocationCard({
           }
         />
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3">
-        {(location.slots ?? []).map((slot) => {
+      <div className="grid grid-cols-1 gap-1.5">
+        {visibleSlots.map((slot) => {
           const empty = isEmptySlot(slot);
           const damaged = state.damagedSlots?.includes(slot.slot) ?? false;
           const destroyed = state.destroyedSlots?.includes(slot.slot) ?? false;
@@ -983,20 +1165,23 @@ function DamageLocationCard({
                   ),
                 }))
               }
-              className={`rounded-xl border px-2 py-2 text-left text-xs transition ${empty ? "cursor-not-allowed border-zinc-800 bg-zinc-950/80 text-zinc-700" : destroyed ? "border-red-400/70 bg-red-500/25 text-red-100" : damaged ? "border-orange-400/60 bg-orange-500/15 text-orange-100" : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-lime-400/40 hover:text-zinc-100"}`}
+              className={`grid grid-cols-[26px_minmax(0,1fr)_64px] items-center gap-2 rounded-xl border px-2 py-1.5 text-xs transition ${empty ? "cursor-not-allowed border-zinc-800 bg-zinc-950/50 text-zinc-600" : destroyed ? "border-red-400/70 bg-red-500/25 text-red-100" : damaged ? "border-orange-400/60 bg-orange-500/15 text-orange-100" : `${slotClass(slot.type)} hover:border-lime-400/40`}`}
             >
-              <div className="font-black">
-                {slot.slot}. {slot.item || "Empty"}
-              </div>
-              <div className="text-[10px] uppercase tracking-wide opacity-70">
+              <span className="text-center font-mono text-zinc-500">
+                {slot.slot.toString().padStart(2, "0")}
+              </span>
+              <span className="truncate text-left font-semibold">
+                {slot.item || "Empty"}
+              </span>
+              <span className="rounded-lg bg-black/20 px-1.5 py-1 text-center text-[10px] font-black uppercase tracking-wider opacity-80">
                 {empty
-                  ? "Empty"
+                  ? "—"
                   : destroyed
-                    ? "Destroyed"
+                    ? "DEST"
                     : damaged
-                      ? "Repair needed"
-                      : (slot.type ?? "slot")}
-              </div>
+                      ? "REPR"
+                      : slotTypeLabel(slot.type)}
+              </span>
             </button>
           );
         })}
@@ -1006,7 +1191,7 @@ function DamageLocationCard({
           No critical components in this location.
         </div>
       )}
-    </div>
+    </article>
   );
 }
 
@@ -1106,11 +1291,11 @@ function HealthStepper({
   const next = (delta: number) =>
     onChange(Math.max(0, Math.min(max, value + delta)));
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-2">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-2 text-center">
       <div className="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500">
         {label}
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2">
+      <div className="mt-2 grid grid-cols-[1.75rem_minmax(3.25rem,1fr)_1.75rem] items-center gap-1">
         <button
           type="button"
           onClick={() => next(-1)}
@@ -1118,7 +1303,7 @@ function HealthStepper({
         >
           −
         </button>
-        <span className="text-sm font-black text-zinc-100">
+        <span className="min-w-0 text-center text-sm font-black leading-7 text-zinc-100 tabular-nums">
           {value}/{max}
         </span>
         <button
@@ -1207,7 +1392,7 @@ function createBlankDamageDraft(
     participated: true,
     pilotDamage: 0,
     killsMade: 0,
-    saved: isChaos,
+    saved: false,
     chaosCondition: "ready",
     chaos: isChaos ? { condition: "ready" } : undefined,
     detailed: isChaos
@@ -1342,10 +1527,10 @@ function getUnitStatus(
   isChaos: boolean,
 ): UnitStatusLabel {
   if (isChaos) {
-    if ((draft.chaosCondition ?? draft.chaos?.condition) === "destroyed")
-      return "Destroyed";
-    if ((draft.chaosCondition ?? draft.chaos?.condition) === "damaged")
-      return "Damaged";
+    const chaosCondition = draft.chaosCondition ?? draft.chaos?.condition;
+    if (chaosCondition === "destroyed") return "Destroyed";
+    if (chaosCondition === "crippled") return "Crippled";
+    if (chaosCondition === "damaged") return "Damaged";
     return "Ready";
   }
   const locations = draft.detailed?.locations ?? {};
@@ -1533,6 +1718,40 @@ function isEmptySlot(slot: { item?: string; type?: string }) {
   return !item || item === "empty" || slot.type === "empty";
 }
 
+function slotTypeLabel(type?: string) {
+  switch (type) {
+    case "weapon":
+      return "WPN";
+    case "ammo":
+      return "AMM";
+    case "engine":
+      return "ENG";
+    case "structure":
+      return "STR";
+    case "equipment":
+      return "EQP";
+    default:
+      return "—";
+  }
+}
+
+function slotClass(type?: string) {
+  switch (type) {
+    case "weapon":
+      return "border-lime-400/30 bg-lime-400/10 text-lime-100";
+    case "ammo":
+      return "border-orange-300/25 bg-orange-300/10 text-orange-100";
+    case "engine":
+      return "border-sky-300/25 bg-sky-300/10 text-sky-100";
+    case "structure":
+      return "border-zinc-600 bg-zinc-900 text-zinc-300";
+    case "equipment":
+      return "border-violet-300/25 bg-violet-300/10 text-violet-100";
+    default:
+      return "border-zinc-800 bg-zinc-950/50 text-zinc-600";
+  }
+}
+
 function findByName(locations: UnitLocation[], name: string) {
   const normalized = name.toLowerCase();
   return (
@@ -1622,7 +1841,8 @@ function getAmmoPools(forceUnit: ForceUnit): Array<{ key: string; label: string;
 }
 
 function friendlyAmmoLabel(value: string): string {
-  const cleaned = value
+  let cleaned = value
+    .replace(/[_-]+/g, " ")
     .replace(/^clan\s+/i, "")
     .replace(/^is\s+/i, "")
     .replace(/^ammo\s+/i, "")
@@ -1630,6 +1850,17 @@ function friendlyAmmoLabel(value: string): string {
     .replace(/\s+/g, " ")
     .trim();
   if (!cleaned) return "Ammo";
+  cleaned = cleaned
+    .replace(/\bac\s*(\d+)\b/i, "AC/$1")
+    .replace(/\bultra\s+ac\s*(\d+)\b/i, "Ultra AC/$1")
+    .replace(/\blb\s*(\d+)x\b/i, "LB $1-X")
+    .replace(/\bsrm\s*(\d+)\b/i, "SRM-$1")
+    .replace(/\blrm\s*(\d+)\b/i, "LRM-$1")
+    .replace(/\bmrm\s*(\d+)\b/i, "MRM-$1")
+    .replace(/\bstreak\s+srm\s*(\d+)\b/i, "Streak SRM-$1")
+    .replace(/\bgauss\b/i, "Gauss")
+    .replace(/\bmg\b/i, "Machine Gun");
+  cleaned = cleaned.replace(/\b(ac|srm|lrm|mrm|ppc|lb|atm|lbx)\b/gi, (match) => match.toUpperCase());
   return `${cleaned} Ammo`;
 }
 
@@ -1651,6 +1882,31 @@ function getPriorAmmoSpent(forceUnit: ForceUnit): Record<string, number> {
     (forceUnit as any).damageState ??
     (forceUnit as any).currentDamage;
   return { ...(overlay?.detailed?.ammoSpent ?? {}) };
+}
+
+function toInputDate(value?: string): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  const iso = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (iso) return iso[1];
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function damageOverlayToDraft(
+  overlay: CampaignUnitDamageOverlay,
+  isChaos: boolean,
+): UnitDamageDraft {
+  return {
+    ...overlay,
+    saved: true,
+    chaosCondition: overlay.chaos?.condition ?? "ready",
+    detailed: isChaos ? undefined : (overlay.detailed ?? { locations: {} }),
+  };
 }
 
 function formatNumber(value: unknown, fallback = "—"): string {
