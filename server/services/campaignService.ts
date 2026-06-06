@@ -433,6 +433,49 @@ export async function updateCampaign(
   return withUserCampaignState(campaign, userId, store);
 }
 
+export async function updateCampaignPlayerColors(
+  campaignId: string,
+  userId: string,
+  colors: Record<string, string>,
+): Promise<Campaign> {
+  const store = await loadStore();
+  const campaign = store.campaigns.find((candidate) => candidate.id === campaignId);
+  if (!campaign) throw new Error("Campaign not found.");
+  if (campaign.ownerId !== userId) {
+    throw new Error("Only the campaign owner can change player colors.");
+  }
+  if (!colors || typeof colors !== "object" || Array.isArray(colors)) {
+    throw new Error("Player colors are required.");
+  }
+
+  const acceptedParticipants = store.campaignParticipants.filter(
+    (participant) =>
+      participant.campaignId === campaignId && participant.status === "Accepted",
+  );
+  const acceptedIds = new Set(acceptedParticipants.map((participant) => participant.userId));
+  const chosenColors = new Set<string>();
+
+  for (const [participantUserId, color] of Object.entries(colors)) {
+    if (!acceptedIds.has(participantUserId)) continue;
+    if (!CAMPAIGN_PLAYER_COLORS.has(color)) {
+      throw new Error("Choose one of the supported campaign player colors.");
+    }
+    if (chosenColors.has(color)) {
+      throw new Error("Each campaign player must have a different color.");
+    }
+    chosenColors.add(color);
+  }
+
+  for (const participant of acceptedParticipants) {
+    const color = colors[participant.userId];
+    if (color) participant.color = color;
+  }
+
+  campaign.updatedAt = new Date().toISOString();
+  await saveStore(store);
+  return withUserCampaignState(campaign, userId, store);
+}
+
 export async function setCampaignForce(
   campaignId: string,
   userId: string,

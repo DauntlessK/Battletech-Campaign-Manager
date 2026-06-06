@@ -12,6 +12,7 @@ import {
   setCampaignForce,
   uninviteCampaignParticipant,
   updateCampaign,
+  updateCampaignPlayerColors,
 } from "../services/campaignService";
 
 const router = express.Router();
@@ -69,6 +70,25 @@ router.post("/:id/begin", requireAuth, async (req: RequestWithUser, res) => {
   } catch (error) {
     console.error("[routes/campaigns] Begin campaign failed:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.patch("/:id/player-colors", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+
+    const campaign = await updateCampaignPlayerColors(
+      req.params.id,
+      user.id,
+      req.body?.colors ?? {},
+    );
+    res.json(campaign);
+  } catch (error) {
+    console.error("[routes/campaigns] Update player colors failed:", error);
+    res.status(400).json({
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 });
 

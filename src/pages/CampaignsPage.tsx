@@ -484,6 +484,7 @@ export default function CampaignsPage({
   assignForceLoading = false,
   assignForceError,
   onUpdateCampaign,
+  onUpdateCampaignPlayerColors,
   onAssignForceToCampaign,
   onBeginCampaign,
   onInviteFriendToCampaign,
@@ -519,6 +520,10 @@ export default function CampaignsPage({
       description?: string;
       settings?: Partial<CampaignSettings>;
     },
+  ) => Promise<Campaign | null>;
+  onUpdateCampaignPlayerColors: (
+    campaignId: string,
+    colors: Record<string, string>,
   ) => Promise<Campaign | null>;
   onAssignForceToCampaign: (
     campaignId: string,
@@ -1233,6 +1238,7 @@ export default function CampaignsPage({
               loadFormFromCampaign(selectedCampaign);
               setEditingFluff(true);
             }}
+            onUpdatePlayerColors={onUpdateCampaignPlayerColors}
           />
           {editingFluff && (
             <CampaignFluffModal
@@ -3695,6 +3701,7 @@ function ActiveCampaignDashboard({
   awaitingBattleLog,
   onStartAwaitingBattleLog,
   onOpenFluff,
+  onUpdatePlayerColors,
 }: {
   campaign: Campaign;
   force?: Force;
@@ -3708,6 +3715,10 @@ function ActiveCampaignDashboard({
   awaitingBattleLog?: Battle | null;
   onStartAwaitingBattleLog: () => void;
   onOpenFluff: () => void;
+  onUpdatePlayerColors: (
+    campaignId: string,
+    colors: Record<string, string>,
+  ) => Promise<Campaign | null>;
 }) {
   const settings = campaign.settings;
   const acceptedPlayers = sortPlayersForControl(
@@ -3993,7 +4004,6 @@ function ActiveCampaignDashboard({
               {force?.name ?? "No force assigned"}
             </h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Campaign-specific force copy status.
             </p>
           </div>
 
@@ -4126,6 +4136,8 @@ function ActiveCampaignDashboard({
       {detailsOpen && (
         <CampaignDetailsModal
           campaign={campaign}
+          isCampaignOwner={isCampaignOwner}
+          onUpdatePlayerColors={onUpdatePlayerColors}
           onClose={() => setDetailsOpen(false)}
         />
       )}
@@ -4173,12 +4185,51 @@ function campaignTurnLabel(campaign: Campaign) {
 
 function CampaignDetailsModal({
   campaign,
+  isCampaignOwner,
+  onUpdatePlayerColors,
   onClose,
 }: {
   campaign: Campaign;
+  isCampaignOwner: boolean;
+  onUpdatePlayerColors: (
+    campaignId: string,
+    colors: Record<string, string>,
+  ) => Promise<Campaign | null>;
   onClose: () => void;
 }) {
   const settings = campaign.settings;
+  const acceptedPlayers = (campaign.participants ?? []).filter(
+    (participant) => participant.status === "Accepted",
+  );
+  const [playerColors, setPlayerColors] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      acceptedPlayers.map((participant, index) => [
+        participant.userId,
+        getPlayerColor(participant, index),
+      ]),
+    ),
+  );
+  const [savingColors, setSavingColors] = useState(false);
+  const [colorError, setColorError] = useState<string | null>(null);
+  const [colorSaved, setColorSaved] = useState(false);
+
+  const savePlayerColors = async () => {
+    setSavingColors(true);
+    setColorError(null);
+    setColorSaved(false);
+    try {
+      const updated = await onUpdatePlayerColors(campaign.id, playerColors);
+      if (!updated) throw new Error("Unable to save player colors.");
+      setColorSaved(true);
+    } catch (error) {
+      setColorError(
+        error instanceof Error ? error.message : "Unable to save player colors.",
+      );
+    } finally {
+      setSavingColors(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 px-4 py-8 backdrop-blur-sm">
       <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
@@ -4245,6 +4296,73 @@ function CampaignDetailsModal({
         {settings?.fluff?.conflictDescription && (
           <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-sm leading-6 text-zinc-300">
             {settings.fluff.conflictDescription}
+          </div>
+        )}
+
+        {isCampaignOwner && acceptedPlayers.length > 0 && (
+          <div className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+            <div className="text-sm font-black text-zinc-100">Player Colors</div>
+            <p className="mt-1 text-xs leading-5 text-zinc-400">
+              Choose the fixed campaign color used for each player in objective and planet-control displays.
+            </p>
+            <div className="mt-4 space-y-3">
+              {acceptedPlayers.map((participant, participantIndex) => (
+                <div
+                  key={participant.id}
+                  className="flex flex-col gap-3 rounded-xl border border-zinc-800 bg-zinc-950/70 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="h-4 w-4 rounded-full border border-white/30"
+                      style={{
+                        backgroundColor:
+                          playerColors[participant.userId] ??
+                          getPlayerColor(participant, participantIndex),
+                      }}
+                    />
+                    <span className="text-sm font-semibold text-zinc-200">
+                      {playerDisplayName(participant)}
+                    </span>
+                  </div>
+                  <select
+                    value={
+                      playerColors[participant.userId] ??
+                      getPlayerColor(participant, participantIndex)
+                    }
+                    onChange={(event) => {
+                      setColorSaved(false);
+                      setPlayerColors((current) => ({
+                        ...current,
+                        [participant.userId]: event.target.value,
+                      }));
+                    }}
+                    className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-lime-400/60"
+                  >
+                    {PLAYER_CONTROL_COLORS.map((color) => (
+                      <option key={color.hex} value={color.hex}>
+                        {color.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+            {colorError && (
+              <div className="mt-3 text-sm text-red-300">{colorError}</div>
+            )}
+            {colorSaved && (
+              <div className="mt-3 text-sm text-lime-300">Player colors saved.</div>
+            )}
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={savePlayerColors}
+                disabled={savingColors}
+                className="rounded-xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {savingColors ? "Saving..." : "Save Player Colors"}
+              </button>
+            </div>
           </div>
         )}
       </div>

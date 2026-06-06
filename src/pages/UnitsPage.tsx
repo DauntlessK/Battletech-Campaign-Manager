@@ -370,7 +370,11 @@ function AddUnitToForceModal({
   const [selectedTeams, setSelectedTeams] = useState<Record<string, number>>({});
   const [addConfirmation, setAddConfirmation] = useState<string | null>(null);
   const unitBV = Number(unit.totalBV ?? unit.bv ?? 0);
-  const forceRows = forces.map((force) => {
+  const originalForces = forces.filter(
+    (force) => force.origin !== "CampaignCopy" && !force.campaignId,
+  );
+
+  const forceRows = originalForces.map((force) => {
     const currentBV = getForceCurrentBV(force, units);
     const remainingBV = Math.max(0, Number(force.totalBV ?? 0) - currentBV);
     const validation = getForceEligibility(force, unit, units, selectedTeams[force.id]);
@@ -421,7 +425,7 @@ function AddUnitToForceModal({
         )}
 
         <div className="btcm-scrollbar min-h-0 flex-1 overflow-y-scroll p-5 [scrollbar-gutter:stable]">
-          {forces.length === 0 ? (
+          {originalForces.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/70 p-6 text-sm text-zinc-400">
               No forces are available yet. Create a force first, then return
               here to add this unit directly from the Units page.
@@ -431,7 +435,7 @@ function AddUnitToForceModal({
               <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div className="text-sm text-zinc-400">
                   Showing {eligibleCount} eligible force
-                  {eligibleCount === 1 ? "" : "s"} of {forces.length}.
+                  {eligibleCount === 1 ? "" : "s"} of {originalForces.length}.
                 </div>
                 <div className="text-xs uppercase tracking-[0.16em] text-zinc-500">
                   Era · Rules · BV limit checked

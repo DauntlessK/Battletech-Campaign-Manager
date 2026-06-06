@@ -363,6 +363,42 @@ export default function App() {
     }
   };
 
+  const updateCampaignPlayerColors = async (
+    campaignId: string,
+    colors: Record<string, string>,
+  ): Promise<Campaign | null> => {
+    setCampaignUpdateLoading(true);
+    setCampaignUpdateError(null);
+
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/player-colors`, {
+        method: "PATCH",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ colors }),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to update player colors.");
+      }
+
+      const updatedCampaign = result as Campaign;
+      replaceCampaignInState(updatedCampaign);
+      return updatedCampaign;
+    } catch (error) {
+      setCampaignUpdateError(
+        error instanceof Error
+          ? error.message
+          : "Unable to update player colors.",
+      );
+      return null;
+    } finally {
+      setCampaignUpdateLoading(false);
+    }
+  };
+
   const beginCampaignForUser = async (
     campaignId: string,
   ): Promise<Campaign | null> => {
@@ -1248,6 +1284,7 @@ export default function App() {
             assignForceError={campaignForceError}
             onCreateCampaign={createCampaignForUser}
             onUpdateCampaign={updateCampaignForUser}
+            onUpdateCampaignPlayerColors={updateCampaignPlayerColors}
             onAssignForceToCampaign={assignForceToCampaignForUser}
             onBeginCampaign={beginCampaignForUser}
             invites={invites}
