@@ -528,11 +528,10 @@ export default function LogBattlePage({
                             </td>
                             <td className="px-4 py-3 text-zinc-300">
                               <div className="font-semibold">
-                                {forceUnit.pilot?.name || "Unnamed Pilot"}
+                                {forceUnit.pilot?.name || "No pilot"}
                               </div>
                               <div className="text-xs text-zinc-500">
-                                {forceUnit.pilot?.gunnery ?? 4}/
-                                {forceUnit.pilot?.piloting ?? 5}
+                                {forceUnit.pilot ? `${forceUnit.pilot.gunnery ?? 4}/${forceUnit.pilot.piloting ?? 5}` : "—"}
                               </div>
                             </td>
                             <td className="px-4 py-3">
@@ -720,7 +719,7 @@ function ChaosDamageEditor({
               {forceUnitDisplayName(forceUnit)}
             </h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Pilot: {forceUnit.pilot?.name || "Unnamed Pilot"}
+              Pilot: {forceUnit.pilot?.name || "No pilot"}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -895,7 +894,7 @@ function DamageEditor({
               {forceUnitDisplayName(forceUnit)}
             </h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Pilot: {forceUnit.pilot?.name || "Unnamed Pilot"}
+              Pilot: {forceUnit.pilot?.name || "No pilot"}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -1129,35 +1128,35 @@ function DamageLocationCard({
       </div>
 
       <div className={`mb-4 grid gap-2 ${location.rearArmor ? "grid-cols-3" : "grid-cols-2"}`}>
-        <HealthStepper
-          label="Armor"
-          value={getCurrentArmor(location, state)}
+        <DamageInput
+          label="Armor Hits"
+          value={Number(state.armorDamage ?? 0)}
           max={location.armor ?? 0}
           onChange={(value) =>
             onUpdate((current, loc) =>
-              updateRemainingHp(current, loc, "armor", value),
+              updateDamageAssigned(current, loc, "armor", value),
             )
           }
         />
         {location.rearArmor ? (
-          <HealthStepper
-            label="Rear"
-            value={getCurrentRearArmor(location, state)}
+          <DamageInput
+            label="Rear Hits"
+            value={Number(state.rearArmorDamage ?? 0)}
             max={location.rearArmor}
             onChange={(value) =>
               onUpdate((current, loc) =>
-                updateRemainingHp(current, loc, "rear", value),
+                updateDamageAssigned(current, loc, "rear", value),
               )
             }
           />
         ) : null}
-        <HealthStepper
-          label="Internal"
-          value={getCurrentStructure(location, state)}
+        <DamageInput
+          label="Internal Hits"
+          value={Number(state.structureDamage ?? 0)}
           max={location.structure ?? 0}
           onChange={(value) =>
             onUpdate((current, loc) =>
-              updateRemainingHp(current, loc, "structure", value),
+              updateDamageAssigned(current, loc, "structure", value),
             )
           }
         />
@@ -1308,7 +1307,7 @@ function Field({
   );
 }
 
-function HealthStepper({
+function DamageInput({
   label,
   value,
   max,
@@ -1319,33 +1318,24 @@ function HealthStepper({
   max: number;
   onChange: (value: number) => void;
 }) {
-  const next = (delta: number) =>
-    onChange(Math.max(0, Math.min(max, value + delta)));
+  const safeValue = Math.max(0, Math.min(max, Number(value ?? 0)));
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-2 text-center">
-      <div className="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500">
+    <label className="block rounded-2xl border border-zinc-800 bg-zinc-900/80 p-2 text-center">
+      <span className="text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500">
         {label}
-      </div>
-      <div className="mt-2 grid grid-cols-[1.75rem_minmax(3.25rem,1fr)_1.75rem] items-center gap-1">
-        <button
-          type="button"
-          onClick={() => next(-1)}
-          className="grid h-7 w-7 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
-        >
-          −
-        </button>
-        <span className="min-w-0 text-center text-sm font-black leading-7 text-zinc-100 tabular-nums">
-          {value}/{max}
-        </span>
-        <button
-          type="button"
-          onClick={() => next(1)}
-          className="grid h-7 w-7 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
-        >
-          +
-        </button>
-      </div>
-    </div>
+      </span>
+      <input
+        type="number"
+        min={0}
+        max={max}
+        value={safeValue}
+        onChange={(event) => onChange(Number(event.target.value || 0))}
+        className="mt-2 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-2 py-1.5 text-center text-sm font-black tabular-nums text-zinc-100 outline-none transition focus:border-lime-400/60"
+      />
+      <span className="mt-1 block text-[10px] uppercase tracking-wide text-zinc-500">
+        of {max}
+      </span>
+    </label>
   );
 }
 
@@ -1686,11 +1676,11 @@ function getCurrentStructure(
   );
 }
 
-function updateRemainingHp(
+function updateDamageAssigned(
   current: NonNullable<UnitDamageDraft["detailed"]>["locations"][string],
   location: UnitLocation,
   kind: "armor" | "rear" | "structure",
-  remaining: number,
+  assignedDamage: number,
 ) {
   const max =
     kind === "armor"
@@ -1698,13 +1688,13 @@ function updateRemainingHp(
       : kind === "rear"
         ? Number(location.rearArmor ?? 0)
         : Number(location.structure ?? 0);
-  const damage = Math.max(0, Math.min(max, max - remaining));
+  const damage = Math.max(0, Math.min(max, assignedDamage));
   const next = { ...current };
   if (kind === "armor") next.armorDamage = damage;
   if (kind === "rear") next.rearArmorDamage = damage;
   if (kind === "structure") {
     next.structureDamage = damage;
-    if (remaining <= 0) {
+    if (damage >= max && max > 0) {
       next.destroyed = true;
       next.missing = false;
       next.armorDamage = Number(location.armor ?? 0);

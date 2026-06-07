@@ -39,6 +39,7 @@ const CAMPAIGN_PLAYER_COLORS = [
   "#14b8a6", // teal
   "#eab308", // yellow
   "#06b6d4", // cyan
+  "#f4f4f5", // white
 ];
 
 function assignParticipantColor(store: any, campaignId: string, participant: any) {
@@ -326,6 +327,37 @@ export async function createCampaign(
   return campaign;
 }
 
+function campaignTurnState(campaignId: string, store: any) {
+  const acceptedUserIds = (store.campaignParticipants ?? [])
+    .filter((entry: any) => entry.campaignId === campaignId && entry.status === "Accepted")
+    .map((entry: any) => entry.userId);
+  const completedCounts = new Map<string, number>(acceptedUserIds.map((id: string) => [id, 0]));
+
+  for (const battle of store.battles ?? []) {
+    if (battle.campaignId !== campaignId || battle.status !== "Complete") continue;
+    const involved = new Set<string>();
+    for (const log of battle.battleLogs ?? []) {
+      if (completedCounts.has(log.userId)) involved.add(log.userId);
+    }
+    if (!involved.size) {
+      if (completedCounts.has(battle.submittedByUserId)) involved.add(battle.submittedByUserId);
+      if (completedCounts.has(battle.defendingUserId)) involved.add(battle.defendingUserId);
+    }
+    for (const participantUserId of involved) {
+      completedCounts.set(participantUserId, (completedCounts.get(participantUserId) ?? 0) + 1);
+    }
+  }
+
+  const playerTurns = new Map<string, number>();
+  for (const participantUserId of acceptedUserIds) {
+    playerTurns.set(participantUserId, (completedCounts.get(participantUserId) ?? 0) + 1);
+  }
+  const campaignTurn = playerTurns.size
+    ? Math.max(1, Math.floor([...playerTurns.values()].reduce((sum, turn) => sum + turn, 0) / playerTurns.size))
+    : 1;
+  return { playerTurns, campaignTurn };
+}
+
 function withUserCampaignState(campaign: Campaign, userId: string, storeOrParticipants: any): Campaign {
   const participants: CampaignParticipant[] = Array.isArray(storeOrParticipants)
     ? storeOrParticipants
@@ -336,6 +368,9 @@ function withUserCampaignState(campaign: Campaign, userId: string, storeOrPartic
       entry.userId === userId &&
       entry.status === "Accepted",
   );
+  const turnState = Array.isArray(storeOrParticipants)
+    ? null
+    : campaignTurnState(campaign.id, storeOrParticipants);
   const campaignParticipants = participants
     .filter((entry) => entry.campaignId === campaign.id && entry.status !== "Removed")
     .map((entry) => {
@@ -351,6 +386,7 @@ function withUserCampaignState(campaign: Campaign, userId: string, storeOrPartic
         : undefined;
       return {
         ...entry,
+        currentTurn: turnState?.playerTurns.get(entry.userId) ?? 1,
         user: publicParticipantUser(participantUser),
         force: participantForce
           ? {
@@ -365,6 +401,11 @@ function withUserCampaignState(campaign: Campaign, userId: string, storeOrPartic
     });
   return {
     ...campaign,
+    turnNumber: turnState?.campaignTurn ?? campaign.turnNumber ?? 1,
+    settings: {
+      ...(campaign.settings ?? {}),
+      currentTurn: turnState?.campaignTurn ?? campaign.settings?.currentTurn ?? campaign.turnNumber ?? 1,
+    },
     assignedForceId: participant?.forceId,
     participants: campaignParticipants,
   } as Campaign;
@@ -457,7 +498,7 @@ export async function updateCampaignPlayerColors(
 
   for (const [participantUserId, color] of Object.entries(colors)) {
     if (!acceptedIds.has(participantUserId)) continue;
-    if (!CAMPAIGN_PLAYER_COLORS.has(color)) {
+    if (!CAMPAIGN_PLAYER_COLORS.includes(color)) {
       throw new Error("Choose one of the supported campaign player colors.");
     }
     if (chosenColors.has(color)) {

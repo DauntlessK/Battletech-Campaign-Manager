@@ -100,6 +100,7 @@ const PLAYER_CONTROL_COLORS = [
   { name: "Teal", hex: "#14b8a6" },
   { name: "Yellow", hex: "#eab308" },
   { name: "Cyan", hex: "#06b6d4" },
+  { name: "White", hex: "#f4f4f5" },
 ];
 type PlayerMode = "2" | "3-10";
 type CampaignParticipantView = NonNullable<Campaign["participants"]>[number];
@@ -3728,9 +3729,11 @@ function ActiveCampaignDashboard({
     authUserId,
   );
   const objectives = settings?.objectives ?? [];
-  const playerShare = acceptedPlayers.length
+  const defaultPlayerShare = acceptedPlayers.length
     ? 100 / acceptedPlayers.length
     : 100;
+  const planetaryControl = getPlanetaryControlShares(campaign, acceptedPlayers);
+  const playerShare = controlShareForUser(planetaryControl, authUserId, defaultPlayerShare);
   const forceUnits = force?.forceUnits ?? [];
   const forceUnitCount = forceUnits.length;
   const pilotCount = forceUnits.filter((forceUnit) => forceUnit.pilot).length;
@@ -3749,6 +3752,14 @@ function ActiveCampaignDashboard({
   );
   const [repairHelpOpen, setRepairHelpOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const currentParticipant = acceptedPlayers.find(
+    (participant) => participant.userId === authUserId,
+  );
+  const playerTurn = Math.max(1, Number(currentParticipant?.currentTurn ?? 1));
+  const campaignTurn = Math.max(1, Number(campaign.turnNumber ?? settings?.currentTurn ?? 1));
+  const maxTurnsAhead = Math.max(0, Number(settings?.maxTurnsAhead ?? settings?.maxTurns ?? 0));
+  const turnsAhead = Math.max(0, playerTurn - campaignTurn);
+  const isAtTurnLimit = maxTurnsAhead > 0 && turnsAhead >= maxTurnsAhead;
 
   return (
     <section className="space-y-5">
@@ -3765,7 +3776,8 @@ function ActiveCampaignDashboard({
             <button
               type="button"
               onClick={onLogBattle}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300"
+              disabled={isAtTurnLimit}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-400 px-4 py-2 text-sm font-black text-zinc-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 disabled:hover:bg-zinc-700"
             >
               <Swords size={16} /> Log Battle
             </button>
@@ -3786,6 +3798,16 @@ function ActiveCampaignDashboard({
           </>
         }
       />
+
+      {isAtTurnLimit && (
+        <div className="rounded-3xl border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+          <div className="font-black">Maximum turns ahead reached</div>
+          <p className="mt-1 text-amber-100/80">
+            You are {turnsAhead} of {maxTurnsAhead} allowed turns ahead of the campaign.
+            You can submit a matching opponent log, but cannot start another battle until the other players catch up.
+          </p>
+        </div>
+      )}
 
       {awaitingBattleLog && (
         <div className="rounded-3xl border border-yellow-400/40 bg-yellow-500/10 p-4 text-sm text-yellow-100">
@@ -3814,8 +3836,14 @@ function ActiveCampaignDashboard({
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:flex xl:items-center">
             <CampaignFactCard
               label="Turn"
-              value={campaignTurnLabel(campaign)}
+              value={String(playerTurn)}
             />
+            {maxTurnsAhead > 0 && (
+              <CampaignFactCard
+                label="Turns Ahead"
+                value={`${turnsAhead}/${maxTurnsAhead}`}
+              />
+            )}
             <CampaignFactCard
               label={resourceTypeLabel(settings)}
               value={resourceLabel(settings)}
@@ -3932,7 +3960,8 @@ function ActiveCampaignDashboard({
                     </div>
                     <ControlStack
                       players={acceptedPlayers}
-                      share={playerShare}
+                      shares={getObjectiveControlShares(objective, acceptedPlayers, defaultPlayerShare)}
+                      fallbackShare={defaultPlayerShare}
                     />
                   </div>
                 ))
@@ -3948,17 +3977,20 @@ function ActiveCampaignDashboard({
                 </div>
                 <div className="mt-3 h-7 overflow-hidden rounded-full border border-zinc-800 bg-zinc-900">
                   <div className="flex h-full w-full">
-                    {acceptedPlayers.map((player, index) => (
-                      <div
-                        key={player.id}
-                        className="h-full"
-                        style={{
-                          width: `${playerShare}%`,
-                          backgroundColor: getPlayerColor(player, index),
-                        }}
-                        title={`${Math.trunc(playerShare)}%`}
-                      />
-                    ))}
+                    {acceptedPlayers.map((player, index) => {
+                      const share = controlShareForUser(planetaryControl, player.userId, defaultPlayerShare);
+                      return (
+                        <div
+                          key={player.id}
+                          className="h-full"
+                          style={{
+                            width: `${share}%`,
+                            backgroundColor: getPlayerColor(player, index),
+                          }}
+                          title={`${share.toFixed(1)}%`}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="mt-3 grid gap-2">
@@ -3977,7 +4009,7 @@ function ActiveCampaignDashboard({
                         {playerDisplayName(player)}
                       </span>
                       <span className="font-semibold text-zinc-400">
-                        {playerShare.toFixed(1)}%
+                        {controlShareForUser(planetaryControl, player.userId, defaultPlayerShare).toFixed(1)}%
                       </span>
                     </div>
                   ))}
@@ -4060,7 +4092,7 @@ function ActiveCampaignDashboard({
                                 className={`font-semibold ${forceUnit.pilot?.dead ? "text-red-300 line-through decoration-red-300 decoration-2" : ""}`}
                                 title={forceUnit.pilot?.dead ? "Pilot killed in action" : undefined}
                               >
-                                {forceUnit.pilot?.name || "No pilot assigned"}
+                                {forceUnit.pilot?.name || "No pilot"}
                                 {forceUnit.pilot?.dead ? (
                                   <span className="ml-2 rounded-full border border-red-400/40 bg-red-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-red-200 no-underline">
                                     KIA
@@ -4072,14 +4104,11 @@ function ActiveCampaignDashboard({
                                 ) : null}
                               </div>
                               <div className="text-xs text-zinc-500">
-                                {forceUnit.pilot?.gunnery ?? 4}/
-                                {forceUnit.pilot?.piloting ?? 5}
+                                {forceUnit.pilot ? `${forceUnit.pilot.gunnery ?? 4}/${forceUnit.pilot.piloting ?? 5}` : "—"}
                               </div>
                             </td>
                             <td className="px-4 py-3">
-                              <span className="inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs font-semibold text-zinc-300">
-                                {forceUnitStatusLabel(forceUnit)}
-                              </span>
+                              <ForceStatusPill status={forceUnitStatusLabel(forceUnit)} />
                             </td>
                             <td className="px-4 py-3 text-right font-semibold text-zinc-300">
                               BV{" "}
@@ -4167,21 +4196,6 @@ function ActionSquareButton({
   );
 }
 
-function campaignTurnLabel(campaign: Campaign) {
-  const settings = campaign.settings;
-  const currentTurn = Number(
-    (campaign as any).turnNumber ?? (settings as any)?.currentTurn ?? 1,
-  );
-  const victoryTurnLimit = settings?.victoryConditions?.turnsElapsedEnabled
-    ? settings.victoryConditions.turnsElapsed
-    : undefined;
-  const setupTurnLimit =
-    Number((settings as any)?.maxTurnsAhead ?? 0) > 0
-      ? Number((settings as any).maxTurnsAhead)
-      : undefined;
-  const limit = victoryTurnLimit ?? setupTurnLimit;
-  return limit ? `${currentTurn}/${limit}` : String(currentTurn);
-}
 
 function CampaignDetailsModal({
   campaign,
@@ -4416,27 +4430,126 @@ function RepairPriorityHelpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function getObjectiveControlShares(
+  objective: NonNullable<Campaign["settings"]>["objectives"] extends Array<infer T> ? T : any,
+  players: NonNullable<Campaign["participants"]>,
+  fallbackShare: number,
+): Record<string, number> {
+  const shares: Record<string, number> = Object.fromEntries(
+    players.map((player) => [player.userId, fallbackShare]),
+  );
+  const source = (objective as any)?.currentControl ?? (objective as any)?.control ?? (objective as any)?.playerControl ?? [];
+  if (Array.isArray(source)) {
+    source.forEach((entry: any) => {
+      const userId = entry?.userId ?? entry?.playerId ?? entry?.participantUserId ?? entry?.participantId;
+      if (userId) shares[userId] = Number(entry.percentage ?? entry.control ?? entry.value ?? entry.share ?? fallbackShare);
+    });
+  } else if (source && typeof source === "object") {
+    Object.entries(source).forEach(([userId, value]) => {
+      shares[userId] = Number(value ?? fallbackShare);
+    });
+  }
+  return clampControlShares(shares, players, fallbackShare);
+}
+
+function getPlanetaryControlShares(
+  campaign: Campaign,
+  players: NonNullable<Campaign["participants"]>,
+): Record<string, number> {
+  const fallbackShare = players.length ? 100 / players.length : 100;
+  const source = (campaign.settings as any)?.planetaryControl ?? [];
+  const shares: Record<string, number> = Object.fromEntries(
+    players.map((player) => [player.userId, fallbackShare]),
+  );
+  if (Array.isArray(source) && source.length) {
+    source.forEach((entry: any) => {
+      const userId = entry?.userId ?? entry?.playerId ?? entry?.participantUserId ?? entry?.participantId;
+      if (userId) shares[userId] = Number(entry.percentage ?? entry.control ?? entry.value ?? entry.share ?? fallbackShare);
+    });
+    return clampControlShares(shares, players, fallbackShare);
+  }
+  const objectives = campaign.settings?.objectives ?? [];
+  if (!objectives.length) return shares;
+  const totals: Record<string, number> = Object.fromEntries(players.map((player) => [player.userId, 0]));
+  objectives.forEach((objective) => {
+    const objectiveShares = getObjectiveControlShares(objective, players, fallbackShare);
+    players.forEach((player) => {
+      totals[player.userId] += objectiveShares[player.userId] ?? fallbackShare;
+    });
+  });
+  players.forEach((player) => {
+    shares[player.userId] = totals[player.userId] / objectives.length;
+  });
+  return clampControlShares(shares, players, fallbackShare);
+}
+
+function clampControlShares(
+  shares: Record<string, number>,
+  players: NonNullable<Campaign["participants"]>,
+  fallbackShare: number,
+): Record<string, number> {
+  const clamped: Record<string, number> = {};
+  players.forEach((player) => {
+    const value = Number(shares[player.userId] ?? fallbackShare);
+    clamped[player.userId] = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : fallbackShare;
+  });
+  return clamped;
+}
+
+function controlShareForUser(
+  shares: Record<string, number>,
+  userId: string | undefined,
+  fallbackShare: number,
+): number {
+  if (!userId) return fallbackShare;
+  const value = Number(shares[userId]);
+  return Number.isFinite(value) ? value : fallbackShare;
+}
+
+function ForceStatusPill({ status }: { status: string }) {
+  const normalized = status.toLowerCase();
+  const classes = normalized.includes("ready")
+    ? "border-lime-400/35 bg-lime-400/10 text-lime-100"
+    : normalized.includes("damaged")
+      ? "border-yellow-400/45 bg-yellow-500/10 text-yellow-100"
+      : normalized.includes("crippled")
+        ? "border-orange-400/50 bg-orange-500/15 text-orange-100"
+        : normalized.includes("destroyed") || normalized.includes("captured")
+          ? "border-red-500/50 bg-red-950/40 text-red-100"
+          : "border-zinc-700 bg-zinc-900 text-zinc-300";
+  return (
+    <span className={`inline-flex rounded-full border px-2 py-1 text-xs font-black ${classes}`}>
+      {status}
+    </span>
+  );
+}
+
 function ControlStack({
   players,
-  share,
+  shares,
+  fallbackShare,
 }: {
   players: NonNullable<Campaign["participants"]>;
-  share: number;
+  shares: Record<string, number>;
+  fallbackShare: number;
 }) {
   return (
     <div className="mt-3 h-5 overflow-hidden rounded-full border border-zinc-800 bg-zinc-900">
       <div className="flex h-full w-full">
-        {players.map((player, index) => (
-          <div
-            key={player.id}
-            className="h-full"
-            style={{
-              width: `${share}%`,
-              backgroundColor: getPlayerColor(player, index),
-            }}
-            title={`${Math.trunc(share)}%`}
-          />
-        ))}
+        {players.map((player, index) => {
+          const share = controlShareForUser(shares, player.userId, fallbackShare);
+          return (
+            <div
+              key={player.id}
+              className="h-full"
+              style={{
+                width: `${share}%`,
+                backgroundColor: getPlayerColor(player, index),
+              }}
+              title={`${share.toFixed(1)}%`}
+            />
+          );
+        })}
       </div>
     </div>
   );

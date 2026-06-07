@@ -63,6 +63,33 @@ export async function createBattle(
   if (!forceId)
     throw new Error("Assign a campaign force before logging battles.");
 
+  const reciprocalBattle = store.battles.find((candidate) => {
+    if (
+      candidate.campaignId !== campaignId ||
+      candidate.status !== "AwaitingOpponent"
+    )
+      return false;
+    const logs = candidate.battleLogs ?? [];
+    const hasMyLog = logs.some((log) => log.userId === submittedByUserId);
+    const opponentLoggedAgainstMe = logs.some(
+      (log) =>
+        log.userId === opponentId && log.opponentUserId === submittedByUserId,
+    );
+    return !hasMyLog && opponentLoggedAgainstMe;
+  });
+
+  if (!reciprocalBattle) {
+    const turnState = calculateCampaignTurnState(store, campaignId);
+    const maxTurnsAhead = Number(campaign.settings?.maxTurnsAhead ?? campaign.settings?.maxTurns ?? 0);
+    const playerTurn = turnState.playerTurns.get(submittedByUserId) ?? 1;
+    const turnsAhead = Math.max(0, playerTurn - turnState.campaignTurn);
+    if (maxTurnsAhead > 0 && turnsAhead >= maxTurnsAhead) {
+      throw new Error(
+        `You are already ${turnsAhead} turn${turnsAhead === 1 ? "" : "s"} ahead of the campaign. Wait for the other players to catch up before logging another battle.`,
+      );
+    }
+  }
+
   const logEntry: BattleLogEntry = {
     id: crypto.randomUUID(),
     userId: submittedByUserId,
@@ -78,22 +105,7 @@ export async function createBattle(
     submittedAt: now,
   };
 
-  const controlSwing = calculateControlSwing(campaign, submittedByUserId, opponentId, payload);
-
-  const reciprocalBattle = store.battles.find((candidate) => {
-    if (
-      candidate.campaignId !== campaignId ||
-      candidate.status !== "AwaitingOpponent"
-    )
-      return false;
-    const logs = candidate.battleLogs ?? [];
-    const hasMyLog = logs.some((log) => log.userId === submittedByUserId);
-    const opponentLoggedAgainstMe = logs.some(
-      (log) =>
-        log.userId === opponentId && log.opponentUserId === submittedByUserId,
-    );
-    return !hasMyLog && opponentLoggedAgainstMe;
-  });
+  const controlSwing = calculateControlSwing(campaign, submittedByUserId, opponentId, payload, store);
 
   if (reciprocalBattle) {
     reciprocalBattle.battleLogs = [
@@ -113,13 +125,14 @@ export async function createBattle(
       submittedByUserId,
       opponentId,
       payload,
+      store,
     );
     reciprocalBattle.controlChangePercent = reciprocalSwing.actualSwing;
     reciprocalBattle.controlSwingBreakdown = reciprocalSwing.breakdown;
     if (agreed) {
-      applyControlSwing(campaign, reciprocalSwing);
+      applyControlSwing(campaign, reciprocalSwing, store);
       applyBattleResultsToForces(store, reciprocalBattle);
-      advanceCampaignTurn(campaign);
+      advanceCampaignTurn(campaign, store);
     }
     await saveStore(store);
 
@@ -298,20 +311,10 @@ function calculateControlSwing(
   submittedByUserId: string,
   opponentId: string,
   payload: BattlePayload,
+  store?: any,
 ): { actualSwing: number; winnerId?: string; loserId?: string; objectiveId?: string; breakdown: Record<string, number | string | boolean> } {
   const outcome = payload.outcome ?? "Victory";
-  const acceptedPlayers = (campaign.participants ?? []).filter((participant: any) =>
-    ["accepted", "joined", "active"].includes(String(participant.status ?? "").toLowerCase()),
-  );
-  const playerIds = Array.from(
-    new Set(
-      [
-        ...acceptedPlayers.map((participant: any) => participant.userId),
-        submittedByUserId,
-        opponentId,
-      ].filter(Boolean),
-    ),
-  );
+  const playerIds = getAcceptedCampaignPlayerIds(campaign, store, [submittedByUserId, opponentId]);
   const playerCount = Math.max(2, playerIds.length || 2);
   const objectives = campaign.settings?.objectives ?? [];
   const objective =
@@ -390,6 +393,27 @@ function calculateControlSwing(
   };
 }
 
+
+function getAcceptedCampaignPlayerIds(
+  campaign: any,
+  store?: any,
+  fallbackIds: Array<string | undefined> = [],
+): string[] {
+  const embedded = (campaign.participants ?? [])
+    .filter((participant: any) =>
+      ["accepted", "joined", "active"].includes(String(participant.status ?? "").toLowerCase()),
+    )
+    .map((participant: any) => participant.userId);
+  const stored = (store?.campaignParticipants ?? [])
+    .filter(
+      (participant: any) =>
+        participant.campaignId === campaign.id &&
+        ["accepted", "joined", "active"].includes(String(participant.status ?? "").toLowerCase()),
+    )
+    .map((participant: any) => participant.userId);
+  return Array.from(new Set([...embedded, ...stored, ...fallbackIds].filter(Boolean)));
+}
+
 function normalizeObjectiveControl(
   objective: any,
   playerIds: string[],
@@ -403,44 +427,54 @@ function normalizeObjectiveControl(
   if (Array.isArray(source)) {
     source.forEach((entry: any) => {
       const userId = entry?.userId ?? entry?.playerId ?? entry?.participantUserId ?? entry?.participantId;
-      if (userId) control[userId] = Number(entry.percentage ?? entry.control ?? entry.value ?? entry.share ?? 0);
+      if (!userId || !playerIds.includes(userId)) return;
+      const value = Number(entry.percentage ?? entry.control ?? entry.value ?? entry.share ?? 0);
+      control[userId] = Number.isFinite(value) ? value : 0;
     });
   } else if (source && typeof source === "object") {
     Object.entries(source).forEach(([userId, value]) => {
-      if (playerIds.includes(userId)) control[userId] = Number(value ?? 0);
+      if (!playerIds.includes(userId)) return;
+      const numeric = Number(value ?? 0);
+      control[userId] = Number.isFinite(numeric) ? numeric : 0;
     });
   }
   return control;
 }
 
-function applyControlSwing(campaign: any, swing: ReturnType<typeof calculateControlSwing>) {
+function applyControlSwing(campaign: any, swing: ReturnType<typeof calculateControlSwing>, store?: any) {
   if (!swing.objectiveId || !swing.winnerId || !swing.loserId || !swing.actualSwing) return;
   const objective = (campaign.settings?.objectives ?? []).find(
     (candidate: any) => candidate.id === swing.objectiveId,
   );
   if (!objective) return;
-  const playerIds = (campaign.participants ?? [])
-    .filter((participant: any) => ["accepted", "joined", "active"].includes(String(participant.status ?? "").toLowerCase()))
-    .map((participant: any) => participant.userId);
+  const playerIds = getAcceptedCampaignPlayerIds(campaign, store, [swing.winnerId, swing.loserId]);
   const control = normalizeObjectiveControl(objective, playerIds);
-  control[swing.winnerId] = Math.min(100, (control[swing.winnerId] ?? 0) + swing.actualSwing);
-  control[swing.loserId] = Math.max(0, (control[swing.loserId] ?? 0) - swing.actualSwing);
-  objective.currentControl = Object.entries(control).map(([userId, percentage]) => ({
+  const winnerCurrent = Math.max(0, Number(control[swing.winnerId] ?? 0));
+  const loserCurrent = Math.max(0, Number(control[swing.loserId] ?? 0));
+  const transfer = roundPercent(
+    Math.max(0, Math.min(Number(swing.actualSwing ?? 0), loserCurrent, 100 - winnerCurrent)),
+  );
+  if (transfer <= 0) return;
+
+  // Strict two-player transfer: the winner gains exactly what the loser loses.
+  // No uninvolved player is ever redistributed or normalized by this update.
+  control[swing.winnerId] = roundPercent(winnerCurrent + transfer);
+  control[swing.loserId] = roundPercent(loserCurrent - transfer);
+
+  objective.currentControl = playerIds.map((userId) => ({
     userId,
-    percentage: roundPercent(percentage),
+    percentage: roundPercent(Math.max(0, Number(control[userId] ?? 0))),
   }));
   campaign.settings = {
     ...(campaign.settings ?? {}),
-    planetaryControl: calculatePlanetaryControl(campaign),
+    planetaryControl: calculatePlanetaryControl(campaign, store),
   };
   campaign.updatedAt = new Date().toISOString();
 }
 
-function calculatePlanetaryControl(campaign: any): Array<{ userId: string; percentage: number }> {
+function calculatePlanetaryControl(campaign: any, store?: any): Array<{ userId: string; percentage: number }> {
   const objectives = campaign.settings?.objectives ?? [];
-  const playerIds = (campaign.participants ?? [])
-    .filter((participant: any) => ["accepted", "joined", "active"].includes(String(participant.status ?? "").toLowerCase()))
-    .map((participant: any) => participant.userId);
+  const playerIds = getAcceptedCampaignPlayerIds(campaign, store);
   if (!objectives.length || !playerIds.length) return [];
   const totals: Record<string, number> = Object.fromEntries(playerIds.map((id: string) => [id, 0]));
   objectives.forEach((objective: any) => {
@@ -477,14 +511,12 @@ function applyBattleResultsToForces(store: any, battle: Battle) {
       forceUnit.isDestroyed = newStatus === "Destroyed";
       forceUnit.kills = Number(forceUnit.kills ?? 0) + Number(overlay.killsMade ?? 0);
 
-      if (forceUnit.pilot) {
-        if (overlay.pilotDamage === "KIA") {
-          forceUnit.pilot.dead = true;
-          forceUnit.pilot.wounds = 6;
-        } else if (overlay.pilotDamage !== undefined) {
-          forceUnit.pilot.wounds = Number(overlay.pilotDamage ?? 0);
-          forceUnit.pilot.dead = false;
-        }
+      if (overlay.pilotDamage === "KIA") {
+        forceUnit.pilot = undefined;
+        forceUnit.assignedPilotId = undefined;
+      } else if (forceUnit.pilot && overlay.pilotDamage !== undefined) {
+        forceUnit.pilot.wounds = Number(overlay.pilotDamage ?? 0);
+        forceUnit.pilot.dead = false;
       }
 
       forceUnit.updatedAt = new Date().toISOString();
@@ -572,13 +604,44 @@ function estimateCurrentBV(forceUnit: any, overlay: any): number {
   return Math.max(0, Math.round(baseBV * Math.max(0.25, 1 - penalty)));
 }
 
-function advanceCampaignTurn(campaign: any) {
-  if (campaign.settings?.type === "Conquest") return;
-  const currentTurn = Number(campaign.turnNumber ?? campaign.settings?.currentTurn ?? 1);
-  campaign.turnNumber = currentTurn + 1;
+function calculateCampaignTurnState(store: any, campaignId: string) {
+  const acceptedUserIds = (store.campaignParticipants ?? [])
+    .filter((entry: any) => entry.campaignId === campaignId && entry.status === "Accepted")
+    .map((entry: any) => entry.userId);
+  const completedCounts = new Map<string, number>(acceptedUserIds.map((id: string) => [id, 0]));
+
+  for (const battle of store.battles ?? []) {
+    if (battle.campaignId !== campaignId || battle.status !== "Complete") continue;
+    const involved = new Set<string>();
+    for (const log of battle.battleLogs ?? []) {
+      if (completedCounts.has(log.userId)) involved.add(log.userId);
+    }
+    if (!involved.size) {
+      if (completedCounts.has(battle.submittedByUserId)) involved.add(battle.submittedByUserId);
+      if (completedCounts.has(battle.defendingUserId)) involved.add(battle.defendingUserId);
+    }
+    for (const participantUserId of involved) {
+      completedCounts.set(participantUserId, (completedCounts.get(participantUserId) ?? 0) + 1);
+    }
+  }
+
+  const playerTurns = new Map<string, number>();
+  for (const participantUserId of acceptedUserIds) {
+    playerTurns.set(participantUserId, (completedCounts.get(participantUserId) ?? 0) + 1);
+  }
+  const campaignTurn = playerTurns.size
+    ? Math.max(1, Math.floor([...playerTurns.values()].reduce((sum, turn) => sum + turn, 0) / playerTurns.size))
+    : 1;
+  return { playerTurns, campaignTurn };
+}
+
+function advanceCampaignTurn(campaign: any, store?: any) {
+  if (!store) return;
+  const turnState = calculateCampaignTurnState(store, campaign.id);
+  campaign.turnNumber = turnState.campaignTurn;
   campaign.settings = {
     ...(campaign.settings ?? {}),
-    currentTurn: currentTurn + 1,
+    currentTurn: turnState.campaignTurn,
   };
   campaign.updatedAt = new Date().toISOString();
 }
@@ -633,15 +696,16 @@ export async function updateBattle(
             log.userId,
             log.opponentUserId ?? "",
             log as BattlePayload,
+            store,
           )
         : { actualSwing: 0, breakdown: { reason: "Campaign not found." } };
       b.controlChangePercent = swing.actualSwing;
       b.controlSwingBreakdown = swing.breakdown;
       if (validation.agreed && previousStatus !== "Complete" && previousStatus !== "Confirmed" && previousStatus !== "Finalized") {
         if (campaign) {
-          applyControlSwing(campaign, swing);
+          applyControlSwing(campaign, swing, store);
           applyBattleResultsToForces(store, b);
-          advanceCampaignTurn(campaign);
+          advanceCampaignTurn(campaign, store);
         }
       }
     }

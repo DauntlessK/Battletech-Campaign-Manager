@@ -87,6 +87,7 @@ export type CampaignSettings = {
   maxPlayers?: number;
   maxTurns?: number;
   maxTurnsAhead?: number;
+  currentTurn?: number;
   combatTeamRules?: boolean;
   combatTeamCount?: number;
   combatTeamBVLimit?: number;
@@ -96,6 +97,7 @@ export type CampaignSettings = {
   startingResources?: ResourceBalance;
   victoryConditions?: VictoryConditions;
   objectives?: CampaignSetupObjective[];
+  planetaryControl?: Array<{ userId: string; percentage: number }>;
   fluff?: CampaignFluff;
 };
 
@@ -131,6 +133,7 @@ export type CampaignParticipant = {
   leftAt?: string;
   forceId?: string;
   color?: string;
+  currentTurn?: number;
 };
 
 export type CampaignParticipantSummary = CampaignParticipant & {
