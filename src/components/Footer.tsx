@@ -12,7 +12,7 @@ export default function Footer() {
       return;
     }
 
-    const options = ["Buy me a coffee!", "Donate to help run this site"];
+    const options = ["Buy me a coffee", "Donate to help run this site"];
     const pick = options[Math.floor(Math.random() * options.length)];
     sessionStorage.setItem(key, pick);
     setDonationLabel(pick);
@@ -23,12 +23,12 @@ export default function Footer() {
       <div className="mx-auto max-w-none px-3 py-4 sm:px-5 2xl:px-8">
         <div className="grid items-center gap-3" style={{ gridTemplateColumns: "1fr 2fr 1fr 1fr" }}>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-lime-400 text-zinc-950 font-bold">BC</div>
-            <div className="text-sm font-semibold">Battletech Campaign Manager</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-lime-400 text-zinc-950 font-bold">DCM</div>
+            <div className="text-sm font-semibold">Daunt's Campaign Manager</div>
           </div>
 
           <div className="text-sm text-zinc-400">
-            © {new Date().getFullYear()} Battletech Campaign Manager. All rights reserved.
+            © {new Date().getFullYear()} Daunt's Campaign Manager. All rights reserved.
           </div>
 
           <div className="flex justify-center">
