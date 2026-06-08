@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
@@ -34,6 +35,7 @@ const DEFAULT_STORE: StoreData = {
   authTokens: [],
   notifications: [],
   friendRequests: [],
+  pilots: [],
 };
 
 const COLLECTION_KEYS = [
@@ -49,6 +51,7 @@ const COLLECTION_KEYS = [
   "authTokens",
   "notifications",
   "friendRequests",
+  "pilots",
 ] as const satisfies readonly (keyof StoreData)[];
 
 type CollectionKey = (typeof COLLECTION_KEYS)[number];
@@ -66,7 +69,7 @@ const REQUIRED_ARRAY_KEYS: readonly CollectionKey[] = [
   "authTokens",
 ];
 
-const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests"];
+const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests", "pilots"];
 
 let saveQueue: Promise<void> = Promise.resolve();
 
@@ -110,11 +113,65 @@ function normalizeStore(raw: unknown): StoreData {
     }
   }
 
-  return normalized;
+  return migrateEmbeddedPilots(normalized);
 }
 
+
+function migrateEmbeddedPilots(store: StoreData): StoreData {
+  store.pilots ??= [];
+  const forceById = new Map(store.forces.map((force) => [force.id, force]));
+  const pilotByAssignedUnit = new Map(
+    store.pilots
+      .filter((pilot) => pilot.assignedUnitId)
+      .map((pilot) => [pilot.assignedUnitId as string, pilot]),
+  );
+
+  for (const forceUnit of store.forceUnits) {
+    const embeddedPilot = forceUnit.pilot;
+    let pilot = forceUnit.assignedPilotId
+      ? store.pilots.find((candidate) => candidate.id === forceUnit.assignedPilotId)
+      : pilotByAssignedUnit.get(forceUnit.id);
+
+    if (!pilot && embeddedPilot) {
+      const force = forceById.get(forceUnit.forceId);
+      const ownerId = force?.ownerId ?? "unknown";
+      const now = new Date().toISOString();
+      pilot = {
+        id: crypto.randomUUID(),
+        ownerId,
+        campaignId: force?.campaignId,
+        forceId: forceUnit.forceId,
+        assignedUnitId: forceUnit.id,
+        status: embeddedPilot.dead ? "Killed" : Number(embeddedPilot.wounds ?? 0) > 0 ? "Wounded" : "Assigned",
+        name: embeddedPilot.name,
+        gunnery: Number(embeddedPilot.gunnery ?? 4),
+        piloting: Number(embeddedPilot.piloting ?? 5),
+        wounds: Number(embeddedPilot.wounds ?? 0),
+        kills: Number(forceUnit.kills ?? 0),
+        experience: 0,
+        isAlive: !embeddedPilot.dead,
+        isCaptured: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      store.pilots.push(pilot);
+      pilotByAssignedUnit.set(forceUnit.id, pilot);
+    }
+
+    if (pilot) {
+      forceUnit.assignedPilotId = pilot.id;
+      pilot.forceId = forceUnit.forceId;
+      pilot.assignedUnitId = forceUnit.id;
+      if (pilot.isAlive && !pilot.isCaptured && pilot.status !== "Wounded") pilot.status = "Assigned";
+    }
+
+    delete forceUnit.pilot;
+  }
+
+  return store;
+}
 function assertValidStoreForSave(store: StoreData): void {
-  normalizeStore(store);
+  migrateEmbeddedPilots(normalizeStore(store));
 }
 
 async function readJsonFile(filePath: string): Promise<unknown> {
@@ -139,6 +196,7 @@ async function backupSplitStore(label = "bak"): Promise<void> {
 }
 
 async function writeSplitStore(store: StoreData): Promise<void> {
+  migrateEmbeddedPilots(store);
   await fs.mkdir(STORE_DIR, { recursive: true });
 
   const stagingDir = path.join(

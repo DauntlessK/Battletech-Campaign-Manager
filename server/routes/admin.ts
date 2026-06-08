@@ -132,15 +132,22 @@ function resetCampaignProgress(store: StoreData, campaignId: string) {
 
   store.forceUnits = store.forceUnits.map((forceUnit) => {
     if (!campaignForceIds.has(forceUnit.forceId)) return forceUnit;
+    const assignedPilot = forceUnit.assignedPilotId
+      ? store.pilots?.find((pilot) => pilot.id === forceUnit.assignedPilotId)
+      : undefined;
+    if (assignedPilot) {
+      assignedPilot.wounds = 0;
+      assignedPilot.status = "Assigned";
+      assignedPilot.isAlive = true;
+      assignedPilot.isCaptured = false;
+      assignedPilot.updatedAt = new Date().toISOString();
+    }
     return {
       ...forceUnit,
       status: "Available",
       currentBV: forceUnit.snapshot?.totalBV ?? forceUnit.currentBV,
       damageDescription: undefined,
       isDestroyed: false,
-      pilot: forceUnit.pilot
-        ? { ...forceUnit.pilot, wounds: 0, dead: false }
-        : forceUnit.pilot,
     };
   });
 

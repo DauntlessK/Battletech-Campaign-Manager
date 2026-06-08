@@ -10,6 +10,8 @@ import {
   XCircle,
 } from "lucide-react";
 import PageTitle from "../components/PageTitle";
+import { WEAPONS } from "../data/weapons";
+import { COMPONENTS } from "../data/components";
 import type {
   Battle,
   Campaign,
@@ -1235,42 +1237,33 @@ function AmmoExpenditureSection({
         Ammo Expenditure
       </div>
       <p className="mt-1 text-xs text-zinc-500">
-        Start from full ammo and reduce shots remaining to match what was spent. Energy weapons are ignored.
+        Enter the number of shots spent during the battle. Energy weapons are ignored.
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {ammoPools.map((pool) => {
           const spentShots = Math.max(0, Math.min(pool.shots, Number(spent[pool.key] ?? 0)));
-          const remaining = pool.shots - spentShots;
-          const setRemaining = (nextRemaining: number) =>
-            onChange(pool.key, Math.max(0, Math.min(pool.shots, pool.shots - nextRemaining)));
           return (
-            <div key={pool.key} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
+            <label key={pool.key} className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
               <div className="text-sm font-black text-zinc-100">{pool.label}</div>
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <button
-                  type="button"
-                  onClick={() => setRemaining(remaining - 1)}
-                  className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
-                >
-                  −
-                </button>
-                <div className="text-center">
-                  <div className="text-sm font-black text-zinc-100">
-                    {remaining}/{pool.shots}
-                  </div>
-                  <div className="text-[10px] uppercase tracking-wide text-zinc-500">
-                    shots left
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setRemaining(remaining + 1)}
-                  className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-700 text-zinc-200"
-                >
-                  +
-                </button>
+              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                <input
+                  type="number"
+                  min={0}
+                  max={pool.shots}
+                  step={1}
+                  value={spentShots}
+                  onChange={(event) =>
+                    onChange(
+                      pool.key,
+                      Math.max(0, Math.min(pool.shots, Number(event.target.value || 0))),
+                    )
+                  }
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-center text-sm font-black text-zinc-100 outline-none transition focus:border-lime-400/60"
+                  aria-label={`${pool.label} shots spent`}
+                />
+                <div className="text-xs font-semibold text-zinc-500">/ {pool.shots} shots</div>
               </div>
-            </div>
+            </label>
           );
         })}
       </div>
@@ -1457,7 +1450,53 @@ function sanitizeDamageDraft(
     detailed: isChaos ? undefined : (draft.detailed ?? { locations: {} }),
     status: forceUnit ? getUnitStatus(forceUnit, draft, isChaos) : undefined,
     damageSummary: forceUnit ? damageSummaryBreakdown(forceUnit, draft) : undefined,
+    repairComplexity: !isChaos && forceUnit ? calculateRepairComplexity(forceUnit, draft) : undefined,
   } as CampaignUnitDamageOverlay;
+}
+
+function calculateRepairComplexity(forceUnit: ForceUnit, draft: UnitDamageDraft): "Simple" | "Intermediate" | "Difficult" | "Impossible" {
+  const locations = draft.detailed?.locations ?? {};
+  let limbReplacements = 0;
+  const grades: string[] = [];
+  for (const location of forceUnit.snapshot?.locations ?? []) {
+    const state = locations[location.id] ?? locations[location.name] ?? {};
+    if ((state.destroyed || state.missing) && isLimbLocation(location)) limbReplacements += 1;
+    const hitSlots = new Set([...(state.damagedSlots ?? []), ...(state.destroyedSlots ?? [])]);
+    const counted = new Set<string>();
+    for (const slot of location.slots ?? []) {
+      if (!hitSlots.has(slot.slot) || isEmptySlot(slot)) continue;
+      const key = `${location.id}:${slot.item}`;
+      if (counted.has(key)) continue;
+      counted.add(key);
+      grades.push(repairGradeForItem(slot.item, forceUnit.snapshot?.era));
+    }
+  }
+  const fCount = grades.filter((grade) => grade === "F" || grade === "X").length;
+  const dCount = grades.filter((grade) => grade === "D").length;
+  const eCount = grades.filter((grade) => grade === "E").length;
+  if (fCount >= 2) return "Impossible";
+  if (fCount === 1 || limbReplacements > 1 || dCount + eCount > 3 || eCount > 1) return "Difficult";
+  if (limbReplacements === 1 || dCount > 0 || eCount === 1) return "Intermediate";
+  return "Simple";
+}
+
+function repairGradeForItem(itemName: string, era?: string): string {
+  const normalized = normalizeRepairName(itemName);
+  const definitions = [...Object.values(WEAPONS), ...Object.values(COMPONENTS)];
+  const match = definitions.find((definition: any) => {
+    const names = [definition.name, ...(definition.altNames ?? [])].map(normalizeRepairName);
+    return names.includes(normalized) || names.some((name) => name && (normalized.includes(name) || name.includes(normalized)));
+  }) as any;
+  if (!match) return "C";
+  const eraKey = String(era ?? "").toLowerCase().includes("succession") ? "successionWars"
+    : String(era ?? "").toLowerCase().includes("clan") ? "clanInvasion" : "starLeague";
+  const availability = match.availability?.[eraKey];
+  return worstRepairGrade(match.techRating, availability);
+}
+function normalizeRepairName(value: string): string { return String(value ?? "").toLowerCase().replace(/\(r\)/g, "").replace(/[^a-z0-9]/g, ""); }
+function worstRepairGrade(...grades: Array<string | undefined>): string {
+  const order = ["A", "B", "C", "D", "E", "F", "X"];
+  return grades.filter(Boolean).sort((a,b) => order.indexOf(String(b)) - order.indexOf(String(a)))[0] ?? "C";
 }
 
 function damageSummary(forceUnit: ForceUnit, draft: UnitDamageDraft): string {

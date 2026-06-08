@@ -253,6 +253,8 @@ export type BattleStatus =
 
 export type BattleOutcome = "Victory" | "Defeat" | "Draw" | string;
 
+export type RepairComplexity = "Simple" | "Intermediate" | "Difficult" | "Impossible";
+
 export type CampaignUnitDamageOverlay = {
   campaignForceUnitId: string;
   participated?: boolean;
@@ -263,6 +265,7 @@ export type CampaignUnitDamageOverlay = {
   status?: string;
   currentBV?: number;
   recalculatedBV?: number;
+  repairComplexity?: RepairComplexity;
   damageSummary?: {
     armor: number;
     internal: number;
@@ -434,6 +437,21 @@ export type FriendRequest = {
   respondedAt?: string;
 };
 
+
+export type UnassignedPilot = {
+  id: string;
+  campaignId: string;
+  userId: string;
+  originalForceId: string;
+  sourceForceUnitId: string;
+  name?: string;
+  gunnery: number;
+  piloting: number;
+  wounds?: number;
+  status: "Available" | "Wounded";
+  createdAt: string;
+};
+
 export type StoreData = {
   users: UserAccount[];
   campaigns: Campaign[];
@@ -447,4 +465,5 @@ export type StoreData = {
   authTokens: AuthToken[];
   notifications?: Notification[];
   friendRequests?: FriendRequest[];
+  unassignedPilots?: UnassignedPilot[];
 };

@@ -688,12 +688,20 @@ function copyCommittedForcesToCampaignInStore(store: any, campaign: Campaign) {
     };
 
     const originalUnits = store.forceUnits.filter((unit: any) => unit.forceId === existingForce.id);
-    const copiedUnits = originalUnits.map((unit: any) => ({
-      ...unit,
-      id: crypto.randomUUID(),
-      forceId: copiedForce.id,
-      pilot: unit.pilot ?? { gunnery: 4, piloting: 5 },
-    }));
+    const copiedUnits = originalUnits.map((unit: any) => {
+      const sourcePilot = unit.assignedPilotId
+        ? store.pilots?.find((pilot: any) => pilot.id === unit.assignedPilotId)
+        : undefined;
+      return {
+        ...unit,
+        id: crypto.randomUUID(),
+        forceId: copiedForce.id,
+        assignedPilotId: undefined,
+        pilot: sourcePilot
+          ? { name: sourcePilot.name, gunnery: sourcePilot.gunnery, piloting: sourcePilot.piloting }
+          : { gunnery: 4, piloting: 5 },
+      };
+    });
     copiedForce.unitIds = copiedUnits
       .sort((a: any, b: any) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
       .map((unit: any) => unit.baseUnitId);

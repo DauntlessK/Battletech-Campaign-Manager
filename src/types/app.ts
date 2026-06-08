@@ -27,6 +27,8 @@ export type BattleStatus =
 
 export type BattleOutcome = "Victory" | "Defeat" | "Draw" | string;
 
+export type RepairComplexity = "Simple" | "Intermediate" | "Difficult" | "Impossible";
+
 export type CampaignUnitDamageOverlay = {
   campaignForceUnitId: string;
   participated?: boolean;
@@ -37,6 +39,7 @@ export type CampaignUnitDamageOverlay = {
   status?: string;
   currentBV?: number;
   recalculatedBV?: number;
+  repairComplexity?: RepairComplexity;
   damageSummary?: {
     armor: number;
     internal: number;

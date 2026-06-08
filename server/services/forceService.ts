@@ -2,20 +2,35 @@ import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import { getUnitDefinitionById } from "./unitLibraryService";
 import { randomPilotName } from "../data/pilotNames";
-import type { CampaignUnitSnapshot, Force, ForceUnit } from "../types/models";
+import type { CampaignUnitSnapshot, Force, ForceUnit, Pilot } from "../types/models";
 import type { Unit } from "../types/unit";
 
-function withForceUnits(force: Force, forceUnits: ForceUnit[]): Force {
+function withForceUnits(force: Force, forceUnits: ForceUnit[], pilots: Pilot[] = []): Force {
   return {
     ...force,
     forceUnits: forceUnits
       .filter((unit) => unit.forceId === force.id)
-      .map((unit, index) => ({
-        ...unit,
-        teamNumber: unit.teamNumber ?? 1,
-        sortOrder: unit.sortOrder ?? index,
-        pilot: unit.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
-      }))
+      .map((unit, index) => {
+        const pilot = unit.assignedPilotId
+          ? pilots.find((candidate) => candidate.id === unit.assignedPilotId)
+          : undefined;
+        return {
+          ...unit,
+          teamNumber: unit.teamNumber ?? 1,
+          sortOrder: unit.sortOrder ?? index,
+          pilot: pilot
+            ? {
+                id: pilot.id,
+                name: pilot.name,
+                gunnery: pilot.gunnery,
+                piloting: pilot.piloting,
+                wounds: pilot.wounds,
+                dead: !pilot.isAlive,
+                status: pilot.status,
+              }
+            : undefined,
+        };
+      })
       .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   };
 }
@@ -157,14 +172,14 @@ export async function createForce(
   store.forces.push(force);
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store.pilots);
 }
 
 export async function listForcesForUser(ownerId: string): Promise<Force[]> {
   const store = await loadStore();
   return store.forces
     .filter((f) => f.ownerId === ownerId && f.status !== "Deleted")
-    .map((force) => withForceUnits(force, store.forceUnits));
+    .map((force) => withForceUnits(force, store.forceUnits, store.pilots));
 }
 
 export async function assignForceToCampaign(originalForceId: string, campaignId: string, assignedOwnerId: string): Promise<Force> {
@@ -187,11 +202,17 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
 
   const originalUnits = store.forceUnits.filter((u) => u.forceId === original.id);
   for (const u of originalUnits) {
+    const sourcePilot = u.assignedPilotId
+      ? store.pilots?.find((pilot) => pilot.id === u.assignedPilotId)
+      : undefined;
     const newUnit: ForceUnit = {
       ...u,
       id: crypto.randomUUID(),
       forceId: copy.id,
-      pilot: u.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
+      assignedPilotId: undefined,
+      pilot: sourcePilot
+        ? { name: sourcePilot.name, gunnery: sourcePilot.gunnery, piloting: sourcePilot.piloting }
+        : { name: randomPilotName(), gunnery: 4, piloting: 5 },
     };
     store.forceUnits.push(newUnit);
   }
@@ -200,13 +221,13 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
   store.forces.push(copy);
   await saveStore(store);
 
-  return withForceUnits(copy, store.forceUnits);
+  return withForceUnits(copy, store.forceUnits, store.pilots);
 }
 
 export async function getForceById(forceId: string): Promise<Force | undefined> {
   const store = await loadStore();
   const force = store.forces.find((candidate) => candidate.id === forceId);
-  return force ? withForceUnits(force, store.forceUnits) : undefined;
+  return force ? withForceUnits(force, store.forceUnits, store.pilots) : undefined;
 }
 
 function buildUnitSnapshot(unit: Unit): CampaignUnitSnapshot {
@@ -284,7 +305,7 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store.pilots);
 }
 
 export async function updateForce(
@@ -369,7 +390,7 @@ export async function updateForce(
 
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store.pilots);
 }
 
 export async function deleteForce(forceId: string, ownerId: string): Promise<void> {
@@ -398,16 +419,43 @@ export async function updateForceUnit(forceId: string, forceUnitId: string, owne
   }
   if (updates.sortOrder !== undefined) forceUnit.sortOrder = Number(updates.sortOrder);
   if (updates.pilotName !== undefined || updates.gunnery !== undefined || updates.piloting !== undefined) {
-    forceUnit.pilot = {
-      name: updates.pilotName ?? forceUnit.pilot?.name ?? randomPilotName(),
-      gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : forceUnit.pilot?.gunnery ?? 4,
-      piloting: updates.piloting !== undefined ? Number(updates.piloting) : forceUnit.pilot?.piloting ?? 5,
-    };
+    store.pilots ??= [];
+    let pilot = forceUnit.assignedPilotId
+      ? store.pilots.find((candidate) => candidate.id === forceUnit.assignedPilotId)
+      : undefined;
+    const now = new Date().toISOString();
+    if (!pilot) {
+      pilot = {
+        id: crypto.randomUUID(),
+        ownerId: force.ownerId,
+        campaignId: force.campaignId,
+        forceId: force.id,
+        assignedUnitId: forceUnit.id,
+        status: "Assigned",
+        name: updates.pilotName ?? randomPilotName(),
+        gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : 4,
+        piloting: updates.piloting !== undefined ? Number(updates.piloting) : 5,
+        wounds: 0,
+        kills: 0,
+        experience: 0,
+        isAlive: true,
+        isCaptured: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      store.pilots.push(pilot);
+      forceUnit.assignedPilotId = pilot.id;
+    } else {
+      pilot.name = updates.pilotName ?? pilot.name ?? randomPilotName();
+      pilot.gunnery = updates.gunnery !== undefined ? Number(updates.gunnery) : pilot.gunnery;
+      pilot.piloting = updates.piloting !== undefined ? Number(updates.piloting) : pilot.piloting;
+      pilot.updatedAt = now;
+    }
   }
 
   validateForceUnitRoster(force, store.forceUnits.filter((entry) => entry.forceId === force.id));
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store.pilots);
 }

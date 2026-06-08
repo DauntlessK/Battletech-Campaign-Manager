@@ -27,6 +27,7 @@ import type {
 } from "../types/app";
 import PageTitle from "../components/PageTitle";
 import LogBattlePage from "./LogBattlePage";
+import MechbayPage from "./MechbayPage";
 import { ERA_OPTIONS as APP_ERA_OPTIONS } from "../constants/appOptions";
 
 const CAMPAIGN_TYPES = ["Chaos", "Advanced", "Conquest"];
@@ -586,6 +587,7 @@ export default function CampaignsPage({
     "objectives" | "planet" | "victory"
   >("objectives");
   const [loggingBattle, setLoggingBattle] = useState(false);
+  const [mechbayPageOpen, setMechbayPageOpen] = useState(false);
   const [battleLogError, setBattleLogError] = useState<string | null>(null);
   const [battleLogLoading, setBattleLogLoading] = useState(false);
   const [battleLogPrefill, setBattleLogPrefill] =
@@ -1190,6 +1192,10 @@ export default function CampaignsPage({
         );
       }
 
+      if (mechbayPageOpen) {
+        return <MechbayPage campaign={selectedCampaign} force={force} onBack={() => setMechbayPageOpen(false)} />;
+      }
+
       if (battleHistoryOpen) {
         return (
           <BattleHistoryView
@@ -1231,6 +1237,7 @@ export default function CampaignsPage({
               );
               setLoggingBattle(true);
             }}
+            onOpenMechbay={() => setMechbayPageOpen(true)}
             onBattleHistory={() => {
               setBattleHistoryOpen(true);
               fetchCampaignBattles(selectedCampaign.id);
@@ -3699,6 +3706,7 @@ function ActiveCampaignDashboard({
   onBack,
   onLogBattle,
   onBattleHistory,
+  onOpenMechbay,
   awaitingBattleLog,
   onStartAwaitingBattleLog,
   onOpenFluff,
@@ -3713,6 +3721,7 @@ function ActiveCampaignDashboard({
   onBack: () => void;
   onLogBattle: () => void;
   onBattleHistory: () => void;
+  onOpenMechbay: () => void;
   awaitingBattleLog?: Battle | null;
   onStartAwaitingBattleLog: () => void;
   onOpenFluff: () => void;
@@ -3880,7 +3889,7 @@ function ActiveCampaignDashboard({
                 <HelpCircle size={17} />
               </ActionSquareButton>
             )}
-            <ActionSquareButton label="Open MechBay">
+            <ActionSquareButton label="Open MechBay" onClick={onOpenMechbay}>
               <Wrench size={17} />
             </ActionSquareButton>
             <ActionSquareButton label="Open spending and purchasing">
@@ -4172,6 +4181,133 @@ function ActiveCampaignDashboard({
       )}
     </section>
   );
+}
+
+
+function MechbayModal({
+  forceUnits,
+  isChaos,
+  onClose,
+}: {
+  forceUnits: ForceUnit[];
+  isChaos: boolean;
+  onClose: () => void;
+}) {
+  const repairUnits = forceUnits.filter((unit) => unitNeedsRepair(unit));
+
+  return (
+    <div className="fixed inset-0 z-[80] grid place-items-center bg-black/75 p-4 backdrop-blur-sm">
+      <div className="max-h-[92vh] w-full max-w-7xl overflow-hidden rounded-3xl border border-zinc-700 bg-zinc-950 shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-5 sm:p-6">
+          <div>
+            <div className="text-xs font-black uppercase tracking-[0.2em] text-lime-300">Campaign Operations</div>
+            <h2 className="mt-1 text-2xl font-black text-zinc-100">Mechbay</h2>
+            <p className="mt-1 text-sm text-zinc-400">Units requiring repair, salvage, or disposition. Pilot management is handled separately.</p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-xl border border-zinc-700 px-3 py-2 text-sm font-black text-zinc-300 hover:border-lime-400/50 hover:text-lime-200">Close</button>
+        </div>
+
+        <div className="max-h-[calc(92vh-7.5rem)] overflow-auto p-4 sm:p-6">
+          {repairUnits.length ? (
+            <div className="overflow-x-auto rounded-2xl border border-zinc-800">
+              <table className="min-w-[980px] w-full text-left text-sm">
+                <thead className="border-b border-zinc-800 bg-zinc-900/90 text-xs uppercase tracking-[0.13em] text-zinc-500">
+                  <tr>
+                    <th className="px-4 py-3">Unit</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Repair Summary</th>
+                    <th className="px-4 py-3 text-right">Current BV</th>
+                    <th className="px-4 py-3 text-right">Total BV</th>
+                    <th className="px-4 py-3">Repair Decision</th>
+                    <th className="px-4 py-3 text-right">Other Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800 bg-zinc-950/60">
+                  {repairUnits.map((unit) => {
+                    const status = forceUnitStatusLabel(unit);
+                    const summary = mechbayRepairSummary(unit);
+                    const repairCost = isChaos ? chaosRepairCost(unit, status) : null;
+                    const destroyed = status === "Destroyed" || Boolean(unit.isDestroyed);
+                    return (
+                      <tr key={unit.id} className="align-top">
+                        <td className="px-4 py-4">
+                          <div className="font-black text-zinc-100">{unit.snapshot?.name ?? unit.baseUnitId}</div>
+                          <div className="mt-1 text-xs text-zinc-500">{unit.snapshot?.weightClass ?? "Unknown class"} · {unit.snapshot?.tonnage ?? "—"} tons</div>
+                        </td>
+                        <td className="px-4 py-4"><span className={`rounded-full border px-2.5 py-1 text-xs font-black ${mechbayStatusClass(status)}`}>{status}</span></td>
+                        <td className="max-w-md px-4 py-4 text-xs leading-relaxed text-zinc-300">{summary}</td>
+                        <td className="px-4 py-4 text-right font-black text-zinc-200">{formatNumber(Number(unit.currentBV ?? 0))}</td>
+                        <td className="px-4 py-4 text-right font-black text-lime-200">{formatNumber(Number(unit.snapshot?.totalBV ?? 0))}</td>
+                        <td className="px-4 py-4">
+                          {isChaos ? (
+                            <button type="button" disabled={destroyed} className="rounded-xl border border-lime-400/35 bg-lime-400/10 px-3 py-2 text-xs font-black text-lime-200 disabled:cursor-not-allowed disabled:border-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-600">
+                              {destroyed ? "Not Repairable" : `Repair (${repairCost} WP cost)`}
+                            </button>
+                          ) : (
+                            <select defaultValue="Do Not Repair" className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-200 outline-none focus:border-lime-400/60">
+                              <option>Repair</option>
+                              <option>Do Not Repair</option>
+                            </select>
+                          )}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex justify-end gap-2">
+                            <button type="button" className="rounded-xl border border-amber-400/35 bg-amber-400/10 px-3 py-2 text-xs font-black text-amber-200">Salvage</button>
+                            <button type="button" className="rounded-xl border border-red-400/35 bg-red-400/10 px-3 py-2 text-xs font-black text-red-200">Sell</button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-10 text-center">
+              <div className="text-lg font-black text-zinc-100">No repairs required</div>
+              <p className="mt-2 text-sm text-zinc-500">Every unit in this campaign force is currently ready.</p>
+            </div>
+          )}
+          <p className="mt-4 text-xs text-zinc-600">This is the initial Mechbay layout. Repair, salvage, and sell controls are intentionally not connected to backend actions yet.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function unitNeedsRepair(unit: ForceUnit): boolean {
+  const status = forceUnitStatusLabel(unit);
+  if (!["Ready", "Available"].includes(status)) return true;
+  const damage = ((unit as any).currentDamage ?? (unit as any).damageOverlay) as any;
+  const summary = damage?.damageSummary ?? summarizeUnitDamage(damage ?? {});
+  return Object.values(summary ?? {}).some((value) => Number(value ?? 0) > 0);
+}
+
+function mechbayRepairSummary(unit: ForceUnit): string {
+  const damage = ((unit as any).currentDamage ?? (unit as any).damageOverlay) as any;
+  const summary = damage?.damageSummary ?? summarizeUnitDamage(damage ?? {});
+  const parts = [
+    [summary?.armor, "armor"], [summary?.internal, "internal"], [summary?.weapons, "weapons"],
+    [summary?.components, "components"], [summary?.engineHits, "engine"], [summary?.gyroHits, "gyro"],
+    [summary?.ammo, "ammo"], [summary?.limbs, "limbs"],
+  ].filter(([value]) => Number(value ?? 0) > 0).map(([value, label]) => `${value} ${label}`);
+  return parts.length ? parts.join(" · ") : forceUnitStatusLabel(unit) === "Destroyed" ? "Destroyed unit" : "Repair assessment required";
+}
+
+function chaosRepairCost(unit: ForceUnit, status: string): number {
+  const weight = String(unit.snapshot?.weightClass ?? "").toLowerCase();
+  const crippled = status === "Crippled";
+  if (weight === "light") return crippled ? 25 : 15;
+  if (weight === "medium") return crippled ? 45 : 30;
+  if (weight === "heavy") return crippled ? 75 : 60;
+  return crippled ? 100 : 80;
+}
+
+function mechbayStatusClass(status: string): string {
+  if (status === "Ready" || status === "Available") return "border-green-400/40 bg-green-500/15 text-green-200";
+  if (status === "Damaged") return "border-yellow-400/40 bg-yellow-500/15 text-yellow-200";
+  if (status === "Crippled") return "border-orange-400/40 bg-orange-500/15 text-orange-200";
+  return "border-red-400/40 bg-red-500/15 text-red-200";
 }
 
 function ActionSquareButton({

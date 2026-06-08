@@ -511,12 +511,24 @@ function applyBattleResultsToForces(store: any, battle: Battle) {
       forceUnit.isDestroyed = newStatus === "Destroyed";
       forceUnit.kills = Number(forceUnit.kills ?? 0) + Number(overlay.killsMade ?? 0);
 
+      const assignedPilot = forceUnit.assignedPilotId
+        ? store.pilots?.find((pilot: any) => pilot.id === forceUnit.assignedPilotId)
+        : undefined;
       if (overlay.pilotDamage === "KIA") {
-        forceUnit.pilot = undefined;
+        if (assignedPilot) {
+          assignedPilot.assignedUnitId = undefined;
+          assignedPilot.status = "Killed";
+          assignedPilot.isAlive = false;
+          assignedPilot.isCaptured = false;
+          assignedPilot.updatedAt = new Date().toISOString();
+        }
         forceUnit.assignedPilotId = undefined;
-      } else if (forceUnit.pilot && overlay.pilotDamage !== undefined) {
-        forceUnit.pilot.wounds = Number(overlay.pilotDamage ?? 0);
-        forceUnit.pilot.dead = false;
+      } else if (assignedPilot && overlay.pilotDamage !== undefined) {
+        assignedPilot.wounds = Number(overlay.pilotDamage ?? 0);
+        assignedPilot.status = assignedPilot.wounds > 0 ? "Wounded" : "Assigned";
+        assignedPilot.isAlive = true;
+        assignedPilot.isCaptured = false;
+        assignedPilot.updatedAt = new Date().toISOString();
       }
 
       forceUnit.updatedAt = new Date().toISOString();
@@ -552,8 +564,26 @@ function captureDestroyedUnitsForFieldHolder(store: any, battle: Battle) {
       if (!forceUnit || forceUnit.forceId === fieldHolderForceId) return;
 
       touchedForceIds.add(forceUnit.forceId);
+      const originalForceId = forceUnit.forceId;
+      const originalParticipant = store.campaignParticipants?.find(
+        (participant: any) =>
+          participant.campaignId === battle.campaignId &&
+          participant.forceId === originalForceId,
+      );
+      const assignedPilot = forceUnit.assignedPilotId
+        ? store.pilots?.find((pilot: any) => pilot.id === forceUnit.assignedPilotId)
+        : undefined;
+      if (assignedPilot && originalParticipant?.userId) {
+        assignedPilot.ownerId = originalParticipant.userId;
+        assignedPilot.campaignId = battle.campaignId;
+        assignedPilot.forceId = originalForceId;
+        assignedPilot.assignedUnitId = undefined;
+        assignedPilot.status = Number(assignedPilot.wounds ?? 0) > 0 ? "Wounded" : "Unassigned";
+        assignedPilot.isAlive = true;
+        assignedPilot.isCaptured = false;
+        assignedPilot.updatedAt = new Date().toISOString();
+      }
       forceUnit.forceId = fieldHolderForceId;
-      forceUnit.pilot = undefined;
       forceUnit.assignedPilotId = undefined;
       forceUnit.teamNumber = undefined;
       forceUnit.sortOrder = store.forceUnits.filter((unit: any) => unit.forceId === fieldHolderForceId).length;
