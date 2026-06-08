@@ -95,18 +95,161 @@ function resetCampaignProgress(store: StoreData, campaignId: string) {
     throw new Error("Campaign not found.");
   }
 
+  const now = new Date().toISOString();
+  const participants = acceptedParticipantsForCampaign(store, campaign);
   const defaultControl = equalControlForCampaign(store, campaign);
-
-  store.battles = store.battles.filter((battle) => battle.campaignId !== campaignId);
-  store.notifications = store.notifications?.filter(
-    (note) => note.payload?.campaignId !== campaignId && note.payload?.battleId == null,
+  const campaignForces = store.forces.filter(
+    (force) => force.campaignId === campaignId && force.origin === "CampaignCopy",
+  );
+  const campaignForceIds = new Set(campaignForces.map((force) => force.id));
+  const oldCampaignUnitIds = new Set(
+    store.forceUnits
+      .filter((forceUnit) => campaignForceIds.has(forceUnit.forceId))
+      .map((forceUnit) => forceUnit.id),
+  );
+  const oldDamageIds = new Set(
+    (store.unitDamage ?? [])
+      .filter((damage) => oldCampaignUnitIds.has(damage.forceUnitId))
+      .map((damage) => damage.id),
   );
 
+  // Remove all mutable campaign state. Campaign forces themselves retain their IDs so
+  // participant.forceId references remain stable, but their rosters are rebuilt below.
+  store.battles = store.battles.filter((battle) => battle.campaignId !== campaignId);
+  store.notifications = (store.notifications ?? []).filter(
+    (note) => note.payload?.campaignId !== campaignId,
+  );
+  store.resourceTransactions = store.resourceTransactions.filter(
+    (transaction) => transaction.campaignId !== campaignId,
+  );
+  store.resourceAccounts = store.resourceAccounts.filter(
+    (account) => account.campaignId !== campaignId,
+  );
+  store.pilots = (store.pilots ?? []).filter(
+    (pilot) => pilot.campaignId !== campaignId && !campaignForceIds.has(pilot.forceId ?? ""),
+  );
+  store.forceUnits = store.forceUnits.filter(
+    (forceUnit) => !campaignForceIds.has(forceUnit.forceId),
+  );
+  store.unitDamage = (store.unitDamage ?? []).filter(
+    (damage) => damage.campaignId !== campaignId && !oldCampaignUnitIds.has(damage.forceUnitId),
+  );
+  store.unitLocationDamage = (store.unitLocationDamage ?? []).filter(
+    (damage) =>
+      !oldCampaignUnitIds.has(damage.forceUnitId) && !oldDamageIds.has(damage.unitDamageId),
+  );
+  store.unitEquipmentDamage = (store.unitEquipmentDamage ?? []).filter(
+    (damage) =>
+      !oldCampaignUnitIds.has(damage.forceUnitId) && !oldDamageIds.has(damage.unitDamageId),
+  );
+  store.unitAmmoState = (store.unitAmmoState ?? []).filter(
+    (ammo) => !oldCampaignUnitIds.has(ammo.forceUnitId),
+  );
+  store.repairOrders = (store.repairOrders ?? []).filter(
+    (order) =>
+      order.campaignId !== campaignId &&
+      !oldCampaignUnitIds.has(order.forceUnitId) &&
+      !oldDamageIds.has(order.unitDamageId),
+  );
+
+  // Rebuild each campaign-copy force from its untouched source force.
+  for (const campaignForce of campaignForces) {
+    const original = campaignForce.originalForceId
+      ? store.forces.find((force) => force.id === campaignForce.originalForceId)
+      : undefined;
+    if (!original) {
+      throw new Error(
+        `Cannot reset ${campaignForce.name}: original force ${campaignForce.originalForceId ?? "is missing"}.`,
+      );
+    }
+
+    const originalUnits = store.forceUnits
+      .filter((unit) => unit.forceId === original.id)
+      .sort(
+        (a, b) =>
+          (a.teamNumber ?? 1) - (b.teamNumber ?? 1) ||
+          (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+      );
+
+    const rebuiltUnits = originalUnits.map((originalUnit, index) => {
+      const newUnitId = crypto.randomUUID();
+      const sourcePilot = (store.pilots ?? []).find(
+        (pilot) =>
+          pilot.id === originalUnit.assignedPilotId ||
+          pilot.assignedUnitId === originalUnit.id,
+      );
+      const assignedPilotId = sourcePilot ? crypto.randomUUID() : undefined;
+
+      if (sourcePilot && assignedPilotId) {
+        store.pilots ??= [];
+        store.pilots.push({
+          ...sourcePilot,
+          id: assignedPilotId,
+          ownerId: campaignForce.ownerId,
+          campaignId,
+          forceId: campaignForce.id,
+          assignedUnitId: newUnitId,
+          status: "Assigned",
+          wounds: 0,
+          kills: 0,
+          experience: 0,
+          isAlive: true,
+          isCaptured: false,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+
+      return {
+        ...originalUnit,
+        id: newUnitId,
+        forceId: campaignForce.id,
+        assignedPilotId,
+        currentBV: Number(originalUnit.snapshot?.totalBV ?? originalUnit.currentBV ?? 0),
+        status: "Available" as const,
+        kills: 0,
+        damageDescription: undefined,
+        isDestroyed: false,
+        teamNumber: originalUnit.teamNumber ?? 1,
+        sortOrder: originalUnit.sortOrder ?? index,
+        pilot: undefined,
+        currentDamage: undefined,
+        damageOverlay: undefined,
+      };
+    });
+
+    store.forceUnits.push(...rebuiltUnits);
+    campaignForce.unitIds = rebuiltUnits.map((unit) => unit.baseUnitId);
+    campaignForce.totalBV = rebuiltUnits.reduce(
+      (total, unit) => total + Number(unit.snapshot?.totalBV ?? unit.currentBV ?? 0),
+      0,
+    );
+    campaignForce.startingBV = campaignForce.totalBV;
+    campaignForce.status = "Assigned";
+    campaignForce.updatedAt = now;
+  }
+
+  // Restore campaign resources for every accepted participant.
+  const startingResources = campaign.settings.startingResources ?? {};
+  for (const participant of participants) {
+    store.resourceAccounts.push({
+      id: crypto.randomUUID(),
+      campaignId,
+      userId: participant.userId,
+      balances: { ...startingResources },
+      lastUpdatedAt: now,
+    });
+    participant.currentTurn = 1;
+  }
+
   campaign.turnNumber = 1;
-  campaign.updatedAt = new Date().toISOString();
+  campaign.updatedAt = now;
+  if (campaign.status === "Active") campaign.startDate = now;
   campaign.planetaryControl = defaultControl;
   campaign.settings = {
     ...campaign.settings,
+    currentTurn: 1,
+    planetaryControl: defaultControl,
     objectives: campaign.settings.objectives?.map((objective) => ({
       ...objective,
       currentControl: defaultControl,
@@ -119,39 +262,79 @@ function resetCampaignProgress(store: StoreData, campaignId: string) {
           ...objective,
           currentOwnerId: undefined,
           currentControl: defaultControl,
-          updatedAt: new Date().toISOString(),
+          updatedAt: now,
         }
       : objective,
   );
 
-  const campaignForceIds = new Set(
-    store.forces
-      .filter((force) => force.campaignId === campaignId && force.origin === "CampaignCopy")
-      .map((force) => force.id),
+  return campaign;
+}
+
+function auditCampaignState(store: StoreData, campaignId: string) {
+  const campaign = store.campaigns.find((entry) => entry.id === campaignId);
+  if (!campaign) throw new Error("Campaign not found.");
+
+  const forces = store.forces.filter((force) => force.campaignId === campaignId);
+  const forceIds = new Set(forces.map((force) => force.id));
+  const units = store.forceUnits.filter((unit) => forceIds.has(unit.forceId));
+  const unitIds = new Set(units.map((unit) => unit.id));
+  const pilots = (store.pilots ?? []).filter(
+    (pilot) => pilot.campaignId === campaignId || forceIds.has(pilot.forceId ?? ""),
+  );
+  const damages = (store.unitDamage ?? []).filter(
+    (damage) => damage.campaignId === campaignId || unitIds.has(damage.forceUnitId),
+  );
+  const damageIds = new Set(damages.map((damage) => damage.id));
+  const orders = (store.repairOrders ?? []).filter(
+    (order) => order.campaignId === campaignId || unitIds.has(order.forceUnitId),
   );
 
-  store.forceUnits = store.forceUnits.map((forceUnit) => {
-    if (!campaignForceIds.has(forceUnit.forceId)) return forceUnit;
-    const assignedPilot = forceUnit.assignedPilotId
-      ? store.pilots?.find((pilot) => pilot.id === forceUnit.assignedPilotId)
-      : undefined;
-    if (assignedPilot) {
-      assignedPilot.wounds = 0;
-      assignedPilot.status = "Assigned";
-      assignedPilot.isAlive = true;
-      assignedPilot.isCaptured = false;
-      assignedPilot.updatedAt = new Date().toISOString();
+  const issues: string[] = [];
+  for (const participant of store.campaignParticipants.filter((p) => p.campaignId === campaignId)) {
+    if (participant.forceId && !forceIds.has(participant.forceId)) {
+      issues.push(`Participant ${participant.userId} references missing force ${participant.forceId}.`);
     }
-    return {
-      ...forceUnit,
-      status: "Available",
-      currentBV: forceUnit.snapshot?.totalBV ?? forceUnit.currentBV,
-      damageDescription: undefined,
-      isDestroyed: false,
-    };
-  });
+  }
+  for (const unit of units) {
+    if (unit.assignedPilotId && !(store.pilots ?? []).some((pilot) => pilot.id === unit.assignedPilotId)) {
+      issues.push(`Unit ${unit.id} references missing pilot ${unit.assignedPilotId}.`);
+    }
+  }
+  for (const pilot of pilots) {
+    if (pilot.assignedUnitId && !unitIds.has(pilot.assignedUnitId)) {
+      issues.push(`Pilot ${pilot.id} references missing campaign unit ${pilot.assignedUnitId}.`);
+    }
+  }
+  for (const damage of damages) {
+    if (!unitIds.has(damage.forceUnitId)) {
+      issues.push(`Damage ${damage.id} references missing unit ${damage.forceUnitId}.`);
+    }
+  }
+  for (const row of store.unitLocationDamage ?? []) {
+    if (damageIds.has(row.unitDamageId) && !unitIds.has(row.forceUnitId)) {
+      issues.push(`Location damage ${row.id} references missing unit ${row.forceUnitId}.`);
+    }
+  }
+  for (const order of orders) {
+    if (!unitIds.has(order.forceUnitId)) {
+      issues.push(`Repair order ${order.id} references missing unit ${order.forceUnitId}.`);
+    }
+  }
 
-  return campaign;
+  return {
+    ok: issues.length === 0,
+    issues,
+    counts: {
+      forces: forces.length,
+      units: units.length,
+      pilots: pilots.length,
+      damageRecords: damages.length,
+      repairOrders: orders.length,
+      battles: store.battles.filter((battle) => battle.campaignId === campaignId).length,
+      resourceAccounts: store.resourceAccounts.filter((account) => account.campaignId === campaignId).length,
+      resourceTransactions: store.resourceTransactions.filter((tx) => tx.campaignId === campaignId).length,
+    },
+  };
 }
 
 function deleteCampaignCascade(store: StoreData, campaignId: string) {
@@ -211,6 +394,17 @@ router.post("/campaigns/:campaignId/reset", async (req, res) => {
   } catch (error) {
     res.status(404).json({
       error: error instanceof Error ? error.message : "Unable to reset campaign.",
+    });
+  }
+});
+
+router.get("/campaigns/:campaignId/audit", async (req, res) => {
+  try {
+    const store = await loadStore();
+    res.json(auditCampaignState(store, req.params.campaignId));
+  } catch (error) {
+    res.status(404).json({
+      error: error instanceof Error ? error.message : "Unable to audit campaign.",
     });
   }
 });

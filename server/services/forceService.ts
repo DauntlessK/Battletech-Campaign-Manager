@@ -5,19 +5,138 @@ import { randomPilotName } from "../data/pilotNames";
 import type { CampaignUnitSnapshot, Force, ForceUnit } from "../types/models";
 import type { Unit } from "../types/unit";
 
-function withForceUnits(force: Force, forceUnits: ForceUnit[]): Force {
+function overlayFromDamageTables(store: any, forceUnit: ForceUnit): any | null {
+  const damage = (store.unitDamage ?? []).find((entry: any) => entry.forceUnitId === forceUnit.id);
+  if (!damage) return null;
+  const locations: Record<string, any> = {};
+  for (const row of store.unitLocationDamage ?? []) {
+    if (row.forceUnitId !== forceUnit.id && row.unitDamageId !== damage.id) continue;
+    const key = row.locationId || row.locationName;
+    locations[key] = {
+      armorDamage: Number(row.armorDamage ?? 0),
+      rearArmorDamage: Number(row.rearArmorDamage ?? 0),
+      structureDamage: Number(row.structureDamage ?? 0),
+      missing: Boolean(row.isMissing),
+      destroyed: Boolean(row.isDestroyed),
+      damagedSlots: [...(row.damagedSlots ?? [])],
+      destroyedSlots: [...(row.destroyedSlots ?? [])],
+    };
+  }
+  const equipmentDamage = (store.unitEquipmentDamage ?? []).filter((row: any) => row.forceUnitId === forceUnit.id || row.unitDamageId === damage.id);
+  const repairOrders = (store.repairOrders ?? []).filter((row: any) => row.forceUnitId === forceUnit.id || row.unitDamageId === damage.id);
+  const ammoSpent: Record<string, number> = {};
+  for (const row of store.unitAmmoState ?? []) {
+    if (row.forceUnitId !== forceUnit.id) continue;
+    ammoSpent[row.ammoTypeId] = Number(row.shotsSpent ?? 0);
+  }
+  return {
+    campaignForceUnitId: forceUnit.id,
+    unitName: forceUnit.snapshot?.name,
+    status: damage.status ?? forceUnit.status,
+    currentBV: forceUnit.currentBV,
+    recalculatedBV: forceUnit.currentBV,
+    repairComplexity: damage.repairComplexity,
+    damageSummary: {
+      armor: Number(damage.armorDamageTotal ?? 0),
+      internal: Number(damage.structureDamageTotal ?? 0),
+      weapons: Number(damage.weapons ?? 0),
+      components: Number(damage.components ?? 0),
+      engineHits: Number(damage.engineHits ?? 0),
+      gyroHits: Number(damage.gyroHits ?? 0),
+      ammo: Number(damage.ammoSpentTotal ?? Object.values(ammoSpent).reduce((sum: number, value: any) => sum + Number(value ?? 0), 0)),
+      limbs: Number(damage.limbs ?? 0),
+    },
+    detailed: {
+      locations,
+      ammoSpent,
+      ammoConfirmed: Object.keys(ammoSpent).length > 0,
+      notes: damage.notes,
+      damagedEquipmentIds: equipmentDamage.filter((row: any) => row.condition === "Damaged").map((row: any) => row.equipmentId).filter(Boolean),
+      destroyedEquipmentIds: equipmentDamage.filter((row: any) => row.condition !== "Damaged").map((row: any) => row.equipmentId).filter(Boolean),
+      equipmentDamage,
+      repairOrders,
+    },
+  };
+}
+
+function clearDamageForUnit(store: any, forceUnitId: string): void {
+  const damageIds = new Set((store.unitDamage ?? []).filter((entry: any) => entry.forceUnitId === forceUnitId).map((entry: any) => entry.id));
+  store.unitDamage = (store.unitDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId);
+  store.unitLocationDamage = (store.unitLocationDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+  store.unitEquipmentDamage = (store.unitEquipmentDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+  store.unitAmmoState = (store.unitAmmoState ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId);
+  store.repairOrders = (store.repairOrders ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+}
+
+function hydratePilot(store: any, forceUnit: ForceUnit): any | null {
+  const pilot = (store.pilots ?? []).find((entry: any) => entry.id === forceUnit.assignedPilotId || entry.assignedUnitId === forceUnit.id);
+  if (!pilot) return null;
+  return {
+    id: pilot.id,
+    name: pilot.name,
+    gunnery: Number(pilot.gunnery ?? 4),
+    piloting: Number(pilot.piloting ?? 5),
+    wounds: Number(pilot.wounds ?? 0),
+    dead: pilot.isAlive === false || pilot.status === "Killed",
+    status: pilot.status,
+  };
+}
+
+function withForceUnits(force: Force, forceUnits: ForceUnit[], store?: any): Force {
   return {
     ...force,
     forceUnits: forceUnits
       .filter((unit) => unit.forceId === force.id)
-      .map((unit, index) => ({
-        ...unit,
-        teamNumber: unit.teamNumber ?? 1,
-        sortOrder: unit.sortOrder ?? index,
-        pilot: unit.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
-      }))
+      .map((unit, index) => {
+        const pilot = store ? hydratePilot(store, unit) : unit.pilot ?? null;
+        const currentDamage = store ? overlayFromDamageTables(store, unit) : (unit as any).currentDamage ?? (unit as any).damageOverlay ?? null;
+        return {
+          ...unit,
+          teamNumber: unit.teamNumber ?? 1,
+          sortOrder: unit.sortOrder ?? index,
+          pilot,
+          currentDamage,
+          damageOverlay: currentDamage,
+        };
+      })
       .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   };
+}
+
+function ensurePilotForUnit(store: any, forceUnit: ForceUnit, ownerId: string, campaignId?: string, pilotInput?: any): string {
+  store.pilots ??= [];
+  const existing = store.pilots.find((entry: any) => entry.id === forceUnit.assignedPilotId || entry.assignedUnitId === forceUnit.id);
+  if (existing) {
+    existing.forceId = forceUnit.forceId;
+    existing.campaignId = campaignId;
+    existing.assignedUnitId = forceUnit.id;
+    existing.status = Number(existing.wounds ?? 0) > 0 ? "Wounded" : "Assigned";
+    existing.updatedAt = new Date().toISOString();
+    forceUnit.assignedPilotId = existing.id;
+    return existing.id;
+  }
+  const now = new Date().toISOString();
+  const pilot = {
+    id: crypto.randomUUID(),
+    ownerId,
+    campaignId,
+    forceId: forceUnit.forceId,
+    assignedUnitId: forceUnit.id,
+    status: "Assigned",
+    name: pilotInput?.name || randomPilotName(),
+    gunnery: Number(pilotInput?.gunnery ?? 4),
+    piloting: Number(pilotInput?.piloting ?? 5),
+    wounds: Number(pilotInput?.wounds ?? 0),
+    kills: 0,
+    experience: 0,
+    isAlive: true,
+    isCaptured: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.pilots.push(pilot);
+  forceUnit.assignedPilotId = pilot.id;
+  return pilot.id;
 }
 
 function refreshForceUnitIds(force: Force, forceUnits: ForceUnit[]) {
@@ -157,14 +276,14 @@ export async function createForce(
   store.forces.push(force);
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store);
 }
 
 export async function listForcesForUser(ownerId: string): Promise<Force[]> {
   const store = await loadStore();
   return store.forces
     .filter((f) => f.ownerId === ownerId && f.status !== "Deleted")
-    .map((force) => withForceUnits(force, store.forceUnits));
+    .map((force) => withForceUnits(force, store.forceUnits, store));
 }
 
 export async function assignForceToCampaign(originalForceId: string, campaignId: string, assignedOwnerId: string): Promise<Force> {
@@ -191,8 +310,9 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
       ...u,
       id: crypto.randomUUID(),
       forceId: copy.id,
-      pilot: u.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
     };
+    const originalPilot = (store.pilots ?? []).find((pilot: any) => pilot.id === u.assignedPilotId || pilot.assignedUnitId === u.id);
+    ensurePilotForUnit(store, newUnit, assignedOwnerId, campaignId, originalPilot ?? u.pilot);
     store.forceUnits.push(newUnit);
   }
 
@@ -200,13 +320,13 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
   store.forces.push(copy);
   await saveStore(store);
 
-  return withForceUnits(copy, store.forceUnits);
+  return withForceUnits(copy, store.forceUnits, store);
 }
 
 export async function getForceById(forceId: string): Promise<Force | undefined> {
   const store = await loadStore();
   const force = store.forces.find((candidate) => candidate.id === forceId);
-  return force ? withForceUnits(force, store.forceUnits) : undefined;
+  return force ? withForceUnits(force, store.forceUnits, store) : undefined;
 }
 
 function buildUnitSnapshot(unit: Unit): CampaignUnitSnapshot {
@@ -276,15 +396,15 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
     isDestroyed: false,
     teamNumber: normalizedTeam,
     sortOrder: nextSortOrder,
-    pilot: { name: randomPilotName(), gunnery: 4, piloting: 5 },
   };
+  ensurePilotForUnit(store, newForceUnit, ownerId, force.campaignId);
 
   store.forceUnits.push(newForceUnit);
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store);
 }
 
 export async function updateForce(
@@ -340,7 +460,7 @@ export async function updateForce(
       const normalizedTeamNumber = force.forConquest ? Math.max(1, Math.min(maxTeamNumber, incomingTeamNumber)) : 1;
       const incomingPilot = incoming.pilot ?? existing?.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 };
 
-      sanitizedForceUnits.push({
+      const sanitizedUnit: ForceUnit = {
         id: typeof incoming.id === "string" && !incoming.id.startsWith("draft-") ? incoming.id : crypto.randomUUID(),
         forceId,
         baseUnitId,
@@ -353,12 +473,9 @@ export async function updateForce(
         assignedPilotId: incoming.assignedPilotId ?? existing?.assignedPilotId,
         teamNumber: normalizedTeamNumber,
         sortOrder: Number(incoming.sortOrder ?? index),
-        pilot: {
-          name: incomingPilot.name || randomPilotName(),
-          gunnery: Number(incomingPilot.gunnery ?? 4),
-          piloting: Number(incomingPilot.piloting ?? 5),
-        },
-      });
+      };
+      ensurePilotForUnit(store, sanitizedUnit, ownerId, force.campaignId, incomingPilot);
+      sanitizedForceUnits.push(sanitizedUnit);
     }
 
     validateForceUnitRoster(force, sanitizedForceUnits);
@@ -369,7 +486,7 @@ export async function updateForce(
 
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store);
 }
 
 export async function deleteForce(forceId: string, ownerId: string): Promise<void> {
@@ -398,18 +515,26 @@ export async function updateForceUnit(forceId: string, forceUnitId: string, owne
   }
   if (updates.sortOrder !== undefined) forceUnit.sortOrder = Number(updates.sortOrder);
   if (updates.pilotName !== undefined || updates.gunnery !== undefined || updates.piloting !== undefined) {
-    forceUnit.pilot = {
-      name: updates.pilotName ?? forceUnit.pilot?.name ?? randomPilotName(),
-      gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : forceUnit.pilot?.gunnery ?? 4,
-      piloting: updates.piloting !== undefined ? Number(updates.piloting) : forceUnit.pilot?.piloting ?? 5,
-    };
+    const pilot = (store.pilots ?? []).find((entry: any) => entry.id === forceUnit.assignedPilotId || entry.assignedUnitId === forceUnit.id);
+    if (pilot) {
+      if (updates.pilotName !== undefined) pilot.name = updates.pilotName;
+      if (updates.gunnery !== undefined) pilot.gunnery = Number(updates.gunnery);
+      if (updates.piloting !== undefined) pilot.piloting = Number(updates.piloting);
+      pilot.updatedAt = new Date().toISOString();
+    } else {
+      ensurePilotForUnit(store, forceUnit, ownerId, force.campaignId, {
+        name: updates.pilotName ?? randomPilotName(),
+        gunnery: updates.gunnery ?? 4,
+        piloting: updates.piloting ?? 5,
+      });
+    }
   }
 
   validateForceUnitRoster(force, store.forceUnits.filter((entry) => entry.forceId === force.id));
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits);
+  return withForceUnits(force, store.forceUnits, store);
 }
 
 function chaosRepairCostForUnit(forceUnit: ForceUnit): number {
@@ -467,6 +592,7 @@ export async function repairChaosForceUnit(
   forceUnit.currentBV = Number(forceUnit.snapshot?.totalBV ?? forceUnit.currentBV ?? 0);
   forceUnit.status = "Ready" as any;
   forceUnit.isDestroyed = false;
+  clearDamageForUnit(store, forceUnit.id);
   delete (forceUnit as any).currentDamage;
   delete (forceUnit as any).damageOverlay;
   delete (forceUnit as any).damageState;
@@ -474,7 +600,7 @@ export async function repairChaosForceUnit(
   await saveStore(store);
 
   return {
-    force: withForceUnits(force, store.forceUnits),
+    force: withForceUnits(force, store.forceUnits, store),
     cost,
     remainingWarchest: Number(account.balances.Warchest ?? 0),
   };
@@ -518,11 +644,12 @@ export async function disposeForceUnit(forceId: string, forceUnitId: string, cam
   account.balances[quote.resourceType] = Number(account.balances[quote.resourceType] ?? 0) + quote.amount;
   account.lastUpdatedAt = new Date().toISOString();
   store.resourceTransactions.push({ id: crypto.randomUUID(), campaignId, userId, type: quote.resourceType, amount: quote.amount, reason: `${action === "sell" ? "Sold" : "Salvaged"} ${unit.snapshot?.name ?? unit.baseUnitId}`, createdAt: new Date().toISOString() });
-  const pilot = store.pilots.find((p: any) => p.assignedUnitId === unit.id);
+  const pilot = (store.pilots ?? []).find((p: any) => p.assignedUnitId === unit.id);
   if (pilot) { pilot.assignedUnitId = undefined; pilot.status = pilot.wounds > 0 ? "Wounded" : "Unassigned"; pilot.updatedAt = new Date().toISOString(); }
+  clearDamageForUnit(store, unit.id);
   store.forceUnits.splice(index, 1);
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return { force: withForceUnits(force, store.forceUnits), ...quote, balance: account.balances[quote.resourceType] };
+  return { force: withForceUnits(force, store.forceUnits, store), ...quote, balance: account.balances[quote.resourceType] };
 }

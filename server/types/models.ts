@@ -181,6 +181,9 @@ export type Force = {
 export type UnitType = "BattleMech" | "Vehicle" | "Infantry" | "Aerospace";
 export type UnitStatus =
   | "Available"
+  | "Ready"
+  | "Damaged"
+  | "Crippled"
   | "Destroyed"
   | "InRepair"
   | "Reserved"
@@ -234,13 +237,41 @@ export type ForceUnit = {
   assignedPilotId?: string;
   teamNumber?: number;
   sortOrder?: number;
-  pilot?: {
-    name?: string;
-    gunnery: number;
-    piloting: number;
-    wounds?: number;
-    dead?: boolean;
-  };
+  // Hydrated API-only fields. Persist pilot state in pilots.json and current damage in the damage collections.
+  pilot?: PilotSummary | null;
+  currentDamage?: CampaignUnitDamageOverlay | null;
+  damageOverlay?: CampaignUnitDamageOverlay | null;
+};
+
+export type PilotStatus = "Assigned" | "Unassigned" | "Wounded" | "Captured" | "Missing" | "Killed";
+
+export type Pilot = {
+  id: string;
+  ownerId: string;
+  campaignId?: string;
+  forceId?: string;
+  assignedUnitId?: string;
+  status: PilotStatus;
+  name?: string;
+  gunnery: number;
+  piloting: number;
+  wounds?: number;
+  kills?: number;
+  experience?: number;
+  isAlive?: boolean;
+  isCaptured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PilotSummary = {
+  id?: string;
+  name?: string;
+  gunnery: number;
+  piloting: number;
+  wounds?: number;
+  dead?: boolean;
+  status?: PilotStatus;
 };
 
 export type BattleStatus =
@@ -298,6 +329,94 @@ export type CampaignUnitDamageOverlay = {
     damagedEquipmentIds?: string[];
     notes?: string;
   };
+};
+
+
+export type ForceUnitDamage = {
+  id: string;
+  campaignId?: string;
+  forceId: string;
+  forceUnitId: string;
+  status?: string;
+  repairComplexity?: RepairComplexity;
+  armorDamageTotal?: number;
+  rearArmorDamageTotal?: number;
+  structureDamageTotal?: number;
+  engineHits?: number;
+  gyroHits?: number;
+  ammoSpentTotal?: number;
+  limbs?: number;
+  weapons?: number;
+  components?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ForceUnitLocationDamage = {
+  id: string;
+  unitDamageId: string;
+  forceUnitId: string;
+  locationId: string;
+  locationName?: string;
+  armorDamage?: number;
+  rearArmorDamage?: number;
+  structureDamage?: number;
+  isMissing?: boolean;
+  isDestroyed?: boolean;
+  damagedSlots?: number[];
+  destroyedSlots?: number[];
+};
+
+export type ForceUnitEquipmentDamage = {
+  id: string;
+  unitDamageId: string;
+  forceUnitId: string;
+  locationId?: string;
+  slotNumber?: number;
+  equipmentId?: string;
+  equipmentName?: string;
+  condition: "Damaged" | "Destroyed" | "Missing";
+  techRating?: string;
+  availabilityRating?: string;
+  repairRoll?: number;
+  disposition?: "Repair" | "Replace";
+  replacementCostCBills?: number;
+};
+
+export type RepairOrder = {
+  id: string;
+  campaignId?: string;
+  forceId: string;
+  forceUnitId: string;
+  unitDamageId: string;
+  category: "Armor" | "Internal Structure" | "Equipment" | "Limb" | "Ammunition";
+  locationId?: string;
+  slotNumber?: number;
+  itemId?: string;
+  itemName: string;
+  quantity: number;
+  action: "Repair" | "Replace" | "Rearm";
+  repairRoll?: number;
+  techRating?: string;
+  availabilityRating?: string;
+  replacementCostCBills?: number;
+  status: "Pending" | "Failed" | "Ordered" | "Awaiting Delivery" | "Delivered" | "In Progress" | "Complete" | "Cancelled";
+  requisitionStatus?: "Needs Order" | "Failed" | "Awaiting Delivery" | "Delivered";
+  deliveryTurnsRemaining?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ForceUnitAmmoState = {
+  id: string;
+  forceUnitId: string;
+  unitDamageId?: string;
+  ammoTypeId: string;
+  shotsSpent: number;
+  shotsRemaining?: number;
+  tonsRequired?: number;
+  updatedAt: string;
 };
 
 export type BattleLogEntry = {
@@ -458,6 +577,12 @@ export type StoreData = {
   campaignParticipants: CampaignParticipant[];
   forces: Force[];
   forceUnits: ForceUnit[];
+  pilots?: Pilot[];
+  unitDamage?: ForceUnitDamage[];
+  unitLocationDamage?: ForceUnitLocationDamage[];
+  unitEquipmentDamage?: ForceUnitEquipmentDamage[];
+  unitAmmoState?: ForceUnitAmmoState[];
+  repairOrders?: RepairOrder[];
   battles: Battle[];
   objectives: Objective[];
   resourceAccounts: ResourceAccount[];

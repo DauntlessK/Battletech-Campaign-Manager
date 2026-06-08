@@ -4,6 +4,11 @@ export type CriticalSlot = {
   slot: number;
   item: string;
   type?: "weapon" | "ammo" | "equipment" | "engine" | "structure" | "empty";
+  techRating?: string;
+  availability?: Record<string, string>;
+  cost?: unknown;
+  shots?: number;
+  capacity?: number;
 };
 
 export type UnitLocation = {
@@ -13,6 +18,10 @@ export type UnitLocation = {
   rearArmor?: number;
   structure: number;
   slots: CriticalSlot[];
+  techRating?: string;
+  availability?: Record<string, string>;
+  cost?: unknown;
+  replacementCostCBills?: number;
 };
 
 export type UnitJsonWarning =

@@ -28,6 +28,12 @@ const DEFAULT_STORE: StoreData = {
   campaignParticipants: [],
   forces: [],
   forceUnits: [],
+  pilots: [],
+  unitDamage: [],
+  unitLocationDamage: [],
+  unitEquipmentDamage: [],
+  unitAmmoState: [],
+  repairOrders: [],
   battles: [],
   objectives: [],
   resourceAccounts: [],
@@ -35,7 +41,7 @@ const DEFAULT_STORE: StoreData = {
   authTokens: [],
   notifications: [],
   friendRequests: [],
-  pilots: [],
+  unassignedPilots: [],
 };
 
 const COLLECTION_KEYS = [
@@ -44,6 +50,12 @@ const COLLECTION_KEYS = [
   "campaignParticipants",
   "forces",
   "forceUnits",
+  "pilots",
+  "unitDamage",
+  "unitLocationDamage",
+  "unitEquipmentDamage",
+  "unitAmmoState",
+  "repairOrders",
   "battles",
   "objectives",
   "resourceAccounts",
@@ -51,7 +63,7 @@ const COLLECTION_KEYS = [
   "authTokens",
   "notifications",
   "friendRequests",
-  "pilots",
+  "unassignedPilots",
 ] as const satisfies readonly (keyof StoreData)[];
 
 type CollectionKey = (typeof COLLECTION_KEYS)[number];
@@ -69,7 +81,7 @@ const REQUIRED_ARRAY_KEYS: readonly CollectionKey[] = [
   "authTokens",
 ];
 
-const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests", "pilots"];
+const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests", "unassignedPilots", "pilots", "unitDamage", "unitLocationDamage", "unitEquipmentDamage", "unitAmmoState", "repairOrders"];
 
 let saveQueue: Promise<void> = Promise.resolve();
 
@@ -94,12 +106,159 @@ function createTimestamp(): string {
   return new Date().toISOString().replace(/[:.]/g, "-");
 }
 
+
+function slugKey(value: string): string {
+  return String(value || "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function findCampaignIdForForce(store: any, forceId?: string): string | undefined {
+  if (!forceId) return undefined;
+  const force = (store.forces ?? []).find((entry: any) => entry.id === forceId);
+  return force?.campaignId;
+}
+
+function findOwnerIdForForce(store: any, forceId?: string): string | undefined {
+  if (!forceId) return undefined;
+  const force = (store.forces ?? []).find((entry: any) => entry.id === forceId);
+  return force?.ownerId;
+}
+
+function buildDamageTablesFromOverlay(store: any, forceUnit: any, overlay: any): void {
+  if (!forceUnit?.id || !overlay) return;
+  store.unitDamage ??= [];
+  store.unitLocationDamage ??= [];
+  store.unitEquipmentDamage ??= [];
+  store.unitAmmoState ??= [];
+  store.repairOrders ??= [];
+
+  store.unitDamage = store.unitDamage.filter((entry: any) => entry.forceUnitId !== forceUnit.id);
+  store.unitLocationDamage = store.unitLocationDamage.filter((entry: any) => entry.forceUnitId !== forceUnit.id);
+  store.unitEquipmentDamage = store.unitEquipmentDamage.filter((entry: any) => entry.forceUnitId !== forceUnit.id);
+  store.unitAmmoState = store.unitAmmoState.filter((entry: any) => entry.forceUnitId !== forceUnit.id);
+
+  const summary = overlay.damageSummary ?? {};
+  const locations = overlay.detailed?.locations ?? {};
+  const ammoSpent = overlay.detailed?.ammoSpent ?? {};
+  const hasDamage =
+    Object.values(summary).some((value: any) => Number(value ?? 0) > 0) ||
+    Object.values(locations).some((entry: any) =>
+      Number(entry?.armorDamage ?? 0) > 0 ||
+      Number(entry?.rearArmorDamage ?? 0) > 0 ||
+      Number(entry?.structureDamage ?? 0) > 0 ||
+      Boolean(entry?.missing || entry?.destroyed),
+    ) ||
+    Object.values(ammoSpent).some((value: any) => Number(value ?? 0) > 0) ||
+    !["ready", "available"].includes(String(overlay.status ?? forceUnit.status ?? "").toLowerCase());
+  if (!hasDamage) return;
+
+  const now = new Date().toISOString();
+  const damageId = `damage-${forceUnit.id}`;
+  store.unitDamage.push({
+    id: damageId,
+    campaignId: findCampaignIdForForce(store, forceUnit.forceId),
+    forceId: forceUnit.forceId,
+    forceUnitId: forceUnit.id,
+    status: overlay.status ?? forceUnit.status,
+    repairComplexity: overlay.repairComplexity,
+    armorDamageTotal: Number(summary.armor ?? 0),
+    rearArmorDamageTotal: Object.values(locations).reduce((sum: number, entry: any) => sum + Number(entry?.rearArmorDamage ?? 0), 0),
+    structureDamageTotal: Number(summary.internal ?? 0),
+    engineHits: Number(summary.engineHits ?? 0),
+    gyroHits: Number(summary.gyroHits ?? 0),
+    ammoSpentTotal: Number(summary.ammo ?? Object.values(ammoSpent).reduce((sum: number, value: any) => sum + Number(value ?? 0), 0)),
+    limbs: Number(summary.limbs ?? 0),
+    weapons: Number(summary.weapons ?? 0),
+    components: Number(summary.components ?? 0),
+    notes: overlay.detailed?.notes,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  Object.entries(locations).forEach(([locationKey, value]: [string, any]) => {
+    if (!value) return;
+    store.unitLocationDamage.push({
+      id: `locdmg-${forceUnit.id}-${slugKey(locationKey)}`,
+      unitDamageId: damageId,
+      forceUnitId: forceUnit.id,
+      locationId: locationKey,
+      locationName: locationKey,
+      armorDamage: Number(value.armorDamage ?? 0),
+      rearArmorDamage: Number(value.rearArmorDamage ?? 0),
+      structureDamage: Number(value.structureDamage ?? 0),
+      isMissing: Boolean(value.missing),
+      isDestroyed: Boolean(value.destroyed),
+      damagedSlots: [...(value.damagedSlots ?? [])],
+      destroyedSlots: [...(value.destroyedSlots ?? [])],
+    });
+  });
+
+  Object.entries(ammoSpent).forEach(([ammoTypeId, shots]: [string, any]) => {
+    const shotsSpent = Math.max(0, Number(shots ?? 0));
+    if (!shotsSpent) return;
+    store.unitAmmoState.push({
+      id: `ammo-${forceUnit.id}-${slugKey(ammoTypeId)}`,
+      forceUnitId: forceUnit.id,
+      unitDamageId: damageId,
+      ammoTypeId,
+      shotsSpent,
+      updatedAt: now,
+    });
+  });
+}
+
+function migrateLegacyEmbeddedState(store: any): void {
+  store.pilots ??= [];
+  store.unitDamage ??= [];
+  store.unitLocationDamage ??= [];
+  store.unitEquipmentDamage ??= [];
+  store.unitAmmoState ??= [];
+
+  const pilotsByAssignedUnit = new Set((store.pilots ?? []).map((pilot: any) => pilot.assignedUnitId).filter(Boolean));
+  for (const forceUnit of store.forceUnits ?? []) {
+    if (forceUnit.pilot && !forceUnit.assignedPilotId && !pilotsByAssignedUnit.has(forceUnit.id)) {
+      const now = new Date().toISOString();
+      const pilotId = crypto.randomUUID();
+      forceUnit.assignedPilotId = pilotId;
+      store.pilots.push({
+        id: pilotId,
+        ownerId: findOwnerIdForForce(store, forceUnit.forceId) ?? "unknown",
+        campaignId: findCampaignIdForForce(store, forceUnit.forceId),
+        forceId: forceUnit.forceId,
+        assignedUnitId: forceUnit.id,
+        status: Number(forceUnit.pilot?.wounds ?? 0) > 0 ? "Wounded" : "Assigned",
+        name: forceUnit.pilot?.name,
+        gunnery: Number(forceUnit.pilot?.gunnery ?? 4),
+        piloting: Number(forceUnit.pilot?.piloting ?? 5),
+        wounds: Number(forceUnit.pilot?.wounds ?? 0),
+        kills: Number(forceUnit.kills ?? 0),
+        experience: 0,
+        isAlive: !forceUnit.pilot?.dead,
+        isCaptured: false,
+        createdAt: now,
+        updatedAt: now,
+      });
+      pilotsByAssignedUnit.add(forceUnit.id);
+    }
+
+    const embeddedDamage = forceUnit.currentDamage ?? forceUnit.damageOverlay ?? forceUnit.damageState;
+    if (embeddedDamage && !(store.unitDamage ?? []).some((entry: any) => entry.forceUnitId === forceUnit.id)) {
+      buildDamageTablesFromOverlay(store, forceUnit, embeddedDamage);
+    }
+
+    delete forceUnit.pilot;
+    delete forceUnit.currentDamage;
+    delete forceUnit.damageOverlay;
+    delete forceUnit.damageState;
+  }
+}
+
 function normalizeStore(raw: unknown): StoreData {
   if (!isRecord(raw)) {
     throw new Error("Store data is not a JSON object.");
   }
 
   const normalized = { ...DEFAULT_STORE, ...raw } as StoreData;
+  migrateLegacyEmbeddedState(normalized as any);
 
   for (const key of REQUIRED_ARRAY_KEYS) {
     if (!Array.isArray(normalized[key])) {
@@ -113,65 +272,11 @@ function normalizeStore(raw: unknown): StoreData {
     }
   }
 
-  return migrateEmbeddedPilots(normalized);
+  return normalized;
 }
 
-
-function migrateEmbeddedPilots(store: StoreData): StoreData {
-  store.pilots ??= [];
-  const forceById = new Map(store.forces.map((force) => [force.id, force]));
-  const pilotByAssignedUnit = new Map(
-    store.pilots
-      .filter((pilot) => pilot.assignedUnitId)
-      .map((pilot) => [pilot.assignedUnitId as string, pilot]),
-  );
-
-  for (const forceUnit of store.forceUnits) {
-    const embeddedPilot = forceUnit.pilot;
-    let pilot = forceUnit.assignedPilotId
-      ? store.pilots.find((candidate) => candidate.id === forceUnit.assignedPilotId)
-      : pilotByAssignedUnit.get(forceUnit.id);
-
-    if (!pilot && embeddedPilot) {
-      const force = forceById.get(forceUnit.forceId);
-      const ownerId = force?.ownerId ?? "unknown";
-      const now = new Date().toISOString();
-      pilot = {
-        id: crypto.randomUUID(),
-        ownerId,
-        campaignId: force?.campaignId,
-        forceId: forceUnit.forceId,
-        assignedUnitId: forceUnit.id,
-        status: embeddedPilot.dead ? "Killed" : Number(embeddedPilot.wounds ?? 0) > 0 ? "Wounded" : "Assigned",
-        name: embeddedPilot.name,
-        gunnery: Number(embeddedPilot.gunnery ?? 4),
-        piloting: Number(embeddedPilot.piloting ?? 5),
-        wounds: Number(embeddedPilot.wounds ?? 0),
-        kills: Number(forceUnit.kills ?? 0),
-        experience: 0,
-        isAlive: !embeddedPilot.dead,
-        isCaptured: false,
-        createdAt: now,
-        updatedAt: now,
-      };
-      store.pilots.push(pilot);
-      pilotByAssignedUnit.set(forceUnit.id, pilot);
-    }
-
-    if (pilot) {
-      forceUnit.assignedPilotId = pilot.id;
-      pilot.forceId = forceUnit.forceId;
-      pilot.assignedUnitId = forceUnit.id;
-      if (pilot.isAlive && !pilot.isCaptured && pilot.status !== "Wounded") pilot.status = "Assigned";
-    }
-
-    delete forceUnit.pilot;
-  }
-
-  return store;
-}
 function assertValidStoreForSave(store: StoreData): void {
-  migrateEmbeddedPilots(normalizeStore(store));
+  normalizeStore(store);
 }
 
 async function readJsonFile(filePath: string): Promise<unknown> {
@@ -196,7 +301,6 @@ async function backupSplitStore(label = "bak"): Promise<void> {
 }
 
 async function writeSplitStore(store: StoreData): Promise<void> {
-  migrateEmbeddedPilots(store);
   await fs.mkdir(STORE_DIR, { recursive: true });
 
   const stagingDir = path.join(

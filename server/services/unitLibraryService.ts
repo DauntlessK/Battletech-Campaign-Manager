@@ -432,11 +432,20 @@ function mapDetailLocations(locations: Record<string, any>): Unit["locations"] {
     armor: Number(location.armor ?? 0),
     rearArmor: location.rearArmor !== undefined ? Number(location.rearArmor) : undefined,
     structure: Number(location.structure ?? 0),
+    techRating: location.techRating,
+    availability: location.availability,
+    cost: location.cost ?? location.costFormula ?? location.replacementCostFormula,
+    replacementCostCBills: location.replacementCostCBills ?? location.costCBills ?? location.replacementCost,
     slots: Array.isArray(location.slots)
       ? location.slots.map((slot: any, index: number) => ({
           slot: slot.slotIndex ?? index + 1,
           item: slot.displayName ?? slot.referenceName ?? slot.raw ?? "Empty",
           type: mapDetailSlotType(slot),
+          techRating: slot.techRating,
+          availability: slot.availability,
+          cost: slot.cost,
+          shots: slot.shots ?? slot.capacity ?? slot.ammoShots,
+          capacity: slot.capacity ?? slot.ammoShots ?? slot.shots,
         }))
       : [],
   }));

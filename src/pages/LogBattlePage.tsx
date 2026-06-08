@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import PageTitle from "../components/PageTitle";
+import BattleMechLocationLayout from "../components/BattleMechLocationLayout";
 import { WEAPONS } from "../data/weapons";
 import { COMPONENTS } from "../data/components";
 import type {
@@ -855,8 +856,6 @@ function DamageEditor({
   const summary = damageSummary(forceUnit, draft);
   const ammoPools = getAmmoPools(forceUnit);
   const locations = forceUnit.snapshot?.locations ?? [];
-  const byName = groupLocationsByName(locations);
-
   const updateLocation = (
     locationId: string,
     updater: (
@@ -1000,33 +999,6 @@ function DamageEditor({
         )}
       </div>
 
-      <div className="mt-5 xl:hidden grid gap-3">
-        {locations.map((location) => renderLocation(location))}
-      </div>
-
-      <div className="mt-5 hidden min-w-0 w-full max-w-full xl:block">
-        <div className="grid min-w-0 w-full max-w-full grid-cols-[minmax(150px,0.85fr)_minmax(190px,1fr)_minmax(210px,1.05fr)_minmax(190px,1fr)_minmax(150px,0.85fr)] items-start gap-3">
-          <div className="space-y-3 pt-20 2xl:pt-10">
-            {renderLocation(byName.leftArm)}
-          </div>
-          <div className="space-y-3">
-            {renderLocation(byName.leftTorso, { tall: true })}
-            {renderLocation(byName.leftLeg)}
-          </div>
-          <div className="space-y-3">
-            {renderLocation(byName.head, { head: true })}
-            {renderLocation(byName.centerTorso, { tall: true })}
-          </div>
-          <div className="space-y-3">
-            {renderLocation(byName.rightTorso, { tall: true })}
-            {renderLocation(byName.rightLeg)}
-          </div>
-          <div className="space-y-3 pt-20 2xl:pt-10">
-            {renderLocation(byName.rightArm)}
-          </div>
-        </div>
-      </div>
-
       <AmmoExpenditureSection
         ammoPools={ammoPools}
         spent={draft.detailed?.ammoSpent ?? {}}
@@ -1044,6 +1016,14 @@ function DamageEditor({
               ammoConfirmed: true,
             },
           }))
+        }
+      />
+
+      <BattleMechLocationLayout
+        className="mt-5"
+        locations={locations}
+        renderLocation={(location, options) =>
+          renderLocation(location, options)
         }
       />
     </section>

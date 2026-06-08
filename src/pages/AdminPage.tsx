@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { RotateCcw, Trash2, RefreshCw, ArrowLeft, KeyRound } from "lucide-react";
+import { RotateCcw, Trash2, RefreshCw, ArrowLeft, KeyRound, ShieldCheck } from "lucide-react";
 import PageTitle from "../components/PageTitle";
 import type { Battle, Campaign, Force } from "../types/app";
 
@@ -108,6 +108,31 @@ export default function AdminPage({
     }
   };
 
+
+  const auditCampaign = async (campaign: Campaign) => {
+    setActionLoading(`audit-${campaign.id}`);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await fetch(`/api/admin/campaigns/${campaign.id}/audit`);
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error || "Unable to audit campaign.");
+      }
+      const counts = result?.counts ?? {};
+      const summary = `${counts.forces ?? 0} forces, ${counts.units ?? 0} units, ${counts.pilots ?? 0} pilots, ${counts.damageRecords ?? 0} damage records, ${counts.repairOrders ?? 0} repair orders, ${counts.resourceAccounts ?? 0} resource accounts.`;
+      if (result?.ok) {
+        setSuccess(`Audit passed for ${campaign.name}: ${summary}`);
+      } else {
+        setError(`Audit found ${result?.issues?.length ?? 0} issue(s) in ${campaign.name}: ${(result?.issues ?? []).join(" ")}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to audit campaign.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const resetUserPassword = async (user: AdminUserSummary) => {
     const password = window.prompt(`Enter a new password for ${user.displayName}:`);
     if (password === null) return;
@@ -134,7 +159,7 @@ export default function AdminPage({
       <PageTitle
         eyebrow="Development tools"
         title="Dev Admin"
-        description="Reset or delete local development campaigns, battles, and forces. These controls are intentionally only exposed by the dev flag in App.tsx."
+        description="Rebuild, audit, or delete local development campaign data. These controls are intentionally only exposed by the dev flag in App.tsx."
         actions={
           <button
             type="button"
@@ -148,7 +173,7 @@ export default function AdminPage({
       />
 
       <div className="rounded-3xl border border-amber-400/30 bg-amber-950/20 p-4 text-sm leading-6 text-amber-100">
-        These tools directly mutate the local dev store. Resetting a campaign removes its battles and resets turn/control progress. Deleting a campaign also removes its battles and campaign-specific force copies.
+        These tools directly mutate the local dev store. Reset now rebuilds campaign forces from their original rosters and clears battles, damage, repair orders, pilot changes, resources, notifications, and turn/control progress. Audit checks the campaign for broken references before or after testing.
       </div>
 
       <div className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-4">
@@ -232,11 +257,19 @@ export default function AdminPage({
                       <div className="flex justify-end gap-2">
                         <button
                           type="button"
+                          disabled={actionLoading === `audit-${campaign.id}`}
+                          onClick={() => void auditCampaign(campaign)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-sky-400/40 bg-sky-950/30 px-3 py-2 text-xs font-bold text-sky-100 hover:bg-sky-900/40 disabled:opacity-50"
+                        >
+                          <ShieldCheck size={14} /> Audit
+                        </button>
+                        <button
+                          type="button"
                           disabled={actionLoading === `reset-${campaign.id}`}
                           onClick={() =>
                             void runAction(
                               `reset-${campaign.id}`,
-                              `Reset campaign \"${campaign.name}\"? This removes all of its battles and resets turn/control progress.`,
+                              `Reset campaign \"${campaign.name}\"? This completely rebuilds its campaign forces and clears battles, damage, repair orders, pilot changes, resources, notifications, and turn/control progress.`,
                               () => fetch(`/api/admin/campaigns/${campaign.id}/reset`, { method: "POST" }),
                               `Reset ${campaign.name}.`,
                             )

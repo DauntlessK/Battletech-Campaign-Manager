@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import { createNotification } from "./notificationService";
+import { getUnitDefinitionById } from "./unitLibraryService";
+import { WEAPONS } from "../../src/data/weapons";
+import { COMPONENTS } from "../../src/data/components";
 import type {
   Battle,
   BattleLogEntry,
@@ -131,7 +134,7 @@ export async function createBattle(
     reciprocalBattle.controlSwingBreakdown = reciprocalSwing.breakdown;
     if (agreed) {
       applyControlSwing(campaign, reciprocalSwing, store);
-      applyBattleResultsToForces(store, reciprocalBattle);
+      await applyBattleResultsToForces(store, reciprocalBattle);
       advanceCampaignTurn(campaign, store);
     }
     await saveStore(store);
@@ -490,13 +493,303 @@ function calculatePlanetaryControl(campaign: any, store?: any): Array<{ userId: 
 }
 
 
-function applyBattleResultsToForces(store: any, battle: Battle) {
-  (battle.battleLogs ?? []).forEach((log: BattleLogEntry) => {
-    (log.unitDamage ?? []).forEach((overlay: any) => {
+
+function damageSlug(value: string): string {
+  return String(value || "unknown").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function clearCurrentDamageForUnit(store: any, forceUnitId: string): void {
+  const damageIds = new Set((store.unitDamage ?? []).filter((entry: any) => entry.forceUnitId === forceUnitId).map((entry: any) => entry.id));
+  store.unitDamage = (store.unitDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId);
+  store.unitLocationDamage = (store.unitLocationDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+  store.unitEquipmentDamage = (store.unitEquipmentDamage ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+  store.unitAmmoState = (store.unitAmmoState ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId);
+  store.repairOrders = (store.repairOrders ?? []).filter((entry: any) => entry.forceUnitId !== forceUnitId && !damageIds.has(entry.unitDamageId));
+}
+
+
+function normalizePartName(value: string): string {
+  return String(value ?? "").toLowerCase().replace(/\(r\)/g, "").replace(/[^a-z0-9]/g, "");
+}
+
+function eraAvailability(definition: any, era?: string): string {
+  const normalized = String(era ?? "").toLowerCase();
+  const key = normalized.includes("succession") ? "successionWars" : normalized.includes("clan") ? "clanInvasion" : normalized.includes("dark") ? "darkAge" : "starLeague";
+  return String(definition?.availability?.[key] ?? definition?.techRating ?? "C");
+}
+
+function findPartDefinition(itemName: string): any | null {
+  const target = normalizePartName(itemName);
+  const definitions = [...Object.values(WEAPONS), ...Object.values(COMPONENTS)] as any[];
+  return definitions.find((definition: any) => {
+    const names = [definition.name, ...(definition.altNames ?? [])].map(normalizePartName);
+    return names.includes(target) || names.some((name) => name && (target.includes(name) || name.includes(target)));
+  }) ?? null;
+}
+
+function evaluatePartCost(cost: any, unit: any, itemName: string): number {
+  if (typeof cost === "number") return Math.max(0, Math.round(cost));
+  if (!cost || typeof cost !== "object") return 0;
+  const tons = Number(unit?.tonnage ?? unit?.snapshot?.tonnage ?? 0);
+  const engineRating = Number(unit?.engineRating ?? String(unit?.engine ?? "").match(/\d+/)?.[0] ?? 0);
+  const gyroTons = Math.max(1, Math.ceil(engineRating / 100));
+  const heatSinks = Number(unit?.heatSinks ?? 0);
+  switch (cost.type) {
+    case "fixed": return Math.max(0, Math.round(Number(cost.amount ?? 0)));
+    case "unitTonnage": return Math.round(tons * Number(cost.multiplier ?? 0));
+    case "engineRatingUnitTonnageDiv75": return Math.round((engineRating * tons / 75) * Number(cost.multiplier ?? 0));
+    case "gyroTonnage": return Math.round(gyroTons * Number(cost.multiplier ?? 0));
+    case "jumpJetsSquaredUnitTonnage": { const jump = Number(unit?.jump ?? 0); return Math.round(jump * jump * tons * Number(cost.multiplier ?? 0)); }
+    case "heatSinksOverFreeFusionSinks": return Math.round(Math.max(0, heatSinks - Number(cost.freeFusionSinks ?? 10)) * Number(cost.multiplier ?? 0));
+    case "totalHeatSinks": return Math.round(heatSinks * Number(cost.multiplier ?? 0));
+    case "armorTonnage": return Math.round((Number(unit?.armor ?? 0) / 16) * Number(cost.multiplier ?? 0));
+    case "internalStructure": return Math.round(tons * Number(cost.multiplier ?? 0));
+    case "equipmentTonnage": return Math.round(Number(cost.tons ?? 1) * Number(cost.multiplier ?? 0));
+    default: return 0;
+  }
+}
+
+
+function locationReplacementCost(location: any, unit: any): number {
+  const direct = Number(location?.replacementCostCBills ?? location?.costCBills ?? location?.replacementCost ?? 0);
+  if (Number.isFinite(direct) && direct > 0) return Math.round(direct);
+  const formula = location?.cost ?? location?.costFormula ?? location?.replacementCostFormula;
+  if (formula) return evaluatePartCost(formula, unit, location?.name ?? "Location");
+  return 0;
+}
+
+function isIncludedLocationSystem(itemName: string, locationName: string): boolean {
+  const normalized = normalizePartName(itemName);
+  if (/arm/i.test(locationName)) {
+    return ["shoulder", "upper arm actuator", "lower arm actuator", "hand actuator"].some((name) => normalized.includes(normalizePartName(name)));
+  }
+  if (/leg/i.test(locationName)) {
+    return ["hip", "upper leg actuator", "lower leg actuator", "foot actuator"].some((name) => normalized.includes(normalizePartName(name)));
+  }
+  return false;
+}
+
+function findAmmoSlot(unitDefinition: any, ammoKey: string): any | null {
+  const target = normalizePartName(ammoKey.replace(/_/g, " "));
+  const locations = Array.isArray(unitDefinition?.locations)
+    ? unitDefinition.locations
+    : Object.values(unitDefinition?.locations ?? {});
+  for (const location of locations as any[]) {
+    for (const slot of location?.slots ?? []) {
+      const name = String(slot?.displayName ?? slot?.item ?? slot?.raw ?? "");
+      const normalized = normalizePartName(name);
+      if (normalized.includes("ammo") && (normalized.includes(target) || target.includes(normalized.replace(/ammo/g, "").trim()))) {
+        return { ...slot, locationId: location.id ?? location.key, locationName: location.name };
+      }
+    }
+  }
+  return null;
+}
+
+function roll2d6(): number {
+  return 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
+}
+
+function addRepairOrder(store: any, base: any): void {
+  const now = new Date().toISOString();
+  store.repairOrders.push({ id: crypto.randomUUID(), status: "Pending", createdAt: now, updatedAt: now, ...base });
+}
+
+async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: Battle, overlay: any): Promise<void> {
+  store.unitDamage ??= [];
+  store.unitLocationDamage ??= [];
+  store.unitEquipmentDamage ??= [];
+  store.unitAmmoState ??= [];
+  store.repairOrders ??= [];
+  clearCurrentDamageForUnit(store, forceUnit.id);
+
+  const summary = overlay?.damageSummary ?? {};
+  const locations = overlay?.detailed?.locations ?? {};
+  const ammoSpent = overlay?.detailed?.ammoSpent ?? {};
+  const hasDamage =
+    Object.values(summary).some((value: any) => Number(value ?? 0) > 0) ||
+    Object.values(locations).some((entry: any) =>
+      Number(entry?.armorDamage ?? 0) > 0 ||
+      Number(entry?.rearArmorDamage ?? 0) > 0 ||
+      Number(entry?.structureDamage ?? 0) > 0 ||
+      Boolean(entry?.missing || entry?.destroyed),
+    ) ||
+    Object.values(ammoSpent).some((value: any) => Number(value ?? 0) > 0) ||
+    !["ready", "available"].includes(String(overlay?.status ?? forceUnit.status ?? "").toLowerCase());
+  if (!hasDamage) return;
+
+  const now = new Date().toISOString();
+  const damageId = crypto.randomUUID();
+  store.unitDamage.push({
+    id: damageId,
+    campaignId: battle.campaignId,
+    forceId: forceUnit.forceId,
+    forceUnitId: forceUnit.id,
+    status: overlay.status ?? forceUnit.status,
+    repairComplexity: overlay.repairComplexity,
+    armorDamageTotal: Number(summary.armor ?? 0),
+    rearArmorDamageTotal: Object.values(locations).reduce((sum: number, entry: any) => sum + Number(entry?.rearArmorDamage ?? 0), 0),
+    structureDamageTotal: Number(summary.internal ?? 0),
+    engineHits: Number(summary.engineHits ?? 0),
+    gyroHits: Number(summary.gyroHits ?? 0),
+    ammoSpentTotal: Number(summary.ammo ?? Object.values(ammoSpent).reduce((sum: number, value: any) => sum + Number(value ?? 0), 0)),
+    limbs: Number(summary.limbs ?? 0),
+    weapons: Number(summary.weapons ?? 0),
+    components: Number(summary.components ?? 0),
+    notes: overlay?.detailed?.notes,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  Object.entries(locations).forEach(([locationKey, entry]: [string, any]) => {
+    if (!entry) return;
+    store.unitLocationDamage.push({
+      id: crypto.randomUUID(),
+      unitDamageId: damageId,
+      forceUnitId: forceUnit.id,
+      locationId: locationKey,
+      locationName: locationKey,
+      armorDamage: Number(entry.armorDamage ?? 0),
+      rearArmorDamage: Number(entry.rearArmorDamage ?? 0),
+      structureDamage: Number(entry.structureDamage ?? 0),
+      isMissing: Boolean(entry.missing),
+      isDestroyed: Boolean(entry.destroyed),
+      damagedSlots: [...(entry.damagedSlots ?? [])],
+      destroyedSlots: [...(entry.destroyedSlots ?? [])],
+    });
+  });
+
+
+  const unitDefinition: any = await getUnitDefinitionById(forceUnit.baseUnitId).catch(() => null);
+  const definitionLocations = unitDefinition?.locations ?? forceUnit.snapshot?.locations ?? [];
+  const campaign = store.campaigns.find((entry: any) => entry.id === battle.campaignId);
+  const era = campaign?.settings?.era ?? unitDefinition?.era ?? forceUnit.snapshot?.era;
+
+  for (const location of definitionLocations) {
+    const entry = locations[location.id] ?? locations[location.name] ?? {};
+    const armorPoints = Number(entry.armorDamage ?? 0) + Number(entry.rearArmorDamage ?? 0);
+    const structurePoints = Number(entry.structureDamage ?? 0);
+    const totalArmorPoints = Math.max(1, Number(unitDefinition?.armor ?? forceUnit.snapshot?.locations?.reduce((sum: number, loc: any) => sum + Number(loc.armor ?? 0) + Number(loc.rearArmor ?? 0), 0) ?? 1));
+    const totalStructurePoints = Math.max(1, Number(unitDefinition?.structure ?? forceUnit.snapshot?.locations?.reduce((sum: number, loc: any) => sum + Number(loc.structure ?? 0), 0) ?? 1));
+    const armorDefinition = findPartDefinition(`${unitDefinition?.armorType ?? "Standard"} Armor`) ?? findPartDefinition("Standard Armor");
+    const structureDefinition = findPartDefinition(`${unitDefinition?.structureType ?? "Standard"} Internal Structure`) ?? findPartDefinition("Standard Internal Structure");
+    const fullArmorCost = evaluatePartCost(armorDefinition?.cost, unitDefinition ?? forceUnit.snapshot, "Armor");
+    const fullStructureCost = evaluatePartCost(structureDefinition?.cost, unitDefinition ?? forceUnit.snapshot, "Internal Structure");
+    if (armorPoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Armor", locationId: location.id, itemId: armorDefinition?.id, itemName: `${location.name} armor`, quantity: armorPoints, action: "Repair", techRating: armorDefinition?.techRating ?? "C", availabilityRating: eraAvailability(armorDefinition, era), replacementCostCBills: Math.round(fullArmorCost * armorPoints / totalArmorPoints) });
+    if (structurePoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Internal Structure", locationId: location.id, itemId: structureDefinition?.id, itemName: `${location.name} internal structure`, quantity: structurePoints, action: "Repair", techRating: structureDefinition?.techRating ?? "C", availabilityRating: eraAvailability(structureDefinition, era), replacementCostCBills: Math.round(fullStructureCost * structurePoints / totalStructurePoints) });
+    if ((entry.missing || entry.destroyed) && /head|torso|arm|leg/i.test(location.name)) {
+      addRepairOrder(store, {
+        campaignId: battle.campaignId,
+        forceId: forceUnit.forceId,
+        forceUnitId: forceUnit.id,
+        unitDamageId: damageId,
+        category: "Limb",
+        locationId: location.id,
+        itemName: `${location.name} assembly`,
+        quantity: 1,
+        action: "Replace",
+        replacementCostCBills: locationReplacementCost(location, unitDefinition ?? forceUnit.snapshot),
+        requisitionStatus: "Needs Order",
+      });
+    }
+
+    const damagedSlots = new Set<number>((entry.damagedSlots ?? []).map(Number));
+    const destroyedSlots = new Set<number>((entry.destroyedSlots ?? []).map(Number));
+    const grouped = new Map<string, { slots: number[]; destroyed: boolean; item: string }>();
+    for (const slot of location.slots ?? []) {
+      if (!damagedSlots.has(Number(slot.slot)) && !destroyedSlots.has(Number(slot.slot))) continue;
+      const slotItem = slot.displayName ?? slot.item ?? slot.raw;
+      if (!slotItem || /^empty$/i.test(slotItem)) continue;
+      if ((entry.missing || entry.destroyed) && isIncludedLocationSystem(slotItem, location.name)) continue;
+      const key = normalizePartName(slotItem);
+      const current = grouped.get(key) ?? { slots: [], destroyed: false, item: slotItem };
+      current.slots.push(Number(slot.slot));
+      current.destroyed ||= destroyedSlots.has(Number(slot.slot));
+      grouped.set(key, current);
+    }
+    for (const component of grouped.values()) {
+      const definition = findPartDefinition(component.item);
+      const roll = component.destroyed ? undefined : roll2d6();
+      const disposition: "Repair" | "Replace" = component.destroyed || Number(roll ?? 0) < 10 ? "Replace" : "Repair";
+      const replacementCostCBills = evaluatePartCost(definition?.cost, unitDefinition ?? forceUnit.snapshot, component.item);
+      const equipmentRow = {
+        id: crypto.randomUUID(), unitDamageId: damageId, forceUnitId: forceUnit.id, locationId: location.id,
+        slotNumber: Math.min(...component.slots), equipmentId: definition?.id, equipmentName: definition?.name ?? component.item,
+        condition: component.destroyed ? "Destroyed" : "Damaged", techRating: definition?.techRating ?? "C",
+        availabilityRating: eraAvailability(definition, era), repairRoll: roll, disposition, replacementCostCBills,
+      };
+      store.unitEquipmentDamage.push(equipmentRow);
+      addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Equipment", locationId: location.id, slotNumber: equipmentRow.slotNumber, itemId: equipmentRow.equipmentId, itemName: equipmentRow.equipmentName, quantity: 1, action: disposition, repairRoll: roll, techRating: equipmentRow.techRating, availabilityRating: equipmentRow.availabilityRating, replacementCostCBills, requisitionStatus: disposition === "Replace" ? "Needs Order" : undefined });
+    }
+  }
+
+  for (const [ammoTypeId, rawSpent] of Object.entries(ammoSpent)) {
+    const shotsSpent = Math.max(0, Number(rawSpent ?? 0));
+    if (shotsSpent <= 0) continue;
+    const ammoSlot = findAmmoSlot(unitDefinition, ammoTypeId);
+    const definition = ammoSlot ? findPartDefinition(String(ammoSlot.displayName ?? ammoSlot.item ?? ammoSlot.raw ?? ammoTypeId)) : findPartDefinition(ammoTypeId);
+    const fullBinCost = evaluatePartCost(ammoSlot?.cost ?? definition?.cost, unitDefinition ?? forceUnit.snapshot, String(ammoTypeId));
+    const binShots = Math.max(1, Number(ammoSlot?.shots ?? ammoSlot?.capacity ?? ammoSlot?.ammoShots ?? shotsSpent));
+    const rearmCost = Math.round(fullBinCost * Math.min(1, shotsSpent / binShots));
+    addRepairOrder(store, {
+      campaignId: battle.campaignId,
+      forceId: forceUnit.forceId,
+      forceUnitId: forceUnit.id,
+      unitDamageId: damageId,
+      category: "Ammunition",
+      locationId: ammoSlot?.locationId,
+      itemId: definition?.id ?? ammoTypeId,
+      itemName: String(ammoSlot?.displayName ?? ammoSlot?.item ?? ammoSlot?.raw ?? ammoTypeId).replace(/[_-]+/g, " "),
+      quantity: shotsSpent,
+      action: "Rearm",
+      techRating: ammoSlot?.techRating ?? definition?.techRating ?? "C",
+      availabilityRating: eraAvailability(ammoSlot ?? definition, era),
+      replacementCostCBills: rearmCost,
+    });
+  }
+
+  overlay.detailed ??= { locations: {} };
+  overlay.detailed.equipmentDamage = store.unitEquipmentDamage.filter((row: any) => row.unitDamageId === damageId);
+  overlay.detailed.repairOrders = store.repairOrders.filter((row: any) => row.unitDamageId === damageId);
+
+  Object.entries(ammoSpent).forEach(([ammoTypeId, shots]: [string, any]) => {
+    const shotsSpent = Math.max(0, Number(shots ?? 0));
+    if (!shotsSpent) return;
+    store.unitAmmoState.push({
+      id: crypto.randomUUID(),
+      forceUnitId: forceUnit.id,
+      unitDamageId: damageId,
+      ammoTypeId: damageSlug(ammoTypeId),
+      shotsSpent,
+      updatedAt: now,
+    });
+  });
+}
+
+function updatePilotAfterBattle(store: any, forceUnit: any, overlay: any): void {
+  const pilot = (store.pilots ?? []).find((entry: any) => entry.id === forceUnit.assignedPilotId || entry.assignedUnitId === forceUnit.id);
+  if (!pilot) return;
+  if (overlay.pilotDamage === "KIA") {
+    pilot.status = "Killed";
+    pilot.isAlive = false;
+    pilot.assignedUnitId = undefined;
+    pilot.updatedAt = new Date().toISOString();
+    forceUnit.assignedPilotId = undefined;
+  } else if (overlay.pilotDamage !== undefined) {
+    pilot.wounds = Number(overlay.pilotDamage ?? 0);
+    pilot.status = Number(pilot.wounds ?? 0) > 0 ? "Wounded" : "Assigned";
+    pilot.updatedAt = new Date().toISOString();
+  }
+}
+
+
+async function applyBattleResultsToForces(store: any, battle: Battle): Promise<void> {
+  for (const log of battle.battleLogs ?? []) {
+    for (const overlay of log.unitDamage ?? []) {
       const forceUnit = store.forceUnits?.find(
         (candidate: any) => candidate.id === overlay.campaignForceUnitId,
       );
-      if (!forceUnit) return;
+      if (!forceUnit) continue;
 
       const newStatus = overlay.status ?? deriveStatusFromOverlay(overlay);
       const newBV = estimateCurrentBV(forceUnit, overlay);
@@ -504,36 +797,18 @@ function applyBattleResultsToForces(store: any, battle: Battle) {
       overlay.currentBV = newBV;
       overlay.recalculatedBV = newBV;
 
-      forceUnit.damageOverlay = overlay;
-      forceUnit.currentDamage = overlay;
+      delete forceUnit.damageOverlay;
+      delete forceUnit.currentDamage;
       forceUnit.status = newStatus;
       forceUnit.currentBV = newBV;
       forceUnit.isDestroyed = newStatus === "Destroyed";
       forceUnit.kills = Number(forceUnit.kills ?? 0) + Number(overlay.killsMade ?? 0);
 
-      const assignedPilot = forceUnit.assignedPilotId
-        ? store.pilots?.find((pilot: any) => pilot.id === forceUnit.assignedPilotId)
-        : undefined;
-      if (overlay.pilotDamage === "KIA") {
-        if (assignedPilot) {
-          assignedPilot.assignedUnitId = undefined;
-          assignedPilot.status = "Killed";
-          assignedPilot.isAlive = false;
-          assignedPilot.isCaptured = false;
-          assignedPilot.updatedAt = new Date().toISOString();
-        }
-        forceUnit.assignedPilotId = undefined;
-      } else if (assignedPilot && overlay.pilotDamage !== undefined) {
-        assignedPilot.wounds = Number(overlay.pilotDamage ?? 0);
-        assignedPilot.status = assignedPilot.wounds > 0 ? "Wounded" : "Assigned";
-        assignedPilot.isAlive = true;
-        assignedPilot.isCaptured = false;
-        assignedPilot.updatedAt = new Date().toISOString();
-      }
-
+      await persistCurrentDamageForUnit(store, forceUnit, battle, overlay);
+      updatePilotAfterBattle(store, forceUnit, overlay);
       forceUnit.updatedAt = new Date().toISOString();
-    });
-  });
+    }
+  }
 
   captureDestroyedUnitsForFieldHolder(store, battle);
 }
@@ -570,20 +845,17 @@ function captureDestroyedUnitsForFieldHolder(store: any, battle: Battle) {
           participant.campaignId === battle.campaignId &&
           participant.forceId === originalForceId,
       );
-      const assignedPilot = forceUnit.assignedPilotId
-        ? store.pilots?.find((pilot: any) => pilot.id === forceUnit.assignedPilotId)
-        : undefined;
-      if (assignedPilot && originalParticipant?.userId) {
-        assignedPilot.ownerId = originalParticipant.userId;
-        assignedPilot.campaignId = battle.campaignId;
-        assignedPilot.forceId = originalForceId;
-        assignedPilot.assignedUnitId = undefined;
-        assignedPilot.status = Number(assignedPilot.wounds ?? 0) > 0 ? "Wounded" : "Unassigned";
-        assignedPilot.isAlive = true;
-        assignedPilot.isCaptured = false;
-        assignedPilot.updatedAt = new Date().toISOString();
+      const pilot = (store.pilots ?? []).find((entry: any) => entry.id === forceUnit.assignedPilotId || entry.assignedUnitId === forceUnit.id);
+      if (pilot) {
+        pilot.forceId = originalForceId;
+        pilot.campaignId = battle.campaignId;
+        pilot.assignedUnitId = undefined;
+        pilot.status = Number(pilot.wounds ?? 0) > 0 ? "Wounded" : "Unassigned";
+        pilot.isCaptured = false;
+        pilot.updatedAt = new Date().toISOString();
       }
       forceUnit.forceId = fieldHolderForceId;
+      delete forceUnit.pilot;
       forceUnit.assignedPilotId = undefined;
       forceUnit.teamNumber = undefined;
       forceUnit.sortOrder = store.forceUnits.filter((unit: any) => unit.forceId === fieldHolderForceId).length;
@@ -734,7 +1006,7 @@ export async function updateBattle(
       if (validation.agreed && previousStatus !== "Complete" && previousStatus !== "Confirmed" && previousStatus !== "Finalized") {
         if (campaign) {
           applyControlSwing(campaign, swing, store);
-          applyBattleResultsToForces(store, b);
+          await applyBattleResultsToForces(store, b);
           advanceCampaignTurn(campaign, store);
         }
       }

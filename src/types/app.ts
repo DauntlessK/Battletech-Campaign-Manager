@@ -71,6 +71,23 @@ export type CampaignUnitDamageOverlay = {
     destroyedEquipmentIds?: string[];
     damagedEquipmentIds?: string[];
     notes?: string;
+    repairOrders?: Array<{
+      id: string;
+      category: "Armor" | "Internal Structure" | "Equipment" | "Limb" | "Ammunition";
+      locationId?: string;
+      slotNumber?: number;
+      itemId?: string;
+      itemName: string;
+      quantity: number;
+      action: "Repair" | "Replace" | "Rearm";
+      repairRoll?: number;
+      techRating?: string;
+      availabilityRating?: string;
+      replacementCostCBills?: number;
+      status: string;
+      requisitionStatus?: "Needs Order" | "Failed" | "Awaiting Delivery" | "Delivered";
+      deliveryTurnsRemaining?: number;
+    }>;
   };
 };
 
@@ -130,6 +147,11 @@ export type CriticalSlot = {
   slot: number;
   item: string;
   type?: "weapon" | "ammo" | "equipment" | "engine" | "structure" | "empty";
+  techRating?: string;
+  availability?: Record<string, string>;
+  cost?: unknown;
+  shots?: number;
+  capacity?: number;
 };
 
 export type UnitLocation = {
@@ -139,6 +161,10 @@ export type UnitLocation = {
   rearArmor?: number;
   structure: number;
   slots: CriticalSlot[];
+  techRating?: string;
+  availability?: Record<string, string>;
+  cost?: unknown;
+  replacementCostCBills?: number;
 };
 
 export type UnitJsonWarning =
@@ -410,13 +436,18 @@ export type ForceUnit = {
   isDestroyed?: boolean;
   teamNumber?: number;
   sortOrder?: number;
+  assignedPilotId?: string;
   pilot?: {
+    id?: string;
     name?: string;
     gunnery: number;
     piloting: number;
     wounds?: number;
     dead?: boolean;
-  };
+    status?: string;
+  } | null;
+  currentDamage?: CampaignUnitDamageOverlay | null;
+  damageOverlay?: CampaignUnitDamageOverlay | null;
 };
 
 export type Force = {
