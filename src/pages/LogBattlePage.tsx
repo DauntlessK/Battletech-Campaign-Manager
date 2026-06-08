@@ -709,6 +709,7 @@ function ChaosDamageEditor({
   onChange: (update: (draft: UnitDamageDraft) => UnitDamageDraft) => void;
   onSave: () => void;
 }) {
+  const ammoPools = getAmmoPools(forceUnit);
   return (
     <section className="rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
@@ -815,6 +816,24 @@ function ChaosDamageEditor({
             </button>
           </div>
         </div>
+        <AmmoExpenditureSection
+          ammoPools={ammoPools}
+          spent={draft.detailed?.ammoSpent ?? {}}
+          onChange={(ammoKey, spentShots) =>
+            onChange((current) => ({
+              ...current,
+              saved: false,
+              detailed: {
+                ...(current.detailed ?? { locations: {} }),
+                ammoSpent: {
+                  ...(current.detailed?.ammoSpent ?? {}),
+                  [ammoKey]: spentShots,
+                },
+                ammoConfirmed: true,
+              },
+            }))
+          }
+        />
       </div>
     </section>
   );
@@ -1409,9 +1428,11 @@ function createBlankDamageDraft(
     saved: false,
     chaosCondition: "ready",
     chaos: isChaos ? { condition: "ready" } : undefined,
-    detailed: isChaos
-      ? undefined
-      : { locations: getPriorDamageLocations(forceUnit), ammoSpent: getPriorAmmoSpent(forceUnit), ammoConfirmed: false },
+    detailed: {
+      locations: isChaos ? {} : getPriorDamageLocations(forceUnit),
+      ammoSpent: getPriorAmmoSpent(forceUnit),
+      ammoConfirmed: false,
+    },
   };
 }
 
@@ -1447,7 +1468,13 @@ function sanitizeDamageDraft(
     chaos: isChaos
       ? { condition: draft.chaosCondition ?? draft.chaos?.condition ?? "ready" }
       : undefined,
-    detailed: isChaos ? undefined : (draft.detailed ?? { locations: {} }),
+    detailed: isChaos
+      ? {
+          locations: {},
+          ammoSpent: { ...(draft.detailed?.ammoSpent ?? {}) },
+          ammoConfirmed: true,
+        }
+      : (draft.detailed ?? { locations: {} }),
     status: forceUnit ? getUnitStatus(forceUnit, draft, isChaos) : undefined,
     damageSummary: forceUnit ? damageSummaryBreakdown(forceUnit, draft) : undefined,
     repairComplexity: !isChaos && forceUnit ? calculateRepairComplexity(forceUnit, draft) : undefined,
@@ -1965,7 +1992,9 @@ function damageOverlayToDraft(
     ...overlay,
     saved: true,
     chaosCondition: overlay.chaos?.condition ?? "ready",
-    detailed: isChaos ? undefined : (overlay.detailed ?? { locations: {} }),
+    detailed: isChaos
+      ? { locations: {}, ammoSpent: { ...(overlay.detailed?.ammoSpent ?? {}) }, ammoConfirmed: true }
+      : (overlay.detailed ?? { locations: {} }),
   };
 }
 

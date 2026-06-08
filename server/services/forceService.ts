@@ -2,35 +2,20 @@ import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import { getUnitDefinitionById } from "./unitLibraryService";
 import { randomPilotName } from "../data/pilotNames";
-import type { CampaignUnitSnapshot, Force, ForceUnit, Pilot } from "../types/models";
+import type { CampaignUnitSnapshot, Force, ForceUnit } from "../types/models";
 import type { Unit } from "../types/unit";
 
-function withForceUnits(force: Force, forceUnits: ForceUnit[], pilots: Pilot[] = []): Force {
+function withForceUnits(force: Force, forceUnits: ForceUnit[]): Force {
   return {
     ...force,
     forceUnits: forceUnits
       .filter((unit) => unit.forceId === force.id)
-      .map((unit, index) => {
-        const pilot = unit.assignedPilotId
-          ? pilots.find((candidate) => candidate.id === unit.assignedPilotId)
-          : undefined;
-        return {
-          ...unit,
-          teamNumber: unit.teamNumber ?? 1,
-          sortOrder: unit.sortOrder ?? index,
-          pilot: pilot
-            ? {
-                id: pilot.id,
-                name: pilot.name,
-                gunnery: pilot.gunnery,
-                piloting: pilot.piloting,
-                wounds: pilot.wounds,
-                dead: !pilot.isAlive,
-                status: pilot.status,
-              }
-            : undefined,
-        };
-      })
+      .map((unit, index) => ({
+        ...unit,
+        teamNumber: unit.teamNumber ?? 1,
+        sortOrder: unit.sortOrder ?? index,
+        pilot: unit.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
+      }))
       .sort((a, b) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
   };
 }
@@ -172,14 +157,14 @@ export async function createForce(
   store.forces.push(force);
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits, store.pilots);
+  return withForceUnits(force, store.forceUnits);
 }
 
 export async function listForcesForUser(ownerId: string): Promise<Force[]> {
   const store = await loadStore();
   return store.forces
     .filter((f) => f.ownerId === ownerId && f.status !== "Deleted")
-    .map((force) => withForceUnits(force, store.forceUnits, store.pilots));
+    .map((force) => withForceUnits(force, store.forceUnits));
 }
 
 export async function assignForceToCampaign(originalForceId: string, campaignId: string, assignedOwnerId: string): Promise<Force> {
@@ -202,17 +187,11 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
 
   const originalUnits = store.forceUnits.filter((u) => u.forceId === original.id);
   for (const u of originalUnits) {
-    const sourcePilot = u.assignedPilotId
-      ? store.pilots?.find((pilot) => pilot.id === u.assignedPilotId)
-      : undefined;
     const newUnit: ForceUnit = {
       ...u,
       id: crypto.randomUUID(),
       forceId: copy.id,
-      assignedPilotId: undefined,
-      pilot: sourcePilot
-        ? { name: sourcePilot.name, gunnery: sourcePilot.gunnery, piloting: sourcePilot.piloting }
-        : { name: randomPilotName(), gunnery: 4, piloting: 5 },
+      pilot: u.pilot ?? { name: randomPilotName(), gunnery: 4, piloting: 5 },
     };
     store.forceUnits.push(newUnit);
   }
@@ -221,13 +200,13 @@ export async function assignForceToCampaign(originalForceId: string, campaignId:
   store.forces.push(copy);
   await saveStore(store);
 
-  return withForceUnits(copy, store.forceUnits, store.pilots);
+  return withForceUnits(copy, store.forceUnits);
 }
 
 export async function getForceById(forceId: string): Promise<Force | undefined> {
   const store = await loadStore();
   const force = store.forces.find((candidate) => candidate.id === forceId);
-  return force ? withForceUnits(force, store.forceUnits, store.pilots) : undefined;
+  return force ? withForceUnits(force, store.forceUnits) : undefined;
 }
 
 function buildUnitSnapshot(unit: Unit): CampaignUnitSnapshot {
@@ -305,7 +284,7 @@ export async function addUnitToForce(forceId: string, baseUnitId: string, ownerI
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
 
-  return withForceUnits(force, store.forceUnits, store.pilots);
+  return withForceUnits(force, store.forceUnits);
 }
 
 export async function updateForce(
@@ -390,7 +369,7 @@ export async function updateForce(
 
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits, store.pilots);
+  return withForceUnits(force, store.forceUnits);
 }
 
 export async function deleteForce(forceId: string, ownerId: string): Promise<void> {
@@ -419,43 +398,131 @@ export async function updateForceUnit(forceId: string, forceUnitId: string, owne
   }
   if (updates.sortOrder !== undefined) forceUnit.sortOrder = Number(updates.sortOrder);
   if (updates.pilotName !== undefined || updates.gunnery !== undefined || updates.piloting !== undefined) {
-    store.pilots ??= [];
-    let pilot = forceUnit.assignedPilotId
-      ? store.pilots.find((candidate) => candidate.id === forceUnit.assignedPilotId)
-      : undefined;
-    const now = new Date().toISOString();
-    if (!pilot) {
-      pilot = {
-        id: crypto.randomUUID(),
-        ownerId: force.ownerId,
-        campaignId: force.campaignId,
-        forceId: force.id,
-        assignedUnitId: forceUnit.id,
-        status: "Assigned",
-        name: updates.pilotName ?? randomPilotName(),
-        gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : 4,
-        piloting: updates.piloting !== undefined ? Number(updates.piloting) : 5,
-        wounds: 0,
-        kills: 0,
-        experience: 0,
-        isAlive: true,
-        isCaptured: false,
-        createdAt: now,
-        updatedAt: now,
-      };
-      store.pilots.push(pilot);
-      forceUnit.assignedPilotId = pilot.id;
-    } else {
-      pilot.name = updates.pilotName ?? pilot.name ?? randomPilotName();
-      pilot.gunnery = updates.gunnery !== undefined ? Number(updates.gunnery) : pilot.gunnery;
-      pilot.piloting = updates.piloting !== undefined ? Number(updates.piloting) : pilot.piloting;
-      pilot.updatedAt = now;
-    }
+    forceUnit.pilot = {
+      name: updates.pilotName ?? forceUnit.pilot?.name ?? randomPilotName(),
+      gunnery: updates.gunnery !== undefined ? Number(updates.gunnery) : forceUnit.pilot?.gunnery ?? 4,
+      piloting: updates.piloting !== undefined ? Number(updates.piloting) : forceUnit.pilot?.piloting ?? 5,
+    };
   }
 
   validateForceUnitRoster(force, store.forceUnits.filter((entry) => entry.forceId === force.id));
   refreshForceUnitIds(force, store.forceUnits);
   force.updatedAt = new Date().toISOString();
   await saveStore(store);
-  return withForceUnits(force, store.forceUnits, store.pilots);
+  return withForceUnits(force, store.forceUnits);
+}
+
+function chaosRepairCostForUnit(forceUnit: ForceUnit): number {
+  const weightClass = String(forceUnit.snapshot?.weightClass ?? "").toLowerCase();
+  const crippled = String(forceUnit.status ?? "").toLowerCase() === "crippled";
+  if (weightClass === "light") return crippled ? 25 : 15;
+  if (weightClass === "medium") return crippled ? 45 : 30;
+  if (weightClass === "heavy") return crippled ? 75 : 60;
+  return crippled ? 100 : 80;
+}
+
+export async function repairChaosForceUnit(
+  forceId: string,
+  forceUnitId: string,
+  campaignId: string,
+  userId: string,
+): Promise<{ force: Force; cost: number; remainingWarchest: number }> {
+  const store = await loadStore();
+  const force = store.forces.find((entry) => entry.id === forceId);
+  if (!force || force.ownerId !== userId || force.campaignId !== campaignId) {
+    throw new Error("Campaign force not found.");
+  }
+  const campaign = store.campaigns.find((entry) => entry.id === campaignId);
+  if (!campaign || String(campaign.settings?.type ?? "") !== "Chaos") {
+    throw new Error("This repair action is only available in Chaos campaigns.");
+  }
+  const forceUnit = store.forceUnits.find((entry) => entry.id === forceUnitId && entry.forceId === forceId);
+  if (!forceUnit) throw new Error("Unit not found in this force.");
+  if (forceUnit.isDestroyed || String(forceUnit.status ?? "").toLowerCase() === "destroyed") {
+    throw new Error("Destroyed units cannot be repaired in Chaos campaigns.");
+  }
+
+  const cost = chaosRepairCostForUnit(forceUnit);
+  let account = store.resourceAccounts.find((entry) => entry.campaignId === campaignId && entry.userId === userId);
+  if (!account) {
+    const starting = Number((campaign.settings as any)?.startingResources?.Warchest ?? 0);
+    account = { id: crypto.randomUUID(), campaignId, userId, balances: { Warchest: starting }, lastUpdatedAt: new Date().toISOString() };
+    store.resourceAccounts.push(account);
+  }
+  const available = Number(account.balances.Warchest ?? 0);
+  if (available < cost) throw new Error(`Insufficient WP. This repair costs ${cost} WP and only ${available} WP is available.`);
+
+  account.balances.Warchest = available - cost;
+  account.lastUpdatedAt = new Date().toISOString();
+  store.resourceTransactions.push({
+    id: crypto.randomUUID(),
+    campaignId,
+    userId,
+    type: "Warchest",
+    amount: -cost,
+    reason: `Chaos repair: ${forceUnit.snapshot?.name ?? forceUnit.baseUnitId}`,
+    createdAt: new Date().toISOString(),
+  });
+
+  forceUnit.currentBV = Number(forceUnit.snapshot?.totalBV ?? forceUnit.currentBV ?? 0);
+  forceUnit.status = "Ready" as any;
+  forceUnit.isDestroyed = false;
+  delete (forceUnit as any).currentDamage;
+  delete (forceUnit as any).damageOverlay;
+  delete (forceUnit as any).damageState;
+  force.updatedAt = new Date().toISOString();
+  await saveStore(store);
+
+  return {
+    force: withForceUnits(force, store.forceUnits),
+    cost,
+    remainingWarchest: Number(account.balances.Warchest ?? 0),
+  };
+}
+
+
+export async function quoteForceUnitDisposition(forceId: string, forceUnitId: string, campaignId: string, userId: string, action: "salvage" | "sell") {
+  const store = await loadStore();
+  const force = store.forces.find((f) => f.id === forceId);
+  const campaign = store.campaigns.find((c) => c.id === campaignId);
+  const unit = store.forceUnits.find((u) => u.id === forceUnitId && u.forceId === forceId);
+  if (!force || !campaign || !unit) throw new Error("Campaign unit not found.");
+  if (force.ownerId !== userId || force.campaignId !== campaignId) throw new Error("You do not have permission to manage this unit.");
+  const isChaos = campaign.settings?.type === "Chaos";
+  const damaged = unit.isDestroyed || !["Ready", "Available"].includes(String(unit.status ?? "Ready"));
+  if (isChaos && action === "sell" && damaged) throw new Error("Damaged or destroyed Chaos units cannot be sold.");
+  if (isChaos) {
+    const tonnage = Number(unit.snapshot?.tonnage ?? 0);
+    return { action, resourceType: "Warchest" as const, amount: action === "sell" ? tonnage : Math.floor(tonnage / 2), bonus: null };
+  }
+  const definition = await getUnitDefinitionById(unit.baseUnitId).catch(() => null);
+  const originalCost = Number(definition?.costCBills ?? 0);
+  const amount = action === "salvage" ? Math.floor(originalCost * 0.10) : Math.floor(originalCost * (damaged ? 0.125 : 0.75));
+  return { action, resourceType: "CBills" as const, amount, bonus: action === "salvage" ? "Future repair bonus (not yet implemented)" : null };
+}
+
+export async function disposeForceUnit(forceId: string, forceUnitId: string, campaignId: string, userId: string, action: "salvage" | "sell") {
+  const quote = await quoteForceUnitDisposition(forceId, forceUnitId, campaignId, userId, action);
+  const store = await loadStore();
+  const force = store.forces.find((f) => f.id === forceId)!;
+  const index = store.forceUnits.findIndex((u) => u.id === forceUnitId && u.forceId === forceId);
+  if (index < 0) throw new Error("Campaign unit not found.");
+  const unit = store.forceUnits[index];
+  let account = store.resourceAccounts.find((a) => a.campaignId === campaignId && a.userId === userId);
+  if (!account) {
+    const campaign = store.campaigns.find((c) => c.id === campaignId);
+    const starting = Number((campaign?.settings as any)?.startingResources?.[quote.resourceType] ?? 0);
+    account = { id: crypto.randomUUID(), campaignId, userId, balances: { [quote.resourceType]: starting }, lastUpdatedAt: new Date().toISOString() };
+    store.resourceAccounts.push(account);
+  }
+  account.balances[quote.resourceType] = Number(account.balances[quote.resourceType] ?? 0) + quote.amount;
+  account.lastUpdatedAt = new Date().toISOString();
+  store.resourceTransactions.push({ id: crypto.randomUUID(), campaignId, userId, type: quote.resourceType, amount: quote.amount, reason: `${action === "sell" ? "Sold" : "Salvaged"} ${unit.snapshot?.name ?? unit.baseUnitId}`, createdAt: new Date().toISOString() });
+  const pilot = store.pilots.find((p: any) => p.assignedUnitId === unit.id);
+  if (pilot) { pilot.assignedUnitId = undefined; pilot.status = pilot.wounds > 0 ? "Wounded" : "Unassigned"; pilot.updatedAt = new Date().toISOString(); }
+  store.forceUnits.splice(index, 1);
+  refreshForceUnitIds(force, store.forceUnits);
+  force.updatedAt = new Date().toISOString();
+  await saveStore(store);
+  return { force: withForceUnits(force, store.forceUnits), ...quote, balance: account.balances[quote.resourceType] };
 }

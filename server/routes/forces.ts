@@ -9,6 +9,9 @@ import {
   updateForce,
   deleteForce,
   updateForceUnit,
+  repairChaosForceUnit,
+  quoteForceUnitDisposition,
+  disposeForceUnit,
 } from "../services/forceService";
 
 const router = express.Router();
@@ -143,6 +146,38 @@ router.patch("/:id/units/:forceUnitId", requireAuth, async (req: RequestWithUser
     res.json(force);
   } catch (error) {
     console.error("[routes/forces] Update force unit failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+router.post("/:id/units/:forceUnitId/chaos-repair", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+    const campaignId = typeof req.body.campaignId === "string" ? req.body.campaignId : "";
+    if (!campaignId) return res.status(400).json({ error: "campaignId is required." });
+    const result = await repairChaosForceUnit(req.params.id, req.params.forceUnitId, campaignId, user.id);
+    res.json(result);
+  } catch (error) {
+    console.error("[routes/forces] Chaos repair failed:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+
+router.post("/:id/units/:forceUnitId/disposition", requireAuth, async (req: RequestWithUser, res) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: "Authentication required." });
+    const campaignId = typeof req.body.campaignId === "string" ? req.body.campaignId : "";
+    const action = req.body.action === "salvage" ? "salvage" : req.body.action === "sell" ? "sell" : null;
+    if (!campaignId || !action) return res.status(400).json({ error: "campaignId and a valid action are required." });
+    const result = req.body.preview
+      ? await quoteForceUnitDisposition(req.params.id, req.params.forceUnitId, campaignId, user.id, action)
+      : await disposeForceUnit(req.params.id, req.params.forceUnitId, campaignId, user.id, action);
+    res.json(result);
+  } catch (error) {
+    console.error("[routes/forces] Unit disposition failed:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });

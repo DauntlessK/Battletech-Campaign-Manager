@@ -147,12 +147,12 @@ function normalizeObjectiveControl(
   return playerMode === "3-10" ? "Percentage" : requested;
 }
 
-function resourceLabel(settings?: CampaignSettings): string {
+function resourceLabel(settings?: CampaignSettings, liveBalance?: number): string {
   const resources = settings?.startingResources ?? {};
   if (settings?.type === "Chaos") {
-    return `${formatNumber(resources.Warchest ?? 0)} WP`;
+    return `${formatNumber(liveBalance ?? resources.Warchest ?? 0)} WP`;
   }
-  return `Ꞓ${formatNumber(resources.CBills ?? 0)}`;
+  return `Ꞓ${formatNumber(liveBalance ?? resources.CBills ?? 0)}`;
 }
 
 function resourceTypeLabel(settings?: CampaignSettings): string {
@@ -604,6 +604,7 @@ export default function CampaignsPage({
     string | null
   >(null);
   const [candidateForceId, setCandidateForceId] = useState<string | null>(null);
+  const [liveResourceBalance, setLiveResourceBalance] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (openInvitesSignal) {
@@ -619,6 +620,23 @@ export default function CampaignsPage({
       onCampaignFocusConsumed?.();
     }
   }, [focusCampaignId, onCampaignFocusConsumed]);
+
+  const fetchLiveResourceBalance = async (campaign: Campaign) => {
+    try {
+      const token = localStorage.getItem("bcm-auth-token");
+      const response = await fetch(`/api/resources/campaigns/${campaign.id}/accounts`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      const accounts = await response.json().catch(() => []);
+      if (!response.ok || !Array.isArray(accounts)) return;
+      const account = accounts.find((entry: any) => entry.userId === authUser.id);
+      const type = campaign.settings?.type === "Chaos" ? "Warchest" : "CBills";
+      const fallback = Number(campaign.settings?.startingResources?.[type] ?? 0);
+      setLiveResourceBalance(Number(account?.balances?.[type] ?? fallback));
+    } catch {
+      setLiveResourceBalance(undefined);
+    }
+  };
 
   const fetchCampaignBattles = async (campaignId: string) => {
     setCampaignBattlesLoading(true);
@@ -741,8 +759,10 @@ export default function CampaignsPage({
     );
     if (campaign?.status === "Active") {
       fetchCampaignBattles(campaign.id);
+      fetchLiveResourceBalance(campaign);
     } else {
       setCampaignBattles([]);
+      setLiveResourceBalance(undefined);
       setBattleHistoryOpen(false);
       setBattleLogPrefill(null);
     }
@@ -1193,7 +1213,7 @@ export default function CampaignsPage({
       }
 
       if (mechbayPageOpen) {
-        return <MechbayPage campaign={selectedCampaign} force={force} onBack={() => setMechbayPageOpen(false)} />;
+        return <MechbayPage campaign={selectedCampaign} force={force} onBack={() => setMechbayPageOpen(false)} onResourceBalanceChange={(_type, balance) => setLiveResourceBalance(balance)} />;
       }
 
       if (battleHistoryOpen) {
@@ -1247,6 +1267,7 @@ export default function CampaignsPage({
               setEditingFluff(true);
             }}
             onUpdatePlayerColors={onUpdateCampaignPlayerColors}
+            liveResourceBalance={liveResourceBalance}
           />
           {editingFluff && (
             <CampaignFluffModal
@@ -1598,7 +1619,7 @@ export default function CampaignsPage({
             />
             <CampaignFactCard
               label="Starting Resources"
-              value={resourceLabel(settings)}
+              value={resourceLabel(settings, liveResourceBalance)}
             />
             <CampaignFactCard
               label="Associated Force"
@@ -3711,6 +3732,7 @@ function ActiveCampaignDashboard({
   onStartAwaitingBattleLog,
   onOpenFluff,
   onUpdatePlayerColors,
+  liveResourceBalance,
 }: {
   campaign: Campaign;
   force?: Force;
@@ -3729,6 +3751,7 @@ function ActiveCampaignDashboard({
     campaignId: string,
     colors: Record<string, string>,
   ) => Promise<Campaign | null>;
+  liveResourceBalance?: number;
 }) {
   const settings = campaign.settings;
   const acceptedPlayers = sortPlayersForControl(
@@ -3855,19 +3878,12 @@ function ActiveCampaignDashboard({
             )}
             <CampaignFactCard
               label={resourceTypeLabel(settings)}
-              value={resourceLabel(settings)}
+              value={resourceLabel(settings, liveResourceBalance)}
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-            {isChaos ? (
-              <button
-                type="button"
-                className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs font-black text-zinc-200 transition hover:border-lime-400/50 hover:text-lime-200"
-              >
-                Repair
-              </button>
-            ) : (
+            {!isChaos && (
               <select
                 value={repairPriority}
                 onChange={(event) => setRepairPriority(event.target.value)}
