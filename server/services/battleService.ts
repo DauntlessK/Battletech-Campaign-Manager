@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { loadStore, saveStore } from "./storageService";
 import { createNotification } from "./notificationService";
 import { getUnitDefinitionById } from "./unitLibraryService";
+import { resolveRepairTimeMinutes } from "./repairTimeService";
 import { WEAPONS } from "../../src/data/weapons";
 import { COMPONENTS } from "../../src/data/components";
 import type {
@@ -633,9 +634,49 @@ function roll2d6(): number {
   return 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6);
 }
 
+const STOCK_TARGETS: Record<string, number> = { A: 3, B: 4, C: 5, D: 7, E: 9, F: 10 };
+const ALWAYS_IN_STOCK_PARTS = ["heat sink", "small laser", "medium laser"];
+
+function hasExistingOpenRequisition(store: any, campaignId: string | undefined, itemName: string): boolean {
+  const target = normalizePartName(itemName);
+  return (store.repairOrders ?? []).some((row: any) =>
+    row.campaignId === campaignId &&
+    row.action === "Replace" &&
+    normalizePartName(row.itemName) === target &&
+    ["Needs Order", "Failed", "Awaiting Delivery"].includes(String(row.requisitionStatus ?? "")),
+  );
+}
+
+function resolveStockState(store: any, base: any): any {
+  if (base.action !== "Replace") return base;
+  const normalized = normalizePartName(base.itemName);
+  const alwaysInStock = ALWAYS_IN_STOCK_PARTS.some((name) => normalized.includes(name));
+  const existingReq = hasExistingOpenRequisition(store, base.campaignId, base.itemName);
+  if (existingReq) return { ...base, inStock: false, requisitionStatus: "Needs Order" };
+  const rating = String(base.availabilityRating ?? "C").trim().toUpperCase().charAt(0);
+  const target = STOCK_TARGETS[rating] ?? STOCK_TARGETS.C;
+  const roll = alwaysInStock ? 12 : roll2d6();
+  const inStock = alwaysInStock || roll >= target;
+  return {
+    ...base,
+    stockRoll: roll,
+    stockTarget: target,
+    inStock,
+    requisitionStatus: inStock ? undefined : "Needs Order",
+  };
+}
+
 function addRepairOrder(store: any, base: any): void {
   const now = new Date().toISOString();
-  store.repairOrders.push({ id: crypto.randomUUID(), status: "Pending", createdAt: now, updatedAt: now, ...base });
+  const resolved = resolveStockState(store, base);
+  store.repairOrders.push({
+    id: crypto.randomUUID(),
+    status: "Pending",
+    repairTimeMinutes: resolveRepairTimeMinutes(resolved),
+    createdAt: now,
+    updatedAt: now,
+    ...resolved,
+  });
 }
 
 async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: Battle, overlay: any): Promise<void> {
@@ -721,7 +762,7 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
     const fullArmorCost = evaluatePartCost(armorDefinition?.cost, unitDefinition ?? forceUnit.snapshot, "Armor");
     const fullStructureCost = evaluatePartCost(structureDefinition?.cost, unitDefinition ?? forceUnit.snapshot, "Internal Structure");
     if (armorPoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Armor", locationId: location.id, itemId: armorDefinition?.id, itemName: `${location.name} armor`, quantity: armorPoints, action: "Repair", techRating: armorDefinition?.techRating ?? "C", availabilityRating: eraAvailability(armorDefinition, era), replacementCostCBills: Math.round(fullArmorCost * armorPoints / totalArmorPoints) });
-    if (structurePoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Internal Structure", locationId: location.id, itemId: structureDefinition?.id, itemName: `${location.name} internal structure`, quantity: structurePoints, action: "Repair", techRating: structureDefinition?.techRating ?? "C", availabilityRating: eraAvailability(structureDefinition, era), replacementCostCBills: Math.round(fullStructureCost * structurePoints / totalStructurePoints) });
+    if (structurePoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Internal Structure", locationId: location.id, itemId: structureDefinition?.id, itemName: `${location.name} internal structure`, quantity: structurePoints, damagePercent: Math.min(100, Math.ceil((structurePoints / Math.max(1, Number(location.structure ?? location.internal ?? 1))) * 100)), action: "Repair", techRating: structureDefinition?.techRating ?? "C", availabilityRating: eraAvailability(structureDefinition, era), replacementCostCBills: Math.round(fullStructureCost * structurePoints / totalStructurePoints) });
     if ((entry.missing || entry.destroyed) && /head|torso|arm|leg/i.test(location.name)) {
       const assemblyCost = locationReplacementCost(location, unitDefinition ?? forceUnit.snapshot);
       addRepairOrder(store, {
@@ -741,7 +782,6 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
         costUnavailableReason: assemblyCost == null
           ? "No resolved location cost was found in the unit-detail record. Regenerate this unit's details with location cost metadata."
           : undefined,
-        requisitionStatus: "Needs Order",
       });
     }
 
@@ -771,7 +811,7 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
         availabilityRating: eraAvailability(definition, era), repairRoll: roll, disposition, replacementCostCBills,
       };
       store.unitEquipmentDamage.push(equipmentRow);
-      addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Equipment", locationId: location.id, slotNumber: equipmentRow.slotNumber, itemId: equipmentRow.equipmentId, itemName: equipmentRow.equipmentName, quantity: 1, action: disposition, repairRoll: roll, techRating: equipmentRow.techRating, availabilityRating: equipmentRow.availabilityRating, replacementCostCBills, requisitionStatus: disposition === "Replace" ? "Needs Order" : undefined });
+      addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Equipment", locationId: location.id, slotNumber: equipmentRow.slotNumber, itemId: equipmentRow.equipmentId, itemName: equipmentRow.equipmentName, quantity: 1, criticalHits: component.slots.length, action: disposition, repairRoll: roll, techRating: equipmentRow.techRating, availabilityRating: equipmentRow.availabilityRating, replacementCostCBills });
     }
   }
 
@@ -793,6 +833,7 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
       itemId: definition?.id ?? ammoTypeId,
       itemName: String(ammoSlot?.displayName ?? ammoSlot?.item ?? ammoSlot?.raw ?? ammoTypeId).replace(/[_-]+/g, " "),
       quantity: shotsSpent,
+      binCount: Math.max(1, Math.ceil(shotsSpent / binShots)),
       action: "Rearm",
       techRating: ammoSlot?.techRating ?? definition?.techRating ?? "C",
       availabilityRating: eraAvailability(ammoSlot ?? definition, era),
@@ -942,20 +983,32 @@ function deriveStatusFromOverlay(overlay: any): string {
 }
 
 function estimateCurrentBV(forceUnit: any, overlay: any): number {
-  if (Number.isFinite(Number(overlay?.currentBV ?? overlay?.recalculatedBV))) return Number(overlay.currentBV ?? overlay.recalculatedBV);
   const baseBV = Number(forceUnit.snapshot?.totalBV ?? forceUnit.startingBV ?? forceUnit.currentBV ?? 0);
   if (!baseBV) return baseBV;
   const status = overlay?.status ?? deriveStatusFromOverlay(overlay);
   if (status === "Destroyed") return 0;
+
+  const locations = overlay?.detailed?.locations ?? {};
+  const definitionLocations = forceUnit.snapshot?.locations ?? [];
+  const totalArmor = Math.max(1, definitionLocations.reduce((sum: number, location: any) =>
+    sum + Number(location.armor ?? 0) + Number(location.rearArmor ?? 0), 0));
+  const totalStructure = Math.max(1, definitionLocations.reduce((sum: number, location: any) =>
+    sum + Number(location.structure ?? location.internal ?? 0), 0));
+  const armorDamage = Object.values(locations).reduce((sum: number, entry: any) =>
+    sum + Number(entry?.armorDamage ?? 0) + Number(entry?.rearArmorDamage ?? 0), 0);
+  const structureDamage = Object.values(locations).reduce((sum: number, entry: any) =>
+    sum + Number(entry?.structureDamage ?? 0), 0);
+
   const summary = overlay?.damageSummary ?? {};
   const penalty =
-    Number(summary.internal ?? 0) * 0.01 +
+    Math.min(1, armorDamage / totalArmor) * 0.35 +
+    Math.min(1, structureDamage / totalStructure) * 0.35 +
     Number(summary.weapons ?? 0) * 0.05 +
     Number(summary.components ?? 0) * 0.025 +
     Number(summary.engineHits ?? 0) * 0.08 +
     Number(summary.gyroHits ?? 0) * 0.08 +
     Number(summary.limbs ?? 0) * 0.1;
-  return Math.max(0, Math.round(baseBV * Math.max(0.25, 1 - penalty)));
+  return Math.max(0, Math.round(baseBV * Math.max(0.2, 1 - penalty)));
 }
 
 function calculateCampaignTurnState(store: any, campaignId: string) {
@@ -1074,6 +1127,89 @@ export async function updateBattle(
   }
   await saveStore(store);
   return b;
+}
+
+
+export async function reofficializeBattle(id: string): Promise<Battle> {
+  const store = await loadStore();
+  const battle = store.battles.find((entry) => entry.id === id);
+  if (!battle) throw new Error("Battle not found");
+
+  const validation = validateBattleLogAgreement(battle);
+  if (!validation.agreed || (battle.battleLogs ?? []).length < 2) {
+    throw new Error(`Battle logs do not match: ${validation.issues.join(" ") || "two matching logs are required."}`);
+  }
+
+  const campaign = store.campaigns.find((entry) => entry.id === battle.campaignId);
+  if (!campaign) throw new Error("Campaign not found");
+  const now = new Date().toISOString();
+
+  battle.status = "Complete";
+  battle.validationIssues = [];
+  battle.confirmedAt = now;
+  battle.updatedAt = now;
+  applyBattleOutcomeFields(battle);
+
+  // Rebuild objective and planetary control from all agreed official battles so
+  // this dev action cannot double-apply a prior control swing.
+  const acceptedUserIds = store.campaignParticipants
+    .filter((participant) => participant.campaignId === campaign.id && participant.status === "Accepted")
+    .map((participant) => participant.userId);
+  const equalShare = acceptedUserIds.length ? 100 / acceptedUserIds.length : 100;
+  const equalControl = acceptedUserIds.map((userId) => ({ userId, percentage: roundPercent(equalShare) }));
+  campaign.settings = {
+    ...(campaign.settings ?? {}),
+    planetaryControl: equalControl,
+    objectives: (campaign.settings?.objectives ?? []).map((objective: any) => ({
+      ...objective,
+      currentControl: equalControl.map((entry) => ({ ...entry })),
+    })),
+  };
+  campaign.planetaryControl = equalControl.map((entry) => ({ ...entry }));
+  for (const objective of store.objectives ?? []) {
+    if (objective.campaignId === campaign.id) {
+      objective.currentControl = equalControl.map((entry) => ({ ...entry }));
+      objective.currentOwnerId = undefined;
+      objective.updatedAt = now;
+    }
+  }
+
+  const officialBattles = store.battles
+    .filter((entry) => entry.campaignId === campaign.id && ["Complete", "Confirmed", "Finalized"].includes(String(entry.status)))
+    .filter((entry) => validateBattleLogAgreement(entry).agreed)
+    .sort((a, b) => String(a.date ?? a.createdAt ?? "").localeCompare(String(b.date ?? b.createdAt ?? "")));
+
+  for (const officialBattle of officialBattles) {
+    const firstLog = officialBattle.battleLogs?.[0];
+    if (!firstLog) continue;
+    const swing = calculateControlSwing(
+      campaign,
+      firstLog.userId,
+      firstLog.opponentUserId ?? "",
+      firstLog as BattlePayload,
+      store,
+    );
+    officialBattle.controlChangePercent = swing.actualSwing;
+    officialBattle.controlSwingBreakdown = swing.breakdown;
+    applyControlSwing(campaign, swing, store);
+  }
+
+  // Kills are additive, so remove this battle's prior contribution before
+  // re-running the downstream unit processing. Other current damage is replaced
+  // idempotently by persistCurrentDamageForUnit().
+  for (const log of battle.battleLogs ?? []) {
+    for (const overlay of log.unitDamage ?? []) {
+      const unit = store.forceUnits.find((entry) => entry.id === overlay.campaignForceUnitId);
+      if (unit) unit.kills = Math.max(0, Number(unit.kills ?? 0) - Number(overlay.killsMade ?? 0));
+    }
+  }
+
+  await applyBattleResultsToForces(store, battle);
+  advanceCampaignTurn(campaign, store);
+  (battle as any).officializedAt = now;
+  (battle as any).officialProcessingVersion = 1;
+  await saveStore(store);
+  return battle;
 }
 
 export async function confirmBattle(id: string): Promise<Battle> {

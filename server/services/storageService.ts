@@ -42,6 +42,7 @@ const DEFAULT_STORE: StoreData = {
   notifications: [],
   friendRequests: [],
   unassignedPilots: [],
+  systemSettings: [{ id: "global", repairEstimateMultiplier: 1.5, unitsPerTechnician: 2, defaultTurnLengthDays: 5, workDayMinutes: 480, requisitionsPerTurn: 10, techExperience: "Regular" }],
 };
 
 const COLLECTION_KEYS = [
@@ -64,6 +65,7 @@ const COLLECTION_KEYS = [
   "notifications",
   "friendRequests",
   "unassignedPilots",
+  "systemSettings",
 ] as const satisfies readonly (keyof StoreData)[];
 
 type CollectionKey = (typeof COLLECTION_KEYS)[number];
@@ -81,7 +83,7 @@ const REQUIRED_ARRAY_KEYS: readonly CollectionKey[] = [
   "authTokens",
 ];
 
-const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests", "unassignedPilots", "pilots", "unitDamage", "unitLocationDamage", "unitEquipmentDamage", "unitAmmoState", "repairOrders"];
+const OPTIONAL_ARRAY_KEYS: readonly CollectionKey[] = ["notifications", "friendRequests", "unassignedPilots", "pilots", "unitDamage", "unitLocationDamage", "unitEquipmentDamage", "unitAmmoState", "repairOrders", "systemSettings"];
 
 let saveQueue: Promise<void> = Promise.resolve();
 

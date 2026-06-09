@@ -329,6 +329,12 @@ export type CampaignSettings = {
   objectiveControlType?: ObjectiveControlType;
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
+  turnLengthDays?: number;
+  technicians?: number;
+  unitsPerTechnician?: number;
+  repairEstimateMultiplier?: number;
+  techTeamExperience?: "Green" | "Regular" | "Veteran" | "Elite";
+  workDayMinutes?: number;
   victoryConditions?: VictoryConditions;
   victoryConditionsReviewed?: boolean;
   objectives?: CampaignObjective[];
@@ -387,6 +393,7 @@ export type CampaignParticipantSummary = {
     name: string;
     totalBV?: number;
     startingBV?: number;
+  startingUnitCount?: number;
     faction?: string;
   };
 };

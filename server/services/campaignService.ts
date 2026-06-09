@@ -275,6 +275,14 @@ function normalizeCampaignSettings(
     objectiveControlType,
     salariesEnabled: type !== "Chaos" && Boolean(rawSettings.salariesEnabled),
     startingResources: normalizeStartingResources(rawSettings, type),
+    turnLengthDays: Math.max(1, Math.floor(toPositiveNumber(rawSettings.turnLengthDays, 5))),
+    technicians: rawSettings.technicians === undefined ? undefined : Math.max(1, Math.ceil(toPositiveNumber(rawSettings.technicians, 1))),
+    unitsPerTechnician: Math.max(0.1, toPositiveNumber(rawSettings.unitsPerTechnician, 2)),
+    repairEstimateMultiplier: Math.max(1, toPositiveNumber(rawSettings.repairEstimateMultiplier, 1.5)),
+    techTeamExperience: ["Green", "Regular", "Veteran", "Elite"].includes(String(rawSettings.techTeamExperience))
+      ? rawSettings.techTeamExperience
+      : "Regular",
+    workDayMinutes: Math.max(1, Math.floor(toPositiveNumber(rawSettings.workDayMinutes, 480))),
     victoryConditions: normalizeVictoryConditions(rawSettings.victoryConditions, type, objectiveControlType),
     victoryConditionsReviewed: Boolean(rawSettings.victoryConditionsReviewed),
     objectives: normalizeCampaignObjectives(rawSettings.objectives),
@@ -301,7 +309,14 @@ export async function createCampaign(
     name: cleanName,
     description: description?.trim() || undefined,
     status: "Setup",
-    settings: normalizeCampaignSettings(settings),
+    settings: normalizeCampaignSettings({
+      ...settings,
+      turnLengthDays: settings.turnLengthDays ?? store.systemSettings?.[0]?.defaultTurnLengthDays ?? 5,
+      unitsPerTechnician: settings.unitsPerTechnician ?? store.systemSettings?.[0]?.unitsPerTechnician ?? 2,
+      repairEstimateMultiplier: settings.repairEstimateMultiplier ?? store.systemSettings?.[0]?.repairEstimateMultiplier ?? 1.5,
+      workDayMinutes: settings.workDayMinutes ?? store.systemSettings?.[0]?.workDayMinutes ?? 480,
+      techTeamExperience: settings.techTeamExperience ?? store.systemSettings?.[0]?.techExperience ?? "Regular",
+    }),
     createdAt: now,
     updatedAt: now,
   };
@@ -688,20 +703,13 @@ function copyCommittedForcesToCampaignInStore(store: any, campaign: Campaign) {
     };
 
     const originalUnits = store.forceUnits.filter((unit: any) => unit.forceId === existingForce.id);
-    const copiedUnits = originalUnits.map((unit: any) => {
-      const sourcePilot = unit.assignedPilotId
-        ? store.pilots?.find((pilot: any) => pilot.id === unit.assignedPilotId)
-        : undefined;
-      return {
-        ...unit,
-        id: crypto.randomUUID(),
-        forceId: copiedForce.id,
-        assignedPilotId: undefined,
-        pilot: sourcePilot
-          ? { name: sourcePilot.name, gunnery: sourcePilot.gunnery, piloting: sourcePilot.piloting }
-          : { gunnery: 4, piloting: 5 },
-      };
-    });
+    const copiedUnits = originalUnits.map((unit: any) => ({
+      ...unit,
+      id: crypto.randomUUID(),
+      forceId: copiedForce.id,
+      pilot: unit.pilot ?? { gunnery: 4, piloting: 5 },
+    }));
+    copiedForce.startingUnitCount = copiedUnits.length;
     copiedForce.unitIds = copiedUnits
       .sort((a: any, b: any) => (a.teamNumber ?? 1) - (b.teamNumber ?? 1) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
       .map((unit: any) => unit.baseUnitId);
@@ -738,6 +746,9 @@ export async function beginCampaign(campaignId: string, userId: string): Promise
   if (!campaignPlayersReady(campaign, store)) throw new Error("Player count and assigned forces must be complete before beginning the campaign.");
 
   copyCommittedForcesToCampaignInStore(store, campaign);
+  const campaignForces = store.forces.filter((force: any) => force.campaignId === campaign.id && force.origin === "CampaignCopy");
+  const largestStartingRoster = campaignForces.reduce((max: number, force: any) => Math.max(max, Number(force.startingUnitCount ?? 0)), 0);
+  campaign.settings.technicians = Math.max(1, Math.ceil(largestStartingRoster / Math.max(0.1, Number(campaign.settings.unitsPerTechnician ?? 2))));
   campaign.status = "Active";
   campaign.startDate = new Date().toISOString();
   campaign.updatedAt = campaign.startDate;

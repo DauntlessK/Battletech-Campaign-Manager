@@ -1,10 +1,25 @@
 import crypto from "crypto";
 import { Router } from "express";
 import { loadStore, saveStore } from "../services/storageService";
+import { reofficializeBattle } from "../services/battleService";
 import type { Campaign, CampaignParticipant, StoreData, UserAccount } from "../types/models";
 
 const router = Router();
 
+
+const DEFAULT_SYSTEM_SETTINGS = {
+  id: "global" as const,
+  repairEstimateMultiplier: 1.5,
+  unitsPerTechnician: 2,
+  defaultTurnLengthDays: 5,
+  workDayMinutes: 480,
+  requisitionsPerTurn: 10,
+  techExperience: "Regular" as const,
+};
+
+function getSystemSettings(store: StoreData) {
+  return { ...DEFAULT_SYSTEM_SETTINGS, ...(store.systemSettings?.[0] ?? {}) };
+}
 const HASH_ALGORITHM = "sha512";
 const HASH_ITERATIONS = 120000;
 const HASH_KEYLEN = 64;
@@ -374,6 +389,27 @@ function deleteCampaignCascade(store: StoreData, campaignId: string) {
 
 router.get("/overview", async (_req, res) => {
   const store = await loadStore();
+  const battleLogs = store.battles.flatMap((battle) => battle.battleLogs ?? []);
+  const damageEntries = battleLogs.flatMap((log) => log.unitDamage ?? []);
+  const shotsFired = damageEntries.reduce((total, damage) => {
+    const spent = damage.detailed?.ammoSpent ?? {};
+    return total + Object.values(spent).reduce((sum, value) => sum + Number(value ?? 0), 0);
+  }, 0);
+  const destroyedUnitIds = new Set(
+    damageEntries
+      .filter((damage) => String(damage.status ?? "").toLowerCase() === "destroyed")
+      .map((damage) => damage.campaignForceUnitId),
+  );
+  const turnsTaken = store.campaignParticipants.reduce(
+    (sum, participant) => sum + Math.max(0, Number(participant.currentTurn ?? 1) - 1),
+    0,
+  );
+  const pilotsKilled = damageEntries.filter((damage) => damage.pilotDamage === "KIA").length;
+  const confirmedBattles = store.battles.filter((battle) =>
+    ["Complete", "Confirmed", "Finalized"].includes(String(battle.status)),
+  ).length;
+  const totalKills = damageEntries.reduce((sum, damage) => sum + Number(damage.killsMade ?? 0), 0);
+
   res.json({
     users: store.users.map(sanitizeAdminUser),
     campaigns: store.campaigns,
@@ -382,6 +418,17 @@ router.get("/overview", async (_req, res) => {
       ...force,
       forceUnits: store.forceUnits.filter((forceUnit) => forceUnit.forceId === force.id),
     })),
+    stats: {
+      campaigns: store.campaigns.length,
+      users: store.users.length,
+      battles: store.battles.length,
+      confirmedBattles,
+      shotsFired,
+      turnsTaken,
+      unitsDestroyed: destroyedUnitIds.size,
+      pilotsKilled,
+      totalKills,
+    },
   });
 });
 
@@ -419,6 +466,52 @@ router.delete("/campaigns/:campaignId", async (req, res) => {
     res.status(404).json({
       error: error instanceof Error ? error.message : "Unable to delete campaign.",
     });
+  }
+});
+
+
+router.post("/battles/:battleId/reofficialize", async (req, res) => {
+  try {
+    const battle = await reofficializeBattle(req.params.battleId);
+    res.json({ ok: true, battle });
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Unable to re-officialize battle.",
+    });
+  }
+});
+
+
+router.get("/settings", async (_req, res) => {
+  try {
+    const store = await loadStore();
+    res.json(getSystemSettings(store));
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : "Unable to load settings." });
+  }
+});
+
+router.put("/settings", async (req, res) => {
+  try {
+    const store = await loadStore();
+    const experience = ["Green", "Regular", "Veteran", "Elite"].includes(String(req.body?.techExperience))
+      ? req.body.techExperience
+      : "Regular";
+    const settings = {
+      id: "global" as const,
+      repairEstimateMultiplier: Math.max(1, Number(req.body?.repairEstimateMultiplier ?? 1.5)),
+      unitsPerTechnician: Math.max(0.1, Number(req.body?.unitsPerTechnician ?? 2)),
+      defaultTurnLengthDays: Math.max(1, Math.floor(Number(req.body?.defaultTurnLengthDays ?? 5))),
+      workDayMinutes: Math.max(1, Math.floor(Number(req.body?.workDayMinutes ?? 480))),
+      requisitionsPerTurn: Math.max(0, Math.floor(Number(req.body?.requisitionsPerTurn ?? 10))),
+      techExperience: experience,
+      updatedAt: new Date().toISOString(),
+    };
+    store.systemSettings = [settings];
+    await saveStore(store);
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : "Unable to save settings." });
   }
 });
 

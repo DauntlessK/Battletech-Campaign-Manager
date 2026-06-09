@@ -95,6 +95,12 @@ export type CampaignSettings = {
   objectiveControlType?: ObjectiveControlType;
   salariesEnabled?: boolean;
   startingResources?: ResourceBalance;
+  turnLengthDays?: number;
+  technicians?: number;
+  unitsPerTechnician?: number;
+  repairEstimateMultiplier?: number;
+  techTeamExperience?: "Green" | "Regular" | "Veteran" | "Elite";
+  workDayMinutes?: number;
   victoryConditions?: VictoryConditions;
   objectives?: CampaignSetupObjective[];
   planetaryControl?: Array<{ userId: string; percentage: number }>;
@@ -147,6 +153,7 @@ export type CampaignParticipantSummary = CampaignParticipant & {
     name: string;
     totalBV?: number;
     startingBV?: number;
+  startingUnitCount?: number;
     faction?: string;
   };
 };
@@ -390,7 +397,7 @@ export type RepairOrder = {
   forceId: string;
   forceUnitId: string;
   unitDamageId: string;
-  category: "Armor" | "Internal Structure" | "Equipment" | "Limb" | "Ammunition";
+  category: "Armor" | "Internal Structure" | "Equipment" | "Limb" | "Location Assembly" | "Ammunition";
   locationId?: string;
   slotNumber?: number;
   itemId?: string;
@@ -404,6 +411,11 @@ export type RepairOrder = {
   status: "Pending" | "Failed" | "Ordered" | "Awaiting Delivery" | "Delivered" | "In Progress" | "Complete" | "Cancelled";
   requisitionStatus?: "Needs Order" | "Failed" | "Awaiting Delivery" | "Delivered";
   deliveryTurnsRemaining?: number;
+  stockRoll?: number;
+  stockTarget?: number;
+  inStock?: boolean;
+  repairTimeMinutes?: number;
+  estimatedWorkDays?: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -571,6 +583,17 @@ export type UnassignedPilot = {
   createdAt: string;
 };
 
+
+export type SystemSettings = {
+  id: "global";
+  repairEstimateMultiplier: number;
+  unitsPerTechnician: number;
+  defaultTurnLengthDays: number;
+  workDayMinutes: number;
+  requisitionsPerTurn: number;
+  techExperience: "Green" | "Regular" | "Veteran" | "Elite";
+  updatedAt?: string;
+};
 export type StoreData = {
   users: UserAccount[];
   campaigns: Campaign[];
@@ -591,4 +614,5 @@ export type StoreData = {
   notifications?: Notification[];
   friendRequests?: FriendRequest[];
   unassignedPilots?: UnassignedPilot[];
+  systemSettings?: SystemSettings[];
 };

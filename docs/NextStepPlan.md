@@ -1,83 +1,90 @@
 # Next Step Plan
 
-## Status: MVP Backend Complete ✅ — Aligning with GitHub Milestones
+**Current baseline:** v71
 
-All core backend services and data models are now implemented. The project uses a structured 9-milestone roadmap (defined in `docs/btcm_github_import/data/milestones.csv`):
+## Immediate validation
 
-- **M1: Project Foundation and Documentation** ✅
-- **M2: Accounts, Friends, and Notifications** ✅ (backend complete, UI partial)
-- **M3: Unit Catalog and Force Management** ✅ (backend complete, UI partial)
-- **M4: Campaign Setup and Campaign-Specific Forces** ✅ (backend complete, UI partial)
-- **M5: Battle Logging and Confirmation** ✅ (backend complete, UI incomplete)
-- **M6: Objectives, Control, and Chaos Campaign MVP** ✅ (backend complete, UI incomplete)
-- **M7: Advanced Campaign Resources and Repairs** ⏳ (next phase)
-- **M8: Conquest Campaign Map and Orders** 🔮 (v1 phase)
-- **M9: Leaderboards, Polish, and Final Release** 🔮 (v1 phase)
+1. Test official battle confirmation without manual refresh.
+2. Verify live WP/C-bill totals and resource capitulation percentages after every transaction.
+3. Test objective percentage transfer with 2, 3, and 4 players; uninvolved shares must remain unchanged.
+4. Validate current BV changes for:
+   - armor-only damage;
+   - rear armor;
+   - internal structure;
+   - destroyed equipment;
+   - destroyed limbs/locations;
+   - Center Torso destruction.
+5. Validate repair-time CSV matching for every repair category.
+6. Regenerate unit details and confirm location assembly cost, tech rating, and availability are captured in new repair orders.
 
-## Completed Work (M1-M6 Backend)
-- ✅ User authentication (registration, login, logout with PBKDF2 hashing)
-- ✅ Account management and profile endpoints
-- ✅ Notification system with email integration and polling
-- ✅ Campaign creation, invitations, and participation
-- ✅ Force management with unit assignment
-- ✅ Battle tracking (create, confirm, finalize)
-- ✅ Objective tracking (create, update)
-- ✅ Resource accounts and transaction history
-- ✅ All HTTP endpoints with auth middleware
-- ✅ File-based persistence (server/data/store.json)
+## Repair execution milestone
 
-## Next: Complete M2-M6 UI (Battle and Objective Pages)
+- Schedule work against tech-team capacity.
+- Use hidden defaults:
+  - 5 days per turn;
+  - 480 work minutes per day;
+  - 4 technicians per team;
+  - Regular team experience (7+);
+  - team count = unit count / 2, rounded up.
+- Attempt repairs/replacements at end-of-turn.
+- Record repair attempt rolls and failures.
+- Prevent work when required parts have not arrived.
+- Complete repair rows and remove resolved current damage.
+- Restore BV/status incrementally or after complete repair, according to final rules decision.
 
-These 127 GitHub issues are organized by epic (use case) and milestone. The **immediate priority** should align with completing M6 (Chaos Campaign MVP):
+## Requisition and delivery milestone
 
-### M5: Battle Logging UI & API (High Priority)
-- **Build battle logging UI** — Create/list battles, confirm/finalize, view participants
-  - Related GitHub issues: `uc-019-build-battle-logging-ui`, `uc-019-create-battle-tables-models`, `uc-019-implement-battle-crud-endpoints`
-- **Build battle confirmation UI** — Approve/dispute battle outcomes
-  - Related GitHub issues: `uc-020-*`
-- **Effort**: ~60-80 lines per page
+- Implement requisition roll against rarity/availability.
+- Apply faction and campaign-location modifiers.
+- Store failed attempts and retry eligibility.
+- Roll delivery time.
+- Decrement delivery time each campaign turn.
+- Move delivered parts back into eligible repair work.
+- Add inventory/salvaged-part bonus model.
 
-### M6: Objectives & Chaos Campaign UI (High Priority)
-- **Build objective management UI** — Create/list objectives, track control, update status
-  - Related GitHub issues: `uc-025-*`
-- **Build campaign dashboard** — Overview of forces, battles, objectives, resources
-  - Related GitHub issues: `uc-016-build-campaign-dashboard-ui`
-- **Implement Chaos campaign defaults** — Resource loop and defaults
-  - Related GitHub issues: `uc-028-*`
-- **Effort**: ~40-60 lines per page, plus Chaos-specific business logic
+## Rearm milestone
 
-### M7: Repair & Resource Management (Medium Priority)
-- **Build repair UI** — Create repair orders, track repairs, resolve orders
-- **Build requisition UI** — Request and allocate new gear
-- **Build resource tracking UI** — View C-bills, repair points, salvage balances
-  - Related GitHub issues: `uc-033-*`
-- **Effort**: ~100-150 lines per feature
+- Execute Advanced/Conquest rearm orders.
+- Deduct exact C-bill cost.
+- Restore ammunition state.
+- Complete/remove rearm orders.
+- Validate Chaos WP rearm behavior.
 
-## How to Work with GitHub Issues
+## Personnel milestone
 
-1. **Browse issues locally** in `docs/btcm_github_import/issue_bodies/` to see acceptance criteria
-2. **Reference issue numbers** in commits/PRs (e.g., `#25 Build battle logging UI`)
-3. **Import issues into GitHub** when ready:
-   ```powershell
-   cd docs/btcm_github_import
-   .\scripts\02_create_milestones.ps1 -Repo DauntlessK/Battletech-Campaign-Manager
-   .\scripts\03_import_issues.ps1 -Repo DauntlessK/Battletech-Campaign-Manager
-   ```
-4. **Use milestones** to organize sprints (M5 → M6 → M7 → M8)
-5. **Track progress** with GitHub Project board
+- Build pilot roster page.
+- Assign/swap/unassign pilots.
+- Track recovery from wounds.
+- Display captured/missing/killed pilot history.
+- Preserve campaign ownership when units transfer.
+- Add pilot XP and skill advancement later.
 
-## Suggested Priority (Top to Bottom)
-1. **Battle Page UI (M5)** — Most gameplay happens here; enables testing battle mechanics
-2. **Objective Page UI (M6)** — Supports Chaos campaign cycle
-3. **Campaign Dashboard (M6)** — Provides strategic overview
-4. **Repair/Requisition UI (M7)** — Enables C-bill tracking and repair mechanics
-5. **Battle damage tracking (M7)** — Gameplay mechanics depth
-6. *(Then)* Leaderboards and statistics (M9)
-7. *(Then)* Conquest map features (M8)
+## Persistence/deployment milestone
 
-## Notes
-- All 127 GitHub issues are ready for import; use the import scripts when ready to track in GitHub
-- The project is oriented around Classic BattleTech campaigns per SRS.md and CampaignManual.md
-- Reference rulebooks: Tech Manual (units/BV/c-bills), Campaign Operations (campaign/repair), Tactical Operations (advanced rules)
-- Current tech stack: React 18 + TypeScript + Tailwind CSS (frontend), Node.js + Express + TypeScript (backend), file-based JSON persistence
-- File-based persistence is sufficient for MVP; migration to database deferred to v2
+- Introduce repository interfaces for current JSON services.
+- Define MySQL migrations for current table-like collections.
+- Import existing `.btcm` arrays preserving UUIDs.
+- Store indexed unit summaries in SQL.
+- Choose generated unit-detail files versus MySQL JSON column for complete static definitions.
+- Add transactions around official battle resolution, repair execution, and disposition.
+
+## UI polish
+
+- Ensure Mechbay queue columns remain aligned at all breakpoints.
+- Preserve one shared location-layout component.
+- Add clearer “remaining” versus “damage taken” labels.
+- Improve repair/requisition status tags.
+- Add confirmation/error feedback for all resource actions.
+- Keep main tables scrollable and avoid oversized modals.
+
+## Dev tools
+
+Potential high-value additions:
+
+- seed damage scenarios;
+- force a stock/requisition/delivery result;
+- advance one campaign turn;
+- recompute current BV for a selected unit;
+- rebuild repair orders from current damage;
+- export campaign diagnostic bundle;
+- compare hydrated API state against underlying table rows.

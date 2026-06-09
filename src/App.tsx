@@ -854,7 +854,7 @@ export default function App() {
         ...current.filter((battle) => battle.id !== createdBattle.id),
       ]);
       if (["Complete", "Confirmed", "Finalized", "Disputed"].includes(createdBattle.status)) {
-        await fetchCampaigns();
+        await Promise.all([fetchCampaigns(), fetchForces()]);
       }
       return createdBattle;
     } catch (error) {

@@ -1701,3 +1701,44 @@ into:
 * Milestones
 * MVP phases
 * Stretch goals
+
+---
+
+# Current API Architecture Notes (v71)
+
+## Hydrated force-unit responses
+
+Force endpoints may return a force unit hydrated with:
+
+- static unit definition (`snapshot`/resolved catalog detail);
+- assigned pilot resolved from `pilots`;
+- current damage resolved from damage collections;
+- repair orders resolved by `forceUnitId`.
+
+These nested response fields are transport conveniences and are not embedded persisted columns.
+
+## Mutation response requirements
+
+Mutations that change resources, units, or campaign progress should return enough updated state for the frontend to refresh immediately. The frontend should reload affected campaign/force/resource aggregates after:
+
+- official battle confirmation;
+- repair/rearm;
+- salvage/sale;
+- reset;
+- objective/control updates.
+
+## Required backend validation
+
+Backend services must enforce:
+
+- campaign/force ownership;
+- resource sufficiency;
+- turns-ahead limit;
+- CT-destroyed salvage-only restriction;
+- Chaos destroyed-unit repair restriction;
+- campaign-specific sale restrictions;
+- pilot transfer/unassignment rules.
+
+## Future repository boundary
+
+Route handlers should depend on services/repositories rather than direct file reads. JSON repositories will be replaced by MySQL implementations without changing endpoint semantics.

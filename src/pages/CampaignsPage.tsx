@@ -3576,11 +3576,13 @@ function VictoryConditionDetails({
   authUserId,
   force,
   playerShare,
+  liveResourceBalance,
 }: {
   campaign: Campaign;
   authUserId: string;
   force?: Force;
   playerShare: number;
+  liveResourceBalance?: number;
 }) {
   const settings = campaign.settings;
   const victory = settings?.victoryConditions;
@@ -3605,10 +3607,16 @@ function VictoryConditionDetails({
       ? Math.min(100, Math.max(0, (forceBV / bvBaseline) * 100))
       : 0;
   const resources = settings?.startingResources ?? {};
-  const resourceValue =
+  const startingResourceValue =
     settings?.type === "Chaos"
       ? Number(resources.Warchest ?? 0)
       : Number(resources.CBills ?? 0);
+  const resourceValue = Number.isFinite(Number(liveResourceBalance))
+    ? Number(liveResourceBalance)
+    : startingResourceValue;
+  const resourcePercent = startingResourceValue > 0
+    ? Math.max(0, (resourceValue / startingResourceValue) * 100)
+    : 0;
   const keyObjectives =
     settings?.objectives?.filter((objective) => objective.isKey) ?? [];
   if (!victory) {
@@ -3627,8 +3635,8 @@ function VictoryConditionDetails({
       />
       <VictoryDetail
         title="Resource capitulation"
-        status={`Currently: 100% of starting resources · capitulation at ${victory.capitulationResourcesPercent ?? 10}%`}
-        detail={`Current tracked resources: ${settings?.type === "Chaos" ? `${formatNumber(resourceValue)} Warchest Points` : `${formatNumber(resourceValue)} C-bills`}. Resource spend tracking can reduce this later.`}
+        status={`Currently: ${resourcePercent.toFixed(1)}% of starting resources · capitulation at ${victory.capitulationResourcesPercent ?? 10}%`}
+        detail={`Current tracked resources: ${settings?.type === "Chaos" ? `${formatNumber(resourceValue)} Warchest Points` : `${formatNumber(resourceValue)} C-bills`} / starting ${formatNumber(startingResourceValue)}.`}
       />
       {victory.dominationEnabled && (
         <VictoryDetail
@@ -4047,6 +4055,7 @@ function ActiveCampaignDashboard({
                 authUserId={authUserId}
                 force={force}
                 playerShare={playerShare}
+                liveResourceBalance={liveResourceBalance}
               />
             )}
           </div>

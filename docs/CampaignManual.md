@@ -825,7 +825,7 @@ The unit is assumed to have brought enough ammo for the campaign so no stocks fo
 Every part will have a rarity which represents the ease at which it can be made or found. This is between A and F. If not known, it is default C. This is also how likely the unit is to stock a given item.
 
 2D6 rolls against rarity:
-A items requires a 2+, B items requires 3+ C requires 4+, D requires 8+, E requires 10+, and F requires 11+
+A items requires a 3+, B items requires 4+ C requires 5+, D requires 7+, E requires 9+, and F requires 10+
 Should be able to configure and tweak these as needed.
 
 A small modifier is applied to stock rolls based on the faction of the force, or by default, a -1 roll mod.
