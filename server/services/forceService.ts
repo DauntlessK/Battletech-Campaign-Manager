@@ -546,6 +546,23 @@ function chaosRepairCostForUnit(forceUnit: ForceUnit): number {
   return crippled ? 100 : 80;
 }
 
+
+function hasDestroyedCenterTorso(store: any, unit: any): boolean {
+  const rows = (store.unitLocationDamage ?? []).filter((row: any) => row.forceUnitId === unit.id);
+  const centerTorso = rows.find((row: any) => {
+    const id = String(row.locationId ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const name = String(row.locationName ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return id === "ct" || id === "centertorso" || name === "centertorso";
+  });
+  if (centerTorso?.isDestroyed || centerTorso?.isMissing) return true;
+  const definition = (unit.snapshot?.locations ?? []).find((location: any) => {
+    const id = String(location.id ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const name = String(location.name ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return id === "ct" || id === "centertorso" || name === "centertorso";
+  });
+  return Boolean(centerTorso && definition && Number(centerTorso.structureDamage ?? 0) >= Number(definition.structure ?? Infinity));
+}
+
 export async function repairChaosForceUnit(
   forceId: string,
   forceUnitId: string,
@@ -563,8 +580,8 @@ export async function repairChaosForceUnit(
   }
   const forceUnit = store.forceUnits.find((entry) => entry.id === forceUnitId && entry.forceId === forceId);
   if (!forceUnit) throw new Error("Unit not found in this force.");
-  if (forceUnit.isDestroyed || String(forceUnit.status ?? "").toLowerCase() === "destroyed") {
-    throw new Error("Destroyed units cannot be repaired in Chaos campaigns.");
+  if (forceUnit.isDestroyed || String(forceUnit.status ?? "").toLowerCase() === "destroyed" || hasDestroyedCenterTorso(store, forceUnit)) {
+    throw new Error("Units with a destroyed center torso are salvage-only and cannot be repaired.");
   }
 
   const cost = chaosRepairCostForUnit(forceUnit);
@@ -616,6 +633,7 @@ export async function quoteForceUnitDisposition(forceId: string, forceUnitId: st
   if (force.ownerId !== userId || force.campaignId !== campaignId) throw new Error("You do not have permission to manage this unit.");
   const isChaos = campaign.settings?.type === "Chaos";
   const damaged = unit.isDestroyed || !["Ready", "Available"].includes(String(unit.status ?? "Ready"));
+  if (action === "sell" && hasDestroyedCenterTorso(store, unit)) throw new Error("Units with a destroyed center torso are salvage-only and cannot be sold.");
   if (isChaos && action === "sell" && damaged) throw new Error("Damaged or destroyed Chaos units cannot be sold.");
   if (isChaos) {
     const tonnage = Number(unit.snapshot?.tonnage ?? 0);

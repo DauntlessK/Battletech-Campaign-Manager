@@ -811,8 +811,9 @@ As described within campaign ops rulebook, the roll required to make a successfu
 ## 9.10 Repair & Req Order of Operations
 
 Order of operations:
+0) If its a weapon or equipment, a 2D6 roll of 10+ means the part can be repaired instead of needing replacing.
 1) Check if repair in question is against a repair that is currently awaiting a part. If it is, check to see if part arrived. If it has not arrived, skip this repair. If it has arrived or the repair is not matched with a repair waiting a part, move to step 2.
-2) Attempt to repair - if item cannot be repaired (due to unsuccessful attempts, or too complex, etc), proceed to next step.
+2) Attempt to repair (end between turns) - if item cannot be repaired (due to unsuccessful attempts, or too complex, etc), proceed to next step.
 3) Stock roll - First check if there are any waiting deliveries against that specific item. If there are deliveries awaiting, then immediately move to next step. Otherwise, roll to see if the item in question is in stock. (2d6 against rarity roll with modifier based on force faction, or by default a -1 roll mod). If not in stock proceed to next step. If it is in stock, go back to step 1.
 4) Requisition roll - Esentially another roll for req. (2d6 against rarity roll)- if req is successful, move to next step. Otherwise fails and must wait to req item next turn.
 5) Delivery time roll - System rolls for delivery time. (2D6 delivery time roll, optional mods based on location of campaign). Add item to delivery queue.
@@ -848,12 +849,12 @@ A items requires a 4+, B items requires 5+ C requires 7+, D requires 9+, E requi
 Should be able to configure and tweak these as needed.
 
 2D6 rolls for delivery time depends on rarity:
-A items: (6+) This turn (available for immediate repairs), (4-5) Next turn, (2-3) 2 Turns
-B items: (7+) This turn, (4-5) next turn, (2-3) 2 Turns
-C items: (7+) This turn, (5-6) next turn, (3-4) 2 Turns, (2) 3 turns
-D items: (8+) This turn,  (6-7) next turn, (4-5) 2 turns, (2-3) 3 turns
-E items: (10+) this turn, (7-9) next turn, (5-6) 2 turns, (3-4) 3 turns, (2) 4 turns
-F items: (11+) this turn, (9-10) next turn, (7-8) 2 turns, (5-6) 3 turns, (2-4) 4 turns
+A items: (3+) This turn (available for immediate repairs), (4-5) Next turn, (2-3) 2 Turns
+B items: (4+) This turn, (4-5) next turn, (2-3) 2 Turns
+C items: (5+) This turn, (5-6) next turn, (3-4) 2 Turns, (2) 3 turns
+D items: (7+) This turn,  (6-7) next turn, (4-5) 2 turns, (2-3) 3 turns
+E items: (9+) this turn, (7-9) next turn, (5-6) 2 turns, (3-4) 3 turns, (2) 4 turns
+F items: (10+) this turn, (9-10) next turn, (7-8) 2 turns, (5-6) 3 turns, (2-4) 4 turns
 
 For delivery time, an optional rule can be included to add a mod to the delivery roll. Certain planets may be easier to acquire items from locally, while others might be complete backwater peripherey planets making it more difficult.
 

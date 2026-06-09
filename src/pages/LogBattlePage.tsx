@@ -1463,6 +1463,15 @@ function sanitizeDamageDraft(
 
 function calculateRepairComplexity(forceUnit: ForceUnit, draft: UnitDamageDraft): "Simple" | "Intermediate" | "Difficult" | "Impossible" {
   const locations = draft.detailed?.locations ?? {};
+  const centerTorso = (forceUnit.snapshot?.locations ?? []).find((location) => {
+    const id = String(location.id ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const name = String(location.name ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return id === "ct" || id === "centertorso" || name === "centertorso";
+  });
+  const centerTorsoState = locations.ct ?? locations.centerTorso ?? (centerTorso ? locations[centerTorso.id] ?? locations[centerTorso.name] : undefined) ?? {};
+  if (centerTorsoState.destroyed || centerTorsoState.missing || (centerTorso && Number(centerTorsoState.structureDamage ?? 0) >= Number(centerTorso.structure ?? Infinity))) {
+    return "Impossible";
+  }
   let limbReplacements = 0;
   const grades: string[] = [];
   for (const location of forceUnit.snapshot?.locations ?? []) {

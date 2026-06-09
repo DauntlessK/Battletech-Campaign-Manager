@@ -550,12 +550,55 @@ function evaluatePartCost(cost: any, unit: any, itemName: string): number {
 }
 
 
-function locationReplacementCost(location: any, unit: any): number {
-  const direct = Number(location?.replacementCostCBills ?? location?.costCBills ?? location?.replacementCost ?? 0);
-  if (Number.isFinite(direct) && direct > 0) return Math.round(direct);
-  const formula = location?.cost ?? location?.costFormula ?? location?.replacementCostFormula;
-  if (formula) return evaluatePartCost(formula, unit, location?.name ?? "Location");
-  return 0;
+function locationReplacementCost(location: any, unit: any): number | undefined {
+  const candidates = [
+    location?.replacementCostCBills,
+    location?.costCBills,
+    location?.replacementCost,
+    location?.cost,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "number" || typeof candidate === "string") {
+      const direct = Number(candidate);
+      if (Number.isFinite(direct) && direct > 0) return Math.round(direct);
+    }
+
+    if (candidate && typeof candidate === "object") {
+      // Newly generated location records normally use
+      // cost: { type: "fixed", amount: <resolved unit-specific cost> }.
+      const calculated = evaluatePartCost(candidate, unit, location?.name ?? "Location");
+      if (calculated > 0) return calculated;
+
+      const amount = Number(candidate.amount ?? candidate.value);
+      if (Number.isFinite(amount) && amount > 0) return Math.round(amount);
+    }
+  }
+
+  const legacyFormula = location?.costFormula ?? location?.replacementCostFormula;
+  if (legacyFormula) {
+    const calculated = evaluatePartCost(legacyFormula, unit, location?.name ?? "Location");
+    if (calculated > 0) return calculated;
+  }
+
+  return undefined;
+}
+
+function locationAvailabilityRating(location: any, era?: string): string {
+  const direct = location?.availabilityRating ?? location?.availability;
+  if (typeof direct === "string" && direct.trim()) return direct.trim();
+  if (direct && typeof direct === "object") return eraAvailability({ availability: direct, techRating: location?.techRating }, era);
+  return String(location?.techRating ?? "C");
+}
+
+function isCenterTorsoDestroyed(locations: Record<string, any>, definitionLocations: any[]): boolean {
+  const centerTorso = definitionLocations.find((location: any) => {
+    const id = String(location?.id ?? location?.key ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const name = String(location?.name ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return id === "ct" || id === "centertorso" || name === "centertorso";
+  });
+  const state = locations.ct ?? locations.centerTorso ?? locations[centerTorso?.id] ?? locations[centerTorso?.name] ?? {};
+  return Boolean(state?.destroyed || state?.missing) || (centerTorso && Number(state?.structureDamage ?? 0) >= Number(centerTorso.structure ?? centerTorso.internal ?? Infinity));
 }
 
 function isIncludedLocationSystem(itemName: string, locationName: string): boolean {
@@ -620,13 +663,15 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
 
   const now = new Date().toISOString();
   const damageId = crypto.randomUUID();
+  const preliminaryCenterTorsoState = locations.ct ?? locations.centerTorso ?? locations["Center Torso"] ?? {};
+  const centerTorsoDestroyed = Boolean(preliminaryCenterTorsoState?.destroyed || preliminaryCenterTorsoState?.missing);
   store.unitDamage.push({
     id: damageId,
     campaignId: battle.campaignId,
     forceId: forceUnit.forceId,
     forceUnitId: forceUnit.id,
     status: overlay.status ?? forceUnit.status,
-    repairComplexity: overlay.repairComplexity,
+    repairComplexity: centerTorsoDestroyed ? "Impossible" : overlay.repairComplexity,
     armorDamageTotal: Number(summary.armor ?? 0),
     rearArmorDamageTotal: Object.values(locations).reduce((sum: number, entry: any) => sum + Number(entry?.rearArmorDamage ?? 0), 0),
     structureDamageTotal: Number(summary.internal ?? 0),
@@ -678,17 +723,24 @@ async function persistCurrentDamageForUnit(store: any, forceUnit: any, battle: B
     if (armorPoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Armor", locationId: location.id, itemId: armorDefinition?.id, itemName: `${location.name} armor`, quantity: armorPoints, action: "Repair", techRating: armorDefinition?.techRating ?? "C", availabilityRating: eraAvailability(armorDefinition, era), replacementCostCBills: Math.round(fullArmorCost * armorPoints / totalArmorPoints) });
     if (structurePoints > 0) addRepairOrder(store, { campaignId: battle.campaignId, forceId: forceUnit.forceId, forceUnitId: forceUnit.id, unitDamageId: damageId, category: "Internal Structure", locationId: location.id, itemId: structureDefinition?.id, itemName: `${location.name} internal structure`, quantity: structurePoints, action: "Repair", techRating: structureDefinition?.techRating ?? "C", availabilityRating: eraAvailability(structureDefinition, era), replacementCostCBills: Math.round(fullStructureCost * structurePoints / totalStructurePoints) });
     if ((entry.missing || entry.destroyed) && /head|torso|arm|leg/i.test(location.name)) {
+      const assemblyCost = locationReplacementCost(location, unitDefinition ?? forceUnit.snapshot);
       addRepairOrder(store, {
         campaignId: battle.campaignId,
         forceId: forceUnit.forceId,
         forceUnitId: forceUnit.id,
         unitDamageId: damageId,
-        category: "Limb",
+        category: "Location Assembly",
         locationId: location.id,
+        itemId: location.id,
         itemName: `${location.name} assembly`,
         quantity: 1,
         action: "Replace",
-        replacementCostCBills: locationReplacementCost(location, unitDefinition ?? forceUnit.snapshot),
+        techRating: String(location.techRating ?? "C"),
+        availabilityRating: locationAvailabilityRating(location, era),
+        replacementCostCBills: assemblyCost,
+        costUnavailableReason: assemblyCost == null
+          ? "No resolved location cost was found in the unit-detail record. Regenerate this unit's details with location cost metadata."
+          : undefined,
         requisitionStatus: "Needs Order",
       });
     }

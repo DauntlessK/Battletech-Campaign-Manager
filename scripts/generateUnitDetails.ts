@@ -64,6 +64,9 @@ type DetailLocation = {
   rearArmor?: number;
   slotCapacity: number;
   slots: DetailLocationSlot[];
+  techRating?: string;
+  availability?: AvailabilityByEra;
+  cost?: { type: "fixed"; amount: number };
 };
 
 type DetailWeapon = {
@@ -105,6 +108,7 @@ type MekLocationKey =
   | "rightArm"
   | "leftLeg"
   | "rightLeg"
+  | "centerLeg"
   | "frontLeftLeg"
   | "frontRightLeg"
   | "rearLeftLeg"
@@ -130,6 +134,7 @@ const LOCATION_DEFS: LocationDefinition[] = [
   { key: "rightArm", mtfName: "Right Arm", armorKeys: ["RA armor", "Right Arm armor"] },
   { key: "leftLeg", mtfName: "Left Leg", armorKeys: ["LL armor", "Left Leg armor"] },
   { key: "rightLeg", mtfName: "Right Leg", armorKeys: ["RL armor", "Right Leg armor"] },
+  { key: "centerLeg", mtfName: "Center Leg", armorKeys: ["CL armor", "Center Leg armor"] },
   { key: "frontLeftLeg", mtfName: "Front Left Leg", armorKeys: ["FLL armor", "Front Left Leg armor"] },
   { key: "frontRightLeg", mtfName: "Front Right Leg", armorKeys: ["FRL armor", "Front Right Leg armor"] },
   { key: "rearLeftLeg", mtfName: "Rear Left Leg", armorKeys: ["RLL armor", "Rear Left Leg armor"] },
@@ -264,6 +269,7 @@ function getLocationStructurePoints(locationKey: MekLocationKey, unitMass: numbe
       return structure.arm;
     case "leftLeg":
     case "rightLeg":
+    case "centerLeg":
     case "frontLeftLeg":
     case "frontRightLeg":
     case "rearLeftLeg":
@@ -297,6 +303,92 @@ function trimSlotsToPhysicalCapacity(locationKey: MekLocationKey, slots: string[
   return slots.slice(0, getLocationSlotCapacity(locationKey));
 }
 
+
+function getLocationComponentDetails(
+  locationKey: MekLocationKey,
+  keyValues: MtfKeyValue[],
+  unitTechBase: string,
+  unitMass: number
+): Pick<DetailLocation, "techRating" | "availability" | "cost"> {
+  const component = resolveLocationComponent(locationKey, keyValues, unitTechBase);
+  if (!component) return {};
+
+  return {
+    ...(component.techRating ? { techRating: String(component.techRating) } : {}),
+    ...(component.availability ? { availability: normalizeAvailability(component.availability) } : {}),
+    cost: { type: "fixed", amount: calculateLocationComponentCost(component, unitMass) },
+  };
+}
+
+function resolveLocationComponent(
+  locationKey: MekLocationKey,
+  keyValues: MtfKeyValue[],
+  unitTechBase: string
+): ComponentDefinition | null {
+  const baseId = getLocationComponentBaseId(locationKey);
+  if (!baseId) return null;
+
+  const structureSuffix = getLocationStructureSuffix(keyValues, unitTechBase);
+  const tsmSuffix = hasTripleStrengthMyomer(keyValues) ? "Tsm" : "";
+  const candidateIds = [
+    `${baseId}${structureSuffix}${tsmSuffix}`,
+    `${baseId}${structureSuffix}`,
+    `${baseId}${tsmSuffix}`,
+    baseId,
+  ];
+
+  for (const id of candidateIds) {
+    const component = (COMPONENTS as Record<string, ComponentDefinition>)[id];
+    if (component) return component;
+  }
+
+  return null;
+}
+
+function getLocationComponentBaseId(locationKey: MekLocationKey): string {
+  const map: Record<MekLocationKey, string> = {
+    head: "mekHead",
+    centerTorso: "mekCenterTorso",
+    leftTorso: "mekLeftTorso",
+    rightTorso: "mekRightTorso",
+    leftArm: "mekLeftArm",
+    rightArm: "mekRightArm",
+    leftLeg: "mekLeftLeg",
+    rightLeg: "mekRightLeg",
+    centerLeg: "mekCenterLeg",
+    frontLeftLeg: "mekFrontLeftLeg",
+    frontRightLeg: "mekFrontRightLeg",
+    rearLeftLeg: "mekRearLeftLeg",
+    rearRightLeg: "mekRearRightLeg",
+  };
+
+  return map[locationKey];
+}
+
+function getLocationStructureSuffix(keyValues: MtfKeyValue[], unitTechBase: string): string {
+  const structure = normalizeLookupText(getFieldValue(keyValues, "structure", "internal structure", "internalStructure"));
+  const techBase = normalizeTechBase(unitTechBase);
+
+  if (structure.includes("industrial")) return "Industrial";
+  if (structure.includes("prototype") && structure.includes("endo")) return "EndoSteelPrototype";
+  if (structure.includes("endo")) return techBase === "Clan" ? "ClanEndoSteel" : "IsEndoSteel";
+
+  return "";
+}
+
+function hasTripleStrengthMyomer(keyValues: MtfKeyValue[]): boolean {
+  const myomer = normalizeLookupText(getFieldValue(keyValues, "myomer", "musculature"));
+  return myomer.includes("triplestrength") || myomer === "tsm" || myomer.includes("tsm");
+}
+
+function calculateLocationComponentCost(component: ComponentDefinition, unitMass: number): number {
+  const cost = component.cost;
+  if (!cost) return 0;
+  if (cost.type === "fixed") return Number(cost.amount ?? 0);
+  if (cost.type === "unitTonnage") return Number(cost.multiplier ?? 0) * unitMass;
+  return 0;
+}
+
 function buildLocations(
   lines: string[],
   keyValues: MtfKeyValue[],
@@ -311,9 +403,11 @@ function buildLocations(
   const slotSections = parseLocationSlotSections(lines);
   const config = getFieldValue(keyValues, "config");
   const isQuad = isQuadMekConfig(config, slotSections);
+  const isTripod = normalizeLookupText(config).includes("tripod") || slotSections.has("centerLeg");
   const result: Partial<Record<MekLocationKey, DetailLocation>> = {};
 
   for (const definition of getApplicableLocationDefs(isQuad)) {
+    if (definition.key === "centerLeg" && !isTripod) continue;
     const rawSlots = trimSlotsToPhysicalCapacity(definition.key, slotSections.get(definition.key) ?? []);
     const location: DetailLocation = {
       key: definition.key,
@@ -324,6 +418,7 @@ function buildLocations(
       slots: rawSlots.map((slot, index) =>
         buildLocationSlot(slot, index + 1, techBase, embedDefinitions, unitName, definition.mtfName, warnings, weaponSlotRefMap, weapons)
       ),
+      ...getLocationComponentDetails(definition.key, keyValues, techBase, unitMass),
     };
 
     if (locationSupportsRearArmor(definition.key)) {
@@ -837,6 +932,8 @@ function normalizeLocationHeader(line: string): MekLocationKey | null {
     ll: "leftLeg",
     "right leg": "rightLeg",
     rl: "rightLeg",
+    "center leg": "centerLeg",
+    cl: "centerLeg",
     "front left leg": "frontLeftLeg",
     fll: "frontLeftLeg",
     "front right leg": "frontRightLeg",
