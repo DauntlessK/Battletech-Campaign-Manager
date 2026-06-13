@@ -40,7 +40,7 @@ export default function Header({
           {navItems
             .filter((item) => item.key !== "myAccount" || authUser)
             .map((item) => (
-              <NavButton key={item.key} active={activePage === item.key} onClick={() => onNavigate(item.key)} label={item.label} icon={item.icon} />
+              <NavButton key={item.key} active={isNavActive(activePage, item.key)} onClick={() => onNavigate(item.key)} label={item.label} icon={item.icon} />
             ))}
         </nav>
 
@@ -95,6 +95,11 @@ export default function Header({
   );
 }
 
+function isNavActive(activePage: PageKey, itemKey: PageKey) {
+  if (itemKey === "guide") return activePage === "guide" || activePage.startsWith("guide");
+  return activePage === itemKey;
+}
+
 function NavButton({ active, onClick, label, icon }: { active: boolean; onClick: () => void; label: string; icon: React.ReactNode }) {
   return (
     <button
@@ -127,7 +132,7 @@ function MobileMenu({ activePage, authUser, onNavigate, onClose }: { activePage:
               <button
                 key={item.key}
                 onClick={() => onNavigate(item.key)}
-                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${activePage === item.key ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${isNavActive(activePage, item.key) ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
               >
                 {item.icon}
                 <span className="font-medium">{item.label}</span>

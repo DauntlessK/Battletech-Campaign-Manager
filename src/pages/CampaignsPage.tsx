@@ -79,6 +79,38 @@ const REPAIR_PRIORITY_DETAILS = [
       "Uses general repairs while increasing emphasis on acquiring parts or salvage. Less total time may be devoted to direct repair work.",
   },
 ];
+
+
+type CampaignPhase = "Main" | "Battle" | "Repairs & Reqs";
+
+const CAMPAIGN_PHASES: Array<{
+  id: CampaignPhase;
+  label: string;
+  shortLabel: string;
+  description: string;
+}> = [
+  {
+    id: "Main",
+    label: "Main",
+    shortLabel: "MAIN",
+    description:
+      "Start-of-turn administration: set up units, review force status, buy or sell where allowed, salvage, assign priorities, and prepare for the next battle.",
+  },
+  {
+    id: "Battle",
+    label: "Battle",
+    shortLabel: "BATTLE",
+    description:
+      "Play and report battles. Matching player logs make the battle official and generate damage, repair orders, objective control changes, and turn progress.",
+  },
+  {
+    id: "Repairs & Reqs",
+    label: "Repairs & Reqs",
+    shortLabel: "REPAIRS & REQS",
+    description:
+      "Between-turn technical work: repairs, rearming, stock checks, requisitions, delivery queues, and other maintenance are resolved here.",
+  },
+];
 const ACTIVE_STATUSES = new Set(["Setup", "Active", "Paused"]);
 const ERA_YEAR_RANGES: Record<string, { min: number; max: number }> = {
   "Star League": { min: 2571, max: 2780 },
@@ -3800,6 +3832,9 @@ function ActiveCampaignDashboard({
   const maxTurnsAhead = Math.max(0, Number(settings?.maxTurnsAhead ?? settings?.maxTurns ?? 0));
   const turnsAhead = Math.max(0, playerTurn - campaignTurn);
   const isAtTurnLimit = maxTurnsAhead > 0 && turnsAhead >= maxTurnsAhead;
+  const currentPhase = normalizeCampaignPhase(
+    (settings as any)?.currentPhase ?? (settings as any)?.turnPhase,
+  );
 
   return (
     <section className="space-y-5">
@@ -3930,6 +3965,8 @@ function ActiveCampaignDashboard({
             </ActionSquareButton>
           </div>
         </div>
+
+        {!isChaos && <CampaignPhaseBar currentPhase={currentPhase} />}
 
         {isCampaignOwner && !settings?.fluff && (
           <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/40 p-4 text-sm text-zinc-300">
@@ -5313,6 +5350,63 @@ function MiniFact({ label, value }: { label: string; value: string }) {
       </div>
       <div className="mt-1 min-h-[1.25rem] truncate text-sm font-semibold leading-5 text-zinc-200" title={value}>
         {value}
+      </div>
+    </div>
+  );
+}
+
+function normalizeCampaignPhase(value: unknown): CampaignPhase {
+  if (value === "Battle") return "Battle";
+  if (value === "Repairs & Reqs" || value === "Repairs" || value === "Repair")
+    return "Repairs & Reqs";
+  return "Main";
+}
+
+function CampaignPhaseBar({ currentPhase }: { currentPhase: CampaignPhase }) {
+  return (
+    <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-950/45 p-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
+          Turn Phase
+        </div>
+        <div className="text-xs font-semibold text-zinc-500">
+          Hover a phase for what happens there
+        </div>
+      </div>
+      <div className="grid gap-2 md:grid-cols-3">
+        {CAMPAIGN_PHASES.map((phase, index) => {
+          const active = phase.id === currentPhase;
+          return (
+            <div
+              key={phase.id}
+              title={phase.description}
+              className={`group relative rounded-xl border px-3 py-2 transition ${
+                active
+                  ? "border-lime-400/60 bg-lime-400/15 text-lime-100"
+                  : "border-zinc-800 bg-zinc-900/70 text-zinc-300 hover:border-lime-400/40"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-black ${
+                    active
+                      ? "bg-lime-400 text-zinc-950"
+                      : "border border-zinc-700 text-zinc-500"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <span className="text-xs font-black uppercase tracking-[0.14em]">
+                  {phase.shortLabel}
+                </span>
+              </div>
+              <div className="pointer-events-none absolute left-0 top-[calc(100%+0.5rem)] z-30 hidden w-72 rounded-xl border border-zinc-700 bg-zinc-950 p-3 text-xs leading-5 text-zinc-300 shadow-2xl group-hover:block">
+                <div className="mb-1 font-black text-zinc-100">{phase.label}</div>
+                {phase.description}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

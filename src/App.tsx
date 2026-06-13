@@ -11,6 +11,13 @@ import CampaignsPage from "./pages/CampaignsPage";
 import ForcesPage from "./pages/ForcesPage";
 import BattlesPage from "./pages/BattlesPage";
 import UnitsPage from "./pages/UnitsPage";
+import {
+  AdvancedGuidePage,
+  ChaosGuidePage,
+  ConquestGuidePage,
+  GuideHomePage,
+  WhichCampaignGuidePage,
+} from "./pages/GuidePage";
 import { navItems, aboutChildren } from "./constants/appOptions";
 import { normalizeCatalogUnit } from "./utils/unitNormalization";
 import type {
@@ -1116,8 +1123,18 @@ export default function App() {
         {activePage === "about" && <AboutPage onNavigate={navigate} />}
         {activePage === "faq" && <FaqPage />}
         {activePage === "campaignTypes" && <CampaignTypesPage />}
-        {activePage === "guide" && (
-          <PlaceholderPage title="Guide" eyebrow="How to play" />
+        {activePage === "guide" && <GuideHomePage onNavigate={navigate} />}
+        {activePage === "guideWhichCampaign" && (
+          <WhichCampaignGuidePage onNavigate={navigate} />
+        )}
+        {activePage === "guideChaosCampaign" && (
+          <ChaosGuidePage onNavigate={navigate} />
+        )}
+        {activePage === "guideAdvancedCampaign" && (
+          <AdvancedGuidePage onNavigate={navigate} />
+        )}
+        {activePage === "guideConquestCampaign" && (
+          <ConquestGuidePage onNavigate={navigate} />
         )}
         {activePage === "units" && (
           <>
@@ -1482,6 +1499,11 @@ export default function App() {
   );
 }
 
+function isNavActive(activePage: PageKey, itemKey: PageKey) {
+  if (itemKey === "guide") return activePage === "guide" || activePage.startsWith("guide");
+  return activePage === itemKey;
+}
+
 function MobileMenu({
   activePage,
   authUser,
@@ -1512,7 +1534,7 @@ function MobileMenu({
               <button
                 key={item.key}
                 onClick={() => onNavigate(item.key)}
-                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${activePage === item.key ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm transition ${isNavActive(activePage, item.key) ? "bg-lime-400 text-zinc-950" : "text-zinc-300 hover:bg-zinc-900"}`}
               >
                 {item.icon}
                 <span className="font-medium">{item.label}</span>
